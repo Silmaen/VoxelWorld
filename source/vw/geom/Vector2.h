@@ -103,6 +103,26 @@ public:
    * @return data
    */
   const DataType &operator[](uint8_t idx) const { return idx == 0 ? X : Y; }
+  /**
+   * @brief Data access
+   * @return data
+   */
+  DataType &x() { return X; }
+  /**
+   * @brief Data access
+   * @return data
+   */
+  const DataType &x() const { return X; }
+  /**
+   * @brief Data access
+   * @return data
+   */
+  DataType &y() { return Y; }
+  /**
+   * @brief Data access
+   * @return data
+   */
+  const DataType &y() const { return Y; }
 
   /**
    * @brief Addition operator
@@ -177,6 +197,15 @@ public:
     Vector2 res{*this};
     res *= other;
     return res;
+  }
+  /**
+   * @brief Product operator
+   * @param other Scalar to multiply
+   * @param vec Vector to multiply
+   * @return Result vector
+   */
+  friend Vector2 operator*(const DataType &other, const Vector2 &vec) {
+    return vec * other;
   }
   /**
    * @brief Division operator
@@ -273,7 +302,7 @@ private:
  */
 template <class DataType>
 inline void to_json(nlohmann::json &jso, const Vector2<DataType> &vect) {
-  jso = nlohmann::json{vect[0], vect[1]};
+  jso = nlohmann::json{vect.x(), vect.y()};
 }
 /**
  * @brief Deserialize this object from json
@@ -282,8 +311,8 @@ inline void to_json(nlohmann::json &jso, const Vector2<DataType> &vect) {
  */
 template <class DataType>
 inline void from_json(const nlohmann::json &jso, Vector2<DataType> &vect) {
-  vect[0] = jso.at(0);
-  vect[1] = jso.at(1);
+  vect.x() = jso.at(0);
+  vect.y() = jso.at(1);
 }
 
 /// Shortcut for a vector of float

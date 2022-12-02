@@ -10,41 +10,35 @@ file(GLOB_RECURSE HDRS
 add_library(${CMAKE_PROJECT_NAME}_lib
         STATIC
         ${SRCS} ${HDRS})
-target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC rc)
+target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC vw)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC ${CMAKE_PROJECT_NAME}_Base)
 
 # ----==== third party ====----
 # OpenGL
 find_package(OpenGL REQUIRED)
-message(STATUS "Found OpenGL in ${OPENGL_INCLUDE_DIR}")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE ${OPENGL_LIBRARIES})
-message(STATUS "OpenGL Libraries: ${OPENGL_LIBRARIES}")
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE OpenGL::GL)
 
 # GLUT
 find_package(GLUT REQUIRED)
-message(STATUS "Found Glut version ${GLUT_VERSION_STRING} in ${GLUT_INCLUDE_DIR}")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE ${GLUT_LIBRARIES})
-message(STATUS "freeglut Libraries: ${GLUT_LIBRARY}")
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE GLUT::GLUT)
 
 # json
 find_package(nlohmann_json 3.11.1 REQUIRED)
-message(STATUS "Found nlohmann")
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE nlohmann_json::nlohmann_json)
 # header-only
 
 #fmt
 find_package(fmt 8 REQUIRED)
-message(STATUS "Found fmt")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC fmt)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC fmt::fmt-header-only)
 
 #spdlog
 find_package(spdlog REQUIRED)
-message(STATUS "Found spdlog")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC spdlog)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC spdlog::spdlog_header_only)
 target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PUBLIC SPDLOG_FMT_EXTERNAL)
 
 # magic_enum
-target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${MAGIC_ENUM_INCLUDE_DIR})
-message(STATUS "Found magic_enum in ${MAGIC_ENUM_INCLUDE_DIR}")
-# header-only
+find_package(MagicEnum REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC MagicEnum)
 #
 #  Main Executable
 #

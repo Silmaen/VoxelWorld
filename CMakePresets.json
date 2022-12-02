@@ -35,7 +35,8 @@
       "name": "mingw-gcc-debug",
       "inherits": "mingw-gcc-release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VW_COVERAGE": "ON"
       }
     },
     {
@@ -68,7 +69,8 @@
       "name": "wsl-gcc-debug",
       "inherits": "wsl-gcc-release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VW_COVERAGE": "ON"
       }
     },
     {

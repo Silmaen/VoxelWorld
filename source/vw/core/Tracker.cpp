@@ -32,7 +32,7 @@ void operator delete(void *memory, size_t size) {
  * @brief Overload of standard memory deallocation
  * @param memory Memory to free
  */
-void operator delete(void *memory) { free(memory); }
+void operator delete(void *memory) { free(memory); }//---UNCOVER---
 
 namespace vw::core {
 

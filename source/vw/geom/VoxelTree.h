@@ -7,6 +7,8 @@
  */
 
 #pragma once
+#include "VoxelTreeNode.h"
+
 
 namespace vw::geom {
 
@@ -41,7 +43,35 @@ public:
    * @brief Destructor.
    */
   virtual ~VoxelTree() = default; //---UNCOVER---
+
+  void constructMap(uint8_t depth);
+
+  void clearMap();
+
+  [[nodiscard]] uint8_t getDepth()const{
+    return depth;
+  }
+
+  enum class checkTreeResult {
+    Good,
+    IncompleteLevel,
+    DepthTooLow,
+    DepthTooHigh,
+    OrphanNodes,
+    BadNodeLink
+  };
+  [[nodiscard]] checkTreeResult checkTree()const;
 private:
+
+  void compactNodes();
+
+  [[nodiscard]] uint8_t computeDepth()const;
+  /// Current tree depth
+  uint8_t depth = 0;
+  /// Root node
+  VoxelTreeNode::pNode rootNode = nullptr;
+  /// Node pool
+  std::vector<VoxelTreeNode::pNode> nodePool;
 };
 
 } // namespace vw::geom
