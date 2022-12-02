@@ -2,21 +2,17 @@
 #
 #
 cmake_minimum_required(VERSION 3.22)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/external/cmake" "${CMAKE_MODULE_PATH}")
 #
 # ---=== GENERALITIES ===---
 #
 project(VoxelWorld VERSION 0.0.1 LANGUAGES CXX)
-set(PRJPREFIX EVL)
-set(PRJPREFIX_LOWER evl)
-set(${PRJPREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
-set(CMAKE_INSTALL_PREFIX ${PROJECT_BUILD_DIR}/Install)
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_VERBOSE_MAKEFILE off)
+set(PRJPREFIX VW)
+set(PRJPREFIX_LOWER vw)
 #
 # ---=== Base Configs ===---
 #
-include(cmake/BaseConfig.cmake)
+include(BaseConfig)
 #
 # ---=== Dependencies ===---
 #
@@ -30,5 +26,8 @@ add_subdirectory(source)
 #
 # ---=== TESTING PROCEDURES ===---
 #
-enable_testing()
-add_subdirectory(test)
+option(${PRJPREFIX}_TESTING "Enable the unit tests" ON)
+if (${PRJPREFIX}_TESTING)
+    enable_testing()
+    add_subdirectory(test)
+endif ()

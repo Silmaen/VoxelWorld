@@ -22,7 +22,7 @@ public:
   using SizeType = uint16_t;
   /// Voxel size's type
   using CoordType = int16_t;
-  /// definition of the voxels coordinates
+  /// Definition of the voxels coordinates
   using Coord = Vector3<CoordType> ;
   /**
    * @brief Default copy constructor
