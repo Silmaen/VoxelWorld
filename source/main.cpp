@@ -6,6 +6,10 @@
  * All modification must get authorization from the author.
  */
 
-int main(int argc, char* argv[]){
-  return 0;
+#include "core/EngineGLFW.h"
+#include <memory>
+
+int main() {
+  auto engine = std::make_shared<vw::core::EngineGLFW>();
+  return engine->run();
 }

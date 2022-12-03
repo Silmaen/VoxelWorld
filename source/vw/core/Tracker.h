@@ -9,9 +9,18 @@
 #pragma once
 #include <cstdint>
 
+/**
+ * @namespace vw
+ * @brief Base namespace for the project
+ */
+/**
+ * @brief namespace for core functions
+ */
 namespace vw::core {
 /**
  * @brief Class Tracker
+ *
+ * A very simple memory allocation tracker
  */
 class Tracker {
 public:
