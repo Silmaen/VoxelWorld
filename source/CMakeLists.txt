@@ -18,9 +18,13 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC ${CMAKE_PROJECT_NAME}_Bas
 find_package(OpenGL REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE OpenGL::GL)
 
-# GLUT
-find_package(GLUT REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE GLUT::GLUT)
+find_package(GLEW REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE GLEW::glew_s)
+
+#find_package(glad REQUIRED)
+find_package(glfw3 REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glfw)
+
 
 # json
 find_package(nlohmann_json 3.11.1 REQUIRED)

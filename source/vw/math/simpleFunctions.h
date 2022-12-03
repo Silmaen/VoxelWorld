@@ -1,5 +1,5 @@
 /**
- * @file functions.h
+ * @file simpleFunctions.h
  * @author Silmaen
  * @date 05/08/2022
  * Copyright © 2022 All rights reserved.
@@ -7,10 +7,14 @@
  */
 
 #pragma once
-#include <algorithm>
 #include <cstdint>
+#include <utility>
 
+/**
+ * @brief Namespace for mathematical functions
+ */
 namespace vw::math {
+
 /**
  * @brief Simple clamp function with no checks
  * @tparam data Data's type to clamp (must be order-able)
@@ -19,9 +23,11 @@ namespace vw::math {
  * @param maxValue max value
  * @return Clamped value
  */
-template<typename data>
-constexpr data clamp(const data& input, const data& minValue, const data& maxValue) { return input < minValue ? minValue : input > maxValue ? maxValue :
-                                                                                                                                              input; }
+template <typename data>
+constexpr data clamp(const data &input, const data &minValue,
+                     const data &maxValue) {
+  return input < minValue ? minValue : input > maxValue ? maxValue : input;
+}
 
 /**
  * @brief Clamp function with mix/max ordering
@@ -31,11 +37,11 @@ constexpr data clamp(const data& input, const data& minValue, const data& maxVal
  * @param maxValue max value
  * @return Clamped value
  */
-template<typename data>
-constexpr data clampSafe(const data& input, data minValue, data maxValue) {
-    if (maxValue < minValue) std::swap(minValue, maxValue);
-    return input < minValue ? minValue : input > maxValue ? maxValue :
-                                                            input;
+template <typename data>
+constexpr data clampSafe(const data &input, data minValue, data maxValue) {
+  if (maxValue < minValue)
+    std::swap(minValue, maxValue);
+  return input < minValue ? minValue : input > maxValue ? maxValue : input;
 }
 
 /**
@@ -44,9 +50,8 @@ constexpr data clampSafe(const data& input, data minValue, data maxValue) {
  * @param input Value to check
  * @return 1 if input positive, else return 0
  */
-template<typename data>
-constexpr data heaviside(const data& input) {
-    return input > 0 ? data{1} : data{};
+template <typename data> constexpr data heaviside(const data &input) {
+  return input > 0 ? data{1} : data{};
 }
 
 /**
@@ -55,9 +60,8 @@ constexpr data heaviside(const data& input) {
  * @param input Value to check
  * @return 0 if input is 0 1 if input positive, else return -1
  */
-template<typename data>
-constexpr data sign(const data& input) {
-    return input > 0 ? data{1} : (input < 0 ? data{-1} : 0);
+template <typename data> constexpr data sign(const data &input) {
+  return input > 0 ? data{1} : (input < 0 ? data{-1} : 0);
 }
 
-}// namespace rc::math
+} // namespace vw::math
