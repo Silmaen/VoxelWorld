@@ -10,6 +10,6 @@
 #include <memory>
 
 int main() {
-  auto engine = std::make_shared<vw::core::EngineGLFW>();
+  auto engine = std::make_shared<owl::core::EngineGLFW>();
   return engine->run();
 }

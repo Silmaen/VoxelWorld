@@ -6,9 +6,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURC
 #
 # ---=== GENERALITIES ===---
 #
-project(VoxelWorld VERSION 0.0.1 LANGUAGES CXX)
-set(PRJPREFIX VW)
-set(PRJPREFIX_LOWER vw)
+project(Owl VERSION 0.0.1 LANGUAGES CXX)
+set(PRJPREFIX OWL)
+set(PRJPREFIX_LOWER owl)
 #
 # ---=== Base Configs ===---
 #

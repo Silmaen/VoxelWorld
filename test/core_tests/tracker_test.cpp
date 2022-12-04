@@ -2,7 +2,7 @@
 #include "core/Tracker.h"
 #include "testHelper.h"
 
-using namespace vw::core;
+using namespace owl::core;
 
 TEST(Tracker, base){
   auto& track = Tracker::get();

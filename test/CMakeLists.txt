@@ -33,7 +33,7 @@ if (${PRJPREFIX}_COVERAGE)
 
     set(COVERAGE_RESULT_DIR ${CMAKE_BINARY_DIR}/Coverage)
     file(MAKE_DIRECTORY ${COVERAGE_RESULT_DIR})
-    set(COVERAGE_TITLE "Voxel World: tests coverage")
+    set(COVERAGE_TITLE "Owl: tests coverage")
     set(COVERAGE_HTML --html --html-details --html-details-syntax-highlighting --html-title ${COVERAGE_TITLE} --source-encoding utf-8)
     set(COVERAGE_FILTER -e".*external/.*" -e".*test/.*" -e".*WorldEditor.*" -e".*autogen.*" -e".*main\.cpp")
     set(COVERAGE_OPTION -buds -j 4 --exclude-throw-branches --exclude-unreachable-branches --exclude-lines-by-pattern ".*---UNCOVER---.*")

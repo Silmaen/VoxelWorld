@@ -2,15 +2,15 @@
 # base library
 #
 file(GLOB_RECURSE SRCS
-        vw/*.cpp
+        owl/*.cpp
         )
 file(GLOB_RECURSE HDRS
-        vw/*.h
+        owl/*.h
         )
 add_library(${CMAKE_PROJECT_NAME}_lib
         STATIC
         ${SRCS} ${HDRS})
-target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC vw)
+target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC owl)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC ${CMAKE_PROJECT_NAME}_Base)
 
 # ----==== third party ====----
@@ -19,12 +19,15 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE OpenGL::GL)
 
 find_package(GLEW REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE GLEW::glew_s)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE GLEW::glew)
 
 #find_package(glad REQUIRED)
 find_package(glfw3 REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glfw)
 
+#debugbreak
+find_package(debugbreak 8 REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC DebugBreak)
 
 # json
 find_package(nlohmann_json 3.11.1 REQUIRED)

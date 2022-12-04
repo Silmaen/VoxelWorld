@@ -12,7 +12,7 @@
 
 class GLFWwindow;
 
-namespace vw::core {
+namespace owl::core {
 
 /**
  * @brief Class EngineGLFW
@@ -26,14 +26,14 @@ public:
   /**
    * @brief Default constructor.
    */
-  EngineGLFW() = default;
+  EngineGLFW();
   /**
    * @brief Destructor.
    */
   virtual ~EngineGLFW() = default; //---UNCOVER---
 
   /**
-   * @brief Main entry point of the the game engine
+   * @brief Main entry point of the game engine
    * @return Exec Return code
    */
   int run();
@@ -44,8 +44,8 @@ public:
    */
   enum class Status {
     Idle,    /// Waiting fo orders
-    Started, /// Currently running
-    Looping, /// during main loop
+    Started, /// Ready to loop
+    Looping, /// During main loop
     Ending,  /// after looping
   };
   [[nodiscard]] const Status &getStatus() const { return status; }
@@ -64,4 +64,4 @@ private:
 
   void requestQuitLoop();
 };
-} // namespace vw::core
+} // namespace owl::core

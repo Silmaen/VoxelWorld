@@ -2,7 +2,7 @@
 #include "math/simpleFunctions.h"
 #include "testHelper.h"
 
-using namespace vw::math;
+using namespace owl::math;
 
 TEST(math,clamp){
   EXPECT_EQ(clamp(150,20,200),150);

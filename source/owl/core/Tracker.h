@@ -9,14 +9,16 @@
 #pragma once
 #include <cstdint>
 
+using size_t=std::size_t;
+
 /**
- * @namespace vw
+ * @namespace owl
  * @brief Base namespace for the project
  */
 /**
  * @brief namespace for core functions
  */
-namespace vw::core {
+namespace owl::core {
 /**
  * @brief Class Tracker
  *
@@ -85,4 +87,4 @@ private:
   AllocationState m_lastAllocationState;
 };
 
-} // namespace vw::core
+} // namespace owl::core

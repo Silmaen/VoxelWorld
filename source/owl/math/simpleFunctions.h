@@ -13,7 +13,7 @@
 /**
  * @brief Namespace for mathematical functions
  */
-namespace vw::math {
+namespace owl::math {
 
 /**
  * @brief Simple clamp function with no checks
@@ -64,4 +64,4 @@ template <typename data> constexpr data sign(const data &input) {
   return input > 0 ? data{1} : (input < 0 ? data{-1} : 0);
 }
 
-} // namespace vw::math
+} // namespace owl::math
