@@ -15,12 +15,14 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(${PRJPREFIX}_GNU_MINIMAL 12)
     set(${PRJPREFIX}_CLANG_MINIMAL 14)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_WINDOWS)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(EXE_EXT "")
     set(LIB_EXT ".so")
     set(${PRJPREFIX}_GNU_MINIMAL 11.2)
     set(${PRJPREFIX}_CLANG_MINIMAL 14.0)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_LINUX)
 else ()
     message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")
 endif ()
@@ -54,6 +56,8 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-used-but-marked-unused
             -Wno-exit-time-destructors
             -Wno-global-constructors
+            -Wno-reserved-macro-identifier
+            -Wno-unused-macros
     )
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")

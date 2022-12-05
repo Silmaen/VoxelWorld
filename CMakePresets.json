@@ -14,10 +14,33 @@
         "strategy": "external"
       },
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "cmake-build-${presetName}/install"
       },
       "generator": "Ninja",
-      "binaryDir": "cmake-build-${presetName}"
+      "binaryDir": "cmake-build-${presetName}",
+      "installDir": "cmake-build-${presetName}/install"
+    },
+    {
+      "name": "mingw-gcc-release-shared",
+      "inherits": "base",
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "MinGW"
+        }
+      },
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "g++",
+        "OWL_BUILD_SHARED": "ON"
+      }
+    },
+    {
+      "name": "mingw-gcc-debug-shared",
+      "inherits": "mingw-gcc-release-shared",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "OWL_COVERAGE": "ON"
+      }
     },
     {
       "name": "mingw-gcc-release",
@@ -53,6 +76,10 @@
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
+
+
+
+
     {
       "name": "wsl-gcc-release",
       "inherits": "base",

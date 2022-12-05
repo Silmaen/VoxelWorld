@@ -7,7 +7,8 @@
  */
 
 #pragma once
-#include <cstdint>
+
+#include "core/Core.h"
 
 using size_t=std::size_t;
 
@@ -18,13 +19,13 @@ using size_t=std::size_t;
 /**
  * @brief namespace for core functions
  */
-namespace owl::core {
+namespace owl::debug {
 /**
  * @brief Class Tracker
  *
  * A very simple memory allocation tracker
  */
-class Tracker {
+class OWL_API Tracker {
 public:
   Tracker(const Tracker &) = delete;
   Tracker(Tracker &&) = delete;
@@ -59,10 +60,10 @@ public:
    * @brief Result structure of allocation state
    */
   struct AllocationState {
-    size_t m_allocatedMemory = 0;   ///< Amount of allocated memory
-    size_t m_allocationCalls = 0;   ///< Amount of memory allocation calls
-    size_t m_deallocationCalls = 0; ///< Amount of deallocation calls
-    size_t m_memoryPeek = 0;        ///< Max seen amount of memory
+    size_t allocatedMemory = 0;   ///< Amount of allocated memory
+    size_t allocationCalls = 0;   ///< Amount of memory allocation calls
+    size_t deallocationCalls = 0; ///< Amount of deallocation calls
+    size_t memoryPeek = 0;        ///< Max seen amount of memory
   };
 
   /**
@@ -82,9 +83,9 @@ private:
    */
   Tracker() = default;
 
-  AllocationState m_globalAllocationState;
-  AllocationState m_currentAllocationState;
-  AllocationState m_lastAllocationState;
+  AllocationState globalAllocationState;
+  AllocationState currentAllocationState;
+  AllocationState lastAllocationState;
 };
 
 } // namespace owl::core

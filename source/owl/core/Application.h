@@ -1,0 +1,70 @@
+/**
+ * @file Application.h
+ * @author Silmaen
+ * @date 04/12/2022
+ * Copyright © 2022 All rights reserved.
+ * All modification must get authorization from the author.
+ */
+
+#pragma once
+#include "Core.h"
+#include "event/AppEvent.h"
+#include "window/Window.h"
+
+/**
+ * @brief Main entry point
+ * @param argc Number of arguments
+ * @param argv List of argument
+ * @return Error code
+ */
+int main(int argc, char* argv[]);
+
+namespace owl::core {
+
+/**
+ * @brief Class Application
+ */
+class OWL_API Application {
+public:
+  Application(const Application &) = delete;
+  Application(Application &&) = delete;
+  Application &operator=(const Application &) = delete;
+  Application &operator=(Application &&) = delete;
+  /**
+   * @brief Default constructor.
+   */
+  Application();
+  /**
+   * @brief Destructor.
+   */
+  virtual ~Application() = default;
+
+  /**
+   * @brief Runs the application
+   */
+  void run();
+  /**
+   * @brief Event Callback function
+   * @param e Event received
+   */
+  void onEvent(event::Event& e);
+private:
+  /**
+   * @brief Action on window close.
+   * @param e the close event
+   * @return True if succeeded
+   */
+  bool onWindowClosed(event::WindowCloseEvent& e);
+  /// Pointer to the window
+  uniq<window::Window> appWindow;
+  /// Running state
+  bool running = true;
+};
+
+/**
+ * @brief Create an application (Must be defined in the client)
+ * @return The application
+ */
+extern std::shared_ptr<Application> createApplication();
+
+} // namespace owl::core
