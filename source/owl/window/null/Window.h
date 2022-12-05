@@ -51,7 +51,8 @@ public:
    * @brief Define the Event Callback function
    * @param callback The new callback function
    */
-  void setEventCallback(const EventCallback &) override {}
+  void
+  setEventCallback([[maybe_unused]] const EventCallback &callback) override {}
   /**
    * @brief St the VSync
    * @param enabled Should VSync enabled
