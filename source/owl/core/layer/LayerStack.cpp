@@ -18,13 +18,15 @@ LayerStack::~LayerStack() {
   }
 }
 
-void LayerStack::pushLayer(shrd<Layer>&& layer) {
+void LayerStack::pushLayer(shrd<Layer> &&layer) {
+  layer->onAttach();
   layers.emplace(layers.begin() + layerInsertIndex, std::move(layer));
   layerInsertIndex++;
 }
 
-void LayerStack::pushOverlay(shrd<Layer>&& overlay) {
+void LayerStack::pushOverlay(shrd<Layer> &&overlay) {
   layers.emplace_back(std::move(overlay));
+  layers.back()->onAttach();
 }
 
 void LayerStack::popLayer(const shrd<Layer> &layer) {

@@ -33,14 +33,17 @@ endif()
 find_package(OpenGL REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE OpenGL::GL)
 
-find_package(GLEW REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE GLEW::glew)
+# glad
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glad)
 
-#find_package(glad REQUIRED)
+# GLFW
 find_package(glfw3 REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glfw)
 
-#debugbreak
+# ImGui
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE imgui)
+
+# debugbreak
 find_package(debugbreak 8 REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC DebugBreak)
 

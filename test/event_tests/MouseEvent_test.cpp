@@ -18,12 +18,12 @@ TEST(MouseEvent, ButtonPressed) {
   EXPECT_EQ(event.getCategoryFlags(),
             category::Input | category::Mouse | category::MouseButton);
   EXPECT_STREQ(event.toString().c_str(), "MouseButtonPressedEvent: 12");
-  EXPECT_TRUE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_FALSE(event.isinCategory(category::Application));
-  EXPECT_TRUE(event.isinCategory(category::Mouse));
-  EXPECT_TRUE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_TRUE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_FALSE(event.isInCategory(category::Application));
+  EXPECT_TRUE(event.isInCategory(category::Mouse));
+  EXPECT_TRUE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(MouseEvent, ButtonReleased) {
@@ -34,12 +34,12 @@ TEST(MouseEvent, ButtonReleased) {
   EXPECT_EQ(event.getCategoryFlags(),
             category::Input | category::Mouse | category::MouseButton);
   EXPECT_STREQ(event.toString().c_str(), "MouseButtonReleasedEvent: 12");
-  EXPECT_TRUE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_FALSE(event.isinCategory(category::Application));
-  EXPECT_TRUE(event.isinCategory(category::Mouse));
-  EXPECT_TRUE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_TRUE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_FALSE(event.isInCategory(category::Application));
+  EXPECT_TRUE(event.isInCategory(category::Mouse));
+  EXPECT_TRUE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(MouseEvent, Moved) {
@@ -51,12 +51,12 @@ TEST(MouseEvent, Moved) {
   EXPECT_EQ(event.getX(), 144);
   EXPECT_EQ(event.getY(), 155);
   EXPECT_STREQ(event.toString().c_str(), "MouseMovedEvent: 144, 155");
-  EXPECT_TRUE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_FALSE(event.isinCategory(category::Application));
-  EXPECT_TRUE(event.isinCategory(category::Mouse));
-  EXPECT_FALSE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_TRUE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_FALSE(event.isInCategory(category::Application));
+  EXPECT_TRUE(event.isInCategory(category::Mouse));
+  EXPECT_FALSE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(MouseEvent, Scrolled) {
@@ -68,10 +68,10 @@ TEST(MouseEvent, Scrolled) {
   EXPECT_EQ(event.getXOff(), 1);
   EXPECT_EQ(event.getYOff(), 1);
   EXPECT_STREQ(event.toString().c_str(), "MouseScrolledEvent: 1, 1");
-  EXPECT_TRUE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_FALSE(event.isinCategory(category::Application));
-  EXPECT_TRUE(event.isinCategory(category::Mouse));
-  EXPECT_FALSE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_TRUE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_FALSE(event.isInCategory(category::Application));
+  EXPECT_TRUE(event.isInCategory(category::Mouse));
+  EXPECT_FALSE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }

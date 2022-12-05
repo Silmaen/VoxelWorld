@@ -91,7 +91,7 @@ public:
    * @param cat Category to check
    * @return True if belongs to category
    */
-  [[nodiscard]] bool isinCategory(const category &cat) const {
+  [[nodiscard]] bool isInCategory(const category &cat) const {
     return (getCategoryFlags() & cat) != 0;
   }
   /// If event already handled

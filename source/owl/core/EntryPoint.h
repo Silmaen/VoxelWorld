@@ -9,13 +9,13 @@
 #include "Application.h"
 #include "Log.h"
 
-int main([[maybe_unused]]int argc, [[maybe_unused]] char* argv[]){
+int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
   owl::core::Log::init();
-  OWL_CORE_WARN("Logger Initialize");
-  OWL_INFO("Logger Initialize");
-
+  // Startup
   auto app = owl::core::createApplication();
+  // runtime
   app->run();
+  // Shutdown
   app.reset();
   return 0;
 }

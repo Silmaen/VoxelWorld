@@ -6,9 +6,10 @@
  * All modification must get authorization from the author.
  */
 
+#include <glad/glad.h>
+
 #include "Window.h"
 #include "core/Log.h"
-
 #include "event/AppEvent.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
@@ -21,14 +22,16 @@ static void GLFWErrorCallback(int error, const char *description) {
   OWL_CORE_ERROR("GLFW Error ({}): {}", error, description);
 }
 
-Window::Window(const Properties &props): ::owl::window::Window() { init(props); }
+Window::Window(const Properties &props) : ::owl::window::Window() {
+  init(props);
+}
 
 Window::~Window() { shutdown(); }
 
 void Window::onUpdate() {
   glfwPollEvents();
   glfwSwapBuffers(glfwWindow);
-  //m_Context->SwapBuffers();
+  // m_Context->SwapBuffers();
 }
 void Window::setVSync(bool enabled) {
   if (enabled)
@@ -61,17 +64,18 @@ void Window::init(const Properties &props) {
     //   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
     glfwWindow = glfwCreateWindow((int)props.width, (int)props.height,
-                                windowData.title.c_str(), nullptr, nullptr);
+                                  windowData.title.c_str(), nullptr, nullptr);
     ++s_GLFWWindowCount;
   }
 
   glfwMakeContextCurrent(glfwWindow);
+  int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+  OWL_CORE_ASSERT(status, "Failed to initialize GLAD");
   // m_Context = GraphicsContext::Create(glfwWindow);
   // m_Context->Init();
 
   glfwSetWindowUserPointer(glfwWindow, &windowData);
   setVSync(true);
-
 
   // Set GLFW callbacks
   glfwSetWindowSizeCallback(
@@ -92,8 +96,8 @@ void Window::init(const Properties &props) {
     data.eventCallback(event);
   });
   glfwSetKeyCallback(glfwWindow, [](GLFWwindow *window, int key,
-                                  [[maybe_unused]] int scancode, int action,
-                                  [[maybe_unused]] int mods) {
+                                    [[maybe_unused]] int scancode, int action,
+                                    [[maybe_unused]] int mods) {
     WindowData &data =
         *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
 
@@ -125,8 +129,8 @@ void Window::init(const Properties &props) {
   });
 
   glfwSetMouseButtonCallback(glfwWindow, [](GLFWwindow *window, int button,
-                                          int action,
-                                          [[maybe_unused]] int mods) {
+                                            int action,
+                                            [[maybe_unused]] int mods) {
     WindowData &data =
         *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
 

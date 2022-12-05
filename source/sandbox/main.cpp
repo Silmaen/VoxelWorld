@@ -19,7 +19,10 @@ public:
 
 class Sandbox : public owl::core::Application {
 public:
-  Sandbox() { pushLayer(owl::mk_shrd<SandboxLayer>()); }
+  Sandbox() {
+    pushLayer(owl::mk_shrd<SandboxLayer>());
+    pushOverlay(owl::mk_shrd<owl::gui::ImGuiLayer>());
+  }
 };
 
 owl::shrd<owl::core::Application> owl::core::createApplication() {

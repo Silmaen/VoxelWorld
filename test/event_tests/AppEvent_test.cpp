@@ -18,12 +18,12 @@ TEST(AppEvent, Tick) {
   EXPECT_EQ(event.getStaticType(), type::AppTick);
   EXPECT_EQ(event.getCategoryFlags(), category::Application);
   EXPECT_STREQ(event.toString().c_str(), "AppTickEvent");
-  EXPECT_FALSE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_TRUE(event.isinCategory(category::Application));
-  EXPECT_FALSE(event.isinCategory(category::Mouse));
-  EXPECT_FALSE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_FALSE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_TRUE(event.isInCategory(category::Application));
+  EXPECT_FALSE(event.isInCategory(category::Mouse));
+  EXPECT_FALSE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(AppEvent, Update) {
@@ -33,12 +33,12 @@ TEST(AppEvent, Update) {
   EXPECT_EQ(event.getStaticType(), type::AppUpdate);
   EXPECT_EQ(event.getCategoryFlags(), category::Application);
   EXPECT_STREQ(event.toString().c_str(), "AppUpdateEvent");
-  EXPECT_FALSE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_TRUE(event.isinCategory(category::Application));
-  EXPECT_FALSE(event.isinCategory(category::Mouse));
-  EXPECT_FALSE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_FALSE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_TRUE(event.isInCategory(category::Application));
+  EXPECT_FALSE(event.isInCategory(category::Mouse));
+  EXPECT_FALSE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(AppEvent, Render) {
@@ -48,12 +48,12 @@ TEST(AppEvent, Render) {
   EXPECT_EQ(event.getStaticType(), type::AppRender);
   EXPECT_EQ(event.getCategoryFlags(), category::Application);
   EXPECT_STREQ(event.toString().c_str(), "AppRenderEvent");
-  EXPECT_FALSE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_TRUE(event.isinCategory(category::Application));
-  EXPECT_FALSE(event.isinCategory(category::Mouse));
-  EXPECT_FALSE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_FALSE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_TRUE(event.isInCategory(category::Application));
+  EXPECT_FALSE(event.isInCategory(category::Mouse));
+  EXPECT_FALSE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(WindowEvent, Close) {
@@ -63,12 +63,12 @@ TEST(WindowEvent, Close) {
   EXPECT_EQ(event.getStaticType(), type::WindowClose);
   EXPECT_EQ(event.getCategoryFlags(), category::Application);
   EXPECT_STREQ(event.toString().c_str(), "WindowCloseEvent");
-  EXPECT_FALSE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_TRUE(event.isinCategory(category::Application));
-  EXPECT_FALSE(event.isinCategory(category::Mouse));
-  EXPECT_FALSE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_FALSE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_TRUE(event.isInCategory(category::Application));
+  EXPECT_FALSE(event.isInCategory(category::Mouse));
+  EXPECT_FALSE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(WindowEvent, Resize) {
@@ -80,10 +80,10 @@ TEST(WindowEvent, Resize) {
   EXPECT_STREQ(event.toString().c_str(), "WindowResizeEvent: 1422, 166");
   EXPECT_EQ(event.getWidth(), 1422);
   EXPECT_EQ(event.getHeight(), 166);
-  EXPECT_FALSE(event.isinCategory(category::Input));
-  EXPECT_FALSE(event.isinCategory(category::Keyboard));
-  EXPECT_TRUE(event.isinCategory(category::Application));
-  EXPECT_FALSE(event.isinCategory(category::Mouse));
-  EXPECT_FALSE(event.isinCategory(category::MouseButton));
-  EXPECT_FALSE(event.isinCategory(category::None));
+  EXPECT_FALSE(event.isInCategory(category::Input));
+  EXPECT_FALSE(event.isInCategory(category::Keyboard));
+  EXPECT_TRUE(event.isInCategory(category::Application));
+  EXPECT_FALSE(event.isInCategory(category::Mouse));
+  EXPECT_FALSE(event.isInCategory(category::MouseButton));
+  EXPECT_FALSE(event.isInCategory(category::None));
 }

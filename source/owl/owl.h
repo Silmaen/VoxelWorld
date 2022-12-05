@@ -11,6 +11,9 @@
 #include "core/Application.h"
 #include "core/Log.h"
 #include "core/layer/Layer.h"
+#include "gui/ImGuiLayer.h"
+
+
 #include "debug/Tracker.h"
 
 // ------ Entry Point ------

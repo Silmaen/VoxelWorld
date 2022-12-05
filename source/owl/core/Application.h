@@ -36,10 +36,14 @@ public:
    */
   Application();
   /**
+   * @brief Access to Application instance
+   * @return Single instance of application
+   */
+  static Application &get() { return *instance; }
+  /**
    * @brief Destructor.
    */
   virtual ~Application() = default;
-
   /**
    * @brief Runs the application
    */
@@ -61,6 +65,10 @@ public:
    */
   void pushOverlay(shrd<layer::Layer> &&overlay);
 
+  [[nodiscard]] const uniq<window::Window> &getWindow() const {
+    return appWindow;
+  }
+
 private:
   /**
    * @brief Action on window close.
@@ -74,6 +82,8 @@ private:
   bool running = true;
   /// The stack of layers
   layer::LayerStack layerStack;
+  /// The application Instance
+  static shrd<Application> instance;
 };
 
 /**
