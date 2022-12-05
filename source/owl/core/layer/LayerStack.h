@@ -1,6 +1,6 @@
 /**
  * @file LayerStack.h
- * @author argawaen
+ * @author Silmaen
  * @date 04/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -15,7 +15,7 @@ namespace owl::core::layer {
 /**
  * @brief Class LayerStack
  */
-class LayerStack {
+class OWL_API LayerStack {
 public:
   using layerList = std::vector<shrd<Layer>>;
   using iterator = layerList::iterator;
@@ -29,15 +29,31 @@ public:
   /**
    * @brief Default constructor.
    */
-  LayerStack() = default;
+  LayerStack() = default; //---UNCOVER---
   /**
    * @brief Destructor.
    */
   virtual ~LayerStack();
 
-  void pushLayer(const shrd<Layer> &layer);
-  void pushOverlay(const shrd<Layer> &overlay);
+  /**
+   * @brief Adding a layer on top of the layers
+   * @param layer The new layer to add
+   */
+  void pushLayer(shrd<Layer> &&layer);
+  /**
+   * @brief Adding an overlay on top of everything
+   * @param overlay The new overlay
+   */
+  void pushOverlay(shrd<Layer> &&overlay);
+  /**
+   * @brief Remove the given layer
+   * @param layer the layer to remove
+   */
   void popLayer(const shrd<Layer> &layer);
+  /**
+   * @brief Remove the given overlay
+   * @param overlay The overlay to remove
+   */
   void popOverlay(const shrd<Layer> &overlay);
 
   [[nodiscard]] iterator begin() { return layers.begin(); }

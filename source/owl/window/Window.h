@@ -1,6 +1,6 @@
 /**
  * @file Window.h
- * @author argawaen
+ * @author Silmaen
  * @date 04/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -14,9 +14,19 @@
 namespace owl::window {
 
 /**
+ * @brief Types of Windows Manager
+ */
+enum struct Type{
+  Null, /// Nothing
+  GLFW  /// Windows managed by Glfw library
+};
+
+/**
  * @brief Structure holding base windows properties
  */
 struct Properties{
+  /// Type of Window manager
+  Type winType = Type::GLFW;
   /// Window title
   std::string Title = "Owl Engine";
   /// Width

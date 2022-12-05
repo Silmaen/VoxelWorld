@@ -1,6 +1,6 @@
 /**
  * @file LayerStack.cpp
- * @author argawaen
+ * @author Silmaen
  * @date 04/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -18,13 +18,13 @@ LayerStack::~LayerStack() {
   }
 }
 
-void LayerStack::pushLayer(const shrd<Layer> &layer) {
-  layers.emplace(layers.begin() + layerInsertIndex, layer);
+void LayerStack::pushLayer(shrd<Layer>&& layer) {
+  layers.emplace(layers.begin() + layerInsertIndex, std::move(layer));
   layerInsertIndex++;
 }
 
-void LayerStack::pushOverlay(const shrd<Layer> &overlay) {
-  layers.emplace_back(overlay);
+void LayerStack::pushOverlay(shrd<Layer>&& overlay) {
+  layers.emplace_back(std::move(overlay));
 }
 
 void LayerStack::popLayer(const shrd<Layer> &layer) {

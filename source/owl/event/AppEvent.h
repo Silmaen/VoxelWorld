@@ -1,6 +1,6 @@
 /**
  * @file AppEvent.h
- * @author argawaen
+ * @author Silmaen
  * @date 04/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -27,7 +27,7 @@ public:
     return fmt::format("WindowResizeEvent: {}, {}", width, height);
   }
   [[nodiscard]] std::string getName() const override {
-    return fmt::format("WindowsResizeEvent");
+    return fmt::format("WindowResizeEvent");
   }
 
   [[nodiscard]] static type getStaticType() { return type::WindowResize; }
@@ -36,6 +36,7 @@ public:
   [[nodiscard]] uint8_t getCategoryFlags() const override {
     return category::Application;
   }
+
 private:
   uint32_t width;
   uint32_t height;
@@ -52,7 +53,7 @@ public:
     return fmt::format("WindowCloseEvent");
   }
   [[nodiscard]] std::string getName() const override {
-    return fmt::format("WindowsCloseEvent");
+    return fmt::format("WindowCloseEvent");
   }
 
   [[nodiscard]] static type getStaticType() { return type::WindowClose; }
@@ -70,10 +71,10 @@ public:
   AppTickEvent() = default;
 
   [[nodiscard]] std::string toString() const override {
-    return fmt::format("AppTick");
+    return fmt::format("AppTickEvent");
   }
   [[nodiscard]] std::string getName() const override {
-    return fmt::format("AppTick");
+    return fmt::format("AppTickEvent");
   }
   [[nodiscard]] static type getStaticType() { return type::AppTick; }
   [[nodiscard]] type getType() const override { return getStaticType(); }
@@ -90,10 +91,10 @@ public:
   AppUpdateEvent() = default;
 
   [[nodiscard]] std::string toString() const override {
-    return fmt::format("AppUpdate");
+    return fmt::format("AppUpdateEvent");
   }
   [[nodiscard]] std::string getName() const override {
-    return fmt::format("AppUpdate");
+    return fmt::format("AppUpdateEvent");
   }
   [[nodiscard]] static type getStaticType() { return type::AppUpdate; }
   [[nodiscard]] type getType() const override { return getStaticType(); }
@@ -109,10 +110,10 @@ class OWL_API AppRenderEvent : public Event {
 public:
   AppRenderEvent() = default;
   [[nodiscard]] std::string toString() const override {
-    return fmt::format("AppRender");
+    return fmt::format("AppRenderEvent");
   }
   [[nodiscard]] std::string getName() const override {
-    return fmt::format("AppRender");
+    return fmt::format("AppRenderEvent");
   }
 
   [[nodiscard]] static type getStaticType() { return type::AppRender; }

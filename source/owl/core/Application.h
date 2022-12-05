@@ -7,8 +7,9 @@
  */
 
 #pragma once
-#include "Core.h"
+
 #include "event/AppEvent.h"
+#include "layer/LayerStack.h"
 #include "window/Window.h"
 
 /**
@@ -17,7 +18,7 @@
  * @param argv List of argument
  * @return Error code
  */
-int main(int argc, char* argv[]);
+int main(int argc, char *argv[]);
 
 namespace owl::core {
 
@@ -47,24 +48,38 @@ public:
    * @brief Event Callback function
    * @param e Event received
    */
-  void onEvent(event::Event& e);
+  void onEvent(event::Event &e);
+
+  /**
+   * @brief Adding a layer on top of the layers
+   * @param layer The new layer to add
+   */
+  void pushLayer(shrd<layer::Layer> &&layer);
+  /**
+   * @brief Adding an overlay on top of everything
+   * @param overlay The new overlay
+   */
+  void pushOverlay(shrd<layer::Layer> &&overlay);
+
 private:
   /**
    * @brief Action on window close.
    * @param e the close event
    * @return True if succeeded
    */
-  bool onWindowClosed(event::WindowCloseEvent& e);
+  bool onWindowClosed(event::WindowCloseEvent &e);
   /// Pointer to the window
   uniq<window::Window> appWindow;
   /// Running state
   bool running = true;
+  /// The stack of layers
+  layer::LayerStack layerStack;
 };
 
 /**
  * @brief Create an application (Must be defined in the client)
  * @return The application
  */
-extern std::shared_ptr<Application> createApplication();
+extern shrd<Application> createApplication();
 
 } // namespace owl::core

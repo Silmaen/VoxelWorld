@@ -1,6 +1,6 @@
 /**
  * @file Layer.h
- * @author argawaen
+ * @author Silmaen
  * @date 04/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -20,7 +20,7 @@ namespace owl::core::layer {
 /**
  * @brief Class Layer
  */
-class Layer {
+class OWL_API Layer {
 public:
   Layer(const Layer &) = delete;
   Layer(Layer &&) = delete;

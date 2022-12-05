@@ -1,6 +1,6 @@
 /**
  * @file Event.h
- * @author argawaen
+ * @author Silmaen
  * @date 04/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -95,7 +95,7 @@ public:
     return (getCategoryFlags() & cat) != 0;
   }
   /// If event already handled
-  bool handled = true;
+  bool handled = false;
 };
 
 /**
@@ -105,7 +105,7 @@ class EventDispatcher {
 public:
   /**
    * @brief Constructor
-   * @param event Event to dispatch
+   * @param dispatchEvent Event to dispatch
    */
   explicit EventDispatcher(Event &dispatchEvent) : event(dispatchEvent) {}
 
@@ -123,8 +123,9 @@ public:
     }
     return false;
   }
+
 private:
-  /// the event
+  /// The event
   Event &event;
 };
 

@@ -1,6 +1,6 @@
 /**
  * @file MouseEvent.h
- * @author argawaen
+ * @author Silmaen
  * @date 04/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -43,12 +43,11 @@ public:
   MouseScrolledEvent(const float xOffset, const float yOffset)
       : XOffset(xOffset), YOffset(yOffset) {}
 
-  [[nodiscard]] float getXOffset() const { return XOffset; }
-  [[nodiscard]] float getYOffset() const { return YOffset; }
+  [[nodiscard]] float getXOff() const { return XOffset; }
+  [[nodiscard]] float getYOff() const { return YOffset; }
 
   [[nodiscard]] std::string toString() const override {
-    return fmt::format("MouseScrolledEvent: {}, {}", getXOffset(),
-                       getYOffset());
+    return fmt::format("MouseScrolledEvent: {}, {}", getXOff(), getYOff());
   }
   [[nodiscard]] std::string getName() const override {
     return fmt::format("MouseScrolledEvent");
