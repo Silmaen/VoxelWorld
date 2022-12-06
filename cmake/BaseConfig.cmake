@@ -9,18 +9,17 @@ add_library(${CMAKE_PROJECT_NAME}_Base INTERFACE)
 #
 # ---=== Supported OS ===---
 #
+set(${PRJPREFIX}_GNU_MINIMAL 11)
+set(${PRJPREFIX}_CLANG_MINIMAL 14)
+
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(EXE_EXT ".exe")
     set(LIB_EXT ".dll")
-    set(${PRJPREFIX}_GNU_MINIMAL 12)
-    set(${PRJPREFIX}_CLANG_MINIMAL 14)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_WINDOWS)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(EXE_EXT "")
     set(LIB_EXT ".so")
-    set(${PRJPREFIX}_GNU_MINIMAL 11.2)
-    set(${PRJPREFIX}_CLANG_MINIMAL 14.0)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_LINUX)
 else ()
@@ -41,7 +40,7 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
             -Wdeprecated-declarations
             -Wcast-align
             -Wcast-qual
-    )
+            )
 elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_CLANG_MINIMAL})
         message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler version too old: ${CMAKE_CXX_COMPILER_VERSION}, need ${${PRJPREFIX}_CLANG_MINIMAL}")
@@ -58,9 +57,27 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-global-constructors
             -Wno-reserved-macro-identifier
             -Wno-unused-macros
-    )
+            )
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
+endif ()
+
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    if (MINGW)
+        cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH COMPILER_PATH)
+        message(STATUS "MinGW environment detected: add dependence to dlls from ${COMPILER_PATH} ${CMAKE_CXX_COMPILER}")
+        set(REQUIRED_LIBS libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll)
+        foreach (lib IN ITEMS ${REQUIRED_LIBS})
+            if (NOT EXISTS ${COMPILER_PATH}/${lib})
+                message(WARNING "Required Dll not found: ${COMPILER_PATH}/${lib}")
+            else ()
+                add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/bin/${lib}
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${COMPILER_PATH}/${lib} ${CMAKE_BINARY_DIR}/bin/${lib}
+                        COMMENT "Copying ${lib} into ${CMAKE_BINARY_DIR}/bin")
+                add_dependencies(${CMAKE_PROJECT_NAME}_Base ${CMAKE_BINARY_DIR}/bin/${lib})
+            endif ()
+        endforeach ()
+    endif ()
 endif ()
 
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_MAJOR="${CMAKE_PROJECT_VERSION_MAJOR}")

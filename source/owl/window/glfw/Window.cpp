@@ -53,7 +53,7 @@ void Window::init(const Properties &props) {
 
   if (s_GLFWWindowCount == 0) {
     // OWL_PROFILE_SCOPE("glfwInit");
-    int success = glfwInit();
+    [[maybe_unused]] int success = glfwInit();
     OWL_CORE_ASSERT(success, "Could not initialize GLFW!");
     glfwSetErrorCallback(GLFWErrorCallback);
   }
@@ -64,13 +64,15 @@ void Window::init(const Properties &props) {
     // if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
     //   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
-    glfwWindow = glfwCreateWindow((int)props.width, (int)props.height,
+    glfwWindow = glfwCreateWindow(static_cast<int>(props.width),
+                                  static_cast<int>(props.height),
                                   windowData.title.c_str(), nullptr, nullptr);
     ++s_GLFWWindowCount;
   }
 
   glfwMakeContextCurrent(glfwWindow);
-  int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+  [[maybe_unused]] int status =
+      gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
   OWL_CORE_ASSERT(status, "Failed to initialize GLAD");
   // m_Context = GraphicsContext::Create(glfwWindow);
   // m_Context->Init();
@@ -83,10 +85,10 @@ void Window::init(const Properties &props) {
       glfwWindow, [](GLFWwindow *window, int width, int height) {
         WindowData &data =
             *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
-        data.width = width;
-        data.height = height;
+        data.width = static_cast<uint32_t>(width);
+        data.height = static_cast<uint32_t>(height);
 
-        event::WindowResizeEvent event(width, height);
+        event::WindowResizeEvent event(data.width, data.height);
         data.eventCallback(event);
       });
 
@@ -102,22 +104,25 @@ void Window::init(const Properties &props) {
     WindowData &data =
         *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
 
+    auto cKey = static_cast<core::KeyCode>(key);
     switch (action) {
     case GLFW_PRESS: {
-      event::KeyPressedEvent event(key, 0);
+      event::KeyPressedEvent event(cKey, false);
       data.eventCallback(event);
       break;
     }
     case GLFW_RELEASE: {
-      event::KeyReleasedEvent event(key);
+      event::KeyReleasedEvent event(cKey);
       data.eventCallback(event);
       break;
     }
     case GLFW_REPEAT: {
-      event::KeyPressedEvent event(key, true);
+      event::KeyPressedEvent event(cKey, true);
       data.eventCallback(event);
       break;
     }
+    default:
+      break;
     }
   });
 
@@ -125,7 +130,7 @@ void Window::init(const Properties &props) {
     WindowData &data =
         *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
 
-    event::KeyTypedEvent event(keycode);
+    event::KeyTypedEvent event(static_cast<core::KeyCode>(keycode));
     data.eventCallback(event);
   });
 
@@ -137,15 +142,19 @@ void Window::init(const Properties &props) {
 
     switch (action) {
     case GLFW_PRESS: {
-      event::MouseButtonPressedEvent event(button);
+      event::MouseButtonPressedEvent event(
+          static_cast<core::MouseCode>(button));
       data.eventCallback(event);
       break;
     }
     case GLFW_RELEASE: {
-      event::MouseButtonReleasedEvent event(button);
+      event::MouseButtonReleasedEvent event(
+          static_cast<core::MouseCode>(button));
       data.eventCallback(event);
       break;
     }
+    default:
+      break;
     }
   });
 
@@ -154,7 +163,8 @@ void Window::init(const Properties &props) {
         WindowData &data =
             *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
 
-        event::MouseScrolledEvent event((float)xOffset, (float)yOffset);
+        event::MouseScrolledEvent event(static_cast<float>(xOffset),
+                                        static_cast<float>(yOffset));
         data.eventCallback(event);
       });
 
@@ -162,7 +172,8 @@ void Window::init(const Properties &props) {
       glfwWindow, [](GLFWwindow *window, double xPos, double yPos) {
         WindowData &data =
             *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
-        event::MouseMovedEvent event((float)xPos, (float)yPos);
+        event::MouseMovedEvent event(static_cast<float>(xPos),
+                                     static_cast<float>(yPos));
         data.eventCallback(event);
       });
 }

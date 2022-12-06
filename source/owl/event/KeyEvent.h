@@ -11,6 +11,11 @@
 #include "core/KeyCodes.h"
 #include <fmt/format.h>
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
+
 namespace owl::event {
 
 /**
@@ -20,13 +25,14 @@ class OWL_API KeyEvent : public Event {
 public:
   /**
    * @brief Get the Key code
-   * @return
+   * @return The Event Key code
    */
   [[nodiscard]] core::KeyCode getKeyCode() const { return keyCode; }
 
   [[nodiscard]] uint8_t getCategoryFlags() const override {
     return category::Input | category::Keyboard;
   }
+
 protected:
   explicit KeyEvent(const core::KeyCode keycode) : keyCode(keycode) {}
   /// Key code
@@ -35,8 +41,8 @@ protected:
 
 class OWL_API KeyPressedEvent : public KeyEvent {
 public:
-  explicit KeyPressedEvent(const core::KeyCode keycode, bool isRepeat = false)
-      : KeyEvent(keycode), isRepeat(isRepeat) {}
+  explicit KeyPressedEvent(const core::KeyCode keycode, bool isRepeat_ = false)
+      : KeyEvent(keycode), isRepeat(isRepeat_) {}
 
   /**
    * @brief Check if the key is repeated
@@ -45,8 +51,7 @@ public:
   [[nodiscard]] bool isRepeated() const { return isRepeat; }
 
   [[nodiscard]] std::string toString() const override {
-    return fmt::format("KeyPressedEvent: {} (repeat = {})", keyCode,
-                       isRepeat);
+    return fmt::format("KeyPressedEvent: {} (repeat = {})", keyCode, isRepeat);
   }
   [[nodiscard]] std::string getName() const override {
     return fmt::format("KeyPressedEvent");
@@ -54,11 +59,12 @@ public:
 
   [[nodiscard]] static type getStaticType() { return type::KeyPressed; }
   [[nodiscard]] type getType() const override { return getStaticType(); }
+
 private:
   bool isRepeat;
 };
 
-class OWL_API  KeyReleasedEvent : public KeyEvent {
+class OWL_API KeyReleasedEvent : public KeyEvent {
 public:
   explicit KeyReleasedEvent(const core::KeyCode keycode) : KeyEvent(keycode) {}
 
@@ -88,3 +94,7 @@ public:
 };
 
 } // namespace owl::event
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

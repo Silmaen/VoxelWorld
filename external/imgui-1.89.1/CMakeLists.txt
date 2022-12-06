@@ -10,8 +10,9 @@ file(GLOB HDRS
         )
 
 add_library(imgui ${SRCS} ${HDRS})
-target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(imgui INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/backends)
+
+target_include_directories(imgui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(imgui SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/backends)
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 # we are only using the glfw version

@@ -10,12 +10,13 @@
 
 #include "core/Core.h"
 
-using size_t=std::size_t;
+using size_t = std::size_t;
 
 /**
  * @namespace owl
  * @brief Base namespace for the project
  */
+
 /**
  * @brief namespace for core functions
  */
@@ -23,7 +24,7 @@ namespace owl::debug {
 /**
  * @brief Class Tracker
  *
- * A very simple memory allocation tracker
+ * A simple memory allocation tracker
  */
 class OWL_API Tracker {
 public:
@@ -34,7 +35,7 @@ public:
   /**
    * @brief Destructor.
    */
-  virtual ~Tracker() = default; //---UNCOVER---
+  ~Tracker() = default; //---UNCOVER---
   /**
    * @brief Get engine instance
    * @return The engine instance
@@ -88,4 +89,4 @@ private:
   AllocationState lastAllocationState;
 };
 
-} // namespace owl::core
+} // namespace owl::debug

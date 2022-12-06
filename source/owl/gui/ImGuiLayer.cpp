@@ -22,43 +22,46 @@ void ImGuiLayer::onAttach() { // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-  //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-  //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-  //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-  //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-  //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+  io.ConfigFlags |=
+      ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+  // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad
+  // Controls io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         //
+  // Enable Docking io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       //
+  // Enable Multi-Viewport / Platform Windows io.ConfigFlags |=
+  // ImGuiConfigFlags_ViewportsNoTaskBarIcons; io.ConfigFlags |=
+  // ImGuiConfigFlags_ViewportsNoMerge;
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
 
   SetDarkThemeColors();
 
-  auto* window = static_cast<GLFWwindow*>(core::Application::get().getWindow()->getNativeWindow());
+  auto *window = static_cast<GLFWwindow *>(
+      core::Application::get().getWindow()->getNativeWindow());
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 410");
 }
 
 void ImGuiLayer::onDetach() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
 }
 
 void ImGuiLayer::onUpdate() {
   ImGuiIO &io = ImGui::GetIO();
   core::Application &app = core::Application::get();
-  io.DisplaySize =
-      ImVec2(app.getWindow()->getWidth(), app.getWindow()->getHeight());
+  io.DisplaySize = ImVec2(static_cast<float>(app.getWindow()->getWidth()),
+                          static_cast<float>(app.getWindow()->getHeight()));
 
-  float time = (float)glfwGetTime();
+  float time = static_cast<float>(glfwGetTime());
   io.DeltaTime = savedTime > 0 ? (time - savedTime) : (1.f / 60.f);
   savedTime = time;
 
   ImGui_ImplOpenGL3_NewFrame();
   ImGui::NewFrame();
 
-  static bool show =true;
+  static bool show = true;
   ImGui::ShowDemoWindow(&show);
 
   ImGui::Render();

@@ -18,4 +18,6 @@ uniq<Window> Window::Create(const Properties &props) {
   return mk_uniq<null::Window>(props);
 }
 
+Window::~Window() = default;
+
 } // namespace owl::window

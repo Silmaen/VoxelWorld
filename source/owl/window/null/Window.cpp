@@ -14,9 +14,9 @@ Window::Window(const window::Properties &) {}
 
 Window::~Window() = default;
 
-void Window::onUpdate(){}
+void Window::onUpdate() {}
 
-void Window::setVSync(bool){}
+void Window::setVSync(bool) {}
 
 bool Window::isVSync() const { return false; };
 

@@ -16,7 +16,7 @@ namespace owl::window {
 /**
  * @brief Types of Windows Manager
  */
-enum struct Type{
+enum struct Type {
   Null, /// Nothing
   GLFW  /// Windows managed by Glfw library
 };
@@ -24,7 +24,7 @@ enum struct Type{
 /**
  * @brief Structure holding base windows properties
  */
-struct Properties{
+struct Properties {
   /// Type of Window manager
   Type winType = Type::GLFW;
   /// Window title
@@ -45,11 +45,11 @@ public:
   Window &operator=(const Window &) = delete;
   Window &operator=(Window &&) = delete;
   /// Call back function's type
-  using EventCallback = std::function<void(event::Event&)>;
+  using EventCallback = std::function<void(event::Event &)>;
   /// Constructor
   Window() = default;
   /// Destructor
-  virtual ~Window() = default;
+  virtual ~Window();
   /**
    * @brief Function called at Update Time
    */
@@ -69,7 +69,7 @@ public:
    * @brief Define the Event Callback function
    * @param callback The new callback function
    */
-  virtual void setEventCallback(const EventCallback& callback) = 0;
+  virtual void setEventCallback(const EventCallback &callback) = 0;
   /**
    * @brief St the VSync
    * @param enabled Should VSync enabled
@@ -85,14 +85,14 @@ public:
    * @brief Access to the Native Window
    * @return Native window's raw pointer
    */
-  [[nodiscard]] virtual void* getNativeWindow() const = 0;
+  [[nodiscard]] virtual void *getNativeWindow() const = 0;
 
   /**
    * @brief Helper for Window creation
    * @param props The window properties
    * @return Pointer to the window
    */
-  static uniq<Window> Create(const Properties& props = Properties());
+  static uniq<Window> Create(const Properties &props = Properties());
 };
 
-}
+} // namespace owl::window

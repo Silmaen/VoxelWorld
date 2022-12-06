@@ -10,6 +10,10 @@
 
 #include "core/Core.h"
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Namespace for Events
  */
@@ -130,3 +134,8 @@ private:
 };
 
 } // namespace owl::event
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif

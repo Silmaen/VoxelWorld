@@ -17,6 +17,10 @@
  */
 namespace owl::core::layer {
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class Layer
  */
@@ -29,7 +33,7 @@ public:
   /**
    * @brief Default constructor.
    */
-  explicit Layer(std::string  name = "Layer"):debugName(std::move(name)){}
+  explicit Layer(std::string name = "Layer") : debugName(std::move(name)) {}
   /**
    * @brief Destructor.
    */
@@ -51,16 +55,21 @@ public:
    * @brief Action on event
    * @param event The Event to react
    */
-  virtual void onEvent([[maybe_unused]]event::Event& event) {}
+  virtual void onEvent([[maybe_unused]] event::Event &event) {}
 
   /**
    * @brief Get the debug name of the layer
    * @return Debug Name of the layer
    */
-  [[nodiscard]] const std::string& getName() const { return debugName; }
+  [[nodiscard]] const std::string &getName() const { return debugName; }
+
 protected:
   /// Debug name for this layer
   std::string debugName;
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 } // namespace owl::core::layer

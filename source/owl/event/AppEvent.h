@@ -10,14 +10,19 @@
 #include "Event.h"
 #include <fmt/format.h>
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
+
 namespace owl::event {
 /**
  * @brief Window Resize Event
  */
 class OWL_API WindowResizeEvent : public Event {
 public:
-  WindowResizeEvent(uint32_t width, uint32_t height)
-      : width(width), height(height) {}
+  WindowResizeEvent(uint32_t width_, uint32_t height_)
+      : width(width_), height(height_) {}
 
   [[nodiscard]] uint32_t getWidth() const { return width; }
 
@@ -124,3 +129,7 @@ public:
 };
 
 } // namespace owl::event
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

@@ -14,7 +14,7 @@ if (${PRJPREFIX}_BUILD_SHARED)
             ${SRCS} ${HDRS})
     target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PUBLIC ${PRJPREFIX}_BUILD_SHARED)
     target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PRIVATE ${PRJPREFIX}_BUILD_DLL)
-
+    set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 else ()
     add_library(${CMAKE_PROJECT_NAME}_lib
             STATIC

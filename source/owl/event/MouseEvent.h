@@ -11,6 +11,11 @@
 #include "core/MouseCode.h"
 #include <fmt/format.h>
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
+
 namespace owl::event {
 
 class OWL_API MouseMovedEvent : public Event {
@@ -111,3 +116,7 @@ public:
 };
 
 } // namespace owl::event
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
