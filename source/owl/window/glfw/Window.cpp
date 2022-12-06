@@ -29,6 +29,7 @@ Window::Window(const Properties &props) : ::owl::window::Window() {
 Window::~Window() { shutdown(); }
 
 void Window::onUpdate() {
+
   glfwPollEvents();
   glfwSwapBuffers(glfwWindow);
   // m_Context->SwapBuffers();

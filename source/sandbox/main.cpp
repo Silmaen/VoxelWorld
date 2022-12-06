@@ -8,19 +8,10 @@
 
 #include "owl.h"
 
-class SandboxLayer : public owl::core::layer::Layer {
-public:
-  SandboxLayer() : Layer("SandBox") {}
-  void onUpdate() override { OWL_INFO("SandboxLayer::Update"); }
-  void onEvent(owl::event::Event &e) override {
-    OWL_TRACE("SandboxLayerEvent {}", e.toString());
-  }
-};
 
 class Sandbox : public owl::core::Application {
 public:
   Sandbox() {
-    pushLayer(owl::mk_shrd<SandboxLayer>());
     pushOverlay(owl::mk_shrd<owl::gui::ImGuiLayer>());
   }
 };

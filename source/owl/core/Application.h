@@ -83,7 +83,7 @@ private:
   /// The stack of layers
   layer::LayerStack layerStack;
   /// The application Instance
-  static shrd<Application> instance;
+  static Application* instance;
 };
 
 /**

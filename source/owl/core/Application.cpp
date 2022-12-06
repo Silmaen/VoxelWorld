@@ -11,11 +11,11 @@
 
 namespace owl::core {
 
-shrd<Application> Application::instance = nullptr;
+Application* Application::instance = nullptr;
 
 Application::Application() {
   OWL_CORE_ASSERT(!instance, "Application already exists!");
-  instance.reset(this);
+  instance= this;
   appWindow = window::Window::Create();
   appWindow->setEventCallback(
       [this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
