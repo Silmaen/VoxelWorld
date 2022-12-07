@@ -6,6 +6,8 @@
  * All modification must get authorization from the author.
  */
 
+#include "owlpch.h"
+
 #include "Log.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>

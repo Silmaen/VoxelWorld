@@ -37,15 +37,13 @@ public:
    */
   void onDetach() override;
   /**
-   * @brief Action on update
-   */
-  void onUpdate() override;
-  /**
    * @brief Action on event
    * @param event The Event to react
    */
   void onEvent([[maybe_unused]] event::Event &event) override;
 
+  void Begin();
+  void End();
 
   void BlockEvents(bool block) { blockEvents = block; }
 

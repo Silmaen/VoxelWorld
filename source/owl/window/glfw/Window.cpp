@@ -6,6 +6,8 @@
  * All modification must get authorization from the author.
  */
 
+#include "owlpch.h"
+
 #include <glad/glad.h>
 
 #include "Window.h"
@@ -29,7 +31,6 @@ Window::Window(const Properties &props) : ::owl::window::Window() {
 Window::~Window() { shutdown(); }
 
 void Window::onUpdate() {
-
   glfwPollEvents();
   glfwSwapBuffers(glfwWindow);
   // m_Context->SwapBuffers();
@@ -104,7 +105,7 @@ void Window::init(const Properties &props) {
     WindowData &data =
         *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
 
-    auto cKey = static_cast<core::KeyCode>(key);
+    auto cKey = static_cast<input::KeyCode>(key);
     switch (action) {
     case GLFW_PRESS: {
       event::KeyPressedEvent event(cKey, false);
@@ -130,7 +131,7 @@ void Window::init(const Properties &props) {
     WindowData &data =
         *static_cast<WindowData *>(glfwGetWindowUserPointer(window));
 
-    event::KeyTypedEvent event(static_cast<core::KeyCode>(keycode));
+    event::KeyTypedEvent event(static_cast<input::KeyCode>(keycode));
     data.eventCallback(event);
   });
 
@@ -143,13 +144,13 @@ void Window::init(const Properties &props) {
     switch (action) {
     case GLFW_PRESS: {
       event::MouseButtonPressedEvent event(
-          static_cast<core::MouseCode>(button));
+          static_cast<input::MouseCode>(button));
       data.eventCallback(event);
       break;
     }
     case GLFW_RELEASE: {
       event::MouseButtonReleasedEvent event(
-          static_cast<core::MouseCode>(button));
+          static_cast<input::MouseCode>(button));
       data.eventCallback(event);
       break;
     }

@@ -6,6 +6,8 @@
  * All modification must get authorization from the author.
  */
 
+#include "owlpch.h"
+
 #include "Window.h"
 
 namespace owl::window::null {

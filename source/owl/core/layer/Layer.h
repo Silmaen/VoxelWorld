@@ -52,6 +52,10 @@ public:
    */
   virtual void onUpdate() {}
   /**
+   * @brief Action for that layer when gui is rendered
+   */
+  virtual void onImGuiRender() {}
+  /**
    * @brief Action on event
    * @param event The Event to react
    */

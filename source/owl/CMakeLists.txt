@@ -8,6 +8,12 @@ file(GLOB_RECURSE SRCS
 file(GLOB_RECURSE HDRS
         *.h
         )
+list(REMOVE_ITEM
+        SRCS
+        owlpch.cpp)
+list(REMOVE_ITEM
+        HDRS
+        owlpch.h)
 if (${PRJPREFIX}_BUILD_SHARED)
     add_library(${CMAKE_PROJECT_NAME}_lib
             SHARED
@@ -40,16 +46,21 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glad)
 find_package(glfw3 REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glfw)
 
+# glm
+find_package(glm REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glm)
+
 # ImGui
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE imgui)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC imgui)
+#target_link_libraries(${CMAKE_PROJECT_NAME}_lib INTERFACE imgui_client)
 
 # debugbreak
 find_package(debugbreak 8 REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC DebugBreak)
 
 # json
-find_package(nlohmann_json 3.11.1 REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE nlohmann_json::nlohmann_json)
+#find_package(nlohmann_json 3.11.1 REQUIRED)
+#target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE nlohmann_json::nlohmann_json)
 # header-only
 
 #fmt

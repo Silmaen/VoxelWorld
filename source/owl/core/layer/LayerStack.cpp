@@ -6,8 +6,9 @@
  * All modification must get authorization from the author.
  */
 
+#include "owlpch.h"
+
 #include "LayerStack.h"
-#include <algorithm>
 
 namespace owl::core::layer {
 

@@ -40,10 +40,7 @@ public:
    * @brief Get engine instance
    * @return The engine instance
    */
-  static Tracker &get() {
-    static Tracker instance;
-    return instance;
-  }
+  static Tracker &get();
 
   /**
    * @brief Function called at each allocation

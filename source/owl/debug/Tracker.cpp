@@ -6,6 +6,8 @@
  * All modification must get authorization from the author.
  */
 
+#include "owlpch.h"
+
 #include "Tracker.h"
 
 #define OWL_DEALLOC_EXCEPT noexcept
@@ -42,6 +44,11 @@ void operator delete(void *memory) OWL_DEALLOC_EXCEPT {
 } //---UNCOVER---
 
 namespace owl::debug {
+
+Tracker& Tracker::get() {
+  static Tracker instance;
+  return instance;
+}
 
 void Tracker::allocate(size_t size) {
   ++currentAllocationState.allocationCalls;

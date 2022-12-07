@@ -8,7 +8,7 @@
 
 #pragma once
 #include "Event.h"
-#include "core/KeyCodes.h"
+#include "input/KeyCodes.h"
 #include <fmt/format.h>
 
 #ifdef __clang__
@@ -27,21 +27,21 @@ public:
    * @brief Get the Key code
    * @return The Event Key code
    */
-  [[nodiscard]] core::KeyCode getKeyCode() const { return keyCode; }
+  [[nodiscard]] input::KeyCode getKeyCode() const { return keyCode; }
 
   [[nodiscard]] uint8_t getCategoryFlags() const override {
     return category::Input | category::Keyboard;
   }
 
 protected:
-  explicit KeyEvent(const core::KeyCode keycode) : keyCode(keycode) {}
+  explicit KeyEvent(const input::KeyCode keycode) : keyCode(keycode) {}
   /// Key code
-  core::KeyCode keyCode;
+  input::KeyCode keyCode;
 };
 
 class OWL_API KeyPressedEvent : public KeyEvent {
 public:
-  explicit KeyPressedEvent(const core::KeyCode keycode, bool isRepeat_ = false)
+  explicit KeyPressedEvent(const input::KeyCode keycode, bool isRepeat_ = false)
       : KeyEvent(keycode), isRepeat(isRepeat_) {}
 
   /**
@@ -66,7 +66,7 @@ private:
 
 class OWL_API KeyReleasedEvent : public KeyEvent {
 public:
-  explicit KeyReleasedEvent(const core::KeyCode keycode) : KeyEvent(keycode) {}
+  explicit KeyReleasedEvent(const input::KeyCode keycode) : KeyEvent(keycode) {}
 
   [[nodiscard]] std::string toString() const override {
     return fmt::format("KeyReleasedEvent: {}", keyCode);
@@ -81,7 +81,7 @@ public:
 
 class KeyTypedEvent : public KeyEvent {
 public:
-  explicit KeyTypedEvent(const core::KeyCode keycode) : KeyEvent(keycode) {}
+  explicit KeyTypedEvent(const input::KeyCode keycode) : KeyEvent(keycode) {}
 
   [[nodiscard]] std::string toString() const override {
     return fmt::format("KeyTypedEvent: {}", keyCode);

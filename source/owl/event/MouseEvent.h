@@ -8,7 +8,7 @@
 
 #pragma once
 #include "Event.h"
-#include "core/MouseCode.h"
+#include "input/MouseCode.h"
 #include <fmt/format.h>
 
 #ifdef __clang__
@@ -70,22 +70,22 @@ private:
 
 class OWL_API MouseButtonEvent : public Event {
 public:
-  [[nodiscard]] core::MouseCode GetMouseButton() const { return mouseButton; }
+  [[nodiscard]] input::MouseCode GetMouseButton() const { return mouseButton; }
 
   [[nodiscard]] uint8_t getCategoryFlags() const override {
     return category::Input | category::Mouse | category::MouseButton;
   }
 
 protected:
-  explicit MouseButtonEvent(const core::MouseCode button)
+  explicit MouseButtonEvent(const input::MouseCode button)
       : mouseButton(button) {}
 
-  core::MouseCode mouseButton;
+  input::MouseCode mouseButton;
 };
 
 class OWL_API MouseButtonPressedEvent : public MouseButtonEvent {
 public:
-  explicit MouseButtonPressedEvent(const core::MouseCode button)
+  explicit MouseButtonPressedEvent(const input::MouseCode button)
       : MouseButtonEvent(button) {}
 
   [[nodiscard]] std::string toString() const override {
@@ -100,7 +100,7 @@ public:
 
 class OWL_API MouseButtonReleasedEvent : public MouseButtonEvent {
 public:
-  explicit MouseButtonReleasedEvent(const core::MouseCode button)
+  explicit MouseButtonReleasedEvent(const input::MouseCode button)
       : MouseButtonEvent(button) {}
 
   [[nodiscard]] std::string toString() const override {

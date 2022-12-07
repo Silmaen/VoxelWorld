@@ -7,9 +7,9 @@
  */
 
 #pragma once
+#include <functional>
 #include "core/Core.h"
 #include "event/Event.h"
-#include <functional>
 
 namespace owl::window {
 
