@@ -14,7 +14,6 @@
 #include "gui/ImGuiLayer.h"
 #include "input/Input.h"
 
-#include "debug/Tracker.h"
 
 // ------ Entry Point ------
 #include "core/EntryPoint.h"

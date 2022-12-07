@@ -13,3 +13,9 @@
 #include <memory>
 #include <string>
 #include <utility>
+
+#include "core/Core.h"
+#include "core/Log.h"
+
+#include "debug/Profiler.h"
+#include "debug/Tracker.h"

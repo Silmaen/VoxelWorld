@@ -25,26 +25,19 @@ static void GLFWErrorCallback(int error, const char *description) {
 }
 
 Window::Window(const Properties &props) : ::owl::window::Window() {
+	OWL_PROFILE_FUNCTION();
 	init(props);
 }
 
-Window::~Window() { shutdown(); }
-
-void Window::onUpdate() {
-	glfwPollEvents();
-	glfwSwapBuffers(glfwWindow);
-	// m_Context->SwapBuffers();
+Window::~Window() {
+	OWL_PROFILE_FUNCTION();
+	shutdown();
 }
-void Window::setVSync(bool enabled) {
-	if (enabled)
-		glfwSwapInterval(1);
-	else
-		glfwSwapInterval(0);
 
-	windowData.VSync = enabled;
-}
-bool Window::isVSync() const { return windowData.VSync; }
 void Window::init(const Properties &props) {
+
+	OWL_PROFILE_FUNCTION();
+
 	windowData.title = props.Title;
 	windowData.width = props.width;
 	windowData.height = props.height;
@@ -53,14 +46,14 @@ void Window::init(const Properties &props) {
 				  props.height);
 
 	if (s_GLFWWindowCount == 0) {
-		// OWL_PROFILE_SCOPE("glfwInit");
+		OWL_PROFILE_SCOPE("glfwInit");
 		[[maybe_unused]] int success = glfwInit();
 		OWL_CORE_ASSERT(success, "Could not initialize GLFW!");
 		glfwSetErrorCallback(GLFWErrorCallback);
 	}
 
 	{
-		// OWL_PROFILE_SCOPE("glfwCreateWindow");
+		OWL_PROFILE_SCOPE("glfwCreateWindow");
 #if defined(OWL_DEBUG)
 		// if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
 		//   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
@@ -71,12 +64,8 @@ void Window::init(const Properties &props) {
 		++s_GLFWWindowCount;
 	}
 
-	glfwMakeContextCurrent(glfwWindow);
-	[[maybe_unused]] int status =
-			gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-	OWL_CORE_ASSERT(status, "Failed to initialize GLAD");
-	// m_Context = GraphicsContext::Create(glfwWindow);
-	// m_Context->Init();
+	context = renderer::GraphContext::Create(glfwWindow);
+	context->Init();
 
 	glfwSetWindowUserPointer(glfwWindow, &windowData);
 	setVSync(true);
@@ -178,7 +167,11 @@ void Window::init(const Properties &props) {
 				data.eventCallback(event);
 			});
 }
+
 void Window::shutdown() {
+
+	OWL_PROFILE_FUNCTION();
+
 	glfwDestroyWindow(glfwWindow);
 	--s_GLFWWindowCount;
 
@@ -186,5 +179,29 @@ void Window::shutdown() {
 		glfwTerminate();
 	}
 }
+
+
+void Window::onUpdate() {
+
+	OWL_PROFILE_FUNCTION();
+
+	glfwPollEvents();
+	glfwSwapBuffers(glfwWindow);
+	context->SwapBuffers();
+}
+
+void Window::setVSync(bool enabled) {
+
+	OWL_PROFILE_FUNCTION();
+
+	if (enabled)
+		glfwSwapInterval(1);
+	else
+		glfwSwapInterval(0);
+
+	windowData.VSync = enabled;
+}
+
+bool Window::isVSync() const { return windowData.VSync; }
 
 }// namespace owl::window::glfw

@@ -40,6 +40,7 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
             -Wdeprecated-declarations
             -Wcast-align
             -Wcast-qual
+            -Wno-mismatched-new-delete
             )
 elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_CLANG_MINIMAL})

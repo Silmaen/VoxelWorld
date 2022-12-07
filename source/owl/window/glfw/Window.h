@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "renderer/GraphContext.h"
 #include "window/Window.h"
 #include <GLFW/glfw3.h>
 
@@ -87,7 +88,7 @@ private:
 	/// Pointer to the GLFW window
 	GLFWwindow *glfwWindow{};
 	/// Pointer to the Graphic Context
-	//uniq<GraphicsContext> m_Context;
+	uniq<renderer::GraphContext> context;
 
 	/**
 	 * @brief Window's data

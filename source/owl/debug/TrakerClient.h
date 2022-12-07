@@ -11,8 +11,8 @@
  */
 #pragma once
 
-#ifdef OWL_BUILD_SHARED
 #include "Tracker.h"
+#ifdef OWL_BUILD_SHARED
 
 #define OWL_DEALLOC_EXCEPT noexcept
 
