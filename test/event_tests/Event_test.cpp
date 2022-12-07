@@ -12,12 +12,12 @@
 using namespace owl::event;
 
 TEST(EventDispatcher, base) {
-  AppTickEvent event;
-  EventDispatcher dispatcher(event);
-  EXPECT_FALSE(
-      dispatcher.dispatch<AppUpdateEvent>([](Event &) { return true; }));
-  EXPECT_TRUE(dispatcher.dispatch<AppTickEvent>([](Event &) { return false; }));
-  EXPECT_FALSE(event.handled);
-  EXPECT_TRUE(dispatcher.dispatch<AppTickEvent>([](Event &) { return true; }));
-  EXPECT_TRUE(event.handled);
+	AppTickEvent event;
+	EventDispatcher dispatcher(event);
+	EXPECT_FALSE(
+			dispatcher.dispatch<AppUpdateEvent>([](Event &) { return true; }));
+	EXPECT_TRUE(dispatcher.dispatch<AppTickEvent>([](Event &) { return false; }));
+	EXPECT_FALSE(event.handled);
+	EXPECT_TRUE(dispatcher.dispatch<AppTickEvent>([](Event &) { return true; }));
+	EXPECT_TRUE(event.handled);
 }

@@ -11,67 +11,67 @@
 using namespace owl::event;
 
 TEST(MouseEvent, ButtonPressed) {
-  MouseButtonPressedEvent event(12);
-  EXPECT_STREQ(event.getName().c_str(), "MouseButtonPressedEvent");
-  EXPECT_EQ(event.getType(), type::MouseButtonPressed);
-  EXPECT_EQ(event.getStaticType(), type::MouseButtonPressed);
-  EXPECT_EQ(event.getCategoryFlags(),
-            category::Input | category::Mouse | category::MouseButton);
-  EXPECT_STREQ(event.toString().c_str(), "MouseButtonPressedEvent: 12");
-  EXPECT_TRUE(event.isInCategory(category::Input));
-  EXPECT_FALSE(event.isInCategory(category::Keyboard));
-  EXPECT_FALSE(event.isInCategory(category::Application));
-  EXPECT_TRUE(event.isInCategory(category::Mouse));
-  EXPECT_TRUE(event.isInCategory(category::MouseButton));
-  EXPECT_FALSE(event.isInCategory(category::None));
+	MouseButtonPressedEvent event(12);
+	EXPECT_STREQ(event.getName().c_str(), "MouseButtonPressedEvent");
+	EXPECT_EQ(event.getType(), type::MouseButtonPressed);
+	EXPECT_EQ(event.getStaticType(), type::MouseButtonPressed);
+	EXPECT_EQ(event.getCategoryFlags(),
+			  category::Input | category::Mouse | category::MouseButton);
+	EXPECT_STREQ(event.toString().c_str(), "MouseButtonPressedEvent: 12");
+	EXPECT_TRUE(event.isInCategory(category::Input));
+	EXPECT_FALSE(event.isInCategory(category::Keyboard));
+	EXPECT_FALSE(event.isInCategory(category::Application));
+	EXPECT_TRUE(event.isInCategory(category::Mouse));
+	EXPECT_TRUE(event.isInCategory(category::MouseButton));
+	EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(MouseEvent, ButtonReleased) {
-  MouseButtonReleasedEvent event(12);
-  EXPECT_STREQ(event.getName().c_str(), "MouseButtonReleasedEvent");
-  EXPECT_EQ(event.getType(), type::MouseButtonReleased);
-  EXPECT_EQ(event.getStaticType(), type::MouseButtonReleased);
-  EXPECT_EQ(event.getCategoryFlags(),
-            category::Input | category::Mouse | category::MouseButton);
-  EXPECT_STREQ(event.toString().c_str(), "MouseButtonReleasedEvent: 12");
-  EXPECT_TRUE(event.isInCategory(category::Input));
-  EXPECT_FALSE(event.isInCategory(category::Keyboard));
-  EXPECT_FALSE(event.isInCategory(category::Application));
-  EXPECT_TRUE(event.isInCategory(category::Mouse));
-  EXPECT_TRUE(event.isInCategory(category::MouseButton));
-  EXPECT_FALSE(event.isInCategory(category::None));
+	MouseButtonReleasedEvent event(12);
+	EXPECT_STREQ(event.getName().c_str(), "MouseButtonReleasedEvent");
+	EXPECT_EQ(event.getType(), type::MouseButtonReleased);
+	EXPECT_EQ(event.getStaticType(), type::MouseButtonReleased);
+	EXPECT_EQ(event.getCategoryFlags(),
+			  category::Input | category::Mouse | category::MouseButton);
+	EXPECT_STREQ(event.toString().c_str(), "MouseButtonReleasedEvent: 12");
+	EXPECT_TRUE(event.isInCategory(category::Input));
+	EXPECT_FALSE(event.isInCategory(category::Keyboard));
+	EXPECT_FALSE(event.isInCategory(category::Application));
+	EXPECT_TRUE(event.isInCategory(category::Mouse));
+	EXPECT_TRUE(event.isInCategory(category::MouseButton));
+	EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(MouseEvent, Moved) {
-  MouseMovedEvent event(144, 155);
-  EXPECT_STREQ(event.getName().c_str(), "MouseMovedEvent");
-  EXPECT_EQ(event.getType(), type::MouseMoved);
-  EXPECT_EQ(event.getStaticType(), type::MouseMoved);
-  EXPECT_EQ(event.getCategoryFlags(), category::Input | category::Mouse);
-  EXPECT_EQ(event.getX(), 144);
-  EXPECT_EQ(event.getY(), 155);
-  EXPECT_STREQ(event.toString().c_str(), "MouseMovedEvent: 144, 155");
-  EXPECT_TRUE(event.isInCategory(category::Input));
-  EXPECT_FALSE(event.isInCategory(category::Keyboard));
-  EXPECT_FALSE(event.isInCategory(category::Application));
-  EXPECT_TRUE(event.isInCategory(category::Mouse));
-  EXPECT_FALSE(event.isInCategory(category::MouseButton));
-  EXPECT_FALSE(event.isInCategory(category::None));
+	MouseMovedEvent event(144, 155);
+	EXPECT_STREQ(event.getName().c_str(), "MouseMovedEvent");
+	EXPECT_EQ(event.getType(), type::MouseMoved);
+	EXPECT_EQ(event.getStaticType(), type::MouseMoved);
+	EXPECT_EQ(event.getCategoryFlags(), category::Input | category::Mouse);
+	EXPECT_EQ(event.getX(), 144);
+	EXPECT_EQ(event.getY(), 155);
+	EXPECT_STREQ(event.toString().c_str(), "MouseMovedEvent: 144, 155");
+	EXPECT_TRUE(event.isInCategory(category::Input));
+	EXPECT_FALSE(event.isInCategory(category::Keyboard));
+	EXPECT_FALSE(event.isInCategory(category::Application));
+	EXPECT_TRUE(event.isInCategory(category::Mouse));
+	EXPECT_FALSE(event.isInCategory(category::MouseButton));
+	EXPECT_FALSE(event.isInCategory(category::None));
 }
 
 TEST(MouseEvent, Scrolled) {
-  MouseScrolledEvent event(1, 1);
-  EXPECT_STREQ(event.getName().c_str(), "MouseScrolledEvent");
-  EXPECT_EQ(event.getType(), type::MouseScrolled);
-  EXPECT_EQ(event.getStaticType(), type::MouseScrolled);
-  EXPECT_EQ(event.getCategoryFlags(), category::Input | category::Mouse);
-  EXPECT_EQ(event.getXOff(), 1);
-  EXPECT_EQ(event.getYOff(), 1);
-  EXPECT_STREQ(event.toString().c_str(), "MouseScrolledEvent: 1, 1");
-  EXPECT_TRUE(event.isInCategory(category::Input));
-  EXPECT_FALSE(event.isInCategory(category::Keyboard));
-  EXPECT_FALSE(event.isInCategory(category::Application));
-  EXPECT_TRUE(event.isInCategory(category::Mouse));
-  EXPECT_FALSE(event.isInCategory(category::MouseButton));
-  EXPECT_FALSE(event.isInCategory(category::None));
+	MouseScrolledEvent event(1, 1);
+	EXPECT_STREQ(event.getName().c_str(), "MouseScrolledEvent");
+	EXPECT_EQ(event.getType(), type::MouseScrolled);
+	EXPECT_EQ(event.getStaticType(), type::MouseScrolled);
+	EXPECT_EQ(event.getCategoryFlags(), category::Input | category::Mouse);
+	EXPECT_EQ(event.getXOff(), 1);
+	EXPECT_EQ(event.getYOff(), 1);
+	EXPECT_STREQ(event.toString().c_str(), "MouseScrolledEvent: 1, 1");
+	EXPECT_TRUE(event.isInCategory(category::Input));
+	EXPECT_FALSE(event.isInCategory(category::Keyboard));
+	EXPECT_FALSE(event.isInCategory(category::Application));
+	EXPECT_TRUE(event.isInCategory(category::Mouse));
+	EXPECT_FALSE(event.isInCategory(category::MouseButton));
+	EXPECT_FALSE(event.isInCategory(category::None));
 }

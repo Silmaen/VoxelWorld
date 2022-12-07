@@ -22,8 +22,8 @@ void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT;
  * @return Pointer to allocated memory
  */
 void *operator new(size_t size) {
-  owl::debug::Tracker::get().allocate(size);
-  return malloc(size);
+	owl::debug::Tracker::get().allocate(size);
+	return malloc(size);
 }
 
 /**
@@ -32,41 +32,41 @@ void *operator new(size_t size) {
  * @param size Amount to free
  */
 void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT {
-  owl::debug::Tracker::get().deallocate(size);
-  free(memory);
+	owl::debug::Tracker::get().deallocate(size);
+	free(memory);
 }
 /**
  * @brief Overload of standard memory deallocation
  * @param memory Memory to free
  */
 void operator delete(void *memory) OWL_DEALLOC_EXCEPT {
-  free(memory);
+	free(memory);
 } //---UNCOVER---
 
 namespace owl::debug {
 
 Tracker& Tracker::get() {
-  static Tracker instance;
-  return instance;
+	static Tracker instance;
+	return instance;
 }
 
 void Tracker::allocate(size_t size) {
-  ++currentAllocationState.allocationCalls;
-  currentAllocationState.allocatedMemory += size;
-  currentAllocationState.memoryPeek =
-      std::max(currentAllocationState.memoryPeek,
-               currentAllocationState.allocatedMemory);
-  ++globalAllocationState.allocationCalls;
-  globalAllocationState.allocatedMemory += size;
-  globalAllocationState.memoryPeek = std::max(
-      globalAllocationState.memoryPeek, globalAllocationState.allocatedMemory);
+	++currentAllocationState.allocationCalls;
+	currentAllocationState.allocatedMemory += size;
+	currentAllocationState.memoryPeek =
+		std::max(currentAllocationState.memoryPeek,
+					currentAllocationState.allocatedMemory);
+	++globalAllocationState.allocationCalls;
+	globalAllocationState.allocatedMemory += size;
+	globalAllocationState.memoryPeek = std::max(
+		globalAllocationState.memoryPeek, globalAllocationState.allocatedMemory);
 }
 void Tracker::deallocate(size_t size) {
-  ++currentAllocationState.deallocationCalls;
-  currentAllocationState.allocatedMemory =
-      currentAllocationState.allocatedMemory > size
-          ? currentAllocationState.allocatedMemory - size
-          : 0;
+	++currentAllocationState.deallocationCalls;
+	currentAllocationState.allocatedMemory =
+		currentAllocationState.allocatedMemory > size
+				 ? currentAllocationState.allocatedMemory - size
+	        : 0;
   ++globalAllocationState.deallocationCalls;
   globalAllocationState.allocatedMemory =
       globalAllocationState.allocatedMemory > size

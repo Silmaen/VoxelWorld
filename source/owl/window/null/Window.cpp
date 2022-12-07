@@ -22,4 +22,4 @@ void Window::setVSync(bool) {}
 
 bool Window::isVSync() const { return false; };
 
-} // namespace owl::window::null
+}// namespace owl::window::null

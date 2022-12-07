@@ -10,12 +10,12 @@
 #include "Log.h"
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
-  owl::core::Log::init();
-  // Startup
-  auto app = owl::core::createApplication();
-  // runtime
-  app->run();
-  // Shutdown
-  app.reset();
-  return 0;
+	owl::core::Log::init();
+	// Startup
+	auto app = owl::core::createApplication();
+	// runtime
+	app->run();
+	// Shutdown
+	app.reset();
+	return 0;
 }

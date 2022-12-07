@@ -83,7 +83,7 @@ endif ()
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_MAJOR="${CMAKE_PROJECT_VERSION_MAJOR}")
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_MINOR="${CMAKE_PROJECT_VERSION_MINOR}")
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_PATCH="${CMAKE_PROJECT_VERSION_PATCH}")
-target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_AUTHOR="Damien Lachouette")
+target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_AUTHOR="Silmaen")
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_DEBUG)

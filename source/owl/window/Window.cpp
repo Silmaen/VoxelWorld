@@ -15,11 +15,11 @@
 namespace owl::window {
 
 uniq<Window> Window::Create(const Properties &props) {
-  if (props.winType == Type::GLFW)
-    return mk_uniq<glfw::Window>(props);
-  return mk_uniq<null::Window>(props);
+	if (props.winType == Type::GLFW)
+		return mk_uniq<glfw::Window>(props);
+	return mk_uniq<null::Window>(props);
 }
 
 Window::~Window() = default;
 
-} // namespace owl::window
+}// namespace owl::window

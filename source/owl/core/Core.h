@@ -29,8 +29,20 @@
 
 #ifdef OWL_ENABLE_ASSERTS
 #include <debugbreak.h>
-#define OWL_ASSERT(x, ...) {if(!(x)) {OWL_ERROR("Assertion Failed: {}", __VA_ARGS__); debug_break();}}
-#define OWL_CORE_ASSERT(x, ...) {if(!(x)) {OWL_CORE_ERROR("Assertion Failed: {}", __VA_ARGS__); debug_break();}}
+#define OWL_ASSERT(x, ...)                                  \
+	{                                                       \
+		if (!(x)) {                                         \
+			OWL_ERROR("Assertion Failed: {}", __VA_ARGS__); \
+			debug_break();                                  \
+		}                                                   \
+	}
+#define OWL_CORE_ASSERT(x, ...)                                  \
+	{                                                            \
+		if (!(x)) {                                              \
+			OWL_CORE_ERROR("Assertion Failed: {}", __VA_ARGS__); \
+			debug_break();                                       \
+		}                                                        \
+	}
 #else
 #define OWL_ASSERT(x, ...)
 #define OWL_CORE_ASSERT(x, ...)
@@ -43,21 +55,23 @@
 namespace owl {
 
 /// Wrap to unique pointer
-template <typename T> using uniq = std::unique_ptr<T>;
+template<typename T>
+using uniq = std::unique_ptr<T>;
 /**
- * @brief  Wrap to unique pointer creator
+ * @brief	Wrap to unique pointer creator
  * @tparam T Type of data
  * @tparam Args Args type to pass to the constructor
  * @param args Args to pass to the constructor
  * @return Unique pointer
  */
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 constexpr uniq<T> mk_uniq(Args &&...args) {
-  return std::make_unique<T>(std::forward<Args>(args)...);
+	return std::make_unique<T>(std::forward<Args>(args)...);
 }
 
 /// Wrap to shared pointer
-template <typename T> using shrd = std::shared_ptr<T>;
+template<typename T>
+using shrd = std::shared_ptr<T>;
 /**
  * @brief Wrap to shared pointer creator
 * @tparam T Type of data
@@ -65,9 +79,9 @@ template <typename T> using shrd = std::shared_ptr<T>;
 * @param args Args to pass to the constructor
 * @return Shared pointer
 */
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 constexpr shrd<T> mk_shrd(Args &&...args) {
-  return std::make_shared<T>(std::forward<Args>(args)...);
+	return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
-} // namespace owl
+}// namespace owl

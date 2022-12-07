@@ -13,38 +13,38 @@
 namespace owl::core::layer {
 
 LayerStack::~LayerStack() {
-  for (auto &layer : layers) {
-    layer->onDetach();
-    layer.reset();
-  }
+	for (auto &layer: layers) {
+		layer->onDetach();
+		layer.reset();
+	}
 }
 
 void LayerStack::pushLayer(shrd<Layer> &&layer) {
-  layer->onAttach();
-  layers.emplace(layers.begin() + layerInsertIndex, std::move(layer));
-  layerInsertIndex++;
+	layer->onAttach();
+	layers.emplace(layers.begin() + layerInsertIndex, std::move(layer));
+	layerInsertIndex++;
 }
 
 void LayerStack::pushOverlay(shrd<Layer> &&overlay) {
-  layers.emplace_back(std::move(overlay));
-  layers.back()->onAttach();
+	layers.emplace_back(std::move(overlay));
+	layers.back()->onAttach();
 }
 
 void LayerStack::popLayer(const shrd<Layer> &layer) {
-  auto it = std::find(layers.begin(), layers.begin() + layerInsertIndex, layer);
-  if (it != layers.begin() + layerInsertIndex) {
-    layer->onDetach();
-    layers.erase(it);
-    layerInsertIndex--;
-  }
+	auto it = std::find(layers.begin(), layers.begin() + layerInsertIndex, layer);
+	if (it != layers.begin() + layerInsertIndex) {
+		layer->onDetach();
+		layers.erase(it);
+		layerInsertIndex--;
+	}
 }
 
 void LayerStack::popOverlay(const shrd<Layer> &overlay) {
-  auto it = std::find(layers.begin() + layerInsertIndex, layers.end(), overlay);
-  if (it != layers.end()) {
-    overlay->onDetach();
-    layers.erase(it);
-  }
+	auto it = std::find(layers.begin() + layerInsertIndex, layers.end(), overlay);
+	if (it != layers.end()) {
+		overlay->onDetach();
+		layers.erase(it);
+	}
 }
 
-} // namespace owl::core::layer
+}// namespace owl::core::layer

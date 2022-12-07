@@ -59,8 +59,8 @@ find_package(debugbreak 8 REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC DebugBreak)
 
 # json
-#find_package(nlohmann_json 3.11.1 REQUIRED)
-#target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE nlohmann_json::nlohmann_json)
+find_package(nlohmann_json 3.11.1 REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC nlohmann_json::nlohmann_json)
 # header-only
 
 #fmt

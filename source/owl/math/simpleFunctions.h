@@ -21,10 +21,11 @@ namespace owl::math {
  * @param maxValue max value
  * @return Clamped value
  */
-template <typename data>
+template<typename data>
 constexpr data clamp(const data &input, const data &minValue,
-                     const data &maxValue) {
-  return input < minValue ? minValue : input > maxValue ? maxValue : input;
+					 const data &maxValue) {
+	return input < minValue ? minValue : input > maxValue ? maxValue
+														  : input;
 }
 
 /**
@@ -35,11 +36,12 @@ constexpr data clamp(const data &input, const data &minValue,
  * @param maxValue max value
  * @return Clamped value
  */
-template <typename data>
+template<typename data>
 constexpr data clampSafe(const data &input, data minValue, data maxValue) {
-  if (maxValue < minValue)
-    std::swap(minValue, maxValue);
-  return input < minValue ? minValue : input > maxValue ? maxValue : input;
+	if (maxValue < minValue)
+		std::swap(minValue, maxValue);
+	return input < minValue ? minValue : input > maxValue ? maxValue
+														  : input;
 }
 
 /**
@@ -48,8 +50,9 @@ constexpr data clampSafe(const data &input, data minValue, data maxValue) {
  * @param input Value to check
  * @return 1 if input positive, else return 0
  */
-template <typename data> constexpr data heaviside(const data &input) {
-  return input > 0 ? data{1} : data{};
+template<typename data>
+constexpr data heaviside(const data &input) {
+	return input > 0 ? data{1} : data{};
 }
 
 /**
@@ -58,8 +61,9 @@ template <typename data> constexpr data heaviside(const data &input) {
  * @param input Value to check
  * @return 0 if input is 0 1 if input positive, else return -1
  */
-template <typename data> constexpr data sign(const data &input) {
-  return input > 0 ? data{1} : (input < 0 ? data{-1} : 0);
+template<typename data>
+constexpr data sign(const data &input) {
+	return input > 0 ? data{1} : (input < 0 ? data{-1} : 0);
 }
 
-} // namespace owl::math
+}// namespace owl::math

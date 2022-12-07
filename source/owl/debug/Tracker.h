@@ -28,19 +28,19 @@ namespace owl::debug {
  */
 class OWL_API Tracker {
 public:
-  Tracker(const Tracker &) = delete;
-  Tracker(Tracker &&) = delete;
-  Tracker &operator=(const Tracker &) = delete;
-  Tracker &operator=(Tracker &&) = delete;
-  /**
-   * @brief Destructor.
-   */
-  ~Tracker() = default; //---UNCOVER---
-  /**
-   * @brief Get engine instance
-   * @return The engine instance
-   */
-  static Tracker &get();
+	Tracker(const Tracker &) = delete;
+	Tracker(Tracker &&) = delete;
+	Tracker &operator=(const Tracker &) = delete;
+	Tracker &operator=(Tracker &&) = delete;
+	/**
+	 * @brief Destructor.
+	 */
+	~Tracker() = default; //---UNCOVER---
+	/**
+	 * @brief Get engine instance
+	 * @return The engine instance
+	 */
+	static Tracker &get();
 
   /**
    * @brief Function called at each allocation

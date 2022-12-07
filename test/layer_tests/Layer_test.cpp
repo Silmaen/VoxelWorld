@@ -13,11 +13,11 @@
 using namespace owl::core::layer;
 
 TEST(Layer, base) {
-  Layer layer("test");
-  layer.onUpdate();
-  layer.onAttach();
-  layer.onDetach();
-  owl::event::AppTickEvent evt;
-  layer.onEvent(evt);
-  EXPECT_STREQ(layer.getName().c_str(), "test");
+	Layer layer("test");
+	layer.onUpdate();
+	layer.onAttach();
+	layer.onDetach();
+	owl::event::AppTickEvent evt;
+	layer.onEvent(evt);
+	EXPECT_STREQ(layer.getName().c_str(), "test");
 }

@@ -26,8 +26,8 @@ void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT;
  * @return Pointer to allocated memory
  */
 void *operator new(size_t size) {
-  owl::debug::Tracker::get().allocate(size);
-  return malloc(size);
+	owl::debug::Tracker::get().allocate(size);
+	return malloc(size);
 }
 
 /**
@@ -36,14 +36,14 @@ void *operator new(size_t size) {
  * @param size Amount to free
  */
 void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT {
-  owl::debug::Tracker::get().deallocate(size);
-  free(memory);
+	owl::debug::Tracker::get().deallocate(size);
+	free(memory);
 }
 /**
  * @brief Overload of standard memory deallocation
  * @param memory Memory to free
  */
 void operator delete(void *memory) OWL_DEALLOC_EXCEPT {
-  free(memory);
-} //---UNCOVER---
+	free(memory);
+}//---UNCOVER---
 #endif
