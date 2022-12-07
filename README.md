@@ -1,5 +1,7 @@
 # Owl
 
+![](res/logo/logo_owl.png)
+
 Owl aims to be a simple game engine.
 
 ## Dependencies

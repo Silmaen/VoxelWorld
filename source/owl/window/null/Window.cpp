@@ -1,6 +1,6 @@
 /**
  * @file Window.cpp
- * @author damien.lachouette
+ * @author Silmaen
  * @date 05/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
