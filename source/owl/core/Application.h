@@ -7,11 +7,13 @@
  */
 
 #pragma once
+#include <filesystem>
 
 #include "Log.h"
 #include "event/AppEvent.h"
 #include "gui/ImGuiLayer.h"
 #include "layer/LayerStack.h"
+#include "renderer/Shader.h"
 #include "window/Window.h"
 
 /**
@@ -96,6 +98,11 @@ private:
 	layer::LayerStack layerStack;
 	/// The application Instance
 	static Application *instance;
+	/// Base Path to the working Directory
+	std::filesystem::path workingDirectory;
+
+	uint32_t vertexArray = 0, vertexBuffer = 0, indexBuffer = 0;
+	uniq<renderer::Shader> shader;
 };
 
 /**

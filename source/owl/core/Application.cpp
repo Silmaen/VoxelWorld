@@ -11,27 +11,84 @@
 #include "Application.h"
 
 // TEMPORARY
+#include <glad/glad.h>
+
 #include <GLFW/glfw3.h>
 
 namespace owl::core {
+
+inline std::string fileToString(const std::filesystem::path &file) {
+	if (!exists(file)){
+		OWL_CORE_WARN("File '{}' does not exists", file.string());
+		return "";
+	}
+	std::ifstream t(file);
+	std::string str;
+	t.seekg(0, std::ios::end);
+	str.reserve(t.tellg());
+	t.seekg(0, std::ios::beg);
+	str.assign((std::istreambuf_iterator<char>(t)),
+			   std::istreambuf_iterator<char>());
+	OWL_CORE_TRACE("Shader read: {}", str);
+	return str;
+}
 
 Application *Application::instance = nullptr;
 
 Application::Application() {
 	OWL_CORE_ASSERT(!instance, "Application already exists!");
 	instance = this;
+
+	// Setup a working directory
+	// Assuming present of a folder 'res' containing the data
+	workingDirectory = absolute(std::filesystem::current_path());
+	while (workingDirectory != workingDirectory.root_path()) {
+		if (exists(workingDirectory / "res")) break;
+		workingDirectory = workingDirectory.parent_path();
+	}
+
 	appWindow = window::Window::Create();
 	appWindow->setEventCallback(
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 	imGuiLayer = mk_shrd<gui::ImGuiLayer>();
 	pushOverlay(imGuiLayer);
+
+	// ----------------
+	glGenVertexArrays(1, &vertexArray);
+	glBindVertexArray(vertexArray);
+
+	glGenBuffers(1, &vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+
+	float vertices[3 * 3] = {
+			-0.5f, -0.5f, 0.0f,
+			0.5f, -0.5f, 0.0f,
+			0.0f, 0.5f, 0.0f};
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+
+	glGenBuffers(1, &indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+	uint32_t indices[3] = {0, 1, 2};
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	auto shaderPath = workingDirectory / "res" / "shaders";
+	shader.reset((new renderer::Shader(fileToString(shaderPath/"basic.vert"),fileToString(shaderPath/"basic.frag"))));
+	//--------------------------
 }
 
 void Application::run() {
 	while (running) {
 		if (!minimized) {
-			glClearColor(0, 0, 0, 1);
+			glClearColor(0.1f, 0.1f, 0.1f, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
+			shader->bind();
+			glBindVertexArray(vertexArray);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 			{
 				for (auto &layer: layerStack)
 					layer->onUpdate();

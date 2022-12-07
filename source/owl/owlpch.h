@@ -9,13 +9,13 @@
 #pragma once
 
 #include <algorithm>
+#include <filesystem>
+#include <fstream>
 #include <functional>
 #include <memory>
+#include <streambuf>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
-
-#include "core/Core.h"
-#include "core/Log.h"
-
-#include "debug/Profiler.h"
-#include "debug/Tracker.h"
+#include <vector>

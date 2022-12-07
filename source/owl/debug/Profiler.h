@@ -189,7 +189,7 @@ constexpr auto cleanupOutputString(const char (&expr)[N],
 
 }// namespace owl::debug
 
-#define OWL_PROFILE 1
+#define OWL_PROFILE 0
 #if OWL_PROFILE
 // Resolve which function signature macro will be used. Note that this only
 // is resolved when the (pre)compiler starts, so the syntax highlighting

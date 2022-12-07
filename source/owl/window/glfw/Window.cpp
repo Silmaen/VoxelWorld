@@ -12,6 +12,7 @@
 
 #include "Window.h"
 #include "core/Log.h"
+#include "debug/Profiler.h"
 #include "event/AppEvent.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
@@ -35,7 +36,6 @@ Window::~Window() {
 }
 
 void Window::init(const Properties &props) {
-
 	OWL_PROFILE_FUNCTION();
 
 	windowData.title = props.Title;
@@ -169,7 +169,6 @@ void Window::init(const Properties &props) {
 }
 
 void Window::shutdown() {
-
 	OWL_PROFILE_FUNCTION();
 
 	glfwDestroyWindow(glfwWindow);
@@ -182,11 +181,9 @@ void Window::shutdown() {
 
 
 void Window::onUpdate() {
-
 	OWL_PROFILE_FUNCTION();
 
 	glfwPollEvents();
-	glfwSwapBuffers(glfwWindow);
 	context->SwapBuffers();
 }
 

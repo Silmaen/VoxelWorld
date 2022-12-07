@@ -23,32 +23,6 @@
 #define OWL_API
 #endif
 
-#ifdef OWL_DEBUG
-#define OWL_ENABLE_ASSERTS
-#endif
-
-#ifdef OWL_ENABLE_ASSERTS
-#include <debugbreak.h>
-#define OWL_ASSERT(x, ...)                                  \
-	{                                                       \
-		if (!(x)) {                                         \
-			OWL_ERROR("Assertion Failed: {}", __VA_ARGS__); \
-			debug_break();                                  \
-		}                                                   \
-	}
-#define OWL_CORE_ASSERT(x, ...)                                  \
-	{                                                            \
-		if (!(x)) {                                              \
-			OWL_CORE_ERROR("Assertion Failed: {}", __VA_ARGS__); \
-			debug_break();                                       \
-		}                                                        \
-	}
-#else
-#define OWL_ASSERT(x, ...)
-#define OWL_CORE_ASSERT(x, ...)
-#endif
-
-
 /**
  * @brief Base Namespace for the project
  */
@@ -85,3 +59,5 @@ constexpr shrd<T> mk_shrd(Args &&...args) {
 }
 
 }// namespace owl
+
+#include "Assert.h"

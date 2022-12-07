@@ -20,6 +20,11 @@ void GraphContext::Init() {
 	glfwMakeContextCurrent(windowHandle);
 	[[maybe_unused]] int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 	OWL_CORE_ASSERT(status, "Failed to initialize GLAD");
+
+	OWL_CORE_INFO("OpenGL Info:");
+	OWL_CORE_INFO("  Vendor: {}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+	OWL_CORE_INFO("  Renderer: {}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+	OWL_CORE_INFO("  Version: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 }
 
 void GraphContext::SwapBuffers() {
