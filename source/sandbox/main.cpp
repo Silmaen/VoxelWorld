@@ -29,6 +29,8 @@ public:
 	void onEvent([[maybe_unused]] owl::event::Event &event) override {}
 	void onImGuiRender() override {
 		auto &tracker = owl::debug::Tracker::get();
+		static bool open = true;
+		ImGui::ShowDemoWindow(&open);
 		ImGui::Begin("Statistics");
 		ImGui::Text(fmt::format("Current used memory: {}",
 								tracker.globals().allocatedMemory)

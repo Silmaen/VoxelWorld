@@ -14,6 +14,8 @@
 #include "gui/ImGuiLayer.h"
 #include "layer/LayerStack.h"
 #include "renderer/Shader.h"
+#include "renderer/Buffer.h"
+#include "renderer/VertexArray.h"
 #include "window/Window.h"
 
 /**
@@ -101,8 +103,11 @@ private:
 	/// Base Path to the working Directory
 	std::filesystem::path workingDirectory;
 
-	uint32_t vertexArray = 0, vertexBuffer = 0, indexBuffer = 0;
 	uniq<renderer::Shader> shader;
+	uniq<renderer::VertexArray> vertexArray;
+
+	uniq<renderer::Shader> blueShader;
+	uniq<renderer::VertexArray> squareVA;
 };
 
 /**

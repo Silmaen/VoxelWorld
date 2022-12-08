@@ -14,7 +14,6 @@ else()
     add_library(imgui STATIC ${SRCS} ${HDRS})
 endif()
 
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 target_include_directories(imgui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(imgui SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} backends)
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
