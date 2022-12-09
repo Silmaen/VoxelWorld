@@ -10,7 +10,7 @@
 
 #include "renderer/GraphContext.h"
 #include "window/Window.h"
-#include <GLFW/glfw3.h>
+#include "core/external/glfw3.h"
 
 namespace owl::window::glfw {
 

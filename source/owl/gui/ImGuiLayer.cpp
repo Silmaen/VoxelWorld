@@ -11,10 +11,8 @@
 #include "ImGuiLayer.h"
 #include "core/Application.h"
 #include "input/Input.h"
-#include <GLFW/glfw3.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <imgui.h>
+#include "core/external/glfw3.h"
+#include "core/external/imgui.h"
 
 namespace owl::gui {
 

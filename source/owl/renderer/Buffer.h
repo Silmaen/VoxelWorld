@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "core/Core.h"
 namespace owl::renderer {
 
@@ -29,7 +31,7 @@ enum class ShaderDataType {
 	Bool
 };
 
-/*static uint32_t ShaderDataTypeSize(ShaderDataType type) {
+static uint32_t ShaderDataTypeSize(ShaderDataType type) {
 	switch (type) {
 		case ShaderDataType::Float:
 			return 4;
@@ -56,14 +58,14 @@ enum class ShaderDataType {
 		case ShaderDataType::None:
 			return 0;
 	}
-	OWL_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
 	return 0;
-}*/
+}
 
 /**
  * @brief Class BufferElement
  */
-struct BufferElement {
+struct OWL_API BufferElement {
 	/// Element Name
 	std::string name;
 	/// Data's type
@@ -75,8 +77,17 @@ struct BufferElement {
 	/// If data's normalized
 	bool normalized = false;
 	/**
+	 * @brief Constructor
+	 * @param name_ Element Name
+	 * @param type_ Data's type
+	 * @param normalized_ If data's normalized
+	 */
+	BufferElement(std::string&& name_, ShaderDataType type_, bool normalized_ = false)
+		: name(std::move(name_)), type(type_), size(ShaderDataTypeSize(type_)), offset(0), normalized(normalized_) {
+	}
+	/**
 	 * @brief Get component's count
-	 * @return component's count
+	 * @return Component's count
 	 */
 	[[nodiscard]] uint32_t getComponentCount() const {
 		switch (type) {
@@ -105,8 +116,7 @@ struct BufferElement {
 			case ShaderDataType::None:
 				return 0;
 		}
-
-		OWL_CORE_ASSERT(false, "Unknown ShaderDataType!");
+		OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
 		return 0;
 	}
 };
@@ -114,14 +124,14 @@ struct BufferElement {
 /**
  * @brief Class BufferLayout
  */
-class BufferLayout {
+class OWL_API BufferLayout {
 public:
 	using element_type = std::vector<BufferElement>;
 	using iterator = element_type::iterator;
 	using const_iterator = element_type::const_iterator;
 	/**
-	 * @brief
-	 * @param elements
+	 * @brief Constructor
+	 * @param elements_ Elements in the layout
 	 */
 	BufferLayout(const std::initializer_list<BufferElement> &elements_)
 		: elements(elements_) {
@@ -129,7 +139,7 @@ public:
 	}
 	/**
 	 * @brief Get buffer stride
-	 * @return the buffer stride
+	 * @return The buffer stride
 	 */
 	[[nodiscard]] inline uint32_t getStride() const { return stride; }
 	/**
@@ -162,10 +172,15 @@ private:
 	}
 };
 
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class VertexBuffer
  */
-class VertexBuffer {
+class OWL_API VertexBuffer {
 public:
 	VertexBuffer(const VertexBuffer &) = default;
 	VertexBuffer(VertexBuffer &&) = default;
@@ -210,11 +225,18 @@ private:
 	/// Data layout description
 	BufferLayout layout{};
 };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class IndexBuffer
  */
-class IndexBuffer {
+class OWL_API IndexBuffer {
 public:
 	IndexBuffer(const IndexBuffer &) = default;
 	IndexBuffer(IndexBuffer &&) = default;
@@ -253,5 +275,8 @@ public:
 
 private:
 };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }// namespace owl::renderer

@@ -9,7 +9,7 @@
 
 #include "Input.h"
 #include "core/Application.h"
-#include <GLFW/glfw3.h>
+#include "core/external/glfw3.h"
 
 namespace owl::input {
 // Change this to allow more input framework!

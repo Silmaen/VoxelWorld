@@ -52,8 +52,6 @@ public:
 private:
 	/// If event should be bocked
 	bool blockEvents = true;
-
-	float savedTime = 0;
 };
 
 } // namespace owl::gui

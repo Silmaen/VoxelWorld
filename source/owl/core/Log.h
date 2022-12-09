@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Core.h"
-#include <spdlog/spdlog.h>
+#include "external/spdlog.h"
 
 namespace owl::core {
 /**

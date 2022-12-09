@@ -10,12 +10,10 @@
 #include <filesystem>
 
 #include "Log.h"
+#include "Timestep.h"
 #include "event/AppEvent.h"
 #include "gui/ImGuiLayer.h"
 #include "layer/LayerStack.h"
-#include "renderer/Shader.h"
-#include "renderer/Buffer.h"
-#include "renderer/VertexArray.h"
 #include "window/Window.h"
 
 /**
@@ -71,8 +69,20 @@ public:
 	*/
 	void pushOverlay(shrd<layer::Layer> &&overlay);
 
+	/**
+	 * @brief Access to the window
+	 * @return The Window
+	 */
 	[[nodiscard]] const window::Window &getWindow() const {
 		return *appWindow.get();
+	}
+
+	/**
+	 * @brief Get the working directory
+	 * @return The current working directory
+	 */
+	[[nodiscard]] const std::filesystem::path &getWorkingDirectory() const {
+		return workingDirectory;
 	}
 
 private:
@@ -103,11 +113,7 @@ private:
 	/// Base Path to the working Directory
 	std::filesystem::path workingDirectory;
 
-	uniq<renderer::Shader> shader;
-	uniq<renderer::VertexArray> vertexArray;
-
-	uniq<renderer::Shader> blueShader;
-	uniq<renderer::VertexArray> squareVA;
+	Timestep stepper;
 };
 
 /**

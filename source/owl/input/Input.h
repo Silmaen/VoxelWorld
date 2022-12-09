@@ -15,6 +15,10 @@
 
 namespace owl::input {
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class Input
  */
@@ -97,5 +101,9 @@ protected:
 	/// pointer to the input instance
 	static Input *instance;
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }// namespace owl::input

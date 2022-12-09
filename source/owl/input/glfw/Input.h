@@ -28,7 +28,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Input() = default;
+	~Input() override = default;
 
 protected:
 	/**

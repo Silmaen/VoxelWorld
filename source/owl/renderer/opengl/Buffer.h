@@ -75,7 +75,7 @@ public:
 	 * @brief Get the number of element in the buffer
 	 * @return Number of element in the buffer
 	 */
-	uint32_t getCount() const override { return count; };
+	uint32_t getCount() const override { return count; }
 
 private:
 	/// ID in OpenGl context

@@ -11,11 +11,13 @@
 
 #include "core/Core.h"
 #include "event/Event.h"
+#include "core/Timestep.h"
 
 /**
  * @brief Namespace for the layer definition
  */
 namespace owl::core::layer {
+
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -49,12 +51,14 @@ public:
 	virtual void onDetach() {}
 	/**
 	 * @brief Action on update
+	 * @param ts The time step since last frame
 	 */
-	virtual void onUpdate() {}
+	virtual void onUpdate([[maybe_unused]]const Timestep& ts) {}
 	/**
 	 * @brief Action for that layer when gui is rendered
+	 * @param ts The time step since last frame
 	 */
-	virtual void onImGuiRender() {}
+	virtual void onImGuiRender([[maybe_unused]]const Timestep& ts) {}
 	/**
 	 * @brief Action on event
 	 * @param event The Event to react

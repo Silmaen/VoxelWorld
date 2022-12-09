@@ -11,16 +11,19 @@
 
 #include "Renderer.h"
 #include "opengl/VertexArray.h"
+#include <magic_enum.hpp>
 
 namespace owl::renderer {
 
-uniq<VertexArray> VertexArray::create() {
-	switch (Renderer::getAPI()) {
-		case APIType::None:
-			OWL_CORE_ASSERT(false, "APIType::None is currently not supported!");
+shrd<VertexArray> VertexArray::create() {
+	auto type = Renderer::getAPI();
+	switch (type) {
+		case RenderAPI::Type::None:
+		case RenderAPI::Type::Vulkan:
+			OWL_CORE_ASSERT(false, "RenderAPI {} is currently not supported!", magic_enum::enum_name(type));
 			return nullptr;
-		case APIType::OpenGL:
-			return mk_uniq<opengl::VertexArray>();
+		case RenderAPI::Type::OpenGL:
+			return mk_shrd<opengl::VertexArray>();
 	}
 
 	OWL_CORE_ASSERT(false, "Unknown Renderer API!");

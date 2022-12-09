@@ -9,7 +9,7 @@
 #pragma once
 
 #include "../GraphContext.h"
-#include <GLFW/glfw3.h>
+#include "core/external/glfw3.h"
 
 namespace owl::renderer::opengl {
 

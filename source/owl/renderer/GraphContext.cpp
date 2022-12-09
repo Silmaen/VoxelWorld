@@ -5,23 +5,29 @@
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "GraphContext.h"
 #include "owlpch.h"
+
+#include "GraphContext.h"
+#include "Renderer.h"
 #include "renderer/opengl/GraphContext.h"
+
+#include <magic_enum.hpp>
 
 namespace owl::renderer {
 
 uniq<GraphContext> GraphContext::Create(void *window) {
-	//	switch (Renderer::GetAPI()) {
-	//		case RendererAPI::API::None:
-	//			OWL_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-	//			return nullptr;
-	//		case RendererAPI::API::OpenGL:
-	return mk_uniq<opengl::GraphContext>(static_cast<GLFWwindow *>(window));
-	//	}
+	auto type = Renderer::getAPI();
+	switch (type) {
+		case RenderAPI::Type::None:
+		case RenderAPI::Type::Vulkan:
+			OWL_CORE_ASSERT("Render API {} is not yet supported", magic_enum::enum_name(type));
+			return nullptr;
+		case RenderAPI::Type::OpenGL:
+			return mk_uniq<opengl::GraphContext>(static_cast<GLFWwindow *>(window));
+	}
 
-	//	OWL_CORE_ASSERT(false, "Unknown RendererAPI!");
-	//	return nullptr;
+	OWL_CORE_ASSERT(false, "Unknown RendererAPI!");
+	return nullptr;
 }
 
 }// namespace owl::renderer

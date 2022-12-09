@@ -7,18 +7,20 @@
  */
 
 #pragma once
+#include "CameraOrtho.h"
+#include "RenderCommand.h"
+#include "Shader.h"
 
 namespace owl::renderer {
 
-enum struct APIType {
-	None = 0,
-	OpenGL=1
-};
-
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class Renderer
  */
-class Renderer {
+class OWL_API Renderer {
 public:
 	Renderer(const Renderer &) = delete;
 	Renderer(Renderer &&) = delete;
@@ -36,8 +38,35 @@ public:
 	 * @brief Get the actual type of rendering API
 	 * @return The Rendering API
 	 */
-	static APIType getAPI();
+	inline static RenderAPI::Type getAPI() { return RenderAPI::getAPI(); }
+	/**
+	 * @brief Begins a scene
+	 */
+	static void beginScene(CameraOrtho &camera);
+
+	/**
+	 * @brief Ends a scene
+	 */
+	static void endScene();
+	/**
+	 * @brief Add an object to the scene
+	 * @param object Object to add
+	 */
+	static void submit(const shrd<Shader> &shader, const shrd<VertexArray> &object);
+
 private:
+	/**
+	 * @brief Data for the current scene
+	 */
+	struct SceneData {
+		/// View projection Matrix
+		glm::mat4 viewProjectionMatrix;
+	};
+	/// The actual sceneData
+	static shrd<SceneData> sceneData;
 };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }// namespace owl::renderer

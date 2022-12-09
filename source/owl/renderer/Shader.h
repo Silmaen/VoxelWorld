@@ -7,41 +7,62 @@
  */
 
 #pragma once
+#include "core/Core.h"
+#include <glm/glm.hpp>
 
 namespace owl::renderer {
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class Shader
  */
-class Shader {
+class OWL_API Shader {
 public:
 	Shader(const Shader &) = delete;
 	Shader(Shader &&) = delete;
 	Shader &operator=(const Shader &) = delete;
 	Shader &operator=(Shader &&) = delete;
 	/**
-	 * @brief Constructor.
-	 * @param vertexSrc Source of the vertex shader
-	 * @param fragmentSrc Source of fragment shader
+	 * @brief Constructor
 	 */
-	Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
+	Shader() = default;
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Shader();
+	virtual ~Shader() = default;
 
 	/**
 	 * @brief Activate the shader on the GPU
 	 */
-	void bind() const;
+	virtual void bind() const = 0;
 
 	/**
 	 * @brief Deactivate the shader on the GPU
 	 */
-	void unbind() const;
+	virtual void unbind() const = 0;
+	/**
+	 * @brief Create a new shader.
+	 * @param vertexSrc Source of the vertex shader
+	 * @param fragmentSrc Source of fragment shader
+	 * @return pointer to the shader
+	 */
+	static shrd<Shader> create(const std::string &vertexSrc, const std::string &fragmentSrc);
+
+	/**
+	 * @brief Push a matrix to the GPU
+	 * @param name Variable's name
+	 * @param matrix The matrix data
+	 */
+	virtual void uploadUniformMat4(const std::string &name, const glm::mat4 &matrix) = 0;
+
 private:
-	/// Id of the shader in the GPU
-	uint32_t rendererID = 0;
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }// namespace owl::renderer

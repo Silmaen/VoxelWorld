@@ -8,13 +8,27 @@
 
 #pragma once
 
+
+// ------- core ------------
 #include "core/Application.h"
 #include "core/Log.h"
+// -------------------------
+
+#include "core/Timestep.h"
 #include "core/layer/Layer.h"
 #include "gui/ImGuiLayer.h"
 #include "input/Input.h"
 
-
-// ------ Entry Point ------
-#include "core/EntryPoint.h"
+// ------ renderer ---------
+#include "renderer/RenderCommand.h"
+#include "renderer/Renderer.h"
+#include "renderer/Buffer.h"
+#include "renderer/Shader.h"
+#include "renderer/VertexArray.h"
+#include "renderer/CameraOrtho.h"
 // -------------------------
+
+// ------ Debugging --------
+#include "debug/Tracker.h"
+// -------------------------
+

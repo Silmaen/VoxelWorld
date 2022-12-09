@@ -9,30 +9,10 @@
 #include "owlpch.h"
 
 #include "Application.h"
-
-// TEMPORARY
-#include <glad/glad.h>
-
-#include <GLFW/glfw3.h>
-
-#include <memory>
+#include "renderer/Renderer.h"
 
 namespace owl::core {
 
-inline std::string fileToString(const std::filesystem::path &file) {
-	if (!exists(file)) {
-		OWL_CORE_WARN("File '{}' does not exists", file.string());
-		return "";
-	}
-	std::ifstream t(file);
-	std::string str;
-	t.seekg(0, std::ios::end);
-	str.reserve(t.tellg());
-	t.seekg(0, std::ios::beg);
-	str.assign((std::istreambuf_iterator<char>(t)),
-			   std::istreambuf_iterator<char>());
-	return str;
-}
 
 Application *Application::instance = nullptr;
 
@@ -48,70 +28,35 @@ Application::Application() {
 		workingDirectory = workingDirectory.parent_path();
 	}
 
+	// startup the renderer
+	renderer::RenderCommand::create(renderer::RenderAPI::Type::OpenGL);
+
+	// create main window
 	appWindow = window::Window::Create();
 	appWindow->setEventCallback(
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
+
+	// create the GUI layer
 	imGuiLayer = mk_shrd<gui::ImGuiLayer>();
 	pushOverlay(imGuiLayer);
 
-	// ------ one triangle ----------
-	vertexArray = renderer::VertexArray::create();
-	float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-			0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-			0.0f, 0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f};
-	shrd<renderer::VertexBuffer> vertexBuffer = renderer::VertexBuffer::create(vertices, sizeof(vertices));
-	renderer::BufferLayout layout = {
-			{"a_Position", renderer::ShaderDataType::Float3},
-			{"a_Color", renderer::ShaderDataType::Float4}};
-	vertexBuffer->SetLayout(layout);
-	vertexArray->addVertexBuffer(vertexBuffer);
-	uint32_t indices[3] = {0, 1, 2};
-	vertexArray->setIndexBuffer(renderer::IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
-	// ------ one triangle ----------
 
-	// -------- Square VA ------------
-	float squareVertices[3 * 4] = {
-			-0.75f, -0.75f, 0.0f,
-			0.75f, -0.75f, 0.0f,
-			0.75f, 0.75f, 0.0f,
-			-0.75f, 0.75f, 0.0f};
-	squareVA = renderer::VertexArray::create();
-	shrd<renderer::VertexBuffer> squareVB = renderer::VertexBuffer::create(squareVertices, sizeof(squareVertices));
-	squareVB->SetLayout({{"a_Position", renderer::ShaderDataType::Float3}});
-	squareVA->addVertexBuffer(squareVB);
-	uint32_t squareIndices[6] = {0, 1, 2, 2, 3, 0};
-	squareVA->setIndexBuffer(renderer::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
-	// -------- Square VA ------------
-
-	// -------- Shaders ---------
-	auto shaderPath = workingDirectory / "res" / "shaders";
-	shader = mk_uniq<renderer::Shader>(fileToString(shaderPath / "basic.vert"), fileToString(shaderPath / "basic.frag"));
-	blueShader = mk_uniq<renderer::Shader>(fileToString(shaderPath / "blue.vert"), fileToString(shaderPath / "blue.frag"));
-	// -------- Shaders ---------
 }
 
 void Application::run() {
 	while (running) {
 		if (!minimized) {
-			glClearColor(0.1f, 0.1f, 0.1f, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
 
-			blueShader->bind();
-			squareVA->bind();
-			glDrawElements(GL_TRIANGLES, squareVA->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+			stepper.update();
 
-			shader->bind();
-			vertexArray->bind();
-			glDrawElements(GL_TRIANGLES, vertexArray->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
 			{
 				for (auto &layer: layerStack)
-					layer->onUpdate();
+					layer->onUpdate(stepper);
 			}
 			imGuiLayer->Begin();
 			{
 				for (auto &layer: layerStack)
-					layer->onImGuiRender();
+					layer->onImGuiRender(stepper);
 			}
 			imGuiLayer->End();
 		}

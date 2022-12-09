@@ -12,10 +12,14 @@
 
 namespace owl::renderer {
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class GraphicContext
  */
-class OWL_API GraphContext {
+class GraphContext {
 public:
 	GraphContext(const GraphContext &) = delete;
 	GraphContext(GraphContext &&) = delete;
@@ -48,5 +52,8 @@ public:
 
 private:
 };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }// namespace owl::renderer

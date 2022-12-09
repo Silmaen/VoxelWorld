@@ -4,7 +4,8 @@
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BUILD_DIR}/Install)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 add_library(${CMAKE_PROJECT_NAME}_Base INTERFACE)
 #
 # ---=== Supported OS ===---
@@ -58,6 +59,8 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-global-constructors
             -Wno-reserved-macro-identifier
             -Wno-unused-macros
+            -Wno-ctad-maybe-unsupported
+            -Wno-format-security
             )
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")

@@ -13,10 +13,14 @@
 
 namespace owl::renderer {
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class VertexArray
  */
-class VertexArray {
+class OWL_API VertexArray {
 public:
 	using vertexBuf = shrd<VertexBuffer>;
 	using indexBuf = shrd<IndexBuffer>;
@@ -70,8 +74,11 @@ public:
 	 * @brief Static method to create a Vertex Array
 	 * @return Vertex Array
 	 */
-	static uniq<VertexArray> create();
+	static shrd<VertexArray> create();
 private:
 };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }// namespace owl::renderer

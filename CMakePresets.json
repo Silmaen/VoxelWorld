@@ -22,28 +22,6 @@
       "installDir": "cmake-build-${presetName}/install"
     },
     {
-      "name": "mingw-gcc-release-shared",
-      "inherits": "base",
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "MinGW"
-        }
-      },
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_CXX_COMPILER": "g++",
-        "OWL_BUILD_SHARED": "ON"
-      }
-    },
-    {
-      "name": "mingw-gcc-debug-shared",
-      "inherits": "mingw-gcc-release-shared",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "OWL_COVERAGE": "ON"
-      }
-    },
-    {
       "name": "mingw-gcc-release",
       "inherits": "base",
       "vendor": {
@@ -79,7 +57,36 @@
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
-
+    {
+      "name": "mingw-gcc-release-shared",
+      "inherits": "mingw-gcc-release",
+      "cacheVariables": {
+        "OWL_BUILD_SHARED": "ON"
+      }
+    },
+    {
+      "name": "mingw-gcc-debug-shared",
+      "inherits": "mingw-gcc-release-shared",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "OWL_COVERAGE": "ON"
+      }
+    },
+    {
+      "name": "mingw-clang-release-shared",
+      "inherits": "mingw-gcc-release-shared",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "mingw-clang-debug-shared",
+      "inherits": "mingw-clang-release-shared",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
 
 
 
@@ -115,6 +122,36 @@
     {
       "name": "wsl-clang-debug",
       "inherits": "wsl-clang-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "wsl-gcc-release-shared",
+      "inherits": "wsl-gcc-release",
+      "cacheVariables": {
+        "OWL_BUILD_SHARED": "ON"
+      }
+    },
+    {
+      "name": "wsl-gcc-debug-shared",
+      "inherits": "wsl-gcc-release-shared",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "OWL_COVERAGE": "ON"
+      }
+    },
+    {
+      "name": "wsl-clang-release-shared",
+      "inherits": "wsl-gcc-release-shared",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "wsl-clang-debug-shared",
+      "inherits": "wsl-clang-release-shared",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
