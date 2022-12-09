@@ -31,7 +31,6 @@ inline std::string fileToString(const std::filesystem::path &file) {
 	t.seekg(0, std::ios::beg);
 	str.assign((std::istreambuf_iterator<char>(t)),
 			   std::istreambuf_iterator<char>());
-	OWL_CORE_TRACE("Shader read: {}", str);
 	return str;
 }
 
@@ -55,8 +54,7 @@ Application::Application() {
 	imGuiLayer = mk_shrd<gui::ImGuiLayer>();
 	pushOverlay(imGuiLayer);
 
-	// ----------------
-
+	// ------ one triangle ----------
 	vertexArray = renderer::VertexArray::create();
 	float vertices[3 * 7] = {
 			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
@@ -68,29 +66,29 @@ Application::Application() {
 			{"a_Color", renderer::ShaderDataType::Float4}};
 	vertexBuffer->SetLayout(layout);
 	vertexArray->addVertexBuffer(vertexBuffer);
-
 	uint32_t indices[3] = {0, 1, 2};
-	shrd<renderer::IndexBuffer> indexBuffer = renderer::IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t));
-	vertexArray->setIndexBuffer(indexBuffer);
+	vertexArray->setIndexBuffer(renderer::IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
+	// ------ one triangle ----------
 
+	// -------- Square VA ------------
 	float squareVertices[3 * 4] = {
 			-0.75f, -0.75f, 0.0f,
 			0.75f, -0.75f, 0.0f,
 			0.75f, 0.75f, 0.0f,
 			-0.75f, 0.75f, 0.0f};
-
+	squareVA = renderer::VertexArray::create();
 	shrd<renderer::VertexBuffer> squareVB = renderer::VertexBuffer::create(squareVertices, sizeof(squareVertices));
 	squareVB->SetLayout({{"a_Position", renderer::ShaderDataType::Float3}});
 	squareVA->addVertexBuffer(squareVB);
-
 	uint32_t squareIndices[6] = {0, 1, 2, 2, 3, 0};
-	shrd<renderer::IndexBuffer> squareIB = renderer::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
-	squareVA->setIndexBuffer(squareIB);
+	squareVA->setIndexBuffer(renderer::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+	// -------- Square VA ------------
 
+	// -------- Shaders ---------
 	auto shaderPath = workingDirectory / "res" / "shaders";
 	shader = mk_uniq<renderer::Shader>(fileToString(shaderPath / "basic.vert"), fileToString(shaderPath / "basic.frag"));
 	blueShader = mk_uniq<renderer::Shader>(fileToString(shaderPath / "blue.vert"), fileToString(shaderPath / "blue.frag"));
-	//--------------------------
+	// -------- Shaders ---------
 }
 
 void Application::run() {

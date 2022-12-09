@@ -77,7 +77,7 @@ void VertexArray::addVertexBuffer(const VertexArray::vertexBuf &vertexBuffer) {
 
 void VertexArray::setIndexBuffer(const VertexArray::indexBuf &indexBuffer_) {
 	glBindVertexArray(rendererID);
-	indexBuffer->bind();
+	indexBuffer_->bind();
 
 	indexBuffer = indexBuffer_;
 }

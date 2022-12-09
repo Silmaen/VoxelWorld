@@ -63,23 +63,26 @@ else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
 
+add_custom_target(${CMAKE_PROJECT_NAME}_SuperBase)
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     if (MINGW)
         cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH COMPILER_PATH)
-        message(STATUS "MinGW environment detected: add dependence to dlls from ${COMPILER_PATH} ${CMAKE_CXX_COMPILER}")
+        message(STATUS "MinGW environment detected: add dependence to dlls from ${COMPILER_PATH}")
         set(REQUIRED_LIBS libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll)
         foreach (lib IN ITEMS ${REQUIRED_LIBS})
             if (NOT EXISTS ${COMPILER_PATH}/${lib})
                 message(WARNING "Required Dll not found: ${COMPILER_PATH}/${lib}")
             else ()
-                add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/bin/${lib}
-                        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${COMPILER_PATH}/${lib} ${CMAKE_BINARY_DIR}/bin/${lib}
-                        COMMENT "Copying ${lib} into ${CMAKE_BINARY_DIR}/bin")
-                add_dependencies(${CMAKE_PROJECT_NAME}_Base ${CMAKE_BINARY_DIR}/bin/${lib})
+                message(STATUS "Adding Dll: ${COMPILER_PATH}/${lib}")
+                add_custom_command(TARGET ${CMAKE_PROJECT_NAME}_SuperBase
+                        DEPENDS ${COMPILER_PATH}/${lib}
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${COMPILER_PATH}/${lib} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                        COMMENT "Copying ${lib} into ${${CMAKE_RUNTIME_OUTPUT_DIRECTORY}}")
             endif ()
         endforeach ()
     endif ()
 endif ()
+add_dependencies(${CMAKE_PROJECT_NAME}_Base ${CMAKE_PROJECT_NAME}_SuperBase)
 
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_MAJOR="${CMAKE_PROJECT_VERSION_MAJOR}")
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_MINOR="${CMAKE_PROJECT_VERSION_MINOR}")

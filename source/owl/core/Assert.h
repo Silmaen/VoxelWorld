@@ -8,13 +8,14 @@
 
 #pragma once
 
+#include "core/Log.h"
+
 #ifdef OWL_DEBUG
 #define OWL_ENABLE_ASSERTS
 #endif
 
 #ifdef OWL_ENABLE_ASSERTS
 #include <debugbreak.h>
-#include "core/Log.h"
 #define OWL_ASSERT(x, ...)                                  \
 	{                                                       \
 		if (!(x)) {                                         \

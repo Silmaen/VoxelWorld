@@ -21,7 +21,7 @@ target_compile_definitions(imgui INTERFACE IMGUI_IMPL_HAS_DOCKING)
 set_target_properties(imgui PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 # we are only using the glfw version
 target_sources(imgui PRIVATE backends/imgui_impl_glfw.cpp backends/imgui_impl_glfw.h)
-find_package(glfw3 REQUIRED)
+#find_package(glfw3 REQUIRED)
 target_link_libraries(imgui PRIVATE glfw)
 
 target_sources(imgui PRIVATE backends/imgui_impl_opengl3.cpp backends/imgui_impl_opengl3.h backends/imgui_impl_opengl3_loader.h)

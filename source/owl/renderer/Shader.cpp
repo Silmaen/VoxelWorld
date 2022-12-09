@@ -40,6 +40,7 @@ Shader::Shader(const std::string &vertexSrc, const std::string &fragmentSrc) {
 		glDeleteShader(vertexShader);
 
 		OWL_CORE_ERROR("{0}", infoLog.data());
+		OWL_CORE_TRACE("Shader read: {}", vertexSrc);
 		OWL_CORE_ASSERT(false, "Vertex shader compilation failure!");
 		return;
 	}
@@ -70,7 +71,8 @@ Shader::Shader(const std::string &vertexSrc, const std::string &fragmentSrc) {
 		// Either of them. Don't leak shaders.
 		glDeleteShader(vertexShader);
 
-		OWL_CORE_ERROR("{0}", infoLog.data());
+		OWL_CORE_ERROR("{}", infoLog.data());
+		OWL_CORE_TRACE("Shader read: {}", fragmentSrc);
 		OWL_CORE_ASSERT(false, "Fragment shader compilation failure!");
 		return;
 	}
@@ -106,7 +108,7 @@ Shader::Shader(const std::string &vertexSrc, const std::string &fragmentSrc) {
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
 
-		OWL_CORE_ERROR("{0}", infoLog.data());
+		OWL_CORE_ERROR("{}", infoLog.data());
 		OWL_CORE_ASSERT(false, "Shader link failure!");
 		return;
 	}

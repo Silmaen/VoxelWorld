@@ -15,63 +15,54 @@ list(REMOVE_ITEM
         HDRS
         owlpch.h)
 if (${PRJPREFIX}_BUILD_SHARED)
-    add_library(${CMAKE_PROJECT_NAME}_lib
+    add_library(${ENGINE_NAME}
             SHARED
             ${SRCS} ${HDRS})
-    target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PUBLIC ${PRJPREFIX}_BUILD_SHARED)
-    target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PRIVATE ${PRJPREFIX}_BUILD_DLL)
-    set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+    target_compile_definitions(${ENGINE_NAME} PUBLIC ${PRJPREFIX}_BUILD_SHARED)
+    target_compile_definitions(${ENGINE_NAME} PRIVATE ${PRJPREFIX}_BUILD_DLL)
+    set_target_properties(${ENGINE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 else ()
-    add_library(${CMAKE_PROJECT_NAME}_lib
+    add_library(${ENGINE_NAME}
             STATIC
             ${SRCS} ${HDRS})
 endif ()
-target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC ${CMAKE_PROJECT_NAME}_Base)
-install(TARGETS ${CMAKE_PROJECT_NAME}_lib)
+target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(${ENGINE_NAME} PUBLIC ${CMAKE_PROJECT_NAME}_Base)
+install(TARGETS ${ENGINE_NAME})
 # precompiled headers
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h")
-  target_precompile_headers(${CMAKE_PROJECT_NAME}_lib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h)
+  target_precompile_headers(${ENGINE_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h)
 endif()
 
 # ----==== third party ====----
-# OpenGL
-find_package(OpenGL REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE OpenGL::GL)
-
-# glad
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glad)
-
-# GLFW
-find_package(glfw3 REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glfw)
-
-# glm
-find_package(glm REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE glm)
-
-# ImGui
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC imgui)
-#target_link_libraries(${CMAKE_PROJECT_NAME}_lib INTERFACE imgui_client)
-
+#  ---- external folder ----
 # debugbreak
 find_package(debugbreak 8 REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC DebugBreak)
+target_link_libraries(${ENGINE_NAME} PUBLIC DebugBreak)
 
-# json
-find_package(nlohmann_json 3.10 REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC nlohmann_json::nlohmann_json)
-# header-only
+# fmt
+target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt-header-only)
 
-#fmt
-find_package(fmt 8 REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC fmt::fmt-header-only)
+# glad
+target_link_libraries(${ENGINE_NAME} PRIVATE glad)
 
-#spdlog
-find_package(spdlog REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC spdlog::spdlog_header_only)
-target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PUBLIC SPDLOG_FMT_EXTERNAL)
+# GLFW
+#find_package(glfw3 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PRIVATE glfw)
+
+# glm
+target_link_libraries(${ENGINE_NAME} PRIVATE glm)
+
+# ImGui
+target_link_libraries(${ENGINE_NAME} PUBLIC imgui)
 
 # magic_enum
 find_package(MagicEnum REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC MagicEnum)
+target_link_libraries(${ENGINE_NAME} PUBLIC MagicEnum)
+
+# json
+target_link_libraries(${ENGINE_NAME} PUBLIC nlohmann_json::nlohmann_json)
+
+# spdlog
+target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog_header_only)
+

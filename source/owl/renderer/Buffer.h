@@ -192,7 +192,7 @@ public:
 	 * @param size Amount of data to read
 	 * @return Pointer to the created buffer
 	 */
-	static uniq<VertexBuffer> create(float *vertices, uint32_t size);
+	static shrd<VertexBuffer> create(float *vertices, uint32_t size);
 
 	/**
 	 * @brief Get the buffer data layout
@@ -249,7 +249,7 @@ public:
 	 * @param size Amount of data to read
 	 * @return Pointer to the created buffer
 	 */
-	static uniq<IndexBuffer> create(uint32_t *indices, uint32_t size);
+	static shrd<IndexBuffer> create(uint32_t *indices, uint32_t size);
 
 private:
 };
