@@ -36,6 +36,23 @@ public:
 	virtual ~RenderCommand() = default;
 
 	/**
+	 * @brief Initialize the renderer
+	 */
+	inline static void init() {
+		renderAPI->init();
+	}
+	
+	/**
+	 * @brief Define the view port for this API
+	 * @param x Starting X coordinate
+	 * @param y Starting Y coordinate
+	 * @param width Viewport's width
+	 * @param height Viewport Height
+	 */
+	inline static void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height){
+		renderAPI->setViewport(x, y, width, height);
+	}
+	/**
 	 * @brief Binding to the definition of background color
 	 * @param color The new background color
 	 */

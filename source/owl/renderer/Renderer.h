@@ -9,7 +9,7 @@
 #pragma once
 #include "CameraOrtho.h"
 #include "RenderCommand.h"
-#include "Shader.h"
+#include "ShaderLibrary.h"
 
 namespace owl::renderer {
 
@@ -35,14 +35,25 @@ public:
 	 */
 	virtual ~Renderer() = default;//---UNCOVER---
 	/**
+	 * @brief Initialize the renderer
+	 */
+	static void init();
+	/**
 	 * @brief Get the actual type of rendering API
 	 * @return The Rendering API
 	 */
 	inline static RenderAPI::Type getAPI() { return RenderAPI::getAPI(); }
+
+	/**
+	 * @brief Event on Window size change
+	 * @param width New width
+	 * @param height New height
+	 */
+	static void onWindowResized(uint32_t width, uint32_t height);
 	/**
 	 * @brief Begins a scene
 	 */
-	static void beginScene(CameraOrtho &camera);
+	static void beginScene(const CameraOrtho &camera);
 
 	/**
 	 * @brief Ends a scene
@@ -50,10 +61,24 @@ public:
 	static void endScene();
 	/**
 	 * @brief Add an object to the scene
+	 * @param shader The shader to use for rendering
 	 * @param object Object to add
+	 * @param transform The transform to apply to object
 	 */
-	static void submit(const shrd<Shader> &shader, const shrd<VertexArray> &object);
+	static void submit(const shrd<Shader> &shader, const shrd<VertexArray> &object, const glm::mat4 &transform = glm::mat4(1.0f));
 
+	/**
+	 * @brief Add an object to the scene
+	 * @param shaderName The shader's name to use for rendering
+	 * @param object Object to add
+	 * @param transform The transform to apply to object
+	 */
+	static void submit(const std::string &shaderName, const shrd<VertexArray> &object, const glm::mat4 &transform = glm::mat4(1.0f));
+	/**
+	 * @brief Access to the shader Library
+	 * @return The shader library
+	 */
+	static ShaderLibrary& getShaderLibrary(){return shaderLibrary;}
 private:
 	/**
 	 * @brief Data for the current scene
@@ -64,6 +89,8 @@ private:
 	};
 	/// The actual sceneData
 	static shrd<SceneData> sceneData;
+	/// Actual library of shaders
+	static ShaderLibrary shaderLibrary;
 };
 #ifdef __clang__
 #pragma clang diagnostic pop

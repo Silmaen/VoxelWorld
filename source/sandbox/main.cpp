@@ -10,11 +10,11 @@
 #include "debug/TrakerClient.h"
 // -------------------------
 
-#include "baseLayer.h"
+#include "base2D.h"
 
 class Sandbox : public owl::core::Application {
 public:
-	Sandbox() { pushLayer(owl::mk_shrd<baseLayer>()); }
+	Sandbox() { pushLayer(owl::mk_shrd<base2D>()); }
 };
 
 owl::shrd<owl::core::Application> owl::core::createApplication() {

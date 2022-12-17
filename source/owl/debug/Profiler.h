@@ -34,7 +34,7 @@ public:
 	Instrumentor &operator=(Instrumentor &&) = delete;
 
 	void beginSession(const std::string &name_,
-						const std::string &filepath = "results.json") {
+					  const std::string &filepath = "results.json") {
 		std::lock_guard lock(instrumentorMutex);
 		if (currentSession) {
 			// If there is already a current session, then close it before beginning
@@ -46,8 +46,8 @@ public:
 			// before Log::Init()
 			if (core::Log::getCoreLogger()) {
 				OWL_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' "
-								 "already open.",
-								 name_, currentSession->name);
+							   "already open.",
+							   name_, currentSession->name)
 			}
 			internalEndSession();
 		}
@@ -58,10 +58,10 @@ public:
 			writeHeader();
 		} else {
 			if (core::Log::getCoreLogger())// Edge case: BeginSession() might be
-											 // before Log::Init()
+										   // before Log::Init()
 			{
 				OWL_CORE_ERROR("Instrumentor could not open results file '{0}'.",
-								 filepath);
+							   filepath)
 			}
 		}
 	}
@@ -76,10 +76,10 @@ public:
 
 		json << std::setprecision(3) << std::fixed;
 		json << ",{";
-		json << "\"cat\":\"function\",";
+		json << R"("cat":"function",)";
 		json << "\"dur\":" << (result.elapsedTime.count()) << ',';
-		json << "\"name\":\"" << result.name << "\",";
-		json << "\"ph\":\"X\",";
+		json << R"("name":")" << result.name << "\",";
+		json << R"("ph":"X",)";
 		json << "\"pid\":0,";
 		json << "\"tid\":" << result.threadID << ",";
 		json << "\"ts\":" << result.start.count();
@@ -100,7 +100,7 @@ private:
 	~Instrumentor() { endSession(); }
 
 	void writeHeader() {
-		outputStream << "{\"otherData\": {},\"traceEvents\":[{}";
+		outputStream << R"({"otherData": {},"traceEvents":[{})";
 		outputStream.flush();
 	}
 
@@ -127,8 +127,8 @@ private:
 
 class InstrumentationTimer {
 public:
-	InstrumentationTimer(const char *name_) : name(name_), stopped(false) {
-		startTimepoint = std::chrono::steady_clock::now();
+	explicit InstrumentationTimer(const char *name_) : name(name_), startTimepoint{std::chrono::steady_clock::now()},
+													   stopped(false) {
 	}
 
 	~InstrumentationTimer() {

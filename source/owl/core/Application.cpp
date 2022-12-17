@@ -17,7 +17,7 @@ namespace owl::core {
 Application *Application::instance = nullptr;
 
 Application::Application() {
-	OWL_CORE_ASSERT(!instance, "Application already exists!");
+	OWL_CORE_ASSERT(!instance, "Application already exists!")
 	instance = this;
 
 	// Setup a working directory
@@ -35,6 +35,8 @@ Application::Application() {
 	appWindow = window::Window::Create();
 	appWindow->setEventCallback(
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
+
+	renderer::Renderer::init();
 
 	// create the GUI layer
 	imGuiLayer = mk_shrd<gui::ImGuiLayer>();
@@ -92,6 +94,7 @@ bool Application::onWindowResized(event::WindowResizeEvent &e) {
 		return false;
 	}
 	minimized = false;
+	renderer::Renderer::onWindowResized(e.getWidth(), e.getHeight());
 	return false;
 }
 

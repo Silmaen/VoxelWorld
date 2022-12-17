@@ -45,6 +45,14 @@ public:
 	CameraOrtho(float left, float right, float bottom, float top);
 
 	/**
+	 * @brief Set projection giving the camera coordinates of corners
+	 * @param left Left of the screen's coordinate.
+	 * @param right Right of the screen's coordinate.
+	 * @param bottom Bottom of the screen's coordinate.
+	 * @param top Top of the screen's coordinate.
+	 */
+	void setProjection(float left, float right, float bottom, float top);
+	/**
 	 * @brief Access to camera's position
 	 * @return Camera's position
 	 */
