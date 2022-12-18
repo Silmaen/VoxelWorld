@@ -21,10 +21,10 @@ void RenderCommand::create(const RenderAPI::Type &type) {
 			return;
 		case RenderAPI::Type::None:
 		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ASSERT("Render API {} is not yet supported", magic_enum::enum_name(type));
+			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
 			return;
 	}
-	OWL_CORE_ASSERT(false, "Unknown Renderer API!");
+	OWL_CORE_ASSERT(false, "Unknown Renderer API!")
 	renderAPI = nullptr;
 }
 

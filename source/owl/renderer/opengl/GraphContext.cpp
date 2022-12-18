@@ -19,12 +19,18 @@ GraphContext::GraphContext(GLFWwindow *window) : windowHandle(window) {
 void GraphContext::Init() {
 	glfwMakeContextCurrent(windowHandle);
 	[[maybe_unused]] int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-	OWL_CORE_ASSERT(status, "Failed to initialize GLAD");
+	OWL_CORE_ASSERT(status, "Failed to initialize GLAD")
 
-	OWL_CORE_INFO("OpenGL Info:");
-	OWL_CORE_INFO("  Vendor: {}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
-	OWL_CORE_INFO("  Renderer: {}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
-	OWL_CORE_INFO("  Version: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+	OWL_CORE_INFO("OpenGL Info:")
+	OWL_CORE_INFO("  Vendor: {}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)))
+	OWL_CORE_INFO("  Renderer: {}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)))
+	OWL_CORE_INFO("  Version: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)))
+#ifdef OWL_ENABLE_ASSERTS
+	int versionMajor,versionMinor;
+	glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
+	glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+	OWL_CORE_ASSERT(versionMajor > 4 || (versionMajor ==4 && versionMinor >= 5), "Owl Engin requires at least OpenGL version 4.5")
+#endif
 }
 
 void GraphContext::SwapBuffers() {

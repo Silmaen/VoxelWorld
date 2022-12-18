@@ -41,6 +41,20 @@ public:
 	 * @brief Destructor.
 	 */
 	virtual ~RenderAPI() = default;
+
+	/**
+	 * @brief Initialize the renderer
+	 */
+	virtual void init() = 0;
+
+	/**
+	 * @brief Define the view port for this API
+	 * @param x Starting X coordinate
+	 * @param y Starting Y coordinate
+	 * @param width Viewport's width
+	 * @param height Viewport Height
+	 */
+	virtual void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 	/**
 	 * @brief Define the background color
 	 * @param color The background color

@@ -1,44 +1,46 @@
 /**
- * @file Buffer.cpp
+ * @file Texture.cpp
  * @author Silmen
- * @date 08/12/2022
+ * @date 12/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
  */
 #include "owlpch.h"
-
-#include "Buffer.h"
-#include "Renderer.h"
-#include "opengl/Buffer.h"
 #include <magic_enum.hpp>
+
+#include "Texture.h"
+
+#include "Renderer.h"
+#include "opengl/Texture.h"
 
 namespace owl::renderer {
 
-shrd<VertexBuffer> VertexBuffer::create(float *vertices, uint32_t size) {
+shrd<Texture2D> Texture2D::create(const std::filesystem::path &file) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::None:
+		case RenderAPI::Type::OpenGL:
+			return mk_shrd<opengl::Texture2D>(file);
 		case RenderAPI::Type::Vulkan:
+		case RenderAPI::Type::None:
 			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
-		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::VertexBuffer>(vertices, size);
 	}
-	OWL_CORE_ASSERT(false, "Unknown API Type!")
+
+	OWL_CORE_ASSERT(false, "Unknown RendererAPI!")
 	return nullptr;
 }
-
-shrd<IndexBuffer> IndexBuffer::create(uint32_t *indices, uint32_t size) {
+shrd<Texture2D> Texture2D::create(uint32_t width, uint32_t height) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::None:
+		case RenderAPI::Type::OpenGL:
+			return mk_shrd<opengl::Texture2D>(width,height);
 		case RenderAPI::Type::Vulkan:
+		case RenderAPI::Type::None:
 			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
-		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::IndexBuffer>(indices, size);
 	}
-	OWL_CORE_ASSERT(false, "Unknown API Type!")
+
+	OWL_CORE_ASSERT(false, "Unknown RendererAPI!")
 	return nullptr;
 }
 

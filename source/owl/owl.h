@@ -17,18 +17,20 @@
 #include "core/Timestep.h"
 #include "core/layer/Layer.h"
 #include "gui/ImGuiLayer.h"
+#include "input/CameraOrthoController.h"
 #include "input/Input.h"
 
 // ------ renderer ---------
+#include "renderer/Buffer.h"
+#include "renderer/CameraOrtho.h"
 #include "renderer/RenderCommand.h"
 #include "renderer/Renderer.h"
-#include "renderer/Buffer.h"
-#include "renderer/Shader.h"
+#include "renderer/Renderer2D.h"
+#include "renderer/ShaderLibrary.h"
+#include "renderer/Texture.h"
 #include "renderer/VertexArray.h"
-#include "renderer/CameraOrtho.h"
 // -------------------------
 
 // ------ Debugging --------
 #include "debug/Tracker.h"
 // -------------------------
-

@@ -7,92 +7,64 @@
  */
 
 #include "baseLayer.h"
+
+#include <glm/gtc/matrix_transform.hpp>
 #include <imgui.h>
-#include <fstream>
-#include <streambuf>
 
-inline std::string fileToString(const std::filesystem::path &file) {
-	if (!exists(file)) {
-		OWL_CORE_WARN("File '{}' does not exists", file.string());
-		return "";
+baseLayer::baseLayer() : Layer("baseLayer"), cameraController(1280.f/720.f) {
+	// -------- Square VA ------------
+	{
+		float squareVertices[5 * 4] = {
+				-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+				0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+				0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+				-0.5f, 0.5f, 0.0f, 0.0f, 1.0f};
+		squareVA = owl::renderer::VertexArray::create();
+		owl::shrd<owl::renderer::VertexBuffer> squareVB = owl::renderer::VertexBuffer::create(squareVertices, sizeof(squareVertices));
+		squareVB->SetLayout({{"a_Position", owl::renderer::ShaderDataType::Float3},
+							 {"a_TexCoord", owl::renderer::ShaderDataType::Float2}});
+		squareVA->addVertexBuffer(squareVB);
+		uint32_t squareIndices[6] = {0, 1, 2, 2, 3, 0};
+		squareVA->setIndexBuffer(owl::renderer::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 	}
-	std::ifstream t(file);
-	std::string str;
-	t.seekg(0, std::ios::end);
-	str.reserve(static_cast<size_t>(t.tellg()));
-	t.seekg(0, std::ios::beg);
-	str.assign((std::istreambuf_iterator<char>(t)),
-			   std::istreambuf_iterator<char>());
-	return str;
-}
-
-
-baseLayer::baseLayer() : Layer("baseLayer"), camera(-1.6f, 1.6f, -0.9f, 0.9f) {
-	// ------ one triangle ----------
-	vertexArray = owl::renderer::VertexArray::create();
-	float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-			0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-			0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f};
-	owl::shrd<owl::renderer::VertexBuffer> vertexBuffer = owl::renderer::VertexBuffer::create(vertices, sizeof(vertices));
-	owl::renderer::BufferLayout layout = {
-			{"a_Position", owl::renderer::ShaderDataType::Float3},
-			{"a_Color", owl::renderer::ShaderDataType::Float4}};
-	vertexBuffer->SetLayout(layout);
-	vertexArray->addVertexBuffer(vertexBuffer);
-	uint32_t indices[3] = {0, 1, 2};
-	vertexArray->setIndexBuffer(owl::renderer::IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
-	// ------ one triangle ----------
-
-	// -------- Square VA ------------
-	float squareVertices[3 * 4] = {
-			-0.75f, -0.75f, 0.0f,
-			0.75f, -0.75f, 0.0f,
-			0.75f, 0.75f, 0.0f,
-			-0.75f, 0.75f, 0.0f};
-	squareVA = owl::renderer::VertexArray::create();
-	owl::shrd<owl::renderer::VertexBuffer> squareVB = owl::renderer::VertexBuffer::create(squareVertices, sizeof(squareVertices));
-	squareVB->SetLayout({{"a_Position", owl::renderer::ShaderDataType::Float3}});
-	squareVA->addVertexBuffer(squareVB);
-	uint32_t squareIndices[6] = {0, 1, 2, 2, 3, 0};
-	squareVA->setIndexBuffer(owl::renderer::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 	// -------- Square VA ------------
 
 	// -------- Shaders ---------
-	auto shaderPath = owl::core::Application::get().getWorkingDirectory() / "res" / "shaders";
-	shader = owl::renderer::Shader::create(fileToString(shaderPath / "basic.vert"), fileToString(shaderPath / "basic.frag"));
-	blueShader = owl::renderer::Shader::create(fileToString(shaderPath / "blue.vert"), fileToString(shaderPath / "blue.frag"));
+	auto &shLib = owl::renderer::Renderer::getShaderLibrary();
+	shLib.addFromStandardPath("texture");
+	shLib.addFromStandardPath("basic");
+	auto texturePath = owl::core::Application::get().getWorkingDirectory() / "res" / "textures";
+	texture = owl::renderer::Texture2D::create(texturePath / "CheckerBoard.png");
+	texturePath = owl::core::Application::get().getWorkingDirectory() / "res" / "logo";
+	textureLogo = owl::renderer::Texture2D::create(texturePath / "logo_owl.png");
+	shLib.get("texture")->bind();
+	shLib.get("texture")->setInt("u_Texture", 0);
 	// -------- Shaders ---------
 }
 
-void baseLayer::onUpdate(const owl::core::Timestep& ts){
 
-	if (owl::input::Input::isKeyPressed(owl::input::key::Left))
-		cameraPosition.x -= cameraMoveSpeed * ts.getSeconds();
-	else if (owl::input::Input::isKeyPressed(owl::input::key::Right))
-		cameraPosition.x += cameraMoveSpeed * ts.getSeconds();
+void baseLayer::onUpdate(const owl::core::Timestep &ts) {
 
-	if (owl::input::Input::isKeyPressed(owl::input::key::Up))
-		cameraPosition.y += cameraMoveSpeed * ts.getSeconds();
-	else if (owl::input::Input::isKeyPressed(owl::input::key::Down))
-		cameraPosition.y -= cameraMoveSpeed * ts.getSeconds();
-
-	if (owl::input::Input::isKeyPressed(owl::input::key::Q))
-		cameraRotation += cameraRotationSpeed * ts.getSeconds();
-	if (owl::input::Input::isKeyPressed(owl::input::key::D))
-		cameraRotation -= cameraRotationSpeed * ts.getSeconds();
+	cameraController.onUpdate(ts);
 
 	owl::renderer::RenderCommand::setClearColor({0.1f, 0.1f, 0.1f, 1});
 	owl::renderer::RenderCommand::clear();
-	camera.setPosition(cameraPosition);
-	camera.setRotation(cameraRotation);
-	owl::renderer::Renderer::beginScene(camera);
-	owl::renderer::Renderer::submit(blueShader, squareVA);
-	owl::renderer::Renderer::submit(shader, vertexArray);
+
+	owl::renderer::Renderer::beginScene(cameraController.getCamera());
+
+	texture->bind();
+	owl::renderer::Renderer::submit("texture", squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+	textureLogo->bind();
+	owl::renderer::Renderer::submit("texture", squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
 	owl::renderer::Renderer::endScene();
 }
 
-void baseLayer::onImGuiRender(const owl::core::Timestep& ts){
+void baseLayer::onEvent(owl::event::Event &event) {
+	cameraController.onEvent(event);
+}
+
+void baseLayer::onImGuiRender(const owl::core::Timestep &ts) {
 	auto &tracker = owl::debug::Tracker::get();
 	ImGui::Begin("Statistics");
 	ImGui::Text(fmt::format("FPS: {}", ts.getFps()).c_str());

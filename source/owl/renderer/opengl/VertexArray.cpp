@@ -31,7 +31,7 @@ static GLenum ShaderDataTypeToOpenGLBaseType(owl::renderer::ShaderDataType type)
 			return GL_ZERO;
 	}
 
-	OWL_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
 	return 0;
 }
 
@@ -54,25 +54,24 @@ void VertexArray::unbind() const {
 }
 
 void VertexArray::addVertexBuffer(const VertexArray::vertexBuf &vertexBuffer) {
-	OWL_CORE_ASSERT(!vertexBuffer->getLayout().getElements().empty(), "Vertex Buffer has no layout!");
+	OWL_CORE_ASSERT(!vertexBuffer->getLayout().getElements().empty(), "Vertex Buffer has no layout!")
 
 	glBindVertexArray(rendererID);
 	vertexBuffer->bind();
 
-	uint32_t index = 0;
-	const auto& layout = vertexBuffer->getLayout();
-	for (const auto& element : layout)
-	{
-		glEnableVertexAttribArray(index);
-		glVertexAttribPointer(index,
+	const auto &layout = vertexBuffer->getLayout();
+	for (const auto &element: layout) {
+		glEnableVertexAttribArray(VBIndexOffset);
+		glVertexAttribPointer(VBIndexOffset,
 							  element.getComponentCount(),
 							  ShaderDataTypeToOpenGLBaseType(element.type),
 							  element.normalized ? GL_TRUE : GL_FALSE,
 							  layout.getStride(),
-							  reinterpret_cast<const void*>(element.offset));
-		index++;
+							  reinterpret_cast<const void *>(element.offset));
+		VBIndexOffset++;
 	}
 	vertexBuffers.push_back(vertexBuffer);
+	VBIndexOffset += layout.getElements().size();
 }
 
 void VertexArray::setIndexBuffer(const VertexArray::indexBuf &indexBuffer_) {
@@ -81,7 +80,6 @@ void VertexArray::setIndexBuffer(const VertexArray::indexBuf &indexBuffer_) {
 
 	indexBuffer = indexBuffer_;
 }
-
 
 
 }// namespace owl::renderer::opengl

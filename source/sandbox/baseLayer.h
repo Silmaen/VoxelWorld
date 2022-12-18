@@ -12,23 +12,20 @@
 /**
  * @brief Class baseLayer
  */
-class baseLayer : public owl::core::layer::Layer{
+class baseLayer : public owl::core::layer::Layer {
 public:
 	baseLayer();
-	void onUpdate(const owl::core::Timestep& ts) override;
-	void onEvent([[maybe_unused]] owl::event::Event &event) override {}
-	void onImGuiRender(const owl::core::Timestep& ts) override;
+
+	void onUpdate(const owl::core::Timestep &ts) override;
+	void onEvent(owl::event::Event &event) override;
+	void onImGuiRender(const owl::core::Timestep &ts) override;
+
 private:
-	owl::shrd<owl::renderer::Shader> shader;
-	owl::shrd<owl::renderer::VertexArray> vertexArray;
+	owl::shrd<owl::renderer::VertexArray> square1;
 
-	owl::shrd<owl::renderer::Shader> blueShader;
 	owl::shrd<owl::renderer::VertexArray> squareVA;
+	owl::shrd<owl::renderer::Texture2D> texture;
+	owl::shrd<owl::renderer::Texture2D> textureLogo;
 
-	owl::renderer::CameraOrtho camera;
-	glm::vec3 cameraPosition;
-	float cameraMoveSpeed = 5.0f;
-
-	float cameraRotation = 0.0f;
-	float cameraRotationSpeed = 180.0f;
+	owl::input::CameraOrthoController cameraController;
 };

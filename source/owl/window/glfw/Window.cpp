@@ -22,7 +22,7 @@ namespace owl::window::glfw {
 static uint8_t s_GLFWWindowCount = 0;
 
 static void GLFWErrorCallback(int error, const char *description) {
-	OWL_CORE_ERROR("GLFW Error ({}): {}", error, description);
+	OWL_CORE_ERROR("GLFW Error ({}): {}", error, description)
 }
 
 Window::Window(const Properties &props) : ::owl::window::Window() {
@@ -43,12 +43,12 @@ void Window::init(const Properties &props) {
 	windowData.height = props.height;
 
 	OWL_CORE_INFO("Creating window {} ({}, {})", props.Title, props.width,
-				  props.height);
+				  props.height)
 
 	if (s_GLFWWindowCount == 0) {
 		OWL_PROFILE_SCOPE("glfwInit");
 		[[maybe_unused]] int success = glfwInit();
-		OWL_CORE_ASSERT(success, "Could not initialize GLFW!");
+		OWL_CORE_ASSERT(success, "Could not initialize GLFW!")
 		glfwSetErrorCallback(GLFWErrorCallback);
 	}
 

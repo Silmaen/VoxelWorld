@@ -8,24 +8,43 @@
 #include "owlpch.h"
 
 #include "Renderer.h"
+#include "Renderer2D.h"
+
 
 namespace owl::renderer {
 
 shrd<Renderer::SceneData> Renderer::sceneData = mk_shrd<Renderer::SceneData>();
 
-void Renderer::beginScene(CameraOrtho& camera) {
+ShaderLibrary Renderer::shaderLibrary = ShaderLibrary();
+
+void Renderer::init() {
+	RenderCommand::init();
+	Renderer2D::init();
+}
+
+void Renderer::beginScene(const CameraOrtho &camera) {
 	sceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
 }
 
 void Renderer::endScene() {
 }
 
-void Renderer::submit(const shrd<Shader>& shader, const shrd<VertexArray> &object) {
-	if (shader){
+void Renderer::submit(const shrd<Shader> &shader, const shrd<VertexArray> &object, const glm::mat4 &transform) {
+	if (shader) {
 		shader->bind();
-		shader->uploadUniformMat4("u_ViewProjection", sceneData->viewProjectionMatrix);
+		shader->setMat4("u_ViewProjection", sceneData->viewProjectionMatrix);
+		shader->setMat4("u_Transform", transform);
 	}
 	object->bind();
 	RenderCommand::drawIndexed(object);
 }
+
+void Renderer::submit(const std::string &shaderName, const shrd<VertexArray> &object, const glm::mat4 &transform) {
+	submit(shaderLibrary.get(shaderName), object, transform);
+}
+
+void Renderer::onWindowResized(uint32_t width, uint32_t height) {
+	RenderCommand::setViewport(0, 0, width, height);
+}
+
 }// namespace owl::renderer

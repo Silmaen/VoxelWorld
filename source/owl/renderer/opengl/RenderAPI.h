@@ -30,6 +30,18 @@ public:
 	 */
 	~RenderAPI() override = default;
 	/**
+	 * @brief Initialize the renderer
+	 */
+	void init() override;
+	/**
+	 * @brief Define the view port for this API
+	 * @param x Starting X coordinate
+	 * @param y Starting Y coordinate
+	 * @param width Viewport's width
+	 * @param height Viewport Height
+	 */
+	void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+	/**
 	 * @brief Define the background color
 	 * @param color The background color
 	 */

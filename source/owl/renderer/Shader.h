@@ -9,8 +9,17 @@
 #pragma once
 #include "core/Core.h"
 #include <glm/glm.hpp>
+#include <unordered_map>
 
 namespace owl::renderer {
+
+class ShaderLibrary;
+
+enum class ShaderType {
+	None,
+	Vertex,
+	Fragment
+};
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -21,14 +30,14 @@ namespace owl::renderer {
  */
 class OWL_API Shader {
 public:
-	Shader(const Shader &) = delete;
-	Shader(Shader &&) = delete;
-	Shader &operator=(const Shader &) = delete;
-	Shader &operator=(Shader &&) = delete;
+	Shader(const Shader &) = default;
+	Shader(Shader &&) = default;
+	Shader &operator=(const Shader &) = default;
+	Shader &operator=(Shader &&) = default;
 	/**
 	 * @brief Constructor
 	 */
-	Shader() = default;
+	Shader(const std::string &name_) : name{name_} {}
 	/**
 	 * @brief Destructor.
 	 */
@@ -45,22 +54,61 @@ public:
 	virtual void unbind() const = 0;
 	/**
 	 * @brief Create a new shader.
+	 * @param shaderName Name of the files in the standard path
 	 * @param vertexSrc Source of the vertex shader
 	 * @param fragmentSrc Source of fragment shader
-	 * @return pointer to the shader
+	 * @return Pointer to the shader
 	 */
-	static shrd<Shader> create(const std::string &vertexSrc, const std::string &fragmentSrc);
+	static shrd<Shader> create(const std::string &shaderName, const std::string &vertexSrc, const std::string &fragmentSrc);
+	/**
+	 * @brief Create a new shader.
+	 * @param shaderName Name of the files in the standard path
+	 * @return Pointer to the shader
+	 */
+	static shrd<Shader> create(const std::string &shaderName);
+	/**
+	 * @brief Create a new shader.
+	 * @param file Source of the shader
+	 * @return Pointer to the shader
+	 */
+	static shrd<Shader> create(const std::filesystem::path &file);
+	/**
+	 * @brief Set shader's internal int variable
+	 * @param name Shader's variable's name
+	 * @param value Shader's variable's value
+	 */
+	virtual void setInt(const std::string &name, int value) = 0;
+	/**
+	 * @brief Set shader's internal vector 3 variable
+	 * @param name Shader's variable's name
+	 * @param value Shader's variable's value
+	 */
+	virtual void setFloat3(const std::string &name, const glm::vec3 &value) = 0;
+	/**
+	 * @brief Set shader's internal vector 4 variable
+	 * @param name Shader's variable's name
+	 * @param value Shader's variable's value
+	 */
+	virtual void setFloat4(const std::string &name, const glm::vec4 &value) = 0;
+	/**
+	 * @brief Set shader's internal Matrix 4 variable
+	 * @param name Shader's variable's name
+	 * @param value Shader's variable's value
+	 */
+	virtual void setMat4(const std::string &name, const glm::mat4 &value) = 0;
 
 	/**
-	 * @brief Push a matrix to the GPU
-	 * @param name Variable's name
-	 * @param matrix The matrix data
+	 * @brief get the shader's name
+	 * @return Shader's name
 	 */
-	virtual void uploadUniformMat4(const std::string &name, const glm::mat4 &matrix) = 0;
+	[[nodiscard]] virtual const std::string &getName() const { return name; }
 
 private:
+	/// Shader's name
+	std::string name;
+	/// Library is a friend to be able to modify name
+	friend class ShaderLibrary;
 };
-
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif

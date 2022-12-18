@@ -9,7 +9,10 @@
 #pragma once
 #include <memory>
 
-#ifdef OWL_PLATFORM_WINDOWS
+#if defined(OWL_PLATFORM_WINDOWS)
+#ifndef _WIN64
+#error 32-bit windows platform is not supported
+#endif
 #ifdef OWL_BUILD_SHARED
 #ifdef OWL_BUILD_DLL
 #define OWL_API __declspec(dllexport)
@@ -19,8 +22,26 @@
 #else
 #define OWL_API
 #endif
+#elif defined(OWL_PLATFORM_LINUX)
+#define OWL_API
 #else
 #define OWL_API
+#if defined(__APPLE__) || defined(__MACH__)
+#include <TargetConditionals.h>
+#if TARGET_IPHONE_SIMULATOR == 1
+#error "IOS simulator is not supported!"
+#elif TARGET_OS_IPHONE == 1
+#error "IOS is not supported!"
+#elif TARGET_OS_MAC == 1
+#error "MacOS is not supported!"
+#else
+#error "Unknown Apple platform!"
+#endif
+#elif defined(__ANDROID__)
+#error "Android is not supported!"
+#else
+#error "Unknown compile platform so: not supported!"
+#endif
 #endif
 
 /**

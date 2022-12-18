@@ -37,8 +37,8 @@ endif()
 # ----==== third party ====----
 #  ---- external folder ----
 # debugbreak
-find_package(debugbreak 8 REQUIRED)
-target_link_libraries(${ENGINE_NAME} PUBLIC DebugBreak)
+find_package(DebugBreak 1.0 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC owl::DebugBreak)
 
 # fmt
 target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt-header-only)
@@ -58,11 +58,14 @@ target_link_libraries(${ENGINE_NAME} PUBLIC imgui)
 
 # magic_enum
 find_package(MagicEnum REQUIRED)
-target_link_libraries(${ENGINE_NAME} PUBLIC MagicEnum)
+target_link_libraries(${ENGINE_NAME} PRIVATE owl::MagicEnum)
 
 # json
-target_link_libraries(${ENGINE_NAME} PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(${ENGINE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 # spdlog
 target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog_header_only)
 
+# magic_enum
+find_package(StbImage REQUIRED)
+target_link_libraries(${ENGINE_NAME} PRIVATE owl::StbImage)

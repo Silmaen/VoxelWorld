@@ -10,9 +10,9 @@
 
 #include "ImGuiLayer.h"
 #include "core/Application.h"
-#include "input/Input.h"
 #include "core/external/glfw3.h"
 #include "core/external/imgui.h"
+#include "input/Input.h"
 
 namespace owl::gui {
 
@@ -60,22 +60,7 @@ void ImGuiLayer::onDetach() {
 	ImGui::DestroyContext();
 }
 
-void ImGuiLayer::onEvent([[maybe_unused]] event::Event &event) {
-	float *itou = nullptr;
-	if (input::Input::isKeyPressed(input::key::C)) {
-		itou = new float;
-		OWL_CORE_TRACE("Alloc Try");
-	}
-	/*if (blockEvents) {
-		ImGuiIO &io = ImGui::GetIO();
-		event.handled |=
-				event.isInCategory(event::category::Mouse) & io.WantCaptureMouse;
-		event.handled |=
-				event.isInCategory(event::category::Keyboard) & io.WantCaptureKeyboard;
-	}*/
-	if (itou != nullptr)
-		delete itou;
-}
+void ImGuiLayer::onEvent([[maybe_unused]] event::Event &event) {}
 
 void ImGuiLayer::Begin() {
 	ImGui_ImplOpenGL3_NewFrame();
