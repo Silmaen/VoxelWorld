@@ -68,7 +68,7 @@ public:
 	 * @brief Draw the vertex array
 	 * @param vertexArray VA to render
 	 */
-	virtual void drawIndexed(const shrd<VertexArray>& vertexArray) = 0;
+	virtual void drawIndexed(const shrd<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 
 	/**
 	 * @brief Get the actual API type

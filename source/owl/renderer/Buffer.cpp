@@ -14,6 +14,21 @@
 
 namespace owl::renderer {
 
+
+shrd<VertexBuffer> VertexBuffer::create( uint32_t size){
+	auto type = Renderer::getAPI();
+	switch (type) {
+		case RenderAPI::Type::None:
+		case RenderAPI::Type::Vulkan:
+			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
+			return nullptr;
+		case RenderAPI::Type::OpenGL:
+			return mk_shrd<opengl::VertexBuffer>(size);
+	}
+	OWL_CORE_ASSERT(false, "Unknown API Type!")
+	return nullptr;
+}
+
 shrd<VertexBuffer> VertexBuffer::create(float *vertices, uint32_t size) {
 	auto type = Renderer::getAPI();
 	switch (type) {

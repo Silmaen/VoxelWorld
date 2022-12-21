@@ -68,9 +68,10 @@ public:
 	/**
 	 * @brief Binding the draw of vertex array
 	 * @param vertexArray VA to render
+	 * @param index The index to draw
 	 */
-	inline static void drawIndexed(const std::shared_ptr<VertexArray> &vertexArray) {
-		renderAPI->drawIndexed(vertexArray);
+	inline static void drawIndexed(const std::shared_ptr<VertexArray> &vertexArray, uint32_t index=0) {
+		renderAPI->drawIndexed(vertexArray, index);
 	}
 	/**
 	 * @brief Create or replace the API base on it type

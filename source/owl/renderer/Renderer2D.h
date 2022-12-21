@@ -14,6 +14,24 @@
 namespace owl::renderer {
 
 /**
+ * @brief Data for drawing a quad
+ */
+struct OWL_API Quad2DData {
+	/// Position of the top-left corner
+	glm::vec3 position;
+	/// Size of the quad
+	glm::vec2 size = glm::vec2{1.f, 1.f};
+	/// Color to apply to the quad
+	glm::vec4 color = glm::vec4{1.f, 1.f, 1.f, 1.f};
+	/// Eventually the texture of the quad (plain color if nullptr)
+	shrd<Texture> texture = nullptr;
+	/// Rotation of the quad
+	float rotation = 0.f;
+	/// Tilling factor of the texture
+	float tilingFactor = 1.f;
+};
+
+/**
  * @brief Class Renderer2D
  */
 class OWL_API Renderer2D {
@@ -47,37 +65,44 @@ public:
 	 * @brief Ends a scene
 	 */
 	static void endScene();
+	/**
+	 * @brief Flush the vertex buffer
+	 */
+	static void flush();
 	// Primitives
 	/**
 	 * @brief Draws a Quad on the screen
-	 * @param position Position of the quad
-	 * @param size Size of the Quad
-	 * @param color Color of the quad
+	 * @param quadData Quad's properties
 	 */
-	static void drawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color);
+	static void drawQuad(const Quad2DData &quadData);
 	/**
-	 * @brief Draws a Quad on the screen
-	 * @param position Position of the quad
-	 * @param size Size of the Quad
-	 * @param color Color of the quad
+	 * @brief Statistics
 	 */
-	static void drawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color);
+	struct OWL_API Statistics {
+		/// Amount of draw calls
+		uint32_t drawCalls = 0;
+		/// Amount of quad drawn
+		uint32_t quadCount = 0;
+		/// Compute the amount of vertices
+		[[nodiscard]] uint32_t getTotalVertexCount()const { return quadCount * 4; }
+		/// Compute the amount of indicies
+		[[nodiscard]] uint32_t getTotalIndexCount()const { return quadCount * 6; }
+	};
 	/**
-	 * @brief Draws a Quad on the screen
-	 * @param position Position of the quad
-	 * @param size Size of the Quad
-	 * @param texture Texture of the quad
+	 * @brief Reset the statistics data
 	 */
-	static void drawQuad(const glm::vec2 &position, const glm::vec2 &size, const shrd<Texture> &texture);
+	static void resetStats();
 	/**
-	 * @brief Draws a Quad on the screen
-	 * @param position Position of the quad
-	 * @param size Size of the Quad
-	 * @param texture Texture of the quad
+	 * @brief Access to stats
+	 * @return The Stats
 	 */
-	static void drawQuad(const glm::vec3 &position, const glm::vec2 &size, const shrd<Texture> &texture);
+	static Statistics getStats();
 
 private:
+	/**
+	 * @brief Combine flush and reset
+	 */
+	static void flushAndReset();
 };
 
 }// namespace owl::renderer

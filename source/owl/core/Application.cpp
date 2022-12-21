@@ -9,7 +9,9 @@
 #include "owlpch.h"
 
 #include "Application.h"
+
 #include "renderer/Renderer.h"
+#include <ranges>
 
 namespace owl::core {
 
@@ -17,6 +19,8 @@ namespace owl::core {
 Application *Application::instance = nullptr;
 
 Application::Application() {
+	OWL_PROFILE_FUNCTION()
+
 	OWL_CORE_ASSERT(!instance, "Application already exists!")
 	instance = this;
 
@@ -41,32 +45,53 @@ Application::Application() {
 	// create the GUI layer
 	imGuiLayer = mk_shrd<gui::ImGuiLayer>();
 	pushOverlay(imGuiLayer);
+}
 
+void Application::enableDocking(){
+	imGuiLayer->enableDocking();
+}
+void Application::disableDocking(){
+	imGuiLayer->disableDocking();
+}
 
+Application::~Application() {
+	OWL_PROFILE_FUNCTION()
+
+	renderer::Renderer::shutdown();
 }
 
 void Application::run() {
+	OWL_PROFILE_FUNCTION()
+
 	while (running) {
 		if (!minimized) {
+			OWL_PROFILE_SCOPE("RunLoop")
 
 			stepper.update();
 
-			{
-				for (auto &layer: layerStack)
-					layer->onUpdate(stepper);
+			if (!minimized) {
+				{
+					OWL_PROFILE_SCOPE("LayerStack onUpdate")
+
+					for (auto &layer: layerStack)
+						layer->onUpdate(stepper);
+				}
+				imGuiLayer->Begin();
+				{
+					OWL_PROFILE_SCOPE("LayerStack onImUpdate")
+
+					for (auto &layer: layerStack)
+						layer->onImGuiRender(stepper);
+				}
+				imGuiLayer->End();
 			}
-			imGuiLayer->Begin();
-			{
-				for (auto &layer: layerStack)
-					layer->onImGuiRender(stepper);
-			}
-			imGuiLayer->End();
 		}
 		appWindow->onUpdate();
 	}
 }
 
 void Application::onEvent(event::Event &e) {
+	OWL_PROFILE_FUNCTION()
 
 	event::EventDispatcher dispatcher(e);
 	dispatcher.dispatch<event::WindowCloseEvent>([this](auto &&PH1) {
@@ -76,19 +101,23 @@ void Application::onEvent(event::Event &e) {
 		return onWindowResized(std::forward<decltype(PH1)>(PH1));
 	});
 
-	for (auto &layer: layerStack) {
+	for (auto &it: std::ranges::reverse_view(layerStack)) {
 		if (e.handled)
 			break;
-		layer->onEvent(e);
+		it->onEvent(e);
 	}
 }
 
 bool Application::onWindowClosed(event::WindowCloseEvent &) {
+	OWL_PROFILE_FUNCTION()
+
 	running = false;
 	return true;
 }
 
 bool Application::onWindowResized(event::WindowResizeEvent &e) {
+	OWL_PROFILE_FUNCTION()
+
 	if (e.getWidth() == 0 || e.getHeight() == 0) {
 		minimized = true;
 		return false;
@@ -99,9 +128,13 @@ bool Application::onWindowResized(event::WindowResizeEvent &e) {
 }
 
 void Application::pushLayer(shrd<layer::Layer> &&layer) {
+	OWL_PROFILE_FUNCTION()
+
 	layerStack.pushLayer(std::move(layer));
 }
 void Application::pushOverlay(shrd<layer::Layer> &&overlay) {
+	OWL_PROFILE_FUNCTION()
+
 	layerStack.pushOverlay(std::move(overlay));
 }
 

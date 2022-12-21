@@ -15,27 +15,41 @@ namespace owl::debug {
 
 using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
 
+/**
+ * @brief Data for profiling result
+ */
 struct ProfileResult {
-	std::string name;
-	FloatingPointMicroseconds start;
-	std::chrono::microseconds elapsedTime;
-	std::thread::id threadID;
+	std::string name; /// Result's name
+	FloatingPointMicroseconds start; /// Data's starting time point
+	std::chrono::microseconds elapsedTime; /// Data's elapsed time
+	std::thread::id threadID; /// Data's thread ID
 };
 
-struct InstrumentationSession {
-	std::string name;
+/**
+ * @brief Profile Session Data
+ */
+struct ProfileSession {
+	std::string name; /// Session's name
 };
 
-class Instrumentor {
+/**
+ * @brief class Profiler
+ */
+class OWL_API Profiler {
 public:
-	Instrumentor(const Instrumentor &) = delete;
-	Instrumentor(Instrumentor &&) = delete;
-	Instrumentor &operator=(const Instrumentor &) = delete;
-	Instrumentor &operator=(Instrumentor &&) = delete;
+	Profiler(const Profiler &) = delete;
+	Profiler(Profiler &&) = delete;
+	Profiler &operator=(const Profiler &) = delete;
+	Profiler &operator=(Profiler &&) = delete;
 
+	/**
+	 * @brief Begins a new profiling session
+	 * @param name_ Session's name
+	 * @param filepath Session File path to store information
+	 */
 	void beginSession(const std::string &name_,
 					  const std::string &filepath = "results.json") {
-		std::lock_guard lock(instrumentorMutex);
+		std::lock_guard lock(profilerMutex);
 		if (currentSession) {
 			// If there is already a current session, then close it before beginning
 			// new one. Subsequent profiling output meant for the original session
@@ -45,7 +59,7 @@ public:
 			// Edge case: BeginSession() might be
 			// before Log::Init()
 			if (core::Log::getCoreLogger()) {
-				OWL_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' "
+				OWL_CORE_ERROR("Profiler::BeginSession('{0}') when session '{1}' "
 							   "already open.",
 							   name_, currentSession->name)
 			}
@@ -54,7 +68,7 @@ public:
 		outputStream.open(filepath);
 
 		if (outputStream.is_open()) {
-			currentSession = new InstrumentationSession({name_});
+			currentSession = new ProfileSession({name_});
 			writeHeader();
 		} else {
 			if (core::Log::getCoreLogger())// Edge case: BeginSession() might be
@@ -66,11 +80,18 @@ public:
 		}
 	}
 
+	/**
+	 * @brief Terminate profile session
+	 */
 	void endSession() {
-		std::lock_guard lock(instrumentorMutex);
+		std::lock_guard lock(profilerMutex);
 		internalEndSession();
 	}
 
+	/**
+	 * @brief Write profiling result into json file
+	 * @param result The Result to write
+	 */
 	void writeProfile(const ProfileResult &result) {
 		std::stringstream json;
 
@@ -85,32 +106,51 @@ public:
 		json << "\"ts\":" << result.start.count();
 		json << "}";
 
-		std::lock_guard lock(instrumentorMutex);
+		std::lock_guard lock(profilerMutex);
 		if (currentSession) {
 			outputStream << json.str();
 			outputStream.flush();
 		}
 	}
 
-	static Instrumentor &get();
+	/**
+	 * @brief Singleton accessor
+	 * @return This instance
+	 */
+	static Profiler &get();
 
 private:
-	Instrumentor() : currentSession(nullptr) {}
+	/**
+	 * @brief Private Constructor
+	 */
+	Profiler() : currentSession(nullptr) {}
 
-	~Instrumentor() { endSession(); }
+	/**
+	 * @brief Private destructor
+	 */
+	~Profiler() { endSession(); }
 
+	/**
+	 * @brief write json header
+	 */
 	void writeHeader() {
 		outputStream << R"({"otherData": {},"traceEvents":[{})";
 		outputStream.flush();
 	}
 
+	/**
+	 * @brief write json footer
+	 */
 	void writeFooter() {
 		outputStream << "]}";
 		outputStream.flush();
 	}
 
-	// Note: you must already own lock on m_Mutex before
-	// calling InternalEndSession()
+	/**
+	 * @brief Terminate the session
+	 *
+	 * @note: you must already own lock on m_Mutex before calling InternalEndSession()
+	 */
 	void internalEndSession() {
 		if (currentSession) {
 			writeFooter();
@@ -120,18 +160,18 @@ private:
 		}
 	}
 
-	std::mutex instrumentorMutex;
-	InstrumentationSession *currentSession;
-	std::ofstream outputStream;
+	std::mutex profilerMutex; /// Mutex
+	ProfileSession *currentSession; /// actual running session
+	std::ofstream outputStream; /// output file stream
 };
 
-class InstrumentationTimer {
+class ProfileTimer {
 public:
-	explicit InstrumentationTimer(const char *name_) : name(name_), startTimepoint{std::chrono::steady_clock::now()},
+	explicit ProfileTimer(const char *name_) : name(name_), startTimepoint{std::chrono::steady_clock::now()},
 													   stopped(false) {
 	}
 
-	~InstrumentationTimer() {
+	~ProfileTimer() {
 		if (!stopped)
 			stop();
 	}
@@ -147,7 +187,7 @@ public:
 						startTimepoint)
 						.time_since_epoch();
 
-		Instrumentor::get().writeProfile(
+		Profiler::get().writeProfile(
 				{name, highResStart, elapsedTime, std::this_thread::get_id()});
 
 		stopped = true;
@@ -159,7 +199,7 @@ private:
 	bool stopped;
 };
 
-namespace InstrumentorUtils {
+namespace utils {
 
 template<size_t N>
 struct ChangeResult {
@@ -185,7 +225,7 @@ constexpr auto cleanupOutputString(const char (&expr)[N],
 	}
 	return result;
 }
-}// namespace InstrumentorUtils
+}// namespace utils
 
 }// namespace owl::debug
 
@@ -215,12 +255,12 @@ constexpr auto cleanupOutputString(const char (&expr)[N],
 #endif
 
 #define OWL_PROFILE_BEGIN_SESSION(name, filepath) \
-	::owl::debug::Instrumentor::get().beginSession(name, filepath)
-#define OWL_PROFILE_END_SESSION() ::owl::debug::Instrumentor::get().endSession()
+	::owl::debug::Profiler::get().beginSession(name, filepath);
+#define OWL_PROFILE_END_SESSION() ::owl::debug::Profiler::get().endSession();
 #define OWL_PROFILE_SCOPE_LINE2(name, line)                                         \
 	constexpr auto fixedName##line =                                                \
-			::owl::debug::InstrumentorUtils::cleanupOutputString(name, "__cdecl "); \
-	::owl::debug::InstrumentationTimer timer##line(fixedName##line.Data)
+			::owl::debug::utils::cleanupOutputString(name, "__cdecl "); \
+	::owl::debug::ProfileTimer timer##line(fixedName##line.Data);
 #define OWL_PROFILE_SCOPE_LINE(name, line) OWL_PROFILE_SCOPE_LINE2(name, line)
 #define OWL_PROFILE_SCOPE(name) OWL_PROFILE_SCOPE_LINE(name, __LINE__)
 #define OWL_PROFILE_FUNCTION() OWL_PROFILE_SCOPE(OWL_FUNC_SIG)

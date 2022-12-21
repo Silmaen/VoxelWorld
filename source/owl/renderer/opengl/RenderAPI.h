@@ -54,7 +54,7 @@ public:
 	 * @brief Draw the vertex array
 	 * @param vertexArray VA to render
 	 */
-	void drawIndexed(const shrd<VertexArray>& vertexArray)override;
+	void drawIndexed(const shrd<VertexArray>& vertexArray, uint32_t indexCount = 0)override;
 };
 
 }// namespace owl::renderer::opengl

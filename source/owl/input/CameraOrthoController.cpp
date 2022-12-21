@@ -17,6 +17,8 @@ CameraOrthoController::CameraOrthoController(float aspectRatio_, bool rotation_)
 }
 
 void CameraOrthoController::onUpdate(core::Timestep ts) {
+	OWL_PROFILE_FUNCTION()
+
 	if (Input::isKeyPressed(input::key::A)) {
 		cameraPosition.x -= cos(glm::radians(cameraRotation)) * cameraTranslationSpeed * ts.getSeconds();
 		cameraPosition.y -= sin(glm::radians(cameraRotation)) * cameraTranslationSpeed * ts.getSeconds();
@@ -47,17 +49,23 @@ void CameraOrthoController::onUpdate(core::Timestep ts) {
 }
 
 void CameraOrthoController::onEvent(event::Event &e) {
+	OWL_PROFILE_FUNCTION()
+
 	event::EventDispatcher dispatcher(e);
 	dispatcher.dispatch<event::MouseScrolledEvent>([this](auto &&PH1) { return onMouseScrolled(std::forward<decltype(PH1)>(PH1)); });
 	dispatcher.dispatch<event::WindowResizeEvent>([this](auto &&PH1) { return onWindowResized(std::forward<decltype(PH1)>(PH1)); });
 }
 bool CameraOrthoController::onMouseScrolled(event::MouseScrolledEvent &e) {
+	OWL_PROFILE_FUNCTION()
+
 	zoomLevel -= e.getYOff() * 0.25f;
 	zoomLevel = std::max(zoomLevel, 0.25f);
 	camera.setProjection(-aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
 	return false;
 }
 bool CameraOrthoController::onWindowResized(event::WindowResizeEvent &e) {
+	OWL_PROFILE_FUNCTION()
+
 	aspectRatio = static_cast<float>(e.getWidth()) / static_cast<float>(e.getHeight());
 	camera.setProjection(-aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
 	return false;

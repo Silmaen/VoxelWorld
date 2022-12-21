@@ -23,6 +23,7 @@
 // ------ renderer ---------
 #include "renderer/Buffer.h"
 #include "renderer/CameraOrtho.h"
+#include "renderer/Framebuffer.h"
 #include "renderer/RenderCommand.h"
 #include "renderer/Renderer.h"
 #include "renderer/Renderer2D.h"
@@ -33,4 +34,5 @@
 
 // ------ Debugging --------
 #include "debug/Tracker.h"
+#include "debug/Profiler.h"
 // -------------------------

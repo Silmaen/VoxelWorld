@@ -47,7 +47,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Application() = default;
+	virtual ~Application();
 	/**
 	 * @brief Runs the application
 	 */
@@ -85,6 +85,10 @@ public:
 		return workingDirectory;
 	}
 
+#ifdef IMGUI_IMPL_HAS_DOCKING
+	void enableDocking();
+	void disableDocking();
+#endif
 private:
 	/**
 	* @brief Action on window close.

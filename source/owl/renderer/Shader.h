@@ -79,6 +79,19 @@ public:
 	 */
 	virtual void setInt(const std::string &name, int value) = 0;
 	/**
+	 * @brief Set shader's internal int variable array
+	 * @param name Shader's variable's name
+	 * @param values Shader's variable's raw values
+	 * @param count Amount values
+	 */
+	virtual void setIntArray(const std::string& name, int* values, uint32_t count) = 0;
+	/**
+	 * @brief Set shader's internal int variable
+	 * @param name Shader's variable's name
+	 * @param value Shader's variable's value
+	 */
+	virtual void setFloat(const std::string &name, float value) = 0;
+	/**
 	 * @brief Set shader's internal vector 3 variable
 	 * @param name Shader's variable's name
 	 * @param value Shader's variable's value

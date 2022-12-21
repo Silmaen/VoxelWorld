@@ -44,8 +44,11 @@ if (EXISTS ${PROJECT_SOURCE_DIR}/external/stb)
     set(StbImage_ROOT_DIR ${PROJECT_SOURCE_DIR}/external/stb)
     set(StbImage_INCLUDE_DIRS ${StbImage_ROOT_DIR})
     set(StbImage_LIBRARY)
-
+if(${PRJPREFIX}_BUILD_SHARED)
+    add_library(stbImage SHARED ${StbImage_ROOT_DIR}/stb_image.h ${StbImage_ROOT_DIR}/stb_image.cpp)
+else()
     add_library(stbImage STATIC ${StbImage_ROOT_DIR}/stb_image.h ${StbImage_ROOT_DIR}/stb_image.cpp)
+endif()
 
     add_library(owl::StbImage INTERFACE IMPORTED)
     target_link_libraries(owl::StbImage INTERFACE stbImage)

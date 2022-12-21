@@ -202,12 +202,25 @@ public:
 	virtual void unbind() const = 0;
 
 	/**
+	 * @brief Defines the data of the vertex buffer
+	 * @param data The raw data
+	 * @param size Number of data
+	 */
+	virtual void setData(const void* data, uint32_t size) = 0;
+	/**
+	 * @brief Create a new empty Vertex buffer in the GPU memory
+	 * @param size Amount of data to read
+	 * @return Pointer to the created buffer
+	 */
+	static shrd<VertexBuffer> create( uint32_t size);
+	/**
 	 * @brief Create a new Vertex buffer in the GPU memory
 	 * @param vertices List of vertices data
 	 * @param size Amount of data to read
 	 * @return Pointer to the created buffer
 	 */
 	static shrd<VertexBuffer> create(float *vertices, uint32_t size);
+
 
 	/**
 	 * @brief Get the buffer data layout
@@ -268,10 +281,10 @@ public:
 	/**
 	 * @brief Create a new Index buffer in the GPU memory
 	 * @param indices List of indices data
-	 * @param size Amount of data to read
+	 * @param count Amount of data to read
 	 * @return Pointer to the created buffer
 	 */
-	static shrd<IndexBuffer> create(uint32_t *indices, uint32_t size);
+	static shrd<IndexBuffer> create(uint32_t *indices, uint32_t count);
 
 private:
 };

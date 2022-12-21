@@ -18,8 +18,13 @@ shrd<Renderer::SceneData> Renderer::sceneData = mk_shrd<Renderer::SceneData>();
 ShaderLibrary Renderer::shaderLibrary = ShaderLibrary();
 
 void Renderer::init() {
+	OWL_PROFILE_FUNCTION()
+
 	RenderCommand::init();
 	Renderer2D::init();
+}
+void Renderer::shutdown() {
+	Renderer2D::shutdown();
 }
 
 void Renderer::beginScene(const CameraOrtho &camera) {

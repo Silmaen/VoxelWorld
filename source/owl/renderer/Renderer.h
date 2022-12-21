@@ -39,6 +39,10 @@ public:
 	 */
 	static void init();
 	/**
+	 * @brief Stops the renderer
+	 */
+	static void shutdown();
+	/**
 	 * @brief Get the actual type of rendering API
 	 * @return The Rendering API
 	 */

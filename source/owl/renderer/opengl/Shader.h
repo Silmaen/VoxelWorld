@@ -61,6 +61,19 @@ public:
 	 */
 	void setInt(const std::string &name, int value) override;
 	/**
+	 * @brief Set shader's internal int variable array
+	 * @param name Shader's variable's name
+	 * @param values Shader's variable's raw values
+	 * @param count Amount values
+	 */
+	void setIntArray(const std::string& name, int* values, uint32_t count) override;
+	/**
+	 * @brief Set shader's internal int variable
+	 * @param name Shader's variable's name
+	 * @param value Shader's variable's value
+	 */
+	void setFloat(const std::string &name, float value) override;
+	/**
 	 * @brief Set shader's internal vector 3 variable
 	 * @param name Shader's variable's name
 	 * @param value Shader's variable's value
@@ -96,6 +109,14 @@ public:
 	 * @param data The int to push
 	 */
 	void uploadUniformInt(const std::string &name, int data);
+
+	/**
+	 * @brief Push an int variable array to the GPU
+	 * @param name Variable's name
+	 * @param values Variable's raw values
+	 * @param count Amount values
+	 */
+	void uploadUniformIntArray(const std::string& name, int* values, uint32_t count);
 	/**
 	 * @brief Push a float to the GPU
 	 * @param name Variable's name

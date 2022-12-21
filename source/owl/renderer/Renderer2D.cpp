@@ -17,79 +17,176 @@
 
 namespace owl::renderer {
 
-struct internalData{
-	shrd<VertexArray> quadVertexArray;
-	shrd<Texture2D> whiteTexture;
-	shrd<Shader> shader;
+struct QuadVertex {
+	glm::vec3 position;
+	glm::vec4 color;
+	glm::vec2 texCoord;
+	float texIndex;
+	float tilingFactor;
 };
 
-static shrd<internalData> data;
+struct internalData {
+	static const uint32_t maxQuads = 20000;
+	static const uint32_t maxVertices = maxQuads * 4;
+	static const uint32_t maxIndices = maxQuads * 6;
+	static const uint32_t maxTextureSlots = 32;// TODO: RenderCaps
+	shrd<VertexArray> quadVertexArray;
+	shrd<VertexBuffer> quadVertexBuffer;
+	shrd<Texture2D> whiteTexture;
+	shrd<Shader> shader;
+	uint32_t quadIndexCount = 0;
+	QuadVertex *quadVertexBufferBase = nullptr;
+	QuadVertex *quadVertexBufferPtr = nullptr;
+
+	std::array<shrd<Texture2D>, maxTextureSlots> textureSlots;
+	uint32_t textureSlotIndex = 1;// 0 = white texture
+	glm::vec4 quadVertexPosition[4];
+
+	Renderer2D::Statistics stats;
+};
+
+static internalData data;
 
 void Renderer2D::init() {
-	data = mk_shrd<internalData>();
-	data->quadVertexArray = VertexArray::create();
-	float squareVertices[5 * 4] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-	};
-	owl::shrd<owl::renderer::VertexBuffer> squareVB = owl::renderer::VertexBuffer::create(squareVertices, sizeof(squareVertices));
-	squareVB->SetLayout({{"a_Position", owl::renderer::ShaderDataType::Float3},
-						 {"a_TexCoord", owl::renderer::ShaderDataType::Float2}
-	});
-	data->quadVertexArray->addVertexBuffer(squareVB);
-	uint32_t squareIndices[6] = {0, 1, 2, 2, 3, 0};
-	data->quadVertexArray->setIndexBuffer(owl::renderer::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
-	auto &shLib = Renderer::getShaderLibrary();
+	OWL_PROFILE_FUNCTION()
 
-	data->whiteTexture = Texture2D::create(1,1);
+	data.quadVertexArray = VertexArray::create();
+	data.quadVertexBuffer = VertexBuffer::create(data.maxVertices * sizeof(QuadVertex));
+	data.quadVertexBuffer->SetLayout({{"a_Position", ShaderDataType::Float3},
+									  {"a_Color", ShaderDataType::Float4},
+									  {"a_TexCoord", ShaderDataType::Float2},
+									  {"a_TexIndex", ShaderDataType::Float},
+									  {"a_TilingFactor", ShaderDataType::Float}});
+	data.quadVertexArray->addVertexBuffer(data.quadVertexBuffer);
+
+	data.quadVertexBufferBase = new QuadVertex[data.maxVertices];
+
+	auto *quadIndices = new uint32_t[data.maxIndices];
+
+	uint32_t offset = 0;
+	for (uint32_t i = 0; i < data.maxIndices; i += 6) {
+		quadIndices[i + 0] = offset + 0;
+		quadIndices[i + 1] = offset + 1;
+		quadIndices[i + 2] = offset + 2;
+
+		quadIndices[i + 3] = offset + 2;
+		quadIndices[i + 4] = offset + 3;
+		quadIndices[i + 5] = offset + 0;
+
+		offset += 4;
+	}
+	data.quadVertexArray->setIndexBuffer(owl::renderer::IndexBuffer::create(quadIndices, data.maxIndices));
+	delete quadIndices;
+
+	data.whiteTexture = Texture2D::create(1, 1);
 	uint32_t whiteTextureData = 0xffffffff;
-	data->whiteTexture->setData(&whiteTextureData, sizeof(uint32_t));
+	data.whiteTexture->setData(&whiteTextureData, sizeof(uint32_t));
 
+	int32_t samplers[data.maxTextureSlots];
+	for (uint32_t i = 0; i < data.maxTextureSlots; ++i)
+		samplers[i] = i;
+
+	auto &shLib = Renderer::getShaderLibrary();
 	shLib.addFromStandardPath("texture");
-	data->shader = shLib.get("texture");
-	data->shader->bind();
-	data->shader->setInt("u_Texture", 0);
+	data.shader = shLib.get("texture");
+	data.shader->bind();
+	data.shader->setIntArray("u_Textures", samplers, data.maxTextureSlots);
+
+	// Set all texture slots to 0
+	data.textureSlots[0] = data.whiteTexture;
+	data.quadVertexPosition[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
+	data.quadVertexPosition[1] = {0.5f, -0.5f, 0.0f, 1.0f};
+	data.quadVertexPosition[2] = {0.5f, 0.5f, 0.0f, 1.0f};
+	data.quadVertexPosition[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
 }
 
 void Renderer2D::shutdown() {
-	data.reset();
+	OWL_PROFILE_FUNCTION()
+
+	delete[] data.quadVertexBufferBase;
 }
 
 void Renderer2D::beginScene(const CameraOrtho &camera) {
-	data->shader->bind();
-	data->shader->setMat4("u_ViewProjection", camera.getViewProjectionMatrix());
-	data->shader->setMat4("u_Transform", glm::mat4(1.0f));
+	OWL_PROFILE_FUNCTION()
+
+	data.shader->bind();
+	data.shader->setMat4("u_ViewProjection", camera.getViewProjectionMatrix());
+	data.quadIndexCount = 0;
+	data.quadVertexBufferPtr = data.quadVertexBufferBase;
 }
 
 void Renderer2D::endScene() {
+	OWL_PROFILE_FUNCTION()
+
+	uint32_t dataSize = (uint8_t *) data.quadVertexBufferPtr - (uint8_t *) data.quadVertexBufferBase;
+	data.quadVertexBuffer->setData(data.quadVertexBufferBase, dataSize);
+
+	flush();
 }
 
-void Renderer2D::drawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color) {
-	drawQuad({ position.x, position.y, 0.0f }, size, color);
+void Renderer2D::flush() {
+	if (data.quadIndexCount == 0)
+		return;// Nothing to draw{
+	for (uint32_t i = 0; i < data.textureSlotIndex; i++)
+		data.textureSlots[i]->bind(i);
+	RenderCommand::drawIndexed(data.quadVertexArray, data.quadIndexCount);
+	data.stats.drawCalls++;
 }
 
-void Renderer2D::drawQuad([[maybe_unused]]const glm::vec3 &position, [[maybe_unused]]const glm::vec2 &size, const glm::vec4 &color) {
-	data->shader->setFloat4("u_Color", color);
-	data->whiteTexture->bind();
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-	data->shader->setMat4("u_Transform", transform);
-	data->quadVertexArray->bind();
-	RenderCommand::drawIndexed(data->quadVertexArray);
+void Renderer2D::flushAndReset() {
+	endScene();
+
+	data.quadIndexCount = 0;
+	data.quadVertexBufferPtr = data.quadVertexBufferBase;
+
+	data.textureSlotIndex = 1;
 }
 
-void Renderer2D::drawQuad(const glm::vec2 &position, const glm::vec2 &size, const shrd<Texture> &texture) {
-	drawQuad({ position.x, position.y, 0.0f }, size, texture);
-}
-void Renderer2D::drawQuad(const glm::vec3 &position, const glm::vec2 &size, const shrd<Texture> &texture) {
-	data->shader->setFloat4("u_Color", glm::vec4(1.0f));
-	texture->bind();
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-	data->shader->setMat4("u_Transform", transform);
-	data->quadVertexArray->bind();
-	RenderCommand::drawIndexed(data->quadVertexArray);
+void Renderer2D::drawQuad(const Quad2DData &quadData) {
+	OWL_PROFILE_FUNCTION()
+	if (data.quadIndexCount >= internalData::maxIndices)
+		flushAndReset();
+	float textureIndex = 0.0f;
+	constexpr size_t quadVertexCount = 4;
+	constexpr glm::vec2 textureCoords[] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
+	if (quadData.texture != nullptr) {
+		for (uint32_t i = 1; i < data.textureSlotIndex; i++) {
+			if (*data.textureSlots[i].get() == *quadData.texture.get()) {
+				textureIndex = (float) i;
+				break;
+			}
+		}
+		if (textureIndex == 0.0f) {
+			if (data.textureSlotIndex >= internalData::maxTextureSlots)
+				flushAndReset();
+			textureIndex = (float) data.textureSlotIndex;
+			data.textureSlots[data.textureSlotIndex] = std::static_pointer_cast<Texture2D>(quadData.texture);
+			data.textureSlotIndex++;
+		}
+	}
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), quadData.position) *
+						  glm::rotate(glm::mat4(1.0f), glm::radians(quadData.rotation), {0.0f, 0.0f, 1.0f}) *
+						  glm::scale(glm::mat4(1.0f), {quadData.size.x, quadData.size.y, 1.0f});
+	for (size_t i = 0; i < quadVertexCount; i++) {
+		data.quadVertexBufferPtr->position = transform * data.quadVertexPosition[i];
+		data.quadVertexBufferPtr->color = quadData.color;
+		data.quadVertexBufferPtr->texCoord = textureCoords[i];
+		data.quadVertexBufferPtr->texIndex = textureIndex;
+		data.quadVertexBufferPtr->tilingFactor = quadData.tilingFactor;
+		data.quadVertexBufferPtr++;
+	}
+	data.quadIndexCount += 6;
+
+	data.stats.quadCount++;
 }
 
+void Renderer2D::resetStats() {
+	data.stats.drawCalls = 0;
+	data.stats.quadCount = 0;
+}
+
+Renderer2D::Statistics Renderer2D::getStats() {
+	return data.stats;
+}
 
 }// namespace owl::renderer

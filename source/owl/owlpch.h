@@ -19,3 +19,6 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include "core/Log.h"
+#include "debug/Profiler.h"

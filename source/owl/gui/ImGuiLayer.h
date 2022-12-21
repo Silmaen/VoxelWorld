@@ -49,9 +49,16 @@ public:
 
 	void SetDarkThemeColors();
 
+#ifdef IMGUI_IMPL_HAS_DOCKING
+	void enableDocking(){ dockingEnable =true; }
+	void disableDocking(){ dockingEnable =false; }
+#endif
 private:
 	/// If event should be bocked
 	bool blockEvents = true;
+#ifdef IMGUI_IMPL_HAS_DOCKING
+	bool dockingEnable = false;
+#endif
 };
 
 } // namespace owl::gui

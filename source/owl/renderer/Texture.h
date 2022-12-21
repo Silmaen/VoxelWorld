@@ -48,7 +48,12 @@ public:
 	 * @brief Destructor.
 	 */
 	virtual ~Texture() = default;//---UNCOVER---
-
+	/**
+	 * @brief Comparison operator
+	 * @param other Other texture to compare
+	 * @return True if same
+	 */
+	virtual bool operator==(const Texture& other) const = 0;
 	/**
 	 * @brief Access to texture's width.
 	 * @return Texture's width
@@ -59,7 +64,11 @@ public:
 	 * @return Texture's height
 	 */
 	[[nodiscard]] virtual uint32_t getHeight() const = 0;
-
+	/**
+	 * @brief Get renderer id
+	 * @return The renderer ID
+	 */
+	virtual uint32_t getRendererID() const = 0;
 	/**
 	 * @brief Activate the texture in the GPU
 	 * @param slot Slot into put the texture

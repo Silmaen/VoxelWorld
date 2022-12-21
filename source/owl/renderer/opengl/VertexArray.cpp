@@ -38,22 +38,32 @@ static GLenum ShaderDataTypeToOpenGLBaseType(owl::renderer::ShaderDataType type)
 namespace owl::renderer::opengl {
 
 VertexArray::VertexArray() {
+	OWL_PROFILE_FUNCTION()
+
 	glCreateVertexArrays(1, &rendererID);
 }
 
 VertexArray::~VertexArray() {
+	OWL_PROFILE_FUNCTION()
+
 	glDeleteVertexArrays(1, &rendererID);
 }
 
 void VertexArray::bind() const {
+	OWL_PROFILE_FUNCTION()
+
 	glBindVertexArray(rendererID);
 }
 
 void VertexArray::unbind() const {
+	OWL_PROFILE_FUNCTION()
+
 	glBindVertexArray(0);
 }
 
 void VertexArray::addVertexBuffer(const VertexArray::vertexBuf &vertexBuffer) {
+	OWL_PROFILE_FUNCTION()
+
 	OWL_CORE_ASSERT(!vertexBuffer->getLayout().getElements().empty(), "Vertex Buffer has no layout!")
 
 	glBindVertexArray(rendererID);
@@ -75,6 +85,8 @@ void VertexArray::addVertexBuffer(const VertexArray::vertexBuf &vertexBuffer) {
 }
 
 void VertexArray::setIndexBuffer(const VertexArray::indexBuf &indexBuffer_) {
+	OWL_PROFILE_FUNCTION()
+
 	glBindVertexArray(rendererID);
 	indexBuffer_->bind();
 

@@ -51,6 +51,14 @@ public:
 	 */
 	~Texture2D() override;
 	/**
+	 * @brief Comparison operator
+	 * @param other Other texture to compare
+	 * @return True if same
+	 */
+	bool operator==(const Texture &other) const override {
+		return rendererID == (dynamic_cast<const Texture2D&>(other)).rendererID;
+	}
+	/**
 	 * @brief Access to texture's width.
 	 * @return Texture's width
 	 */
@@ -60,7 +68,11 @@ public:
 	 * @return Texture's height
 	 */
 	[[nodiscard]] uint32_t getHeight() const override { return height; }
-
+	/**
+	 * @brief Get renderer id
+	 * @return The renderer ID
+	 */
+	[[nodiscard]] uint32_t getRendererID() const  override {return rendererID;}
 	/**
 	 * @brief Activate the texture in the GPU
 	 * @param slot Slot into put the texture
@@ -71,7 +83,8 @@ public:
 	 * @param data Raw data
 	 * @param size Size of the data
 	 */
-	void setData(void* data, uint32_t size) override;
+	void setData(void *data, uint32_t size) override;
+
 private:
 	std::filesystem::path path;
 	uint32_t width = 0;

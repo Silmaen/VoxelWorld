@@ -16,8 +16,6 @@
 void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT;
 #endif
 
-
-
 /**
  * @brief Overload of the standard memory allocator
  * @param size Size to allocate

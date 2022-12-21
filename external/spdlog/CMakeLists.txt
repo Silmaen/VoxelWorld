@@ -56,13 +56,13 @@ endif()
 option(SPDLOG_BUILD_ALL "Build all artifacts" OFF)
 
 # build shared option
-option(SPDLOG_BUILD_SHARED "Build shared library" OFF)
+option(SPDLOG_BUILD_SHARED "Build shared library" ON)
 
 # precompiled headers option
-option(SPDLOG_ENABLE_PCH "Build static or shared library using precompiled header to speed up compilation time" OFF)
+option(SPDLOG_ENABLE_PCH "Build static or shared library using precompiled header to speed up compilation time" ON)
 
 # build position independent code
-option(SPDLOG_BUILD_PIC "Build position independent code (-fPIC)" OFF)
+option(SPDLOG_BUILD_PIC "Build position independent code (-fPIC)" ON)
 
 # example options
 option(SPDLOG_BUILD_EXAMPLE "Build example" ${SPDLOG_MASTER_PROJECT})

@@ -10,8 +10,8 @@
 
 namespace owl::debug {
 
-	Instrumentor &Instrumentor::get() {
-		static Instrumentor instance;
+	Profiler &Profiler::get() {
+		static Profiler instance;
 		return instance;
 	}
 

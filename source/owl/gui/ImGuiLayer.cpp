@@ -20,6 +20,8 @@ ImGuiLayer::ImGuiLayer() : core::layer::Layer("ImGuiLayer") {}
 ImGuiLayer::~ImGuiLayer() = default;
 
 void ImGuiLayer::onAttach() {// Setup Dear ImGui context
+	OWL_PROFILE_FUNCTION()
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
@@ -55,20 +57,41 @@ void ImGuiLayer::onAttach() {// Setup Dear ImGui context
 }
 
 void ImGuiLayer::onDetach() {
+	OWL_PROFILE_FUNCTION()
+
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
 
-void ImGuiLayer::onEvent([[maybe_unused]] event::Event &event) {}
+void ImGuiLayer::onEvent([[maybe_unused]] event::Event &event) {
+	ImGuiIO& io = ImGui::GetIO();
+	event.handled |= event.isInCategory(event::category::Mouse) & io.WantCaptureMouse;
+	event.handled |= event.isInCategory(event::category::Keyboard) & io.WantCaptureKeyboard;
+}
 
 void ImGuiLayer::Begin() {
+	OWL_PROFILE_FUNCTION()
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+#ifdef IMGUI_IMPL_HAS_DOCKING
+	if (dockingEnable){
+		//ImGui::Begin("Docking");
+		ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(),dockspace_flags);
+	}
+#endif
 }
 
 void ImGuiLayer::End() {
+	OWL_PROFILE_FUNCTION()
+#ifdef IMGUI_IMPL_HAS_DOCKING
+	if (dockingEnable){
+		//ImGui::End();
+	}
+#endif
 	ImGuiIO &io = ImGui::GetIO();
 	core::Application &app = core::Application::get();
 	io.DisplaySize = ImVec2(static_cast<float>(app.getWindow().getWidth()),

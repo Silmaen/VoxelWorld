@@ -24,6 +24,10 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
+	VertexBuffer(uint32_t size);
+	/**
+	 * @brief Default constructor.
+	 */
 	VertexBuffer(float *vertices, uint32_t size);
 	/**
 	 * @brief Destructor.
@@ -39,6 +43,12 @@ public:
 	 */
 	void unbind() const override;
 
+	/**
+	 * @brief Defines the data of the vertex buffer
+	 * @param data The raw data
+	 * @param size Number of data
+	 */
+	void setData(const void* data, uint32_t size) override;
 private:
 	/// ID in the OpenGL context
 	uint32_t rendererID = 0;

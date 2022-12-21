@@ -15,6 +15,8 @@ namespace owl::renderer::opengl {
 
 
 Texture2D::Texture2D(uint32_t width_, uint32_t height_):width{width_},height{height_} {
+	OWL_PROFILE_FUNCTION()
+
 	internalFormat = GL_RGBA8;
 	dataFormat = GL_RGBA;
 
@@ -29,9 +31,15 @@ Texture2D::Texture2D(uint32_t width_, uint32_t height_):width{width_},height{hei
 }
 
 Texture2D::Texture2D(const std::filesystem::path &path_) : path{path_} {
+	OWL_PROFILE_FUNCTION()
+
 	int width_, height_, channels;
 	stbi_set_flip_vertically_on_load(1);
-	stbi_uc *data = stbi_load(path.string().c_str(), &width_, &height_, &channels, 0);
+	stbi_uc *data = nullptr;
+	{
+		OWL_PROFILE_SCOPE("stbi_load - Texture2D::Texture2D(const std::filesystem::path &)")
+		data = stbi_load(path.string().c_str(), &width_, &height_, &channels, 0);
+	}
 	OWL_CORE_ASSERT(data, "Failed to load image!")
 	width = static_cast<uint32_t>(width_);
 	height = static_cast<uint32_t>(height_);
@@ -60,14 +68,20 @@ Texture2D::Texture2D(const std::filesystem::path &path_) : path{path_} {
 }
 
 Texture2D::~Texture2D() {
+	OWL_PROFILE_FUNCTION()
+
 	glDeleteTextures(1, &rendererID);
 }
 
 void Texture2D::bind(uint32_t slot) const {
+	OWL_PROFILE_FUNCTION()
+
 	glBindTextureUnit(slot, rendererID);
 }
 
 void Texture2D::setData(void *data, [[maybe_unused]] uint32_t size) {
+	OWL_PROFILE_FUNCTION()
+
 	[[maybe_unused]] uint32_t bpp = dataFormat == GL_RGBA ? 4 : 3;
 	OWL_CORE_ASSERT(size == width * height * bpp, "Data must be entire texture!");
 	glTextureSubImage2D(rendererID, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);

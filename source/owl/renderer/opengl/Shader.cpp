@@ -48,6 +48,8 @@ inline static std::string fileToString(const std::filesystem::path &file) {
 }
 
 Shader::Shader(const std::string &shaderName, const std::vector<std::filesystem::path> &sources): ::owl::renderer::Shader{shaderName}  {
+	OWL_PROFILE_FUNCTION()
+
 	std::unordered_map<ShaderType, std::string> strSources;
 	for(const auto& src: sources){
 		ShaderType type = ShaderType::None;
@@ -65,6 +67,7 @@ Shader::Shader(const std::string &shaderName, const std::vector<std::filesystem:
 }
 
 void Shader::compile(const std::unordered_map<ShaderType, std::string> &sources) {
+	OWL_PROFILE_FUNCTION()
 
 	// Get a program object.
 	GLuint program = glCreateProgram();
@@ -159,44 +162,65 @@ void Shader::compile(const std::unordered_map<ShaderType, std::string> &sources)
 }
 
 Shader::~Shader() {
+	OWL_PROFILE_FUNCTION()
+
 	glDeleteProgram(programID);
 }
 ;
 void Shader::bind() const {
+	OWL_PROFILE_FUNCTION()
+
 	glUseProgram(programID);
 }
 
 void Shader::unbind() const {
+	OWL_PROFILE_FUNCTION()
+
 	glUseProgram(0);
 }
 
 void Shader::setInt(const std::string &name, int value) {
+	OWL_PROFILE_FUNCTION()
+
 	uploadUniformInt(name, value);
+}
+void Shader::setIntArray(const std::string& name, int* values, uint32_t count) {
+	OWL_PROFILE_FUNCTION()
+
+	uploadUniformIntArray(name, values, count);
+}
+
+void Shader::setFloat(const std::string &name, float value) {
+	OWL_PROFILE_FUNCTION()
+
+	uploadUniformFloat(name, value);
 }
 
 void Shader::setFloat3(const std::string &name, const glm::vec3 &value) {
+	OWL_PROFILE_FUNCTION()
+
 	uploadUniformFloat3(name, value);
 }
 
 void Shader::setFloat4(const std::string &name, const glm::vec4 &value) {
+	OWL_PROFILE_FUNCTION()
+
 	uploadUniformFloat4(name, value);
 }
 
 void Shader::setMat4(const std::string &name, const glm::mat4 &matrix) {
+	OWL_PROFILE_FUNCTION()
+
 	uploadUniformMat4(name, matrix);
 }
 
-void Shader::uploadUniformMat3(const std::string &name, const glm::mat3 &matrix) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
-}
-void Shader::uploadUniformMat4(const std::string &name, const glm::mat4 &matrix) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
-}
 void Shader::uploadUniformInt(const std::string &name, int data) {
 	GLint location = glGetUniformLocation(programID, name.c_str());
 	glUniform1i(location, data);
+}
+void Shader::uploadUniformIntArray(const std::string& name, int* values, uint32_t count){
+	GLint location = glGetUniformLocation(programID, name.c_str());
+	glUniform1iv(location, count, values);
 }
 void Shader::uploadUniformFloat(const std::string &name, float value) {
 	GLint location = glGetUniformLocation(programID, name.c_str());
@@ -213,6 +237,15 @@ void Shader::uploadUniformFloat3(const std::string &name, const glm::vec3 &value
 void Shader::uploadUniformFloat4(const std::string &name, const glm::vec4 &value) {
 	GLint location = glGetUniformLocation(programID, name.c_str());
 	glUniform4f(location, value.x, value.y, value.z, value.w);
+}
+
+void Shader::uploadUniformMat3(const std::string &name, const glm::mat3 &matrix) {
+	GLint location = glGetUniformLocation(programID, name.c_str());
+	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+void Shader::uploadUniformMat4(const std::string &name, const glm::mat4 &matrix) {
+	GLint location = glGetUniformLocation(programID, name.c_str());
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 }// namespace owl::renderer::opengl

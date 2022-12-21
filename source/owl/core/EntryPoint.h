@@ -8,14 +8,22 @@
 #pragma once
 #include "Application.h"
 #include "Log.h"
+#include "debug/Profiler.h"
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
+
 	owl::core::Log::init();
 	// Startup
+	OWL_PROFILE_BEGIN_SESSION("Startup","OwlProfile-startup.json")
 	auto app = owl::core::createApplication();
+	OWL_PROFILE_END_SESSION()
 	// runtime
+	OWL_PROFILE_BEGIN_SESSION("Runtime","OwlProfile-runtime.json")
 	app->run();
+	OWL_PROFILE_END_SESSION()
 	// Shutdown
+	OWL_PROFILE_BEGIN_SESSION("Shutdown","OwlProfile-shutdown.json")
 	app.reset();
+	OWL_PROFILE_END_SESSION()
 	return 0;
 }

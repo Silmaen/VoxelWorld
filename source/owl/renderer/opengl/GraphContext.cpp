@@ -17,6 +17,8 @@ GraphContext::GraphContext(GLFWwindow *window) : windowHandle(window) {
 }
 
 void GraphContext::Init() {
+	OWL_PROFILE_FUNCTION()
+
 	glfwMakeContextCurrent(windowHandle);
 	[[maybe_unused]] int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 	OWL_CORE_ASSERT(status, "Failed to initialize GLAD")
@@ -34,6 +36,8 @@ void GraphContext::Init() {
 }
 
 void GraphContext::SwapBuffers() {
+	OWL_PROFILE_FUNCTION()
+
 	glfwSwapBuffers(windowHandle);
 }
 

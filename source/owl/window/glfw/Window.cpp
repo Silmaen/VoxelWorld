@@ -16,6 +16,7 @@
 #include "event/AppEvent.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
+#include "renderer/Renderer.h"
 
 namespace owl::window::glfw {
 
@@ -26,17 +27,19 @@ static void GLFWErrorCallback(int error, const char *description) {
 }
 
 Window::Window(const Properties &props) : ::owl::window::Window() {
-	OWL_PROFILE_FUNCTION();
+	OWL_PROFILE_FUNCTION()
+
 	init(props);
 }
 
 Window::~Window() {
-	OWL_PROFILE_FUNCTION();
+	OWL_PROFILE_FUNCTION()
+
 	shutdown();
 }
 
 void Window::init(const Properties &props) {
-	OWL_PROFILE_FUNCTION();
+	OWL_PROFILE_FUNCTION()
 
 	windowData.title = props.Title;
 	windowData.width = props.width;
@@ -55,8 +58,8 @@ void Window::init(const Properties &props) {
 	{
 		OWL_PROFILE_SCOPE("glfwCreateWindow");
 #if defined(OWL_DEBUG)
-		// if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
-		//   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+		if (renderer::Renderer::getAPI() == renderer::RenderAPI::Type::OpenGL)
+		   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 		glfwWindow = glfwCreateWindow(static_cast<int>(props.width),
 									  static_cast<int>(props.height),
@@ -169,7 +172,7 @@ void Window::init(const Properties &props) {
 }
 
 void Window::shutdown() {
-	OWL_PROFILE_FUNCTION();
+	OWL_PROFILE_FUNCTION()
 
 	glfwDestroyWindow(glfwWindow);
 	--s_GLFWWindowCount;
@@ -181,15 +184,14 @@ void Window::shutdown() {
 
 
 void Window::onUpdate() {
-	OWL_PROFILE_FUNCTION();
+	OWL_PROFILE_FUNCTION()
 
 	glfwPollEvents();
 	context->SwapBuffers();
 }
 
 void Window::setVSync(bool enabled) {
-
-	OWL_PROFILE_FUNCTION();
+	OWL_PROFILE_FUNCTION()
 
 	if (enabled)
 		glfwSwapInterval(1);

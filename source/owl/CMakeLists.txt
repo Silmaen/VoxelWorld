@@ -1,7 +1,6 @@
 #
 # base library
 #
-option(${PRJPREFIX}_BUILD_SHARED "If the Library must be build as shared library" OFF)
 file(GLOB_RECURSE SRCS
         *.cpp
         )
@@ -41,7 +40,7 @@ find_package(DebugBreak 1.0 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC owl::DebugBreak)
 
 # fmt
-target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt-header-only)
+target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
 
 # glad
 target_link_libraries(${ENGINE_NAME} PRIVATE glad)
@@ -51,7 +50,7 @@ target_link_libraries(${ENGINE_NAME} PRIVATE glad)
 target_link_libraries(${ENGINE_NAME} PRIVATE glfw)
 
 # glm
-target_link_libraries(${ENGINE_NAME} PRIVATE glm)
+target_link_libraries(${ENGINE_NAME} PRIVATE glm_shared)
 
 # ImGui
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui)
@@ -64,7 +63,7 @@ target_link_libraries(${ENGINE_NAME} PRIVATE owl::MagicEnum)
 target_link_libraries(${ENGINE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 # spdlog
-target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog_header_only)
+target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog)
 
 # magic_enum
 find_package(StbImage REQUIRED)
