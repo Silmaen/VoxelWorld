@@ -38,7 +38,7 @@ shrd<Shader> Shader::create(const std::string &shaderName) {
 			return nullptr;
 		case RenderAPI::Type::OpenGL: {
 			std::vector<std::filesystem::path> sources;
-			auto shaderDir = core::Application::get().getWorkingDirectory() / "res" / "shaders";
+			auto shaderDir = core::Application::get().getAssetDirectory() / "shaders";
 			for (const auto &file: std::filesystem::directory_iterator(shaderDir)) {
 				if (file.path().stem().string() == shaderName)
 					sources.push_back(file);

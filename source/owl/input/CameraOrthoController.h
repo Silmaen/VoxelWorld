@@ -58,7 +58,12 @@ public:
 	 * @param e The received event
 	 */
 	void onEvent(event::Event &e);
-
+	/**
+	 * @brief Action when view port is resized
+	 * @param width New width
+	 * @param height New height
+	 */
+	void onResize(float width, float height);
 	/**
 	 * @brief Access to the camera
 	 * @return The camera

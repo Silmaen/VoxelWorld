@@ -39,6 +39,9 @@ protected:
 	input::KeyCode keyCode;
 };
 
+/**
+ * @brief Event of key presse
+ */
 class OWL_API KeyPressedEvent : public KeyEvent {
 public:
 	explicit KeyPressedEvent(const input::KeyCode keycode, bool isRepeat_ = false)
@@ -64,6 +67,9 @@ private:
 	bool isRepeat;
 };
 
+/**
+ * @brief Event of key released
+ */
 class OWL_API KeyReleasedEvent : public KeyEvent {
 public:
 	explicit KeyReleasedEvent(const input::KeyCode keycode) : KeyEvent(keycode) {}
@@ -79,6 +85,9 @@ public:
 	[[nodiscard]] type getType() const override { return getStaticType(); }
 };
 
+/**
+ * @brief Event of key typed
+ */
 class KeyTypedEvent : public KeyEvent {
 public:
 	explicit KeyTypedEvent(const input::KeyCode keycode) : KeyEvent(keycode) {}

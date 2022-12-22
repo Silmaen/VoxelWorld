@@ -67,6 +67,7 @@ public:
 	/**
 	 * @brief Draw the vertex array
 	 * @param vertexArray VA to render
+	 * @param indexCount The index number
 	 */
 	virtual void drawIndexed(const shrd<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 

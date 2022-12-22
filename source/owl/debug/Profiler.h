@@ -165,12 +165,14 @@ private:
 	std::ofstream outputStream; /// output file stream
 };
 
+/**
+ * @brief Timer used for profiling
+ */
 class ProfileTimer {
 public:
 	explicit ProfileTimer(const char *name_) : name(name_), startTimepoint{std::chrono::steady_clock::now()},
 													   stopped(false) {
 	}
-
 	~ProfileTimer() {
 		if (!stopped)
 			stop();
@@ -192,20 +194,34 @@ public:
 
 		stopped = true;
 	}
-
 private:
 	const char *name;
 	std::chrono::time_point<std::chrono::steady_clock> startTimepoint;
 	bool stopped;
 };
 
+/**
+ * @brief Namespace for profinling utility functions
+ */
 namespace utils {
 
+/**
+ * @brief Simple char array
+ * @tparam N Size of the array
+ */
 template<size_t N>
 struct ChangeResult {
 	char Data[N];
 };
 
+/**
+ * @brief Simple String cleaner
+ * @tparam N Size of the string
+ * @tparam K Size of pattern to remove
+ * @param expr The string
+ * @param remove Pattern to remove
+ * @return The corrected string
+ */
 template<size_t N, size_t K>
 constexpr auto cleanupOutputString(const char (&expr)[N],
 								   const char (&remove)[K]) {

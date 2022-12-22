@@ -13,14 +13,24 @@
 
 namespace owl::renderer::opengl {
 
+constexpr uint32_t maxFramebufferSize = 8192;
 
-Framebuffer::Framebuffer(const FramebufferSpecification &spec): specs{spec} {
+Framebuffer::Framebuffer(const FramebufferSpecification &spec) : specs{spec} {
 	invalidate();
 }
 Framebuffer::~Framebuffer() {
 	glDeleteFramebuffers(1, &rendererID);
+	glDeleteTextures(1, &colorAttachment);
+	glDeleteTextures(1, &depthAttachment);
 }
 void Framebuffer::invalidate() {
+
+	if (rendererID) {
+		glDeleteFramebuffers(1, &rendererID);
+		glDeleteTextures(1, &colorAttachment);
+		glDeleteTextures(1, &depthAttachment);
+	}
+
 	glCreateFramebuffers(1, &rendererID);
 	glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 
@@ -35,7 +45,7 @@ void Framebuffer::invalidate() {
 	glCreateTextures(GL_TEXTURE_2D, 1, &depthAttachment);
 	glBindTexture(GL_TEXTURE_2D, depthAttachment);
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, specs.width, specs.height);
-	// glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, specs.width, specs.height, 0,
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, specs.width, specs.height, 0,
 	// 	GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthAttachment, 0);
 
@@ -45,8 +55,21 @@ void Framebuffer::invalidate() {
 }
 void Framebuffer::bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
+	glViewport(0, 0, specs.width, specs.height);
 }
 void Framebuffer::unbind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+void Framebuffer::resize(uint32_t width, uint32_t height) {
+	if (width == 0 || height == 0 || width > maxFramebufferSize || height > maxFramebufferSize) {
+		OWL_CORE_WARN("Attempt to resize frame buffer to {} {}", width, height)
+		return;
+	}
+	specs.width = width;
+	specs.height = height;
+	invalidate();
+}
+
+
 }// namespace owl::renderer::opengl

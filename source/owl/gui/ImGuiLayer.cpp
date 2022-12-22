@@ -29,17 +29,15 @@ void ImGuiLayer::onAttach() {// Setup Dear ImGui context
 			ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
 											   // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad
 											   // Controls
-#ifdef IMGUI_IMPL_HAS_DOCKING
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport /
 													   // Platform Windows
-#endif
 	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
-#ifdef IMGUI_IMPL_HAS_DOCKING
+
 	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
 	// windows can look identical to regular ones.
 	ImGuiStyle &style = ImGui::GetStyle();
@@ -47,8 +45,8 @@ void ImGuiLayer::onAttach() {// Setup Dear ImGui context
 		style.WindowRounding = 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
-#endif
-	SetDarkThemeColors();
+
+	setDarkThemeColors();
 
 	auto *window = static_cast<GLFWwindow *>(
 			core::Application::get().getWindow().getNativeWindow());
@@ -65,33 +63,27 @@ void ImGuiLayer::onDetach() {
 }
 
 void ImGuiLayer::onEvent([[maybe_unused]] event::Event &event) {
-	ImGuiIO& io = ImGui::GetIO();
-	event.handled |= event.isInCategory(event::category::Mouse) & io.WantCaptureMouse;
-	event.handled |= event.isInCategory(event::category::Keyboard) & io.WantCaptureKeyboard;
+	if (blockEvent) {
+		ImGuiIO &io = ImGui::GetIO();
+		event.handled |= event.isInCategory(event::category::Mouse) & io.WantCaptureMouse;
+		event.handled |= event.isInCategory(event::category::Keyboard) & io.WantCaptureKeyboard;
+	}
 }
 
-void ImGuiLayer::Begin() {
-	OWL_PROFILE_FUNCTION()
-
+void ImGuiLayer::begin(){
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-#ifdef IMGUI_IMPL_HAS_DOCKING
-	if (dockingEnable){
-		//ImGui::Begin("Docking");
-		ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
-		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(),dockspace_flags);
+	if (dockingEnable) {
+		initializeDocking();
 	}
-#endif
 }
 
-void ImGuiLayer::End() {
+void ImGuiLayer::end() {
 	OWL_PROFILE_FUNCTION()
-#ifdef IMGUI_IMPL_HAS_DOCKING
-	if (dockingEnable){
-		//ImGui::End();
+	if (dockingEnable) {
+		ImGui::End();
 	}
-#endif
 	ImGuiIO &io = ImGui::GetIO();
 	core::Application &app = core::Application::get();
 	io.DisplaySize = ImVec2(static_cast<float>(app.getWindow().getWidth()),
@@ -100,17 +92,15 @@ void ImGuiLayer::End() {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-#ifdef IMGUI_IMPL_HAS_DOCKING
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 		GLFWwindow *backup_current_context = glfwGetCurrentContext();
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
 		glfwMakeContextCurrent(backup_current_context);
 	}
-#endif
 }
 
-void ImGuiLayer::SetDarkThemeColors() {
+void ImGuiLayer::setDarkThemeColors() {
 	auto &colors = ImGui::GetStyle().Colors;
 	colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.105f, 0.11f, 1.0f};
 
@@ -140,6 +130,45 @@ void ImGuiLayer::SetDarkThemeColors() {
 	colors[ImGuiCol_TitleBg] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
 	colors[ImGuiCol_TitleBgActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
 	colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+}
+
+void ImGuiLayer::initializeDocking() {
+	static bool dockspaceOpen = true;
+	static bool opt_fullscreen_persistant = true;
+	bool opt_fullscreen = opt_fullscreen_persistant;
+	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+	// because it would be confusing to have two docking targets within each others.
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	if (opt_fullscreen) {
+		ImGuiViewport *viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->Pos);
+		ImGui::SetNextWindowSize(viewport->Size);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	}
+	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
+	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+		window_flags |= ImGuiWindowFlags_NoBackground;
+	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+	// all active windows docked into it will lose their parent and become undocked.
+	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+	ImGui::PopStyleVar();
+	if (opt_fullscreen)
+		ImGui::PopStyleVar(2);
+	// DockSpace
+	ImGuiIO &io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+	}
 }
 
 }// namespace owl::gui

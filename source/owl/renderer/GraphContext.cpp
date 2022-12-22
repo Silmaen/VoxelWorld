@@ -15,7 +15,7 @@
 
 namespace owl::renderer {
 
-uniq<GraphContext> GraphContext::Create(void *window) {
+uniq<GraphContext> GraphContext::create(void *window) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:

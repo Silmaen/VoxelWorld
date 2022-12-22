@@ -37,18 +37,18 @@ public:
 	/**
 	 * @brief Initialize the context
 	 */
-	virtual void Init() = 0;
+	virtual void init() = 0;
 	/**
 	 * @brief Doo the buffer swap
 	 */
-	virtual void SwapBuffers() = 0;
+	virtual void swapBuffers() = 0;
 
 	/**
 	 * @brief Create a Graphics context
 	 * @param window The window into render context
 	 * @return The created context
 	 */
-	static uniq<GraphContext> Create(void *window);
+	static uniq<GraphContext> create(void *window);
 
 private:
 };

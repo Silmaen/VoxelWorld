@@ -11,6 +11,9 @@
 #include "RenderCommand.h"
 #include "ShaderLibrary.h"
 
+/**
+ * @brief Namespace for the renderer elements
+ */
 namespace owl::renderer {
 
 #ifdef __clang__
@@ -46,7 +49,7 @@ public:
 	 * @brief Get the actual type of rendering API
 	 * @return The Rendering API
 	 */
-	inline static RenderAPI::Type getAPI() { return RenderAPI::getAPI(); }
+	static RenderAPI::Type getAPI() { return RenderAPI::getAPI(); }
 
 	/**
 	 * @brief Event on Window size change

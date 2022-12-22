@@ -56,10 +56,16 @@ public:
 	 */
 	void unbind() override;
 	/**
+	 * @brief Change the size of the frame buffer
+	 * @param width New width
+	 * @param height New height
+	 */
+	void resize(uint32_t width, uint32_t height) override;
+	/**
 	 * @brief Get renderer id
 	 * @return The renderer ID
 	 */
-	[[nodiscard]] uint32_t getColorAttachmentRendererID() const override { return rendererID; }
+	[[nodiscard]] uint32_t getColorAttachmentRendererID() const override { return colorAttachment; }
 	/**
 	 * @brief Get the specs
 	 * @return The specs

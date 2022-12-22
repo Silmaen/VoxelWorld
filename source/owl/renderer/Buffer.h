@@ -141,12 +141,12 @@ public:
 	 * @brief Get buffer stride
 	 * @return The buffer stride
 	 */
-	[[nodiscard]] inline uint32_t getStride() const { return stride; }
+	[[nodiscard]] uint32_t getStride() const { return stride; }
 	/**
 	 * @brief Get the buffer Elements
 	 * @return Buffer elements
 	 */
-	[[nodiscard]] inline const std::vector<BufferElement> &getElements() const { return elements; }
+	[[nodiscard]] const std::vector<BufferElement> &getElements() const { return elements; }
 
 	[[nodiscard]] iterator begin() { return elements.begin(); }
 	[[nodiscard]] iterator end() { return elements.end(); }

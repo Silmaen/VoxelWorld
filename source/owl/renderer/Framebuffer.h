@@ -26,6 +26,10 @@ struct FramebufferSpecification {
 	bool swapChainTarget = false;
 };
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class Framebuffer
  */
@@ -66,10 +70,16 @@ public:
 	 */
 	virtual void unbind() = 0;
 	/**
+	 * @brief Change the size of the frame buffer
+	 * @param width New width
+	 * @param height New height
+	 */
+	virtual void resize(uint32_t width, uint32_t height) = 0;
+	/**
 	 * @brief Get renderer id
 	 * @return The renderer ID
 	 */
-	virtual uint32_t getColorAttachmentRendererID() const = 0;
+	[[nodiscard]] virtual uint32_t getColorAttachmentRendererID() const = 0;
 	/**
 	 * @brief Get the specs
 	 * @return The specs
@@ -83,5 +93,8 @@ public:
 	static shrd<Framebuffer> create(const FramebufferSpecification& spec);
 private:
 };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }// namespace owl::renderer

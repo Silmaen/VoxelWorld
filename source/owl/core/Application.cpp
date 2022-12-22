@@ -18,7 +18,7 @@ namespace owl::core {
 
 Application *Application::instance = nullptr;
 
-Application::Application() {
+Application::Application(const AppParams &appParams) {
 	OWL_PROFILE_FUNCTION()
 
 	OWL_CORE_ASSERT(!instance, "Application already exists!")
@@ -27,16 +27,13 @@ Application::Application() {
 	// Setup a working directory
 	// Assuming present of a folder 'res' containing the data
 	workingDirectory = absolute(std::filesystem::current_path());
-	while (workingDirectory != workingDirectory.root_path()) {
-		if (exists(workingDirectory / "res")) break;
-		workingDirectory = workingDirectory.parent_path();
-	}
+	OWL_ASSERT(searchAssets(appParams.assetsPattern), "Unable to find assets")
 
 	// startup the renderer
 	renderer::RenderCommand::create(renderer::RenderAPI::Type::OpenGL);
 
 	// create main window
-	appWindow = window::Window::Create();
+	appWindow = input::Window::create({.title = appParams.name});
 	appWindow->setEventCallback(
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 
@@ -47,10 +44,11 @@ Application::Application() {
 	pushOverlay(imGuiLayer);
 }
 
-void Application::enableDocking(){
+void Application::enableDocking() {
 	imGuiLayer->enableDocking();
 }
-void Application::disableDocking(){
+
+void Application::disableDocking() {
 	imGuiLayer->disableDocking();
 }
 
@@ -58,6 +56,10 @@ Application::~Application() {
 	OWL_PROFILE_FUNCTION()
 
 	renderer::Renderer::shutdown();
+}
+
+void Application::close() {
+	running = false;
 }
 
 void Application::run() {
@@ -76,14 +78,14 @@ void Application::run() {
 					for (auto &layer: layerStack)
 						layer->onUpdate(stepper);
 				}
-				imGuiLayer->Begin();
+				imGuiLayer->begin();
 				{
 					OWL_PROFILE_SCOPE("LayerStack onImUpdate")
 
 					for (auto &layer: layerStack)
 						layer->onImGuiRender(stepper);
 				}
-				imGuiLayer->End();
+				imGuiLayer->end();
 			}
 		}
 		appWindow->onUpdate();
@@ -132,10 +134,25 @@ void Application::pushLayer(shrd<layer::Layer> &&layer) {
 
 	layerStack.pushLayer(std::move(layer));
 }
+
 void Application::pushOverlay(shrd<layer::Layer> &&overlay) {
 	OWL_PROFILE_FUNCTION()
 
 	layerStack.pushOverlay(std::move(overlay));
+}
+
+bool Application::searchAssets(const std::string &pattern) {
+	std::filesystem::path parent = workingDirectory;
+	std::filesystem::path assets = parent / pattern;
+	while (parent != parent.root_path()) {
+		if (exists(assets)) {
+			assetDirectory = assets;
+			return true;
+		}
+		parent = parent.parent_path();
+		assets = parent / pattern;
+	}
+	return false;
 }
 
 }// namespace owl::core

@@ -9,15 +9,15 @@
 #pragma once
 
 #include "renderer/GraphContext.h"
-#include "window/Window.h"
+#include "../Window.h"
 #include "core/external/glfw3.h"
 
-namespace owl::window::glfw {
+namespace owl::input::glfw {
 
 /**
  * @brief Class GLFW Window
  */
-class OWL_API Window : public ::owl::window::Window {
+class OWL_API Window : public ::owl::input::Window {
 public:
 	Window(const Window &) = delete;
 	Window(Window &&) = delete;

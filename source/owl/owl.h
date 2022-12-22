@@ -20,6 +20,11 @@
 #include "input/CameraOrthoController.h"
 #include "input/Input.h"
 
+// ------- scene -----------
+#include "scene/Scene.h"
+#include "scene/Entity.h"
+//--------------------------
+
 // ------ renderer ---------
 #include "renderer/Buffer.h"
 #include "renderer/CameraOrtho.h"
@@ -33,6 +38,6 @@
 // -------------------------
 
 // ------ Debugging --------
-#include "debug/Tracker.h"
 #include "debug/Profiler.h"
+#include "debug/Tracker.h"
 // -------------------------

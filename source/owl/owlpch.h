@@ -8,6 +8,10 @@
 
 #pragma once
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundefined-func-template"
+#endif
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -22,3 +26,7 @@
 
 #include "core/Log.h"
 #include "debug/Profiler.h"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

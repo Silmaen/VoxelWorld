@@ -30,14 +30,18 @@ target_link_libraries(${ENGINE_NAME} PUBLIC ${CMAKE_PROJECT_NAME}_Base)
 install(TARGETS ${ENGINE_NAME})
 # precompiled headers
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h")
-  target_precompile_headers(${ENGINE_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h)
-endif()
+    target_precompile_headers(${ENGINE_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h)
+endif ()
 
 # ----==== third party ====----
 #  ---- external folder ----
 # debugbreak
 find_package(DebugBreak 1.0 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC owl::DebugBreak)
+
+# Emtt
+find_package(Entt 3.11 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC owl::Entt)
 
 # fmt
 target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)

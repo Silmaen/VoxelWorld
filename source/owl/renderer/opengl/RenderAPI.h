@@ -10,6 +10,9 @@
 
 #include "../RenderAPI.h"
 
+/**
+ * @brief Namespace for opengl specific rendering objects
+ */
 namespace owl::renderer::opengl {
 
 /**
@@ -53,6 +56,7 @@ public:
 	/**
 	 * @brief Draw the vertex array
 	 * @param vertexArray VA to render
+	 * @param indexCount The index number
 	 */
 	void drawIndexed(const shrd<VertexArray>& vertexArray, uint32_t indexCount = 0)override;
 };

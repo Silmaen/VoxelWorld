@@ -11,13 +11,12 @@
 #include "core/Core.h"
 #include "event/Event.h"
 
-namespace owl::window {
+namespace owl::input {
 
 /**
- * @brief Types of Windows Manager
+ * @brief Types of input Manager
  */
 enum struct Type {
-	Null, /// Nothing
 	GLFW	/// Windows managed by Glfw library
 };
 
@@ -28,7 +27,7 @@ struct Properties {
 	/// Type of Window manager
 	Type winType = Type::GLFW;
 	/// Window title
-	std::string Title = "Owl Engine";
+	std::string title = "Owl Engine";
 	/// Width
 	uint32_t width = 1280;
 	/// Height
@@ -92,7 +91,7 @@ public:
 	 * @param props The window properties
 	 * @return Pointer to the window
 	 */
-	static uniq<Window> Create(const Properties &props = Properties());
+	static uniq<Window> create(const Properties &props = Properties());
 };
 
 } // namespace owl::window

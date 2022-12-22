@@ -9,6 +9,9 @@
 #pragma once
 #include "core/layer/Layer.h"
 
+/**
+ * @brief Namespace for gui
+ */
 namespace owl::gui {
 
 /**
@@ -42,23 +45,25 @@ public:
 	 */
 	void onEvent([[maybe_unused]] event::Event &event) override;
 
-	void Begin();
-	void End();
+	void begin();
 
-	void BlockEvents(bool block) { blockEvents = block; }
+	void end();
 
-	void SetDarkThemeColors();
+	void blockEvents(bool block) { blockEvent = block; }
 
-#ifdef IMGUI_IMPL_HAS_DOCKING
+	void setDarkThemeColors();
+
 	void enableDocking(){ dockingEnable =true; }
+
 	void disableDocking(){ dockingEnable =false; }
-#endif
+
 private:
 	/// If event should be bocked
-	bool blockEvents = true;
-#ifdef IMGUI_IMPL_HAS_DOCKING
+	bool blockEvent = true;
+	/// If the docking space exists
 	bool dockingEnable = false;
-#endif
+	/// Function that initialize the docking port
+	void initializeDocking();
 };
 
 } // namespace owl::gui

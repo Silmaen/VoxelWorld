@@ -71,17 +71,47 @@ void VertexArray::addVertexBuffer(const VertexArray::vertexBuf &vertexBuffer) {
 
 	const auto &layout = vertexBuffer->getLayout();
 	for (const auto &element: layout) {
-		glEnableVertexAttribArray(VBIndexOffset);
-		glVertexAttribPointer(VBIndexOffset,
-							  element.getComponentCount(),
-							  ShaderDataTypeToOpenGLBaseType(element.type),
-							  element.normalized ? GL_TRUE : GL_FALSE,
-							  layout.getStride(),
-							  reinterpret_cast<const void *>(element.offset));
-		VBIndexOffset++;
+		switch (element.type) {
+			case ShaderDataType::Float:
+			case ShaderDataType::Float2:
+			case ShaderDataType::Float3:
+			case ShaderDataType::Float4:
+			case ShaderDataType::Int:
+			case ShaderDataType::Int2:
+			case ShaderDataType::Int3:
+			case ShaderDataType::Int4:
+			case ShaderDataType::Bool: {
+				glEnableVertexAttribArray(VBIndexOffset);
+				glVertexAttribPointer(VBIndexOffset,
+									  element.getComponentCount(),
+									  ShaderDataTypeToOpenGLBaseType(element.type),
+									  element.normalized ? GL_TRUE : GL_FALSE,
+									  layout.getStride(),
+									  reinterpret_cast<const void *>(element.offset));
+				VBIndexOffset++;
+				break;
+			}
+			case ShaderDataType::Mat3:
+			case ShaderDataType::Mat4: {
+				uint8_t count = element.getComponentCount();
+				for (uint8_t i = 0; i < count; i++) {
+					glEnableVertexAttribArray(VBIndexOffset);
+					glVertexAttribPointer(VBIndexOffset,
+										  count,
+										  ShaderDataTypeToOpenGLBaseType(element.type),
+										  element.normalized ? GL_TRUE : GL_FALSE,
+										  layout.getStride(),
+										  reinterpret_cast<const void *>(element.offset + sizeof(float) * count * i));
+							glVertexAttribDivisor(VBIndexOffset, 1);
+							VBIndexOffset++;
+				}
+				break;
+			}
+			default:
+				OWL_CORE_ASSERT(false, "Unknown ShaderDataType!");
+		}
 	}
 	vertexBuffers.push_back(vertexBuffer);
-	VBIndexOffset += layout.getElements().size();
 }
 
 void VertexArray::setIndexBuffer(const VertexArray::indexBuf &indexBuffer_) {

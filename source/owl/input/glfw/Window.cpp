@@ -18,7 +18,7 @@
 #include "event/MouseEvent.h"
 #include "renderer/Renderer.h"
 
-namespace owl::window::glfw {
+namespace owl::input::glfw {
 
 static uint8_t s_GLFWWindowCount = 0;
 
@@ -26,7 +26,7 @@ static void GLFWErrorCallback(int error, const char *description) {
 	OWL_CORE_ERROR("GLFW Error ({}): {}", error, description)
 }
 
-Window::Window(const Properties &props) : ::owl::window::Window() {
+Window::Window(const Properties &props) : ::owl::input::Window() {
 	OWL_PROFILE_FUNCTION()
 
 	init(props);
@@ -41,11 +41,11 @@ Window::~Window() {
 void Window::init(const Properties &props) {
 	OWL_PROFILE_FUNCTION()
 
-	windowData.title = props.Title;
+	windowData.title = props.title;
 	windowData.width = props.width;
 	windowData.height = props.height;
 
-	OWL_CORE_INFO("Creating window {} ({}, {})", props.Title, props.width,
+	OWL_CORE_INFO("Creating window {} ({}, {})", props.title, props.width,
 				  props.height)
 
 	if (s_GLFWWindowCount == 0) {
@@ -67,8 +67,8 @@ void Window::init(const Properties &props) {
 		++s_GLFWWindowCount;
 	}
 
-	context = renderer::GraphContext::Create(glfwWindow);
-	context->Init();
+	context = renderer::GraphContext::create(glfwWindow);
+	context->init();
 
 	glfwSetWindowUserPointer(glfwWindow, &windowData);
 	setVSync(true);
@@ -187,7 +187,7 @@ void Window::onUpdate() {
 	OWL_PROFILE_FUNCTION()
 
 	glfwPollEvents();
-	context->SwapBuffers();
+	context->swapBuffers();
 }
 
 void Window::setVSync(bool enabled) {
