@@ -134,19 +134,19 @@ void EditorLayer::onImGuiRender(const core::Timestep &ts) {
 void EditorLayer::renderStats(const core::Timestep &ts) {
 	auto &tracker = debug::Tracker::get();
 	ImGui::Begin("Stats");
-	ImGui::Text(fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
+	ImGui::Text("%s", fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
 	ImGui::Separator();
-	ImGui::Text(fmt::format("Current used memory: {}",
-							tracker.globals().allocatedMemory)
-						.c_str());
-	ImGui::Text(fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
-						.c_str());
+	ImGui::Text("%s", fmt::format("Current used memory: {}",
+								  tracker.globals().allocatedMemory)
+							  .c_str());
+	ImGui::Text("%s", fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
+							  .c_str());
 	ImGui::Text(
-			fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
-					.c_str());
-	ImGui::Text(fmt::format("Deallocation calls: {}",
-							tracker.globals().deallocationCalls)
-						.c_str());
+			"%s", fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
+						  .c_str());
+	ImGui::Text("%s", fmt::format("Deallocation calls: {}",
+								  tracker.globals().deallocationCalls)
+							  .c_str());
 	ImGui::Separator();
 	std::string name = "None";
 	if (hoveredEntity)
@@ -327,7 +327,7 @@ bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
 	return false;
 }
 bool EditorLayer::onMouseButtonPressed(event::MouseButtonPressedEvent &e) {
-	if (e.GetMouseButton() == input::mouse::ButtonLeft){
+	if (e.GetMouseButton() == input::mouse::ButtonLeft) {
 		if (viewportHovered && !ImGuizmo::IsOver() && !input::Input::isKeyPressed(input::key::LeftAlt))
 			sceneHierarchy.setSelectedEntity(hoveredEntity);
 	}

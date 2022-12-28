@@ -68,7 +68,7 @@ static bool isDepthFormat(FramebufferTextureFormat format) {
 		case FramebufferTextureFormat::None:
 		case FramebufferTextureFormat::RGBA8:
 		case FramebufferTextureFormat::RED_INTEGER:
-			break;
+			return false;
 	}
 	return false;
 }

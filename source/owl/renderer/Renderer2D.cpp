@@ -12,8 +12,10 @@
 
 #include "RenderCommand.h"
 #include "Shader.h"
+#include "UniformBuffer.h"
 #include "VertexArray.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace owl::renderer {
 
@@ -53,6 +55,11 @@ struct internalData {
 	std::array<shrd<Texture2D>, maxTextureSlots> textureSlots;
 	uint32_t textureSlotIndex = 1;// 0 = white texture
 	Renderer2D::Statistics stats;
+	struct CameraData {
+		glm::mat4 viewProjection;
+	};
+	CameraData cameraBuffer;
+	shrd<UniformBuffer> cameraUniformBuffer;
 };
 
 }
@@ -101,17 +108,16 @@ void Renderer2D::init() {
 	std::vector<int32_t> samplers;
 	samplers.resize(utils::maxTextureSlots);
 	int32_t i = 0;
-	for (auto & sampler: samplers)
+	for (auto &sampler: samplers)
 		sampler = i++;
 
 	auto &shLib = Renderer::getShaderLibrary();
 	shLib.addFromStandardPath("texture");
 	data.shader = shLib.get("texture");
-	data.shader->bind();
-	data.shader->setIntArray("u_Textures", samplers.data(), utils::maxTextureSlots);
 
 	// Set all texture slots to 0
 	data.textureSlots[0] = data.whiteTexture;
+	data.cameraUniformBuffer = UniformBuffer::create(sizeof(utils::internalData::CameraData), 0);
 }
 
 void Renderer2D::shutdown() {
@@ -130,20 +136,16 @@ void Renderer2D::beginScene(const CameraOrtho &camera) {
 void Renderer2D::beginScene(const CameraEditor &camera) {
 	OWL_PROFILE_FUNCTION();
 
-	glm::mat4 viewProj = camera.getViewProjection();
-
-	data.shader->bind();
-	data.shader->setMat4("u_ViewProjection", viewProj);
+	data.cameraBuffer.viewProjection = camera.getViewProjection();
+	data.cameraUniformBuffer->setData(&data.cameraBuffer, sizeof(utils::internalData::CameraData));
 	startBatch();
 }
 
 void Renderer2D::beginScene(const Camera &camera, const glm::mat4 &transform) {
 	OWL_PROFILE_FUNCTION()
 
-	glm::mat4 viewProj = camera.getProjection() * glm::inverse(transform);
-
-	data.shader->bind();
-	data.shader->setMat4("u_ViewProjection", viewProj);
+	data.cameraBuffer.viewProjection = camera.getProjection() * glm::inverse(transform);
+	data.cameraUniformBuffer->setData(&data.cameraBuffer, sizeof(utils::internalData::CameraData));
 	startBatch();
 }
 
@@ -161,13 +163,13 @@ void Renderer2D::flush() {
 								   static_cast<uint32_t>(data.quadVertexBuf.size() * sizeof(utils::QuadVertex)));
 	for (uint32_t i = 0; i < data.textureSlotIndex; i++)
 		data.textureSlots[i]->bind(i);
+	data.shader->bind();
 	RenderCommand::drawIndexed(data.quadVertexArray, data.quadIndexCount);
 	data.stats.drawCalls++;
 }
 
 void Renderer2D::startBatch() {
 	data.quadIndexCount = 0;
-	//data.quadVertexBufferPtr = data.quadVertexBufferBase;
 	data.quadVertexBuf.clear();
 	data.quadVertexBuf.reserve(utils::maxVertices);
 

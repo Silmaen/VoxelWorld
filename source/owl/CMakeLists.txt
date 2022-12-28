@@ -75,4 +75,11 @@ find_package(StbImage REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE owl::StbImage)
 
 # NativeFile Dialog
-target_link_libraries(${ENGINE_NAME} PUBLIC nfd)
+target_link_libraries(${ENGINE_NAME} PRIVATE nfd)
+
+# Spir-V
+target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-cpp)
+target_include_directories(${ENGINE_NAME} PRIVATE ${${PRJPREFIX}_EXTERNAL_DIR}/SPIRV-Cross)
+# shaderc
+target_link_libraries(${ENGINE_NAME} PRIVATE shaderc_shared)
+

@@ -34,6 +34,7 @@ void SceneCamera::setPerspective(float verticalFOV, float nearClip, float farCli
 }
 
 void SceneCamera::setViewportSize(uint32_t width, uint32_t height) {
+	OWL_CORE_ASSERT(width > 0 && height > 0, "Null viewport size")
 	aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 	recalculateProjection();
 }

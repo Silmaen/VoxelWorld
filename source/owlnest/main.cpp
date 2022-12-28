@@ -16,7 +16,7 @@ namespace owl {
 class OwlNest : public core::Application {
 public:
 	OwlNest() = delete;
-	explicit OwlNest(core::AppParams param) : core::Application(param) {
+	explicit OwlNest(const core::AppParams& param) : core::Application(param) {
 		pushLayer(mk_shrd<EditorLayer>());
 	}
 };

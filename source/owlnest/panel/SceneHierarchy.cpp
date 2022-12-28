@@ -62,7 +62,7 @@ void SceneHierarchy::drawEntityNode(scene::Entity entity) {
 
 	ImGuiTreeNodeFlags flags = ((selection == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-	bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, tag.c_str());
+	bool opened = ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, "%s", tag.c_str());
 	if (ImGui::IsItemClicked()) {
 		selection = entity;
 	}
@@ -76,7 +76,7 @@ void SceneHierarchy::drawEntityNode(scene::Entity entity) {
 
 	if (opened) {
 		ImGuiTreeNodeFlags flags_o = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened_o = ImGui::TreeNodeEx(reinterpret_cast<void*>(9817239), flags_o, tag.c_str());
+		bool opened_o = ImGui::TreeNodeEx(reinterpret_cast<void *>(9817239), flags_o, "%s", tag.c_str());
 		if (opened_o)
 			ImGui::TreePop();
 		ImGui::TreePop();
@@ -96,7 +96,7 @@ static void drawVec3Control(const std::string &label, glm::vec3 &values, float r
 
 	ImGui::Columns(2);
 	ImGui::SetColumnWidth(0, columnWidth);
-	ImGui::Text(label.c_str());
+	ImGui::Text("%s", label.c_str());
 	ImGui::NextColumn();
 
 	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
@@ -162,7 +162,7 @@ static void drawComponent(const std::string &name, scene::Entity entity, UIFunct
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
 		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 		ImGui::Separator();
-		bool open = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(T).hash_code()), treeNodeFlags, name.c_str());
+		bool open = ImGui::TreeNodeEx(reinterpret_cast<void *>(typeid(T).hash_code()), treeNodeFlags, "%s", name.c_str());
 		ImGui::PopStyleVar();
 		ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 		if (ImGui::Button("+", ImVec2{lineHeight, lineHeight})) {
