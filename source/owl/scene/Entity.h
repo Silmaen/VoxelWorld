@@ -49,7 +49,9 @@ public:
 	template<typename T, typename... Args>
 	T &addComponent(Args &&...args) {
 		OWL_CORE_ASSERT(!hasComponent<T>(), "Entity already has component!");
-		return scene->registry.emplace<T>(entityHandle, std::forward<Args>(args)...);
+		T& component = scene->registry.emplace<T>(entityHandle, std::forward<Args>(args)...);
+		scene->onComponentAdded<T>(*this, component);
+		return component;
 	}
 
 	template<typename T>
@@ -82,6 +84,7 @@ public:
 private:
 	entt::entity entityHandle{entt::null};
 	Scene *scene = nullptr;
+	friend class Scene;
 };
 
 }// namespace owl::scene

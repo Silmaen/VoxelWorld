@@ -30,10 +30,17 @@ else ()
 endif ()
 
 #
-# include targets for nlohmann-json
-add_subdirectory(nlohmann-json)
-
-#
 # include targets for spdlog
 add_subdirectory(spdlog)
+
+#
+# include targets for yaml-cpp
+set(YAML_BUILD_SHARED_LIBS OFF CACHE BOOL "")
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "")
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "")
+set(YAML_CPP_FORMAT_SOURCE OFF CACHE BOOL "")
+add_subdirectory(yaml-cpp)
+#
+# include targets for nativefiledialog
+add_subdirectory(nativefiledialog)
 

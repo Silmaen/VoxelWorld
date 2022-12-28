@@ -44,17 +44,17 @@ protected:
  */
 class OWL_API KeyPressedEvent : public KeyEvent {
 public:
-	explicit KeyPressedEvent(const input::KeyCode keycode, bool isRepeat_ = false)
-		: KeyEvent(keycode), isRepeat(isRepeat_) {}
+	explicit KeyPressedEvent(const input::KeyCode keycode, uint16_t  repeatCount_)
+		: KeyEvent(keycode), repeatCount(repeatCount_) {}
 
 	/**
 	 * @brief Check if the key is repeated
 	 * @return True if repeated
 	 */
-	[[nodiscard]] bool isRepeated() const { return isRepeat; }
+	[[nodiscard]] bool getRepeatCount() const { return repeatCount; }
 
 	[[nodiscard]] std::string toString() const override {
-		return fmt::format("KeyPressedEvent: {} (repeat = {})", keyCode, isRepeat);
+		return fmt::format("KeyPressedEvent: {} (repeat = {})", keyCode, repeatCount);
 	}
 	[[nodiscard]] std::string getName() const override {
 		return fmt::format("KeyPressedEvent");
@@ -64,7 +64,7 @@ public:
 	[[nodiscard]] type getType() const override { return getStaticType(); }
 
 private:
-	bool isRepeat;
+	uint16_t  repeatCount;
 };
 
 /**

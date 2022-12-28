@@ -29,9 +29,9 @@ struct Properties {
 	/// Window title
 	std::string title = "Owl Engine";
 	/// Width
-	uint32_t width = 1280;
+	uint32_t width = 1600;
 	/// Height
-	uint32_t height = 720;
+	uint32_t height = 900;
 };
 
 /**

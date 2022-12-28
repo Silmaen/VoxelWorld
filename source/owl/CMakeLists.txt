@@ -39,7 +39,7 @@ endif ()
 find_package(DebugBreak 1.0 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC owl::DebugBreak)
 
-# Emtt
+# Entt
 find_package(Entt 3.11 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC owl::Entt)
 
@@ -50,7 +50,6 @@ target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
 target_link_libraries(${ENGINE_NAME} PRIVATE glad)
 
 # GLFW
-#find_package(glfw3 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE glfw)
 
 # glm
@@ -63,8 +62,8 @@ target_link_libraries(${ENGINE_NAME} PUBLIC imgui)
 find_package(MagicEnum REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE owl::MagicEnum)
 
-# json
-target_link_libraries(${ENGINE_NAME} PRIVATE nlohmann_json::nlohmann_json)
+# yaml
+target_link_libraries(${ENGINE_NAME} PRIVATE yaml-cpp::yaml-cpp)
 
 # spdlog
 target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog)
@@ -72,3 +71,6 @@ target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog)
 # magic_enum
 find_package(StbImage REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE owl::StbImage)
+
+# NativeFile Dialog
+target_link_libraries(${ENGINE_NAME} PUBLIC nfd)

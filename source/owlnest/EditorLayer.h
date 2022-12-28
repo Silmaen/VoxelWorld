@@ -10,6 +10,7 @@
 
 #include "owl.h"
 
+#include "event/KeyEvent.h"
 #include "panel/SceneHierarchy.h"
 
 namespace owl {
@@ -41,24 +42,23 @@ public:
 private:
 	void renderViewport();
 
+	void renderStats(const core::Timestep &ts);
+	void renderMenu();
+
+	void newScene();
+	void openScene();
+	void saveSceneAs();
+
+	bool onKeyPressed(event::KeyPressedEvent& e);
+
 	input::CameraOrthoController cameraController;
 
 	bool viewportFocused = false;
 	bool viewportHovered = false;
 	glm::vec2 viewportSize = {0.0f, 0.0f};
-
-	shrd<renderer::VertexArray> squareVA;
-	shrd<renderer::Texture> checkerboardTexture;
-	glm::vec4 squareColor2 = {0.2f, 0.3f, 0.8f, 1.0f};
 	shrd<renderer::Framebuffer> framebuffer;
 
 	shrd<scene::Scene> activeScene;
-	scene::Entity squareEntity;
-
-	scene::Entity cameraEntity;
-	scene::Entity secondCamera;
-	bool primaryCamera = true;
-
 	panel::SceneHierarchy sceneHierarchy;
 };
 

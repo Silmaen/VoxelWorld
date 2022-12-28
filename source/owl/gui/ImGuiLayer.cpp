@@ -26,14 +26,27 @@ void ImGuiLayer::onAttach() {// Setup Dear ImGui context
 	ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
 	io.ConfigFlags |=
-			ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
-											   // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad
-											   // Controls
+			ImGuiConfigFlags_NavEnableKeyboard;        // Enable Keyboard Controls
+													   // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad
+													   // Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport /
 													   // Platform Windows
 	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+
+	// Better fonts
+	auto assetDir = core::Application::get().getAssetDirectory();
+	if (exists(assetDir / "fonts" / "opensans" / "OpenSans-Bold.ttf")) {
+		io.Fonts->AddFontFromFileTTF((assetDir / "fonts" / "opensans" / "OpenSans-Bold.ttf").string().c_str(), 18.0f);
+	} else {
+		OWL_CORE_WARN("Unable to find OpenSans-Bold, fall back to default font")
+	}
+	if (exists(assetDir / "fonts" / "opensans" / "OpenSans-Regular.ttf")) {
+		io.FontDefault = io.Fonts->AddFontFromFileTTF((assetDir / "fonts" / "opensans" / "OpenSans-Regular.ttf").string().c_str(), 18.0f);
+	} else {
+		OWL_CORE_WARN("Unable to find OpenSans-Regular, fall back to default font")
+	}
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -70,7 +83,7 @@ void ImGuiLayer::onEvent([[maybe_unused]] event::Event &event) {
 	}
 }
 
-void ImGuiLayer::begin(){
+void ImGuiLayer::begin() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -165,10 +178,14 @@ void ImGuiLayer::initializeDocking() {
 		ImGui::PopStyleVar(2);
 	// DockSpace
 	ImGuiIO &io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+	float minWinSizeX = style.WindowMinSize.x;
+	style.WindowMinSize.x = 370.0f;
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 	}
+	style.WindowMinSize.x = minWinSizeX;
 }
 
 }// namespace owl::gui

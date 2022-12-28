@@ -45,7 +45,7 @@ public:
 	 * @return The Entity
 	 */
 	Entity createEntity(const std::string& name = std::string());
-
+	void destroyEntity(Entity entity);
 	/**
 	 * @brief Update actions
 	 * @param ts The time step
@@ -56,6 +56,8 @@ public:
 	/// Entities registry
 	entt::registry registry;
 private:
+	template<typename T>
+	void onComponentAdded(Entity entity, T& component);
 	uint32_t viewportWidth = 0;
 	uint32_t viewportHeight = 0;
 

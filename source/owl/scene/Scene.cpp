@@ -14,10 +14,10 @@
 #include "renderer/Renderer2D.h"
 
 #include "component/Camera.h"
+#include "component/NativeScript.h"
 #include "component/SpriteRenderer.h"
 #include "component/Tag.h"
 #include "component/Transform.h"
-#include "scene/component/NativeScript.h"
 
 namespace owl::scene {
 
@@ -36,6 +36,10 @@ Entity Scene::createEntity(const std::string &name) {
 	return entity;
 }
 
+void Scene::destroyEntity(Entity entity) {
+	registry.destroy(entity.entityHandle);
+}
+
 void Scene::onUpdate([[maybe_unused]] const core::Timestep &ts) {
 	// update scripts
 	{
@@ -50,25 +54,25 @@ void Scene::onUpdate([[maybe_unused]] const core::Timestep &ts) {
 	}
 	// Render 2D
 	renderer::Camera *mainCamera = nullptr;
-	glm::mat4 *cameraTransform = nullptr;
+	glm::mat4 cameraTransform;
 	{
 		auto view = registry.view<component::Transform, component::Camera>();
 		for (auto entity: view) {
 			auto [transform, camera] = view.get<component::Transform, component::Camera>(entity);
 			if (camera.primary) {
 				mainCamera = &camera.camera;
-				cameraTransform = &transform.transform;
+				cameraTransform = transform.getTransform();
 				break;
 			}
 		}
 	}
 
 	if (mainCamera) {
-		renderer::Renderer2D::beginScene(*mainCamera, *cameraTransform);
+		renderer::Renderer2D::beginScene(*mainCamera, cameraTransform);
 		auto group = registry.group<component::Transform>(entt::get<component::SpriteRenderer>);
 		for (auto entity: group) {
 			auto [transform, sprite] = group.get<component::Transform, component::SpriteRenderer>(entity);
-			renderer::Renderer2D::drawQuad({.transform = transform,
+			renderer::Renderer2D::drawQuad({.transform = transform.getTransform(),
 											.color = sprite.color});
 		}
 	}
@@ -87,6 +91,32 @@ void Scene::onViewportResize(uint32_t width, uint32_t height) {
 		if (!cameraComponent.fixedAspectRatio)
 			cameraComponent.camera.setViewportSize(width, height);
 	}
+}
+
+template<typename T>
+void Scene::onComponentAdded([[maybe_unused]] Entity entity, [[maybe_unused]] T &component) {
+	OWL_ASSERT(false, "Unknown component");
+}
+
+template<>
+OWL_API void Scene::onComponentAdded<component::Transform>([[maybe_unused]] Entity entity, [[maybe_unused]] component::Transform &component) {
+}
+
+template<>
+OWL_API void Scene::onComponentAdded<component::Camera>([[maybe_unused]] Entity entity, component::Camera &component) {
+	component.camera.setViewportSize(viewportWidth, viewportHeight);
+}
+
+template<>
+OWL_API void Scene::onComponentAdded<component::SpriteRenderer>([[maybe_unused]] Entity entity, [[maybe_unused]] component::SpriteRenderer &component) {
+}
+
+template<>
+OWL_API void Scene::onComponentAdded<component::Tag>([[maybe_unused]] Entity entity, [[maybe_unused]] component::Tag &component) {
+}
+
+template<>
+OWL_API void Scene::onComponentAdded<component::NativeScript>([[maybe_unused]] Entity entity, [[maybe_unused]] component::NativeScript &component) {
 }
 
 }// namespace owl::scene

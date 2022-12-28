@@ -7,6 +7,10 @@
  */
 
 #include "EditorLayer.h"
+#include "core/Application.h"
+#include "core/PlatformUtils.h"
+#include "event/KeyEvent.h"
+#include "scene/SceneSerializer.h"
 #include "scene/ScriptableEntity.h"
 #include "scene/component/Camera.h"
 #include "scene/component/NativeScript.h"
@@ -25,9 +29,6 @@ EditorLayer::EditorLayer() : core::layer::Layer("EditorLayer"), cameraController
 void EditorLayer::onAttach() {
 	OWL_PROFILE_FUNCTION()
 
-	auto texturePath = core::Application::get().getAssetDirectory() / "textures";
-	checkerboardTexture = renderer::Texture2D::create(texturePath / "CheckerBoard.png");
-
 	core::Application::get().enableDocking();
 
 	renderer::FramebufferSpecification specs;
@@ -36,44 +37,6 @@ void EditorLayer::onAttach() {
 	framebuffer = renderer::Framebuffer::create(specs);
 
 	activeScene = mk_shrd<scene::Scene>();
-
-	// entity
-	auto square = activeScene->createEntity("Green square");
-	square.addComponent<scene::component::SpriteRenderer>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-	auto redSquare = activeScene->createEntity("Red Square");
-	redSquare.addComponent<scene::component::SpriteRenderer>(glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
-
-	squareEntity = square;
-	cameraEntity = activeScene->createEntity("Camera A");
-	cameraEntity.addComponent<scene::component::Camera>();
-
-	secondCamera = activeScene->createEntity("Camera B");
-	auto &cc = secondCamera.addComponent<scene::component::Camera>();
-	cc.primary = false;
-
-	class CameraController : public scene::ScriptableEntity {
-	public:
-		void onCreate() override {
-			auto &transform = getComponent<scene::component::Transform>().transform;
-			transform[3][0] = rand() % 10 - 5.0f;
-		}
-		void onDestroy() override {}
-		void onUpdate(core::Timestep ts) override {
-			auto &transform = getComponent<scene::component::Transform>().transform;
-			constexpr float speed = 5.0f;
-			if (input::Input::isKeyPressed(input::key::A))
-				transform[3][0] -= speed * ts.getSeconds();
-			if (input::Input::isKeyPressed(input::key::D))
-				transform[3][0] += speed * ts.getSeconds();
-			if (input::Input::isKeyPressed(input::key::W))
-				transform[3][1] -= speed * ts.getSeconds();
-			if (input::Input::isKeyPressed(input::key::S))
-				transform[3][1] += speed * ts.getSeconds();
-		}
-	};
-
-	cameraEntity.addComponent<scene::component::NativeScript>().bind<CameraController>();
-	secondCamera.addComponent<scene::component::NativeScript>().bind<CameraController>();
 
 	sceneHierarchy.setContext(activeScene);
 }
@@ -111,54 +74,51 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 
 void EditorLayer::onEvent(event::Event &event) {
 	cameraController.onEvent(event);
+
+	event::EventDispatcher dispatcher(event);
+	dispatcher.dispatch<event::KeyPressedEvent>([this](auto &&PH1) {
+		return onKeyPressed(std::forward<decltype(PH1)>(PH1));
+	});
 }
 
 void EditorLayer::onImGuiRender(const core::Timestep &ts) {
+	OWL_PROFILE_FUNCTION()
+
 	// ==================================================================
-	{
-		auto &tracker = debug::Tracker::get();
-		ImGui::Begin("Stats");
-		ImGui::Text(fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
-		ImGui::Text(fmt::format("Current used memory: {}",
-								tracker.globals().allocatedMemory)
-							.c_str());
-		ImGui::Text(fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
-							.c_str());
-		ImGui::Text(
-				fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
-						.c_str());
-		ImGui::Text(fmt::format("Deallocation calls: {}",
-								tracker.globals().deallocationCalls)
-							.c_str());
-
-		auto stats = renderer::Renderer2D::getStats();
-		ImGui::Text("Renderer2D Stats:");
-		ImGui::Text("Draw Calls: %d", stats.drawCalls);
-		ImGui::Text("Quads: %d", stats.quadCount);
-		ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
-		ImGui::Text("Indices: %d", stats.getTotalIndexCount());
-		ImGui::Text("Viewport size: %f %f", viewportSize.x, viewportSize.y);
-		ImGui::Text("Aspect ratio: %f", viewportSize.x / viewportSize.y);
-		ImGui::End();
-	}
+	renderStats(ts);
 	//=============================================================
-
-	if (ImGui::BeginMenuBar()) {
-		if (ImGui::BeginMenu("File")) {
-			// Disabling fullscreen would allow the window to be moved to the front of other windows,
-			// which we can't undo at the moment without finer window depth/z control.
-			//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
-			if (ImGui::MenuItem("Exit")) owl::core::Application::get().close();
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenuBar();
-	}
+	renderMenu();
 	//=============================================================
 	sceneHierarchy.onImGuiRender();
-
 	//=============================================================
-
 	renderViewport();
+}
+
+void EditorLayer::renderStats(const core::Timestep &ts) {
+	auto &tracker = debug::Tracker::get();
+	ImGui::Begin("Stats");
+	ImGui::Text(fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
+	ImGui::Text(fmt::format("Current used memory: {}",
+							tracker.globals().allocatedMemory)
+						.c_str());
+	ImGui::Text(fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
+						.c_str());
+	ImGui::Text(
+			fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
+					.c_str());
+	ImGui::Text(fmt::format("Deallocation calls: {}",
+							tracker.globals().deallocationCalls)
+						.c_str());
+
+	auto stats = renderer::Renderer2D::getStats();
+	ImGui::Text("Renderer2D Stats:");
+	ImGui::Text("Draw Calls: %d", stats.drawCalls);
+	ImGui::Text("Quads: %d", stats.quadCount);
+	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
+	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
+	ImGui::Text("Viewport size: %f %f", viewportSize.x, viewportSize.y);
+	ImGui::Text("Aspect ratio: %f", viewportSize.x / viewportSize.y);
+	ImGui::End();
 }
 
 void EditorLayer::renderViewport() {
@@ -177,5 +137,72 @@ void EditorLayer::renderViewport() {
 	ImGui::PopStyleVar();
 }
 
+void EditorLayer::renderMenu() {
+	if (ImGui::BeginMenuBar()) {
+		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("New", "Ctrl+N"))
+				newScene();
+			if (ImGui::MenuItem("Open...", "Ctrl+O"))
+				openScene();
+			if (ImGui::MenuItem("Save as..", "Ctrl+Shift+S"))
+				saveSceneAs();
+			if (ImGui::MenuItem("Exit")) owl::core::Application::get().close();
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+}
+
+void EditorLayer::newScene() {
+	activeScene = mk_shrd<scene::Scene>();
+	activeScene->onViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+	sceneHierarchy.setContext(activeScene);
+}
+
+void EditorLayer::openScene() {
+	auto filepath = core::FileDialog::openFile("Owl Scene (*.owl)|owl\n");
+	if (!filepath.empty()){
+		activeScene = mk_shrd<scene::Scene>();
+		activeScene->onViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+		sceneHierarchy.setContext(activeScene);
+		scene::SceneSerializer serializer(activeScene);
+		serializer.deserialize(filepath);
+	}
+}
+
+void EditorLayer::saveSceneAs() {
+	auto filepath = core::FileDialog::saveFile("Owl Scene (*.owl)|owl\n");
+	if (!filepath.empty()){
+		scene::SceneSerializer serializer(activeScene);
+		serializer.serialize(filepath);
+	}
+}
+
+bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
+	// Shortcuts
+	if (e.getRepeatCount() > 0)
+		return false;
+
+	bool control = input::Input::isKeyPressed(input::key::LeftControl) || input::Input::isKeyPressed(input::key::RightControl);
+	bool shift = input::Input::isKeyPressed(input::key::LeftShift) || input::Input::isKeyPressed(input::key::RightShift);
+	switch (e.getKeyCode()) {
+		case input::key::N: {
+			if (control)
+				newScene();
+			break;
+		}
+		case input::key::O: {
+			if (control)
+				openScene();
+			break;
+		}
+		case input::key::S: {
+			if (control && shift)
+				saveSceneAs();
+			break;
+		}
+	}
+	return false;
+}
 
 }// namespace owl
