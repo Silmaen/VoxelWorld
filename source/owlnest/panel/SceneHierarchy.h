@@ -61,6 +61,11 @@ public:
 	 * @brief Action on Gui Render
 	 */
 	void onImGuiRender();
+	/**
+	 * @brief Access to the selected entity
+	 * @return The selected entity
+	 */
+	scene::Entity getSelectedEntity()const{return selection;}
 private:
 	/**
 	 * @brief Draw one entity node

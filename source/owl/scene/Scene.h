@@ -11,6 +11,7 @@
 #include <entt.hpp>
 
 #include "core/Timestep.h"
+#include "renderer/CameraEditor.h"
 
 /**
  * @brief Namespace for the Scene elements
@@ -50,9 +51,16 @@ public:
 	 * @brief Update actions
 	 * @param ts The time step
 	 */
-	void onUpdate(const core::Timestep &ts);
+	void onUpdateRuntime(const core::Timestep &ts);
+	void onUpdateEditor(core::Timestep ts, renderer::CameraEditor& camera);
 
 	void onViewportResize(uint32_t width, uint32_t height);
+
+	/**
+	 * @brief Access to the primary Camera
+	 * @return The primary camera
+	 */
+	Entity getPrimaryCamera();
 	/// Entities registry
 	entt::registry registry;
 private:

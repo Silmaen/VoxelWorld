@@ -10,16 +10,17 @@
 #include "core/Application.h"
 #include "core/PlatformUtils.h"
 #include "event/KeyEvent.h"
+#include "math/Transform.h"
 #include "scene/SceneSerializer.h"
 #include "scene/ScriptableEntity.h"
 #include "scene/component/Camera.h"
-#include "scene/component/NativeScript.h"
-#include "scene/component/SpriteRenderer.h"
 #include "scene/component/Tag.h"
 #include "scene/component/Transform.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
+// must be included AFTER imgui
+#include <ImGuizmo.h>
 
 namespace owl {
 
@@ -37,7 +38,7 @@ void EditorLayer::onAttach() {
 	framebuffer = renderer::Framebuffer::create(specs);
 
 	activeScene = mk_shrd<scene::Scene>();
-
+	editorCamera = renderer::CameraEditor(30.0f, 1.778f, 0.1f, 1000.0f);
 	sceneHierarchy.setContext(activeScene);
 }
 
@@ -48,9 +49,6 @@ void EditorLayer::onDetach() {
 void EditorLayer::onUpdate(const core::Timestep &ts) {
 	OWL_PROFILE_FUNCTION()
 
-	// Update
-	if (viewportFocused)
-		cameraController.onUpdate(ts);
 
 	// resize
 	auto spec = framebuffer->getSpecification();
@@ -59,8 +57,14 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 	if (width > 0 && height > 0 && (width != spec.width || height != spec.height)) {
 		framebuffer->resize(width, height);
 		cameraController.onResize(viewportSize.x, viewportSize.y);
+		editorCamera.setViewportSize(viewportSize.x, viewportSize.y);
 		activeScene->onViewportResize(width, height);
 	}
+
+	// Update
+	if (viewportFocused)
+		cameraController.onUpdate(ts);
+	editorCamera.onUpdate(ts);
 
 	// Render
 	framebuffer->bind();
@@ -68,12 +72,13 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 	renderer::RenderCommand::clear();
 
 	// Update scene
-	activeScene->onUpdate(ts);
+	activeScene->onUpdateEditor(ts, editorCamera);
 	framebuffer->unbind();
 }
 
 void EditorLayer::onEvent(event::Event &event) {
 	cameraController.onEvent(event);
+	editorCamera.onEvent(event);
 
 	event::EventDispatcher dispatcher(event);
 	dispatcher.dispatch<event::KeyPressedEvent>([this](auto &&PH1) {
@@ -127,14 +132,67 @@ void EditorLayer::renderViewport() {
 
 	viewportFocused = ImGui::IsWindowFocused();
 	viewportHovered = ImGui::IsWindowHovered();
-	core::Application::get().getImGuiLayer()->blockEvents(!viewportFocused || !viewportHovered);
+	core::Application::get().getImGuiLayer()->blockEvents(!viewportFocused && !viewportHovered);
 
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 	uint64_t textureID = framebuffer->getColorAttachmentRendererID();
 	ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
+
+	renderGizmo();
+
 	ImGui::End();
 	ImGui::PopStyleVar();
+}
+
+void EditorLayer::renderGizmo() {
+	// Gizmos
+	scene::Entity selectedEntity = sceneHierarchy.getSelectedEntity();
+	if (selectedEntity && gizmoType != -1) {
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+
+		float windowWidth = ImGui::GetWindowWidth();
+		float windowHeight = ImGui::GetWindowHeight();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+		// Runtime camera from entity
+		// auto cameraEntity = activeScene->getPrimaryCamera();
+		// const auto &camera = cameraEntity.getComponent<scene::component::Camera>().camera;
+		// const glm::mat4 &cameraProjection = camera.getProjection();
+		// glm::mat4 cameraView = glm::inverse(cameraEntity.getComponent<scene::component::Transform>().getTransform());
+
+		// Editor camera
+		const glm::mat4& cameraProjection = editorCamera.getProjection();
+		glm::mat4 cameraView = editorCamera.getViewMatrix();
+
+		// Entity transform
+		auto &tc = selectedEntity.getComponent<scene::component::Transform>();
+		glm::mat4 transform = tc.getTransform();
+
+		// Snapping
+		bool snap = input::Input::isKeyPressed(input::key::LeftControl);
+		float snapValue = 0.5f;// Snap to 0.5m for translation/scale
+		// Snap to 45 degrees for rotation
+		if (gizmoType == ImGuizmo::OPERATION::ROTATE)
+			snapValue = 45.0f;
+
+		float snapValues[3] = {snapValue, snapValue, snapValue};
+
+		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+							 (ImGuizmo::OPERATION) gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+							 nullptr, snap ? snapValues : nullptr);
+
+		if (ImGuizmo::IsUsing()) {
+			glm::vec3 translation, rotation, scale;
+			math::decomposeTransform(transform, translation, rotation, scale);
+
+			glm::vec3 deltaRotation = rotation - tc.rotation;
+			tc.translation = translation;
+			tc.rotation += deltaRotation;
+			tc.scale = scale;
+		}
+	}
 }
 
 void EditorLayer::renderMenu() {
@@ -142,10 +200,12 @@ void EditorLayer::renderMenu() {
 		if (ImGui::BeginMenu("File")) {
 			if (ImGui::MenuItem("New", "Ctrl+N"))
 				newScene();
+			ImGui::Separator();
 			if (ImGui::MenuItem("Open...", "Ctrl+O"))
 				openScene();
 			if (ImGui::MenuItem("Save as..", "Ctrl+Shift+S"))
 				saveSceneAs();
+			ImGui::Separator();
 			if (ImGui::MenuItem("Exit")) owl::core::Application::get().close();
 			ImGui::EndMenu();
 		}
@@ -155,15 +215,15 @@ void EditorLayer::renderMenu() {
 
 void EditorLayer::newScene() {
 	activeScene = mk_shrd<scene::Scene>();
-	activeScene->onViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+	activeScene->onViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
 	sceneHierarchy.setContext(activeScene);
 }
 
 void EditorLayer::openScene() {
 	auto filepath = core::FileDialog::openFile("Owl Scene (*.owl)|owl\n");
-	if (!filepath.empty()){
+	if (!filepath.empty()) {
 		activeScene = mk_shrd<scene::Scene>();
-		activeScene->onViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+		activeScene->onViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
 		sceneHierarchy.setContext(activeScene);
 		scene::SceneSerializer serializer(activeScene);
 		serializer.deserialize(filepath);
@@ -172,7 +232,7 @@ void EditorLayer::openScene() {
 
 void EditorLayer::saveSceneAs() {
 	auto filepath = core::FileDialog::saveFile("Owl Scene (*.owl)|owl\n");
-	if (!filepath.empty()){
+	if (!filepath.empty()) {
 		scene::SceneSerializer serializer(activeScene);
 		serializer.serialize(filepath);
 	}
@@ -201,6 +261,19 @@ bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
 				saveSceneAs();
 			break;
 		}
+		// Gizmos
+		case input::key::Q:
+			gizmoType = -1;
+			break;
+		case input::key::W:
+			gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		case input::key::E:
+			gizmoType = ImGuizmo::OPERATION::ROTATE;
+			break;
+		case input::key::R:
+			gizmoType = ImGuizmo::OPERATION::SCALE;
+			break;
 	}
 	return false;
 }

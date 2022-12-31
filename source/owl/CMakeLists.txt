@@ -57,6 +57,8 @@ target_link_libraries(${ENGINE_NAME} PRIVATE glm_shared)
 
 # ImGui
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui)
+find_package(ImGuizmo REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC owl::ImGuizmo)
 
 # magic_enum
 find_package(MagicEnum REQUIRED)

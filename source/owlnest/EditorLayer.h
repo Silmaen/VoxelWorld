@@ -12,6 +12,7 @@
 
 #include "event/KeyEvent.h"
 #include "panel/SceneHierarchy.h"
+#include "renderer/CameraEditor.h"
 
 namespace owl {
 
@@ -44,6 +45,7 @@ private:
 
 	void renderStats(const core::Timestep &ts);
 	void renderMenu();
+	void renderGizmo();
 
 	void newScene();
 	void openScene();
@@ -53,12 +55,18 @@ private:
 
 	input::CameraOrthoController cameraController;
 
+	renderer::CameraEditor editorCamera;
+
 	bool viewportFocused = false;
 	bool viewportHovered = false;
 	glm::vec2 viewportSize = {0.0f, 0.0f};
 	shrd<renderer::Framebuffer> framebuffer;
 
 	shrd<scene::Scene> activeScene;
+
+	int gizmoType = -1;
+
+	// Panels
 	panel::SceneHierarchy sceneHierarchy;
 };
 

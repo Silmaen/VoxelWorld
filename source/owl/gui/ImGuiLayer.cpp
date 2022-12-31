@@ -12,7 +12,8 @@
 #include "core/Application.h"
 #include "core/external/glfw3.h"
 #include "core/external/imgui.h"
-#include "input/Input.h"
+
+#include <ImGuizmo.h>
 
 namespace owl::gui {
 
@@ -87,6 +88,7 @@ void ImGuiLayer::begin() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 	if (dockingEnable) {
 		initializeDocking();
 	}

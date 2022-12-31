@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Camera.h"
+#include "CameraEditor.h"
 #include "CameraOrtho.h"
 #include "Texture.h"
 
@@ -80,6 +81,10 @@ public:
 	 * @brief Begins a scene
 	 */
 	static void beginScene(const CameraOrtho &camera);
+	/**
+	 * @brief Begins a scene
+	 */
+	static void beginScene(const CameraEditor &camera);
 	/**
 	 * @brief Begins a scene
 	 */

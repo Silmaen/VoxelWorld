@@ -115,6 +115,16 @@ void Renderer2D::beginScene(const CameraOrtho &camera) {
 	startBatch();
 }
 
+void Renderer2D::beginScene(const CameraEditor& camera){
+	OWL_PROFILE_FUNCTION();
+
+	glm::mat4 viewProj = camera.getViewProjection();
+
+	data.shader->bind();
+	data.shader->setMat4("u_ViewProjection", viewProj);
+	startBatch();
+}
+
 void Renderer2D::beginScene(const Camera &camera, const glm::mat4 &transform) {
 	OWL_PROFILE_FUNCTION()
 

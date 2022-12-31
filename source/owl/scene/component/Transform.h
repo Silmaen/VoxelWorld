@@ -10,6 +10,8 @@
 #include "core/Core.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 namespace owl::scene::component {
 
@@ -23,10 +25,7 @@ struct OWL_API Transform {
 	explicit Transform(const glm::vec3 &translation_)
 		: translation(translation_) {}
 	[[nodiscard]] glm::mat4 getTransform() const {
-		glm::mat4 rot = glm::rotate(glm::mat4(1.0), rotation.x, {1, 0, 0}) *
-						glm::rotate(glm::mat4(1.0), rotation.y, {0, 1, 0}) *
-						glm::rotate(glm::mat4(1.0), rotation.z, {0, 0, 1});
-		return glm::translate(glm::mat4(1.0f), translation) * rot *
+		return glm::translate(glm::mat4(1.0f), translation) * glm::toMat4(glm::quat(rotation)) *
 			   glm::scale(glm::mat4(1.f), scale);
 	}
 };

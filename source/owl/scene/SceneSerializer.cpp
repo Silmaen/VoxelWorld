@@ -23,6 +23,7 @@ struct YAML::convert<glm::vec3> {
 		node.push_back(rhs.x);
 		node.push_back(rhs.y);
 		node.push_back(rhs.z);
+		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
 	static bool decode(const Node &node, glm::vec3 &rhs) {
@@ -43,6 +44,7 @@ struct YAML::convert<glm::vec4> {
 		node.push_back(rhs.y);
 		node.push_back(rhs.z);
 		node.push_back(rhs.w);
+		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
 	static bool decode(const Node &node, glm::vec4 &rhs) {
@@ -145,10 +147,7 @@ void SceneSerializer::serialize(const std::filesystem::path &filepath) {
 }
 
 bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
-	std::ifstream stream(filepath);
-	std::stringstream strStream;
-	strStream << stream.rdbuf();
-	YAML::Node data = YAML::Load(strStream.str());
+	YAML::Node data = YAML::LoadFile(filepath.string());
 	if (!data["Scene"])
 		return false;
 	auto sceneName = data["Scene"].as<std::string>();

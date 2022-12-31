@@ -40,7 +40,7 @@ void Scene::destroyEntity(Entity entity) {
 	registry.destroy(entity.entityHandle);
 }
 
-void Scene::onUpdate([[maybe_unused]] const core::Timestep &ts) {
+void Scene::onUpdateRuntime([[maybe_unused]] const core::Timestep &ts) {
 	// update scripts
 	{
 		registry.view<component::NativeScript>().each([=, this](auto entity, auto &nsc) {
@@ -80,6 +80,18 @@ void Scene::onUpdate([[maybe_unused]] const core::Timestep &ts) {
 	renderer::Renderer2D::endScene();
 }
 
+
+void Scene::onUpdateEditor([[maybe_unused]]core::Timestep ts, renderer::CameraEditor &camera) {
+	renderer::Renderer2D::beginScene(camera);
+	auto group = registry.group<component::Transform>(entt::get<component::SpriteRenderer>);
+	for (auto entity: group) {
+		auto [transform, sprite] = group.get<component::Transform, component::SpriteRenderer>(entity);
+		renderer::Renderer2D::drawQuad({.transform = transform.getTransform(),
+										.color = sprite.color});
+	}
+	renderer::Renderer2D::endScene();
+}
+
 void Scene::onViewportResize(uint32_t width, uint32_t height) {
 	viewportWidth = width;
 	viewportHeight = height;
@@ -91,6 +103,16 @@ void Scene::onViewportResize(uint32_t width, uint32_t height) {
 		if (!cameraComponent.fixedAspectRatio)
 			cameraComponent.camera.setViewportSize(width, height);
 	}
+}
+
+Entity Scene::getPrimaryCamera() {
+	auto view = registry.view<component::Camera>();
+	for (auto entity: view) {
+		const auto &camera = view.get<component::Camera>(entity);
+		if (camera.primary)
+			return Entity{entity, this};
+	}
+	return {};
 }
 
 template<typename T>
