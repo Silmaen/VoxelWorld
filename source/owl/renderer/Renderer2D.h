@@ -12,6 +12,7 @@
 #include "CameraEditor.h"
 #include "CameraOrtho.h"
 #include "Texture.h"
+#include "scene/component/SpriteRenderer.h"
 
 namespace owl::renderer {
 
@@ -31,6 +32,7 @@ struct OWL_API Quad2DData {
 	float rotation = 0.f;
 	/// Tilling factor of the texture
 	float tilingFactor = 1.f;
+	int entityID;
 };
 
 /**
@@ -45,6 +47,7 @@ struct OWL_API Quad2DDataT {
 	shrd<Texture> texture = nullptr;
 	/// Tilling factor of the texture
 	float tilingFactor = 1.f;
+	int entityID;
 };
 
 #ifdef __clang__
@@ -109,6 +112,13 @@ public:
 	 */
 	static void drawQuad(const Quad2DDataT &quadData);
 	/**
+	 * @brief Draw a sprite entity
+	 * @param transform Sprite transformations
+	 * @param src The sprite to render
+	 * @param entityID The entity ID
+	 */
+	static void drawSprite(const glm::mat4& transform, scene::component::SpriteRenderer& src, int entityID);
+	/**
 	 * @brief Statistics
 	 */
 	struct OWL_API Statistics {
@@ -118,7 +128,7 @@ public:
 		uint32_t quadCount = 0;
 		/// Compute the amount of vertices
 		[[nodiscard]] uint32_t getTotalVertexCount() const { return quadCount * 4; }
-		/// Compute the amount of indicies
+		/// Compute the amount of indices
 		[[nodiscard]] uint32_t getTotalIndexCount() const { return quadCount * 6; }
 	};
 	/**

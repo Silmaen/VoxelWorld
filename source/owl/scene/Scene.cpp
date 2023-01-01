@@ -72,8 +72,9 @@ void Scene::onUpdateRuntime([[maybe_unused]] const core::Timestep &ts) {
 		auto group = registry.group<component::Transform>(entt::get<component::SpriteRenderer>);
 		for (auto entity: group) {
 			auto [transform, sprite] = group.get<component::Transform, component::SpriteRenderer>(entity);
-			renderer::Renderer2D::drawQuad({.transform = transform.getTransform(),
-											.color = sprite.color});
+			renderer::Renderer2D::drawSprite(transform.getTransform(),
+											sprite,
+											 static_cast<int>(entity));
 		}
 	}
 
@@ -86,8 +87,9 @@ void Scene::onUpdateEditor([[maybe_unused]]core::Timestep ts, renderer::CameraEd
 	auto group = registry.group<component::Transform>(entt::get<component::SpriteRenderer>);
 	for (auto entity: group) {
 		auto [transform, sprite] = group.get<component::Transform, component::SpriteRenderer>(entity);
-		renderer::Renderer2D::drawQuad({.transform = transform.getTransform(),
-										.color = sprite.color});
+		renderer::Renderer2D::drawSprite(transform.getTransform(),
+										 sprite,
+										 static_cast<int>(entity));
 	}
 	renderer::Renderer2D::endScene();
 }

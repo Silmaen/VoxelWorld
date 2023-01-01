@@ -66,6 +66,7 @@ public:
 	 * @return The selected entity
 	 */
 	scene::Entity getSelectedEntity()const{return selection;}
+	void setSelectedEntity(scene::Entity entity){ selection = entity;}
 private:
 	/**
 	 * @brief Draw one entity node

@@ -74,6 +74,12 @@ public:
 	 */
 	void setFloat(const std::string &name, float value) override;
 	/**
+	 * @brief Set shader's internal vector 2 variable
+	 * @param name Shader's variable's name
+	 * @param value Shader's variable's value
+	 */
+	void setFloat2(const std::string& name, const glm::vec2& value) override;
+	/**
 	 * @brief Set shader's internal vector 3 variable
 	 * @param name Shader's variable's name
 	 * @param value Shader's variable's value

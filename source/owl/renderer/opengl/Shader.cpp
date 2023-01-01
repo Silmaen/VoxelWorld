@@ -196,6 +196,12 @@ void Shader::setFloat(const std::string &name, float value) {
 	uploadUniformFloat(name, value);
 }
 
+void Shader::setFloat2(const std::string &name, const glm::vec2 &value) {
+	OWL_PROFILE_FUNCTION()
+
+	uploadUniformFloat2(name, value);
+}
+
 void Shader::setFloat3(const std::string &name, const glm::vec3 &value) {
 	OWL_PROFILE_FUNCTION()
 

@@ -26,6 +26,7 @@ struct QuadVertex {
 	glm::vec2 texCoord;
 	float texIndex;
 	float tilingFactor;
+	int entityID;
 };
 
 /**
@@ -57,11 +58,14 @@ void Renderer2D::init() {
 
 	data.quadVertexArray = VertexArray::create();
 	data.quadVertexBuffer = VertexBuffer::create(data.maxVertices * sizeof(QuadVertex));
-	data.quadVertexBuffer->SetLayout({{"a_Position", ShaderDataType::Float3},
-									  {"a_Color", ShaderDataType::Float4},
-									  {"a_TexCoord", ShaderDataType::Float2},
-									  {"a_TexIndex", ShaderDataType::Float},
-									  {"a_TilingFactor", ShaderDataType::Float}});
+	data.quadVertexBuffer->SetLayout({
+			{"a_Position", ShaderDataType::Float3},
+			{"a_Color", ShaderDataType::Float4},
+			{"a_TexCoord", ShaderDataType::Float2},
+			{"a_TexIndex", ShaderDataType::Float},
+			{"a_TilingFactor", ShaderDataType::Float},
+			{"a_EntityID", ShaderDataType::Int},
+	});
 	data.quadVertexArray->addVertexBuffer(data.quadVertexBuffer);
 
 	data.quadVertexBufferBase = new QuadVertex[data.maxVertices];
@@ -115,7 +119,7 @@ void Renderer2D::beginScene(const CameraOrtho &camera) {
 	startBatch();
 }
 
-void Renderer2D::beginScene(const CameraEditor& camera){
+void Renderer2D::beginScene(const CameraEditor &camera) {
 	OWL_PROFILE_FUNCTION();
 
 	glm::mat4 viewProj = camera.getViewProjection();
@@ -195,6 +199,7 @@ void Renderer2D::drawQuad(const Quad2DDataT &quadData) {
 		data.quadVertexBufferPtr->texCoord = textureCoords[i];
 		data.quadVertexBufferPtr->texIndex = textureIndex;
 		data.quadVertexBufferPtr->tilingFactor = quadData.tilingFactor;
+		data.quadVertexBufferPtr->entityID = quadData.entityID;
 		data.quadVertexBufferPtr++;
 	}
 	data.quadIndexCount += 6;
@@ -208,10 +213,19 @@ void Renderer2D::drawQuad(const Quad2DData &quadData) {
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), quadData.position) *
 						  glm::rotate(glm::mat4(1.0f), glm::radians(quadData.rotation), {0.0f, 0.0f, 1.0f}) *
 						  glm::scale(glm::mat4(1.0f), {quadData.size.x, quadData.size.y, 1.0f});
+	drawQuad({
+			.transform = transform,
+			.color = quadData.color,
+			.texture = quadData.texture,
+			.tilingFactor = quadData.tilingFactor,
+			.entityID = quadData.entityID,
+	});
+}
+
+void Renderer2D::drawSprite(const glm::mat4 &transform, scene::component::SpriteRenderer &src, int entityID) {
 	drawQuad({.transform = transform,
-			  .color = quadData.color,
-			  .texture = quadData.texture,
-			  .tilingFactor = quadData.tilingFactor});
+			  .color = src.color,
+			  .entityID = entityID});
 }
 
 void Renderer2D::resetStats() {

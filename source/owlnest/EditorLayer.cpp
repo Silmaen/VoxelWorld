@@ -33,6 +33,10 @@ void EditorLayer::onAttach() {
 	core::Application::get().enableDocking();
 
 	renderer::FramebufferSpecification specs;
+	specs.attachments = {
+			renderer::FramebufferTextureFormat::RGBA8,
+			renderer::FramebufferTextureFormat::RED_INTEGER,
+			renderer::FramebufferTextureFormat::Depth};
 	specs.width = 1280;
 	specs.height = 720;
 	framebuffer = renderer::Framebuffer::create(specs);
@@ -71,8 +75,25 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 	renderer::RenderCommand::setClearColor({0.1f, 0.1f, 0.1f, 1});
 	renderer::RenderCommand::clear();
 
+	// Clear our entity ID attachment to -1
+	framebuffer->clearAttachment(1, -1);
+
 	// Update scene
 	activeScene->onUpdateEditor(ts, editorCamera);
+
+	auto [mx, my] = ImGui::GetMousePos();
+	mx -= viewportBounds[0].x;
+	my -= viewportBounds[0].y;
+	glm::vec2 viewportSize_ = viewportBounds[1] - viewportBounds[0];
+	my = viewportSize_.y - my;
+	int mouseX = (int) mx;
+	int mouseY = (int) my;
+
+	if (mouseX >= 0 && mouseY >= 0 && mouseX < (int) viewportSize_.x && mouseY < (int) viewportSize_.y) {
+		int pixelData = framebuffer->readPixel(1, mouseX, mouseY);
+		hoveredEntity = pixelData == -1 ? scene::Entity() : scene::Entity((entt::entity)pixelData, activeScene.get());
+	}
+
 	framebuffer->unbind();
 }
 
@@ -83,6 +104,9 @@ void EditorLayer::onEvent(event::Event &event) {
 	event::EventDispatcher dispatcher(event);
 	dispatcher.dispatch<event::KeyPressedEvent>([this](auto &&PH1) {
 		return onKeyPressed(std::forward<decltype(PH1)>(PH1));
+	});
+	dispatcher.dispatch<event::MouseButtonPressedEvent>([this](auto &&PH1) {
+		return onMouseButtonPressed(std::forward<decltype(PH1)>(PH1));
 	});
 }
 
@@ -103,6 +127,7 @@ void EditorLayer::renderStats(const core::Timestep &ts) {
 	auto &tracker = debug::Tracker::get();
 	ImGui::Begin("Stats");
 	ImGui::Text(fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
+	ImGui::Separator();
 	ImGui::Text(fmt::format("Current used memory: {}",
 							tracker.globals().allocatedMemory)
 						.c_str());
@@ -114,7 +139,12 @@ void EditorLayer::renderStats(const core::Timestep &ts) {
 	ImGui::Text(fmt::format("Deallocation calls: {}",
 							tracker.globals().deallocationCalls)
 						.c_str());
-
+	ImGui::Separator();
+	std::string name = "None";
+	if (hoveredEntity)
+		name = hoveredEntity.getComponent<scene::component::Tag>().tag;
+	ImGui::Text("Hovered Entity: %s", name.c_str());
+	ImGui::Separator();
 	auto stats = renderer::Renderer2D::getStats();
 	ImGui::Text("Renderer2D Stats:");
 	ImGui::Text("Draw Calls: %d", stats.drawCalls);
@@ -129,6 +159,11 @@ void EditorLayer::renderStats(const core::Timestep &ts) {
 void EditorLayer::renderViewport() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
 	ImGui::Begin("Viewport");
+	auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+	auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+	auto viewportOffset = ImGui::GetWindowPos();
+	viewportBounds[0] = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
+	viewportBounds[1] = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
 
 	viewportFocused = ImGui::IsWindowFocused();
 	viewportHovered = ImGui::IsWindowHovered();
@@ -152,9 +187,7 @@ void EditorLayer::renderGizmo() {
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
 
-		float windowWidth = ImGui::GetWindowWidth();
-		float windowHeight = ImGui::GetWindowHeight();
-		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+		ImGuizmo::SetRect(viewportBounds[0].x, viewportBounds[0].y, viewportBounds[1].x - viewportBounds[0].x, viewportBounds[1].y - viewportBounds[0].y);
 
 		// Runtime camera from entity
 		// auto cameraEntity = activeScene->getPrimaryCamera();
@@ -163,7 +196,7 @@ void EditorLayer::renderGizmo() {
 		// glm::mat4 cameraView = glm::inverse(cameraEntity.getComponent<scene::component::Transform>().getTransform());
 
 		// Editor camera
-		const glm::mat4& cameraProjection = editorCamera.getProjection();
+		const glm::mat4 &cameraProjection = editorCamera.getProjection();
 		glm::mat4 cameraView = editorCamera.getViewMatrix();
 
 		// Entity transform
@@ -262,18 +295,33 @@ bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
 			break;
 		}
 		// Gizmos
-		case input::key::Q:
-			gizmoType = -1;
+		case input::key::Q: {
+			if (!ImGuizmo::IsUsing())
+				gizmoType = -1;
 			break;
-		case input::key::W:
-			gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+		}
+		case input::key::W: {
+			if (!ImGuizmo::IsUsing())
+				gizmoType = ImGuizmo::OPERATION::TRANSLATE;
 			break;
-		case input::key::E:
-			gizmoType = ImGuizmo::OPERATION::ROTATE;
+		}
+		case input::key::E: {
+			if (!ImGuizmo::IsUsing())
+				gizmoType = ImGuizmo::OPERATION::ROTATE;
 			break;
-		case input::key::R:
-			gizmoType = ImGuizmo::OPERATION::SCALE;
+		}
+		case input::key::R: {
+			if (!ImGuizmo::IsUsing())
+				gizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
+		}
+	}
+	return false;
+}
+bool EditorLayer::onMouseButtonPressed(event::MouseButtonPressedEvent &e) {
+	if (e.GetMouseButton() == input::mouse::ButtonLeft){
+		if (viewportHovered && !ImGuizmo::IsOver() && !input::Input::isKeyPressed(input::key::LeftAlt))
+			sceneHierarchy.setSelectedEntity(hoveredEntity);
 	}
 	return false;
 }

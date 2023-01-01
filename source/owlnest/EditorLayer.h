@@ -52,14 +52,17 @@ private:
 	void saveSceneAs();
 
 	bool onKeyPressed(event::KeyPressedEvent& e);
+	bool onMouseButtonPressed(event::MouseButtonPressedEvent& e);
 
 	input::CameraOrthoController cameraController;
 
+	scene::Entity hoveredEntity;
 	renderer::CameraEditor editorCamera;
 
 	bool viewportFocused = false;
 	bool viewportHovered = false;
 	glm::vec2 viewportSize = {0.0f, 0.0f};
+	glm::vec2 viewportBounds[2];
 	shrd<renderer::Framebuffer> framebuffer;
 
 	shrd<scene::Scene> activeScene;
