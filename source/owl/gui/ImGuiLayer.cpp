@@ -13,7 +13,14 @@
 #include "core/external/glfw3.h"
 #include "core/external/imgui.h"
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
 #include <ImGuizmo.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 namespace owl::gui {
 

@@ -14,7 +14,7 @@
 #include "input/MouseCode.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include <GLM/gtx/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace owl::renderer {
 

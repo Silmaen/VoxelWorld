@@ -18,7 +18,7 @@ namespace owl::core {
 
 Application *Application::instance = nullptr;
 
-Application::Application(const AppParams &appParams) {
+Application::Application(const AppParams &appParams): initParams{appParams} {
 	OWL_PROFILE_FUNCTION()
 
 	OWL_CORE_ASSERT(!instance, "Application already exists!")
@@ -103,10 +103,11 @@ void Application::onEvent(event::Event &e) {
 		return onWindowResized(std::forward<decltype(PH1)>(PH1));
 	});
 
-	for (auto &it: std::ranges::reverse_view(layerStack)) {
+	//for (auto &it: std::ranges::reverse_view(layerStack)) {
+	for (auto it = layerStack.rbegin(); it != layerStack.rend(); ++it) {
 		if (e.handled)
 			break;
-		it->onEvent(e);
+		(*it)->onEvent(e);
 	}
 }
 

@@ -10,12 +10,12 @@
 #include "Log.h"
 #include "debug/Profiler.h"
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
+int main(int argc, char *argv[]) {
 
 	owl::core::Log::init();
 	// Startup
 	OWL_PROFILE_BEGIN_SESSION("Startup","OwlProfile-startup.json")
-	auto app = owl::core::createApplication();
+	auto app = owl::core::createApplication(argc, argv);
 	OWL_PROFILE_END_SESSION()
 	// runtime
 	OWL_PROFILE_BEGIN_SESSION("Runtime","OwlProfile-runtime.json")

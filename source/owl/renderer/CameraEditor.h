@@ -31,6 +31,10 @@ public:
 	 * @brief Destructor.
 	 */
 	~CameraEditor() override = default;
+	CameraEditor(const CameraEditor&) = default;
+	CameraEditor(CameraEditor&&) = default;
+	CameraEditor& operator=(const CameraEditor&) =default;
+	CameraEditor& operator=(CameraEditor&&) =default;
 
 	void onUpdate(core::Timestep ts);
 

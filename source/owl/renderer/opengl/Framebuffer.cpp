@@ -11,6 +11,8 @@
 #include "Framebuffer.h"
 #include <glad/glad.h>
 
+#include <utility>
+
 namespace owl::renderer::opengl {
 
 constexpr uint32_t maxFramebufferSize = 8192;
@@ -63,9 +65,13 @@ static bool isDepthFormat(FramebufferTextureFormat format) {
 	switch (format) {
 		case FramebufferTextureFormat::DEPTH24STENCIL8:
 			return true;
-		default:
-			return false;
+		case FramebufferTextureFormat::None:
+		case FramebufferTextureFormat::RGBA8:
+		case FramebufferTextureFormat::RED_INTEGER:
+			break;
 	}
+	OWL_CORE_ASSERT(false, "Bad Depth format")
+	return false;
 }
 
 static GLenum FBTextureFormatToGL(FramebufferTextureFormat format) {
@@ -74,16 +80,17 @@ static GLenum FBTextureFormatToGL(FramebufferTextureFormat format) {
 			return GL_RGBA8;
 		case FramebufferTextureFormat::RED_INTEGER:
 			return GL_RED_INTEGER;
-		default:
+		case FramebufferTextureFormat::None:
+		case FramebufferTextureFormat::DEPTH24STENCIL8:
 			break;
 	}
-	OWL_CORE_ASSERT(false, "Bad Texture format");
+	OWL_CORE_ASSERT(false, "Bad Texture format")
 	return 0;
 }
 
 }// namespace utils
 
-Framebuffer::Framebuffer(const FramebufferSpecification &spec) : specs{spec} {
+Framebuffer::Framebuffer(FramebufferSpecification spec) : specs{std::move(spec)} {
 	for (auto spec_: specs.attachments.attachments) {
 		if (!utils::isDepthFormat(spec_.textureFormat))
 			colorAttachmentSpecifications.emplace_back(spec_);
@@ -115,18 +122,19 @@ void Framebuffer::invalidate() {
 	// Attachments
 	if (colorAttachmentSpecifications.size()) {
 		colorAttachments.resize(colorAttachmentSpecifications.size());
-		utils::createTextures(multisample, colorAttachments.data(), colorAttachments.size());
+		utils::createTextures(multisample, colorAttachments.data(), static_cast<uint32_t>(colorAttachments.size()));
 
 		for (size_t i = 0; i < colorAttachments.size(); i++) {
 			utils::bindTexture(multisample, colorAttachments[i]);
 			switch (colorAttachmentSpecifications[i].textureFormat) {
 				case FramebufferTextureFormat::RGBA8:
-					utils::attachColorTexture(colorAttachments[i], specs.samples, GL_RGBA8, GL_RGBA, specs.width, specs.height, i);
+					utils::attachColorTexture(colorAttachments[i], static_cast<int>(specs.samples), GL_RGBA8, GL_RGBA, specs.width, specs.height, static_cast<int>(i));
 					break;
 				case FramebufferTextureFormat::RED_INTEGER:
-					utils::attachColorTexture(colorAttachments[i], specs.samples, GL_R32I, GL_RED_INTEGER, specs.width, specs.height, i);
+					utils::attachColorTexture(colorAttachments[i], static_cast<int>(specs.samples), GL_R32I, GL_RED_INTEGER, specs.width, specs.height, static_cast<int>(i));
 					break;
-				default:
+				case FramebufferTextureFormat::None:
+				case FramebufferTextureFormat::DEPTH24STENCIL8:
 					break;
 			}
 		}
@@ -137,15 +145,17 @@ void Framebuffer::invalidate() {
 		utils::bindTexture(multisample, depthAttachment);
 		switch (depthAttachmentSpecification.textureFormat) {
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
-				utils::attachDepthTexture(depthAttachment, specs.samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, specs.width, specs.height);
+				utils::attachDepthTexture(depthAttachment, static_cast<int>(specs.samples), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, specs.width, specs.height);
 				break;
-			default:
+			case FramebufferTextureFormat::None:
+			case FramebufferTextureFormat::RGBA8:
+			case FramebufferTextureFormat::RED_INTEGER:
 				break;
 		}
 	}
 
 	if (colorAttachments.size() > 1) {
-		OWL_CORE_ASSERT(colorAttachments.size() <= 4, "Bad color attachment size");
+		OWL_CORE_ASSERT(colorAttachments.size() <= 4, "Bad color attachment size")
 		GLenum buffers[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
 		glDrawBuffers(colorAttachments.size(), buffers);
 	} else if (colorAttachments.empty()) {
@@ -153,7 +163,7 @@ void Framebuffer::invalidate() {
 		glDrawBuffer(GL_NONE);
 	}
 
-	OWL_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
+	OWL_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!")
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -176,7 +186,7 @@ void Framebuffer::resize(uint32_t width, uint32_t height) {
 }
 
 int Framebuffer::readPixel(uint32_t attachmentIndex, int x, int y) {
-	OWL_CORE_ASSERT(attachmentIndex < colorAttachments.size(), "ReadPixel bad attachment index");
+	OWL_CORE_ASSERT(attachmentIndex < colorAttachments.size(), "ReadPixel bad attachment index")
 
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 	int pixelData;
@@ -185,7 +195,7 @@ int Framebuffer::readPixel(uint32_t attachmentIndex, int x, int y) {
 }
 
 void Framebuffer::clearAttachment(uint32_t attachmentIndex, int value) {
-	OWL_CORE_ASSERT(attachmentIndex < colorAttachments.size(), "clearAttachment bad attachment index");
+	OWL_CORE_ASSERT(attachmentIndex < colorAttachments.size(), "clearAttachment bad attachment index")
 	const auto &spec = colorAttachmentSpecifications[attachmentIndex];
 	glClearTexImage(colorAttachments[attachmentIndex], 0,
 					utils::FBTextureFormatToGL(spec.textureFormat), GL_INT, &value);

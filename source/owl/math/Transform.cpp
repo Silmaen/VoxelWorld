@@ -8,6 +8,7 @@
 #include "owlpch.h"
 
 #include "Transform.h"
+#include "math/trigonometry.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
@@ -66,11 +67,11 @@ bool decomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm:
 #endif
 
 	rotation.y = glm::asin(-row[0][2]);
-	if (glm::cos(rotation.y) != 0) {
-		rotation.x = atan2(row[1][2], row[2][2]);
-		rotation.z = atan2(row[0][1], row[0][0]);
+	if (glm::epsilonEqual(glm::cos(rotation.y), zero, epsi)) {
+		rotation.x = math::atan2(row[1][2], row[2][2]);
+		rotation.z = math::atan2(row[0][1], row[0][0]);
 	} else {
-		rotation.x = atan2(-row[2][0], row[1][1]);
+		rotation.x = math::atan2(-row[2][0], row[1][1]);
 		rotation.z = 0;
 	}
 

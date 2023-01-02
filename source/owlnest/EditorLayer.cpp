@@ -20,7 +20,15 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 // must be included AFTER imgui
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
 #include <ImGuizmo.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 namespace owl {
 
@@ -86,12 +94,12 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 	my -= viewportBounds[0].y;
 	glm::vec2 viewportSize_ = viewportBounds[1] - viewportBounds[0];
 	my = viewportSize_.y - my;
-	int mouseX = (int) mx;
-	int mouseY = (int) my;
+	int mouseX = static_cast<int>(mx);
+	int mouseY = static_cast<int>(my);
 
-	if (mouseX >= 0 && mouseY >= 0 && mouseX < (int) viewportSize_.x && mouseY < (int) viewportSize_.y) {
+	if (mouseX >= 0 && mouseY >= 0 && mouseX < static_cast<int>(viewportSize_.x) && mouseY < static_cast<int>(viewportSize_.y)) {
 		int pixelData = framebuffer->readPixel(1, mouseX, mouseY);
-		hoveredEntity = pixelData == -1 ? scene::Entity() : scene::Entity((entt::entity)pixelData, activeScene.get());
+		hoveredEntity = pixelData == -1 ? scene::Entity() : scene::Entity(static_cast<entt::entity>(pixelData), activeScene.get());
 	}
 
 	framebuffer->unbind();
@@ -151,8 +159,8 @@ void EditorLayer::renderStats(const core::Timestep &ts) {
 	ImGui::Text("Quads: %d", stats.quadCount);
 	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
 	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
-	ImGui::Text("Viewport size: %f %f", viewportSize.x, viewportSize.y);
-	ImGui::Text("Aspect ratio: %f", viewportSize.x / viewportSize.y);
+	ImGui::Text("Viewport size: %f %f", static_cast<double>(viewportSize.x), static_cast<double>(viewportSize.y));
+	ImGui::Text("Aspect ratio: %f", static_cast<double>(viewportSize.x / viewportSize.y));
 	ImGui::End();
 }
 
@@ -213,7 +221,7 @@ void EditorLayer::renderGizmo() {
 		float snapValues[3] = {snapValue, snapValue, snapValue};
 
 		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-							 (ImGuizmo::OPERATION) gizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+							 static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform),
 							 nullptr, snap ? snapValues : nullptr);
 
 		if (ImGuizmo::IsUsing()) {
@@ -248,7 +256,7 @@ void EditorLayer::renderMenu() {
 
 void EditorLayer::newScene() {
 	activeScene = mk_shrd<scene::Scene>();
-	activeScene->onViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
+	activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 	sceneHierarchy.setContext(activeScene);
 }
 
@@ -256,7 +264,7 @@ void EditorLayer::openScene() {
 	auto filepath = core::FileDialog::openFile("Owl Scene (*.owl)|owl\n");
 	if (!filepath.empty()) {
 		activeScene = mk_shrd<scene::Scene>();
-		activeScene->onViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
+		activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 		sceneHierarchy.setContext(activeScene);
 		scene::SceneSerializer serializer(activeScene);
 		serializer.deserialize(filepath);

@@ -12,6 +12,10 @@
 
 namespace owl::scene {
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 /**
  * @brief Class SceneCamera
  */
@@ -56,7 +60,7 @@ public:
 	/**
 	 * @brief Defines the viewport
 	 * @param width Viewport's width
-	 * @param heightViewport height
+	 * @param height Viewport's height
 	 */
 	void setViewportSize(uint32_t width, uint32_t height);
 
@@ -125,5 +129,8 @@ private:
 
 	float aspectRatio = 0.0f;
 };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }// namespace owl::scene

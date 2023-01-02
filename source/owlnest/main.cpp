@@ -15,17 +15,21 @@ namespace owl {
 
 class OwlNest : public core::Application {
 public:
-	OwlNest() : core::Application({.name = "Owl Nest - Owl Engine Editor",
-#ifdef OWL_ASSETS_LOCATION
-								   .assetsPattern = OWL_ASSETS_LOCATION,
-#endif
-				}) {
+	OwlNest() = delete;
+	explicit OwlNest(core::AppParams param) : core::Application(param) {
 		pushLayer(mk_shrd<EditorLayer>());
 	}
 };
 
-shrd<core::Application> core::createApplication() {
-	return mk_shrd<OwlNest>();
+shrd<core::Application> core::createApplication([[maybe_unused]]int argc, [[maybe_unused]]char **argv) {
+	return mk_shrd<OwlNest>(core::AppParams{
+			.name = "Owl Nest - Owl Engine Editor",
+#ifdef OWL_ASSETS_LOCATION
+			.assetsPattern = OWL_ASSETS_LOCATION,
+#endif
+			.argCount = argc,
+			.args = argv,
+	});
 }
 
 }// namespace owl

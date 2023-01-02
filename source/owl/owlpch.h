@@ -13,10 +13,12 @@
 #pragma clang diagnostic ignored "-Wundefined-func-template"
 #endif
 #include <algorithm>
+#include <array>
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <memory>
+#include <ranges>
 #include <streambuf>
 #include <string>
 #include <string_view>

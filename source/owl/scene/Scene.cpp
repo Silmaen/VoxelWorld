@@ -119,7 +119,7 @@ Entity Scene::getPrimaryCamera() {
 
 template<typename T>
 void Scene::onComponentAdded([[maybe_unused]] Entity entity, [[maybe_unused]] T &component) {
-	OWL_ASSERT(false, "Unknown component");
+	OWL_ASSERT(false, "Unknown component")
 }
 
 template<>

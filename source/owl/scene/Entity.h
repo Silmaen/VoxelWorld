@@ -46,17 +46,26 @@ public:
 
 	Entity(entt::entity handle, Scene *scene);
 
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundefined-func-template"
+#endif
 	template<typename T, typename... Args>
 	T &addComponent(Args &&...args) {
-		OWL_CORE_ASSERT(!hasComponent<T>(), "Entity already has component!");
+		OWL_CORE_ASSERT(!hasComponent<T>(), "Entity already has component!")
 		T& component = scene->registry.emplace<T>(entityHandle, std::forward<Args>(args)...);
 		scene->onComponentAdded<T>(*this, component);
 		return component;
 	}
 
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 	template<typename T>
 	T &getComponent() {
-		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!");
+		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!")
 		return scene->registry.get<T>(entityHandle);
 	}
 
@@ -67,12 +76,12 @@ public:
 
 	template<typename T>
 	void removeComponent() {
-		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!");
+		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!")
 		scene->registry.remove<T>(entityHandle);
 	}
 
 	operator bool() const { return entityHandle != entt::null; }
-	operator uint32_t() const {return (uint32_t)entityHandle;}
+	operator uint32_t() const {return static_cast<uint32_t>(entityHandle);}
 
 	bool operator==(const Entity& other)const {
 		return entityHandle == other.entityHandle && scene == other.scene;

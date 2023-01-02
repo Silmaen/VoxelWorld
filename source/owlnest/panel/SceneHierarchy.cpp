@@ -62,7 +62,7 @@ void SceneHierarchy::drawEntityNode(scene::Entity entity) {
 
 	ImGuiTreeNodeFlags flags = ((selection == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-	bool opened = ImGui::TreeNodeEx((void *) (uint64_t) (uint32_t) entity, flags, tag.c_str());
+	bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, tag.c_str());
 	if (ImGui::IsItemClicked()) {
 		selection = entity;
 	}
@@ -76,7 +76,7 @@ void SceneHierarchy::drawEntityNode(scene::Entity entity) {
 
 	if (opened) {
 		ImGuiTreeNodeFlags flags_o = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened_o = ImGui::TreeNodeEx((void *) 9817239, flags_o, tag.c_str());
+		bool opened_o = ImGui::TreeNodeEx(reinterpret_cast<void*>(9817239), flags_o, tag.c_str());
 		if (opened_o)
 			ImGui::TreePop();
 		ImGui::TreePop();
@@ -162,7 +162,7 @@ static void drawComponent(const std::string &name, scene::Entity entity, UIFunct
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
 		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 		ImGui::Separator();
-		bool open = ImGui::TreeNodeEx((void *) typeid(T).hash_code(), treeNodeFlags, name.c_str());
+		bool open = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(T).hash_code()), treeNodeFlags, name.c_str());
 		ImGui::PopStyleVar();
 		ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 		if (ImGui::Button("+", ImVec2{lineHeight, lineHeight})) {
@@ -189,7 +189,7 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 
 		char buffer[256];
 		memset(buffer, 0, sizeof(buffer));
-		strcpy_s(buffer, sizeof(buffer), tag.c_str());
+		memcpy(buffer, tag.c_str(), sizeof(buffer));
 		if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
 			tag = std::string(buffer);
 		}
@@ -204,7 +204,7 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 			if (!selection.hasComponent<scene::component::Camera>())
 				selection.addComponent<scene::component::Camera>();
 			else
-				OWL_CORE_WARN("This entity already has the Camera Component!");
+				OWL_CORE_WARN("This entity already has the Camera Component!")
 
 			ImGui::CloseCurrentPopup();
 		}
@@ -212,7 +212,7 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 			if (!selection.hasComponent<scene::component::SpriteRenderer>())
 				selection.addComponent<scene::component::SpriteRenderer>();
 			else
-				OWL_CORE_WARN("This entity already has the Sprite Renderer Component!");
+				OWL_CORE_WARN("This entity already has the Sprite Renderer Component!")
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndPopup();
@@ -230,13 +230,13 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 		auto &camera = component.camera;
 		ImGui::Checkbox("Primary", &component.primary);
 		const char *projectionTypeStrings[] = {"Perspective", "Orthographic"};
-		const char *currentProjectionTypeString = projectionTypeStrings[(int) camera.getProjectionType()];
+		const char *currentProjectionTypeString = projectionTypeStrings[static_cast<int>(camera.getProjectionType())];
 		if (ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
 			for (int i = 0; i < 2; i++) {
 				bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
 				if (ImGui::Selectable(projectionTypeStrings[i], isSelected)) {
 					currentProjectionTypeString = projectionTypeStrings[i];
-					camera.setProjectionType((scene::SceneCamera::ProjectionType) i);
+					camera.setProjectionType(static_cast<scene::SceneCamera::ProjectionType>(i));
 				}
 				if (isSelected)
 					ImGui::SetItemDefaultFocus();

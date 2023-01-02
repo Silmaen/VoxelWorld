@@ -34,12 +34,26 @@ struct OWL_API AppParams{
 	std::string name = "Owl Engine";
 	/// Application's assets pattern
 	std::string assetsPattern = "assets";
+	/// Number of command line arguments
+	int argCount = 0;
+	/// List of command line argument
+	char** args = nullptr;
+	/**
+	 * @brief Access to the given command line argument
+	 * @param index Id of the argument
+	 * @return The argument
+	 */
+	const char* operator[](int index)const{
+		OWL_CORE_ASSERT(index < argCount, "Bad command line index")
+		return args[index];
+	}
 };
 /**
  * @brief Class Application
  */
 class OWL_API Application {
 public:
+	Application() = delete;
 	Application(const Application &) = delete;
 	Application(Application &&) = delete;
 	Application &operator=(const Application &) = delete;
@@ -125,6 +139,11 @@ public:
 	 * @brief Disable the docking environment
 	 */
 	void disableDocking();
+	/**
+	 * @brief Access to init parameters
+	 * @return Init parameters
+	 */
+	[[nodiscard]]const AppParams& getInitParams()const{return initParams;}
 private:
 	/**
 	 * @brief Runs the application
@@ -158,7 +177,8 @@ private:
 	std::filesystem::path assetDirectory;
 	/// Time steps management
 	Timestep stepper;
-
+	/// Initialization parameters
+	AppParams initParams;
 	/// The application Instance
 	static Application *instance;
 	/// Mark the main entrypoint function as friend
@@ -169,6 +189,6 @@ private:
  * @brief Create an application (Must be defined in the client)
  * @return The application
  */
-extern shrd<Application> createApplication();
+extern shrd<Application> createApplication(int argc, char** argv);
 
 }// namespace owl::core

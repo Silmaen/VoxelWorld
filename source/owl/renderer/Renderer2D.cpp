@@ -36,7 +36,7 @@ struct internalData {
 	static const uint32_t maxQuads = 20000;
 	static const uint32_t maxVertices = maxQuads * 4;
 	static const uint32_t maxIndices = maxQuads * 6;
-	static const uint32_t maxTextureSlots = 32;// TODO: RenderCaps
+	static const int32_t maxTextureSlots = 32;// TODO: RenderCaps
 	shrd<VertexArray> quadVertexArray;
 	shrd<VertexBuffer> quadVertexBuffer;
 	shrd<Texture2D> whiteTexture;
@@ -70,36 +70,39 @@ void Renderer2D::init() {
 
 	data.quadVertexBufferBase = new QuadVertex[data.maxVertices];
 
-	auto *quadIndices = new uint32_t[data.maxIndices];
+	{
+		std::vector<uint32_t> quadIndices;
+		quadIndices.resize(data.maxIndices);
+		uint32_t offset = 0;
+		for (uint32_t i = 0; i < data.maxIndices; i += 6) {
+			quadIndices[i + 0] = offset + 0;
+			quadIndices[i + 1] = offset + 1;
+			quadIndices[i + 2] = offset + 2;
 
-	uint32_t offset = 0;
-	for (uint32_t i = 0; i < data.maxIndices; i += 6) {
-		quadIndices[i + 0] = offset + 0;
-		quadIndices[i + 1] = offset + 1;
-		quadIndices[i + 2] = offset + 2;
+			quadIndices[i + 3] = offset + 2;
+			quadIndices[i + 4] = offset + 3;
+			quadIndices[i + 5] = offset + 0;
 
-		quadIndices[i + 3] = offset + 2;
-		quadIndices[i + 4] = offset + 3;
-		quadIndices[i + 5] = offset + 0;
-
-		offset += 4;
+			offset += 4;
+		}
+		data.quadVertexArray->setIndexBuffer(owl::renderer::IndexBuffer::create(quadIndices.data(), data.maxIndices));
 	}
-	data.quadVertexArray->setIndexBuffer(owl::renderer::IndexBuffer::create(quadIndices, data.maxIndices));
-	delete quadIndices;
 
 	data.whiteTexture = Texture2D::create(1, 1);
 	uint32_t whiteTextureData = 0xffffffff;
 	data.whiteTexture->setData(&whiteTextureData, sizeof(uint32_t));
 
-	int32_t samplers[data.maxTextureSlots];
-	for (uint32_t i = 0; i < data.maxTextureSlots; ++i)
-		samplers[i] = i;
+	std::vector<int32_t> samplers;
+	samplers.resize(data.maxTextureSlots);
+	int32_t i = 0;
+	for (auto & sampler: samplers)
+		sampler = i++;
 
 	auto &shLib = Renderer::getShaderLibrary();
 	shLib.addFromStandardPath("texture");
 	data.shader = shLib.get("texture");
 	data.shader->bind();
-	data.shader->setIntArray("u_Textures", samplers, data.maxTextureSlots);
+	data.shader->setIntArray("u_Textures", samplers.data(), data.maxTextureSlots);
 
 	// Set all texture slots to 0
 	data.textureSlots[0] = data.whiteTexture;
@@ -148,7 +151,7 @@ void Renderer2D::endScene() {
 void Renderer2D::flush() {
 	if (data.quadIndexCount == 0)
 		return;// Nothing to draw{
-	auto dataSize = (uint32_t) ((uint8_t *) data.quadVertexBufferPtr - (uint8_t *) data.quadVertexBufferBase);
+	auto dataSize = static_cast<uint32_t>(data.quadVertexBufferPtr - data.quadVertexBufferBase);
 	data.quadVertexBuffer->setData(data.quadVertexBufferBase, dataSize);
 	for (uint32_t i = 0; i < data.textureSlotIndex; i++)
 		data.textureSlots[i]->bind(i);
@@ -181,14 +184,14 @@ void Renderer2D::drawQuad(const Quad2DDataT &quadData) {
 	if (quadData.texture != nullptr) {
 		for (uint32_t i = 1; i < data.textureSlotIndex; i++) {
 			if (*data.textureSlots[i] == *quadData.texture) {
-				textureIndex = (float) i;
+				textureIndex = static_cast<float>(i);
 				break;
 			}
 		}
 		if (textureIndex == 0.0f) {
 			if (data.textureSlotIndex >= internalData::maxTextureSlots)
 				nextBatch();
-			textureIndex = (float) data.textureSlotIndex;
+			textureIndex = static_cast<float>(data.textureSlotIndex);
 			data.textureSlots[data.textureSlotIndex] = std::static_pointer_cast<Texture2D>(quadData.texture);
 			data.textureSlotIndex++;
 		}

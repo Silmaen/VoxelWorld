@@ -8,10 +8,12 @@
 
 #pragma once
 
+#include <utility>
+
 #include "core/Core.h"
 #include "core/Log.h"
-#include "scene/Scene.h"
 #include "scene/Entity.h"
+#include "scene/Scene.h"
 
 namespace owl::panel {
 
@@ -51,12 +53,12 @@ public:
 	 * @brief Constructor
 	 * @param scene The base scene
 	 */
-	SceneHierarchy(const shrd<scene::Scene>& scene);
+	explicit SceneHierarchy(const shrd<scene::Scene> &scene);
 	/**
 	 * @brief Define the Scene context
 	 * @param scene The Scene
 	 */
-	void setContext(const shrd<scene::Scene>& scene);
+	void setContext(const shrd<scene::Scene> &scene);
 	/**
 	 * @brief Action on Gui Render
 	 */
@@ -65,8 +67,9 @@ public:
 	 * @brief Access to the selected entity
 	 * @return The selected entity
 	 */
-	scene::Entity getSelectedEntity()const{return selection;}
-	void setSelectedEntity(scene::Entity entity){ selection = entity;}
+	[[nodiscard]] scene::Entity getSelectedEntity() const { return selection; }
+	void setSelectedEntity(scene::Entity entity) { selection = std::move(entity); }
+
 private:
 	/**
 	 * @brief Draw one entity node
@@ -84,4 +87,4 @@ private:
 	scene::Entity selection;
 };
 
-}// namespace panel
+}// namespace owl::panel

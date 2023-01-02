@@ -20,17 +20,17 @@ static std::vector<std::string_view> split(const std::string_view str, const cha
 	std::vector<std::string_view> result;
 	int indexCommaToLeftOfColumn = 0;
 	int indexCommaToRightOfColumn = -1;
-	for (int i = 0; i < static_cast<int>(str.size()); i++) {
+	for (uint32_t i = 0; i < str.size(); i++) {
 		if (str[i] == delim) {
 			indexCommaToLeftOfColumn = indexCommaToRightOfColumn;
-			indexCommaToRightOfColumn = i;
-			int index = indexCommaToLeftOfColumn + 1;
-			int length = indexCommaToRightOfColumn - index;
+			indexCommaToRightOfColumn = static_cast<int>(i);
+			int32_t index = indexCommaToLeftOfColumn + 1;
+			uint32_t length = static_cast<uint32_t>(indexCommaToRightOfColumn - index);
 			std::string_view column(str.data() + index, length);
 			result.push_back(column);
 		}
 	}
-	const std::string_view finalColumn(str.data() + indexCommaToRightOfColumn + 1, str.size() - indexCommaToRightOfColumn - 1);
+	const std::string_view finalColumn(str.data() + indexCommaToRightOfColumn + 1, str.size() - static_cast<size_t>(indexCommaToRightOfColumn - 1));
 	result.push_back(finalColumn);
 	return result;
 }
@@ -59,7 +59,7 @@ std::filesystem::path FileDialog::openFile(const std::string &filter) {
 	auto ff = parseFilter(cfilters);
 	auto initialDir = Application::get().getAssetDirectory();
 	std::string tmp = initialDir.string();
-	auto result = NFD::OpenDialog(outpath, ff.data(), ff.size(), tmp.c_str());
+	auto result = NFD::OpenDialog(outpath, ff.data(), static_cast<uint32_t>(ff.size()), tmp.c_str());
 	if (result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {
@@ -80,7 +80,7 @@ std::filesystem::path FileDialog::saveFile([[maybe_unused]]const std::string &fi
 	std::string cfilters{filter};
 	auto ff = parseFilter(cfilters);
 	auto initialDir = Application::get().getAssetDirectory();
-	auto result = NFD::SaveDialog(outpath, ff.data(), ff.size(), initialDir.string().c_str(), nullptr);
+	auto result = NFD::SaveDialog(outpath, ff.data(), static_cast<uint32_t>(ff.size()), initialDir.string().c_str(), nullptr);
 	if (result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {

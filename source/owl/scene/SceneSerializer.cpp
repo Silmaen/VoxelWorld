@@ -14,7 +14,19 @@
 #include "scene/component/SpriteRenderer.h"
 #include "scene/component/Tag.h"
 #include "scene/component/Transform.h"
-#include "yaml-cpp/yaml.h"
+
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic ignored "-Wshadow"
+#endif
+#include <yaml-cpp/yaml.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+#include <magic_enum.hpp>
 
 template<>
 struct YAML::convert<glm::vec3> {
@@ -58,13 +70,13 @@ struct YAML::convert<glm::vec4> {
 	}
 };
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec3 &v) {
+static YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec3 &v) {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
 	return out;
 }
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec4 &v) {
+static YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec4 &v) {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
 	return out;
@@ -104,7 +116,7 @@ static void serializeEntity(YAML::Emitter &out, Entity entity) {
 		auto &camera = cameraComponent.camera;
 		out << YAML::Key << "Camera" << YAML::Value;
 		out << YAML::BeginMap;// Camera
-		out << YAML::Key << "ProjectionType" << YAML::Value << (int) camera.getProjectionType();
+		out << YAML::Key << "ProjectionType" << YAML::Value << static_cast<int>(camera.getProjectionType());
 		out << YAML::Key << "PerspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
 		out << YAML::Key << "PerspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
 		out << YAML::Key << "PerspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
@@ -151,7 +163,7 @@ bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
 	if (!data["Scene"])
 		return false;
 	auto sceneName = data["Scene"].as<std::string>();
-	OWL_CORE_TRACE("Deserializing scene '{0}'", sceneName);
+	OWL_CORE_TRACE("Deserializing scene '{0}'", sceneName)
 	auto entities = data["Entities"];
 	if (entities) {
 		for (auto entity: entities) {
@@ -161,7 +173,7 @@ bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
 			if (tagComponent)
 				name = tagComponent["Tag"].as<std::string>();
 
-			OWL_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
+			OWL_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name)
 
 			Entity deserializedEntity = scene->createEntity(name);
 
@@ -178,7 +190,7 @@ bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
 			if (cameraComponent) {
 				auto &cc = deserializedEntity.addComponent<component::Camera>();
 				auto cameraProps = cameraComponent["Camera"];
-				cc.camera.setProjectionType((SceneCamera::ProjectionType) cameraProps["ProjectionType"].as<int>());
+				cc.camera.setProjectionType(static_cast<SceneCamera::ProjectionType>(cameraProps["ProjectionType"].as<int>()));
 				cc.camera.setPerspectiveVerticalFOV(cameraProps["PerspectiveFOV"].as<float>());
 				cc.camera.setPerspectiveNearClip(cameraProps["PerspectiveNear"].as<float>());
 				cc.camera.setPerspectiveFarClip(cameraProps["PerspectiveFar"].as<float>());

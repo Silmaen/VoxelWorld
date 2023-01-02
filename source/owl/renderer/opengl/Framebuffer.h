@@ -38,7 +38,7 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	explicit Framebuffer(const FramebufferSpecification &spec);
+	explicit Framebuffer(FramebufferSpecification spec);
 	/**
 	 * @brief Destructor.
 	 */
@@ -69,7 +69,7 @@ public:
 	 * @return The renderer ID
 	 */
 	[[nodiscard]] uint32_t getColorAttachmentRendererID(uint32_t index = 0) const override {
-		OWL_CORE_ASSERT(index < colorAttachments.size(), "ColorAttachment out of bounds");
+		OWL_CORE_ASSERT(index < colorAttachments.size(), "ColorAttachment out of bounds")
 		return colorAttachments[index]; }
 	/**
 	 * @brief Get the specs
