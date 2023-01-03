@@ -18,6 +18,9 @@
 
 namespace owl::event {
 
+/**
+ * @brief Mouse move evnet
+ */
 class OWL_API MouseMovedEvent : public Event {
 public:
 	MouseMovedEvent(const float x, const float y) : mouseX(x), mouseY(y) {}
@@ -43,6 +46,9 @@ private:
 	float mouseY;
 };
 
+/**
+ * @brief Event when mouse is scrolled
+ */
 class OWL_API MouseScrolledEvent : public Event {
 public:
 	MouseScrolledEvent(const float xOffset, const float yOffset)
@@ -68,6 +74,9 @@ private:
 	float YOffset;
 };
 
+/**
+ * @brief Event for mouse button
+ */
 class OWL_API MouseButtonEvent : public Event {
 public:
 	[[nodiscard]] input::MouseCode GetMouseButton() const { return mouseButton; }
@@ -83,6 +92,9 @@ protected:
 	input::MouseCode mouseButton;
 };
 
+/**
+ * @brief Event for Mouse button pressed
+ */
 class OWL_API MouseButtonPressedEvent : public MouseButtonEvent {
 public:
 	explicit MouseButtonPressedEvent(const input::MouseCode button)
@@ -98,6 +110,9 @@ public:
 	[[nodiscard]] type getType() const override { return getStaticType(); }
 };
 
+/**
+ * @brief Event for mouse button released
+ */
 class OWL_API MouseButtonReleasedEvent : public MouseButtonEvent {
 public:
 	explicit MouseButtonReleasedEvent(const input::MouseCode button)

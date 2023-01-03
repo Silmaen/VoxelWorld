@@ -14,7 +14,7 @@
 
 class Sandbox : public owl::core::Application {
 public:
-	Sandbox() { pushLayer(owl::mk_shrd<base2D>()); }
+	Sandbox() : Application({"Sandbox"}) { pushLayer(owl::mk_shrd<owl::base2D>()); }
 };
 
 owl::shrd<owl::core::Application> owl::core::createApplication() {

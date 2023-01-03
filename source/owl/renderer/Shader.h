@@ -92,6 +92,12 @@ public:
 	 */
 	virtual void setFloat(const std::string &name, float value) = 0;
 	/**
+	 * @brief Set shader's internal vector 2 variable
+	 * @param name Shader's variable's name
+	 * @param value Shader's variable's value
+	 */
+	virtual void setFloat2(const std::string& name, const glm::vec2& value) = 0;
+	/**
 	 * @brief Set shader's internal vector 3 variable
 	 * @param name Shader's variable's name
 	 * @param value Shader's variable's value

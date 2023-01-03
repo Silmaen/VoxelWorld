@@ -9,9 +9,16 @@
 #include "owlpch.h"
 
 #include "Log.h"
-
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#pragma clang diagnostic ignored "-Wundefined-func-template"
+#endif
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 namespace owl::core {
 

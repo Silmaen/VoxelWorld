@@ -34,12 +34,12 @@ public:
 	/**
 	 * @brief Initialize the context
 	 */
-	void Init() override;
+	void init() override;
 
 	/**
 	 * @brief Doo the buffer swap
 	 */
-	void SwapBuffers() override;
+	void swapBuffers() override;
 
 private:
 	/// Link to the parent window

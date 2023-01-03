@@ -30,14 +30,18 @@ target_link_libraries(${ENGINE_NAME} PUBLIC ${CMAKE_PROJECT_NAME}_Base)
 install(TARGETS ${ENGINE_NAME})
 # precompiled headers
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h")
-  target_precompile_headers(${ENGINE_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h)
-endif()
+    target_precompile_headers(${ENGINE_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h)
+endif ()
 
 # ----==== third party ====----
 #  ---- external folder ----
 # debugbreak
 find_package(DebugBreak 1.0 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC owl::DebugBreak)
+
+# Entt
+find_package(Entt 3.11 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC owl::Entt)
 
 # fmt
 target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
@@ -46,7 +50,6 @@ target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
 target_link_libraries(${ENGINE_NAME} PRIVATE glad)
 
 # GLFW
-#find_package(glfw3 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE glfw)
 
 # glm
@@ -54,13 +57,15 @@ target_link_libraries(${ENGINE_NAME} PRIVATE glm_shared)
 
 # ImGui
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui)
+find_package(ImGuizmo REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC owl::ImGuizmo)
 
 # magic_enum
 find_package(MagicEnum REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE owl::MagicEnum)
 
-# json
-target_link_libraries(${ENGINE_NAME} PRIVATE nlohmann_json::nlohmann_json)
+# yaml
+target_link_libraries(${ENGINE_NAME} PRIVATE yaml-cpp::yaml-cpp)
 
 # spdlog
 target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog)
@@ -68,3 +73,6 @@ target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog)
 # magic_enum
 find_package(StbImage REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE owl::StbImage)
+
+# NativeFile Dialog
+target_link_libraries(${ENGINE_NAME} PUBLIC nfd)

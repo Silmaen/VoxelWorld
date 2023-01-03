@@ -13,6 +13,9 @@
 
 namespace owl::core {
 
+/**
+ * @brief Class managing the Time Steps
+ */
 class OWL_API Timestep {
 public:
 	using clock = std::chrono::steady_clock;
@@ -28,7 +31,7 @@ public:
 
 	[[nodiscard]] float getSeconds() const { return static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(delta).count()) / 1000.0f; }
 	[[nodiscard]] float getMilliseconds() const { return static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(delta).count()) / 1000.0f; }
-	[[nodiscard]] float getFps() const { return 1e6f / getMilliseconds(); }
+	[[nodiscard]] float getFps() const { return 1e3f / getMilliseconds(); }
 
 private:
 	time_point lastCall;

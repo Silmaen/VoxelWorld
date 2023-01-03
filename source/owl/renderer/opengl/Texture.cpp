@@ -83,7 +83,7 @@ void Texture2D::setData(void *data, [[maybe_unused]] uint32_t size) {
 	OWL_PROFILE_FUNCTION()
 
 	[[maybe_unused]] uint32_t bpp = dataFormat == GL_RGBA ? 4 : 3;
-	OWL_CORE_ASSERT(size == width * height * bpp, "Data must be entire texture!");
+	OWL_CORE_ASSERT(size == width * height * bpp, "Data must be entire texture!")
 	glTextureSubImage2D(rendererID, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
 }
 

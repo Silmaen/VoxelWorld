@@ -11,6 +11,9 @@
 #include "Core.h"
 #include "external/spdlog.h"
 
+/**
+ * @brief Namespace for the core objects
+ */
 namespace owl::core {
 /**
  * @brief Class Log

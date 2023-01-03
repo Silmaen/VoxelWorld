@@ -7,12 +7,15 @@
  */
 
 #pragma once
+
 #include "owl.h"
+
+namespace owl {
 
 /**
  * @brief Class base2D
  */
-class base2D: public owl::core::layer::Layer {
+class base2D : public core::layer::Layer {
 public:
 	/**
 	 * @brief Default constructor.
@@ -21,19 +24,22 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~base2D() = default;
+	~base2D() override = default;
 
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const owl::core::Timestep &ts) override;
-	void onEvent(owl::event::Event &event) override;
-	void onImGuiRender(const owl::core::Timestep &ts) override;
+	void onUpdate(const core::Timestep &ts) override;
+	void onEvent(event::Event &event) override;
+	void onImGuiRender(const core::Timestep &ts) override;
 
 private:
-	owl::input::CameraOrthoController cameraController;
+	input::CameraOrthoController cameraController;
 
-	owl::shrd<owl::renderer::VertexArray> squareVA;
-	owl::shrd<owl::renderer::Texture> checkerboardTexture;
-	glm::vec4 squareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
-	owl::shrd<owl::renderer::Framebuffer> framebuffer;
+	glm::vec2 viewportSize = {0.0f, 0.0f};
+
+	shrd<renderer::VertexArray> squareVA;
+	shrd<renderer::Texture> checkerboardTexture;
+	glm::vec4 squareColor = {0.2f, 0.3f, 0.8f, 1.0f};
 };
+
+}// namespace owl
