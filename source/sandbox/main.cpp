@@ -14,9 +14,16 @@
 
 class Sandbox : public owl::core::Application {
 public:
-	Sandbox() : Application({"Sandbox"}) { pushLayer(owl::mk_shrd<owl::base2D>()); }
+	Sandbox(owl::core::AppParams param) : Application(param) { pushLayer(owl::mk_shrd<owl::base2D>()); }
 };
 
-owl::shrd<owl::core::Application> owl::core::createApplication() {
-	return owl::mk_shrd<Sandbox>();
+owl::shrd<owl::core::Application> owl::core::createApplication(int argc, char **argv) {
+	return owl::mk_shrd<Sandbox>(core::AppParams{
+			.name = "Sandbox",
+#ifdef OWL_ASSETS_LOCATION
+			.assetsPattern = OWL_ASSETS_LOCATION,
+#endif
+			.argCount = argc,
+			.args = argv,
+	});
 }

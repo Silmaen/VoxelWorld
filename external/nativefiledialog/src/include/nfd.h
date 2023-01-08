@@ -122,7 +122,7 @@ void NFD_ClearError(void);
 /* path set operations */
 #ifdef _WIN32
 typedef unsigned long nfdpathsetsize_t;
-#elif __APPLE__
+#elif defined(__APPLE__)
 typedef unsigned long nfdpathsetsize_t;
 #else
 typedef unsigned int nfdpathsetsize_t;
@@ -141,7 +141,7 @@ nfdresult_t NFD_PathSet_GetPathN(const nfdpathset_t* pathSet,
 /* Free the path gotten by NFD_PathSet_GetPathN */
 #ifdef _WIN32
 #define NFD_PathSet_FreePathN NFD_FreePathN
-#elif __APPLE__
+#elif defined(__APPLE__)
 #define NFD_PathSet_FreePathN NFD_FreePathN
 #else
 void NFD_PathSet_FreePathN(const nfdnchar_t* filePath);

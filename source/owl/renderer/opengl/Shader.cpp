@@ -69,6 +69,8 @@ Shader::Shader(const std::string &shaderName, const std::vector<std::filesystem:
 void Shader::compile(const std::unordered_map<ShaderType, std::string> &sources) {
 	OWL_PROFILE_FUNCTION()
 
+	auto start = std::chrono::steady_clock::now();
+
 	// Get a program object.
 	GLuint program = glCreateProgram();
 
@@ -156,9 +158,15 @@ void Shader::compile(const std::unordered_map<ShaderType, std::string> &sources)
 		return;
 	}
 	// Always detach shaders after a successful link.
-	for (auto sId: shaderIDs)
+	for (auto sId: shaderIDs) {
 		glDetachShader(program, sId);
+		glDeleteShader(sId);
+	}
 	programID = program;
+
+	auto timer = std::chrono::steady_clock::now() - start;
+	double duration = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) / 1000.0;
+	OWL_CORE_INFO("Compilation of shader {} in {} ms",getName(), duration)
 }
 
 Shader::~Shader() {

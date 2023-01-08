@@ -21,7 +21,7 @@ public:
 	}
 };
 
-shrd<core::Application> core::createApplication([[maybe_unused]]int argc, [[maybe_unused]]char **argv) {
+shrd<core::Application> core::createApplication(int argc, char **argv) {
 	return mk_shrd<OwlNest>(core::AppParams{
 			.name = "Owl Nest - Owl Engine Editor",
 #ifdef OWL_ASSETS_LOCATION

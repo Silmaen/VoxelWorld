@@ -232,7 +232,7 @@ public:
 	 * @brief Define the data layout
 	 * @param layout_ New data layout
 	 */
-	void SetLayout(const BufferLayout &layout_) { layout = layout_; }
+	void setLayout(const BufferLayout &layout_) { layout = layout_; }
 
 private:
 	/// Data layout description
