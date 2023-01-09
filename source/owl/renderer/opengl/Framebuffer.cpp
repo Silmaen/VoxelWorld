@@ -70,7 +70,6 @@ static bool isDepthFormat(FramebufferTextureFormat format) {
 		case FramebufferTextureFormat::RED_INTEGER:
 			break;
 	}
-	OWL_CORE_ASSERT(false, "Bad Depth format")
 	return false;
 }
 
@@ -99,11 +98,13 @@ Framebuffer::Framebuffer(FramebufferSpecification spec) : specs{std::move(spec)}
 	}
 	invalidate();
 }
+
 Framebuffer::~Framebuffer() {
 	glDeleteFramebuffers(1, &rendererID);
 	glDeleteTextures(colorAttachments.size(), colorAttachments.data());
 	glDeleteTextures(1, &depthAttachment);
 }
+
 void Framebuffer::invalidate() {
 
 	if (rendererID) {
@@ -120,7 +121,7 @@ void Framebuffer::invalidate() {
 	bool multisample = specs.samples > 1;
 
 	// Attachments
-	if (colorAttachmentSpecifications.size()) {
+	if (!colorAttachmentSpecifications.empty()) {
 		colorAttachments.resize(colorAttachmentSpecifications.size());
 		utils::createTextures(multisample, colorAttachments.data(), static_cast<uint32_t>(colorAttachments.size()));
 
@@ -163,7 +164,11 @@ void Framebuffer::invalidate() {
 		glDrawBuffer(GL_NONE);
 	}
 
-	OWL_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!")
+	bool completeFramebuffer = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+	OWL_CORE_ASSERT(completeFramebuffer, "Framebuffer is incomplete!")
+	if(!completeFramebuffer) {
+		OWL_CORE_WARN("Incomplete Framebuffer")
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -171,6 +176,7 @@ void Framebuffer::bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 	glViewport(0, 0, specs.width, specs.height);
 }
+
 void Framebuffer::unbind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

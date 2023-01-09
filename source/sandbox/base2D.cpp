@@ -66,14 +66,19 @@ void base2D::onUpdate(const core::Timestep &ts) {
 											 .tilingFactor = 20.f});
 		renderer::Renderer2D::endScene();
 
-
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
-		for (float y = -5.0f; y < 5.0f; y += 0.5f) {
-			for (float x = -5.0f; x < 5.0f; x += 0.5f) {
+		int32_t id = 0;
+		float scalex = 1.f;
+		float scaley = 1.f;
+		float marg = 0.9f;
+		for (float y = -5.0f; y < 5.0f; y += scaley) {
+			for (float x = -5.0f; x < 5.0f; x += scalex) {
 				glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f};
 				renderer::Renderer2D::drawQuad({.position = {x, y, 0},
-													 .size = {0.45f, 0.45f},
-													 .color = color});
+												.size = {scalex * marg, scaley * marg},
+												.color = color,
+												.entityID = id});
+				id++;
 			}
 		}
 		renderer::Renderer2D::endScene();
@@ -114,8 +119,8 @@ void base2D::onImGuiRender(const core::Timestep &ts) {
 		ImGui::Text("Quads: %d", stats.quadCount);
 		ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.getTotalIndexCount());
-		ImGui::Text("Viewport size: %f %f", viewportSize.x, viewportSize.y);
-		ImGui::Text("Aspect ratio: %f", viewportSize.x/ viewportSize.y);
+		ImGui::Text("Viewport size: %f %f", static_cast<double>(viewportSize.x), static_cast<double>(viewportSize.y));
+		ImGui::Text("Aspect ratio: %f", static_cast<double>(viewportSize.x / viewportSize.y));
 		ImGui::End();
 	}
 	viewportSize = {core::Application::get().getWindow().getWidth(), core::Application::get().getWindow().getHeight()};

@@ -21,7 +21,7 @@ namespace owl::renderer {
  */
 struct OWL_API Quad2DData {
 	/// Position of the top-left corner
-	glm::vec3 position;
+	glm::vec3 position = glm::vec3{0.f, 0.f, 0.f};
 	/// Size of the quad
 	glm::vec2 size = glm::vec2{1.f, 1.f};
 	/// Color to apply to the quad
@@ -32,7 +32,8 @@ struct OWL_API Quad2DData {
 	float rotation = 0.f;
 	/// Tilling factor of the texture
 	float tilingFactor = 1.f;
-	int entityID;
+	/// unique ID for the entity
+	int entityID = -1;
 };
 
 /**

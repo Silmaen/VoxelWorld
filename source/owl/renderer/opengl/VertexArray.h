@@ -65,7 +65,7 @@ private:
 	/// Id in the OpenGL context
 	uint32_t rendererID = 0;
 	/// Offset on index
-	uint32_t VBIndexOffset = 0;
+	uint32_t vertexBufferIndex = 0;
 	/// The vertex buffers
 	vertBufs vertexBuffers;
 	/// The index buffer

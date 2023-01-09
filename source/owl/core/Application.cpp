@@ -27,7 +27,9 @@ Application::Application(const AppParams &appParams): initParams{appParams} {
 	// Setup a working directory
 	// Assuming present of a folder 'res' containing the data
 	workingDirectory = absolute(std::filesystem::current_path());
-	OWL_ASSERT(searchAssets(appParams.assetsPattern), "Unable to find assets")
+	OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
+	[[maybe_unused]]bool assetFound = searchAssets(appParams.assetsPattern);
+	OWL_CORE_ASSERT(assetFound, "Unable to find assets")
 
 	// startup the renderer
 	renderer::RenderCommand::create(renderer::RenderAPI::Type::OpenGL);
@@ -42,6 +44,8 @@ Application::Application(const AppParams &appParams): initParams{appParams} {
 	// create the GUI layer
 	imGuiLayer = mk_shrd<gui::ImGuiLayer>();
 	pushOverlay(imGuiLayer);
+
+	OWL_CORE_TRACE("Application creation done.")
 }
 
 void Application::enableDocking() {
@@ -143,6 +147,8 @@ void Application::pushOverlay(shrd<layer::Layer> &&overlay) {
 }
 
 bool Application::searchAssets(const std::string &pattern) {
+	OWL_PROFILE_FUNCTION()
+
 	std::filesystem::path parent = workingDirectory;
 	std::filesystem::path assets = parent / pattern;
 	while (parent != parent.root_path()) {
@@ -153,6 +159,7 @@ bool Application::searchAssets(const std::string &pattern) {
 		parent = parent.parent_path();
 		assets = parent / pattern;
 	}
+	assetDirectory = workingDirectory;
 	return false;
 }
 
