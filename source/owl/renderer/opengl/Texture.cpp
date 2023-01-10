@@ -40,7 +40,10 @@ Texture2D::Texture2D(const std::filesystem::path &path_) : path{path_} {
 		OWL_PROFILE_SCOPE("stbi_load - Texture2D::Texture2D(const std::filesystem::path &)")
 		data = stbi_load(path.string().c_str(), &width_, &height_, &channels, 0);
 	}
-	OWL_CORE_ASSERT(data, "Failed to load image!")
+	if (!data) {
+		OWL_CORE_WARN("Failed to load image {}", path.string())
+		return;
+	}
 	width = static_cast<uint32_t>(width_);
 	height = static_cast<uint32_t>(height_);
 

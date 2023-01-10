@@ -12,6 +12,7 @@
 
 #include "event/KeyEvent.h"
 #include "panel/SceneHierarchy.h"
+#include "panel/ContentBrowser.h"
 #include "renderer/CameraEditor.h"
 
 namespace owl {
@@ -49,7 +50,10 @@ private:
 
 	void newScene();
 	void openScene();
+	void openScene(const std::filesystem::path scene);
 	void saveSceneAs();
+	void saveSceneAs(const std::filesystem::path scene);
+	void saveCurrentScene();
 
 	bool onKeyPressed(event::KeyPressedEvent& e);
 	bool onMouseButtonPressed(event::MouseButtonPressedEvent& e);
@@ -68,9 +72,11 @@ private:
 	shrd<scene::Scene> activeScene;
 
 	int gizmoType = -1;
+	std::filesystem::path currentScenePath{};
 
 	// Panels
 	panel::SceneHierarchy sceneHierarchy;
+	panel::ContentBrowser contentBrowser;
 };
 
 }// namespace owl
