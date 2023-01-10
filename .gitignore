@@ -31,5 +31,9 @@
 *.out
 *.app
 
+# IDE & Build
 cmake-*
 .idea
+
+# Cache
+*.cached_*

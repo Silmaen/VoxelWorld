@@ -46,3 +46,24 @@ add_subdirectory(yaml-cpp)
 # include targets for nativefiledialog
 add_subdirectory(nativefiledialog)
 
+
+# ---- SPIR-V cross/tools/headers
+set(SPIRV_SKIP_TESTS ON CACHE BOOL " ")
+set(SPIRV_CROSS_ENABLE_TESTS OFF CACHE BOOL " ")
+set(SPIRV_CROSS_CLI OFF CACHE BOOL " ")
+set(SPIRV_HEADERS_SKIP_EXAMPLES ON CACHE BOOL " ")
+set(SKIP_SPIRV_TOOLS_INSTALL ON CACHE BOOL " ")
+set(SPIRV_WERROR OFF CACHE BOOL " ")
+set(SHADERC_ENABLE_SHARED_CRT ON)
+add_subdirectory(SPIRV-Cross)
+add_subdirectory(SPIRV-Headers)
+add_subdirectory(SPIRV-Tools)
+
+# ---- gls lang ---------------
+add_subdirectory(glslang)
+
+# ---- Shaderc -----------
+set(SHADERC_SKIP_TESTS ON CACHE BOOL " ")
+set(SHADERC_SKIP_EXAMPLES ON CACHE BOOL " ")
+set(SHADERC_SKIP_COPYRIGHT_CHECK ON CACHE BOOL " ")
+add_subdirectory(shaderc)

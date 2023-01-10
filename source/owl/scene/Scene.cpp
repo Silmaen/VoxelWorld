@@ -128,7 +128,8 @@ OWL_API void Scene::onComponentAdded<component::Transform>([[maybe_unused]] Enti
 
 template<>
 OWL_API void Scene::onComponentAdded<component::Camera>([[maybe_unused]] Entity entity, component::Camera &component) {
-	component.camera.setViewportSize(viewportWidth, viewportHeight);
+	if (viewportWidth > 0 && viewportHeight > 0)
+		component.camera.setViewportSize(viewportWidth, viewportHeight);
 }
 
 template<>

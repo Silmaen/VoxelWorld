@@ -157,6 +157,15 @@ private:
 	 * @param sources The shader's sources with type
 	 */
 	void compile(const std::unordered_map<ShaderType, std::string> &sources);
+
+	void reflect(ShaderType stage, const std::vector<uint32_t>& shaderData);
+	void compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string> &sources);
+	void compileOrGetOpenGLBinaries();
+	void createProgram();
+
+	std::unordered_map<ShaderType, std::vector<uint32_t>> vulkanSPIRV;
+	std::unordered_map<ShaderType, std::vector<uint32_t>> openGLSPIRV;
+	std::unordered_map<ShaderType, std::string> openGLSource;
 };
 
 }// namespace owl::renderer::opengl
