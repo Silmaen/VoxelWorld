@@ -69,6 +69,11 @@ public:
 	 */
 	[[nodiscard]] uint32_t getHeight() const override { return height; }
 	/**
+	 * @brief Tells if the data effectively loaded
+	 * @return True if texture contains data
+	 */
+	[[nodiscard]] bool isLoaded() const override {return width*height>0;}
+	/**
 	 * @brief Get renderer id
 	 * @return The renderer ID
 	 */
