@@ -20,9 +20,9 @@ shrd<Texture2D> Texture2D::create(const std::filesystem::path &file) {
 	switch (type) {
 		case RenderAPI::Type::OpenGL: {
 			auto texture = mk_shrd<opengl::Texture2D>(file);
-			if (texture->getWidth() * texture->getHeight() == 0) // No data
-				return nullptr;
-			return texture;
+			if (texture->isLoaded()) // No data
+				return texture;
+			return nullptr;
 		}
 		case RenderAPI::Type::Vulkan:
 		case RenderAPI::Type::None:

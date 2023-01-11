@@ -47,18 +47,32 @@ private:
 	void renderStats(const core::Timestep &ts);
 	void renderMenu();
 	void renderGizmo();
+	void renderToolbar();
 
 	void newScene();
 	void openScene();
-	void openScene(const std::filesystem::path scene);
+	void openScene(const std::filesystem::path& scene);
 	void saveSceneAs();
-	void saveSceneAs(const std::filesystem::path scene);
+	void saveSceneAs(const std::filesystem::path& scene);
 	void saveCurrentScene();
 
 	bool onKeyPressed(event::KeyPressedEvent& e);
 	bool onMouseButtonPressed(event::MouseButtonPressedEvent& e);
+	void onScenePlay() {
+		state = State::Play;
+	}
+	void onSceneStop(){
+		state = State::Edit;
+	}
+
 
 	input::CameraOrthoController cameraController;
+
+	enum class State {
+		Edit,
+		Play
+	};
+	State state = State::Edit;
 
 	scene::Entity hoveredEntity;
 	renderer::CameraEditor editorCamera;
@@ -77,6 +91,10 @@ private:
 	// Panels
 	panel::SceneHierarchy sceneHierarchy;
 	panel::ContentBrowser contentBrowser;
+
+	// Editor resources
+	shrd<renderer::Texture2D> iconPlay;
+	shrd<renderer::Texture2D> iconStop;
 };
 
 }// namespace owl

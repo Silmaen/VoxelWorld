@@ -52,6 +52,10 @@ void EditorLayer::onAttach() {
 	activeScene = mk_shrd<scene::Scene>();
 	editorCamera = renderer::CameraEditor(30.0f, 1.778f, 0.1f, 1000.0f);
 	sceneHierarchy.setContext(activeScene);
+
+	auto iconPath = core::Application::get().getAssetDirectory() / "icons";
+	iconPlay = renderer::Texture2D::create(iconPath / "PlayButton.png");
+	iconStop = renderer::Texture2D::create(iconPath / "StopButton.png");
 }
 
 void EditorLayer::onDetach() {
@@ -73,12 +77,6 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 		activeScene->onViewportResize(width, height);
 	}
 
-	// Update
-	if (viewportFocused) {
-		cameraController.onUpdate(ts);
-		editorCamera.onUpdate(ts);
-	}
-
 	// Render
 	framebuffer->bind();
 	renderer::RenderCommand::setClearColor({0.1f, 0.1f, 0.1f, 1});
@@ -88,7 +86,20 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 	framebuffer->clearAttachment(1, -1);
 
 	// Update scene
-	activeScene->onUpdateEditor(ts, editorCamera);
+	switch (state) {
+		case State::Edit: {
+			if (viewportFocused)
+				cameraController.onUpdate(ts);
+			if (viewportHovered)
+				editorCamera.onUpdate(ts);
+			activeScene->onUpdateEditor(ts, editorCamera);
+			break;
+		}
+		case State::Play: {
+			activeScene->onUpdateRuntime(ts);
+			break;
+		}
+	}
 
 	auto [mx, my] = ImGui::GetMousePos();
 	mx -= viewportBounds[0].x;
@@ -131,6 +142,8 @@ void EditorLayer::onImGuiRender(const core::Timestep &ts) {
 	contentBrowser.onImGuiRender();
 	//=============================================================
 	renderViewport();
+	//=============================================================
+	renderToolbar();
 }
 
 void EditorLayer::renderStats(const core::Timestep &ts) {
@@ -188,8 +201,11 @@ void EditorLayer::renderViewport() {
 		if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 			const char *path = reinterpret_cast<const char *>(payload->Data);
 			std::filesystem::path scenePath = core::Application::get().getAssetDirectory() / path;
-			if (scenePath.extension() == ".owl")
+			if (scenePath.extension() == ".owl") {
 				openScene(scenePath);
+			} else {
+				OWL_CORE_WARN("Could not load {}: not a scene file", scenePath.string())
+			}
 		}
 		ImGui::EndDragDropTarget();
 	}
@@ -268,6 +284,32 @@ void EditorLayer::renderMenu() {
 	}
 }
 
+void EditorLayer::renderToolbar() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+	auto &colors = ImGui::GetStyle().Colors;
+	const auto &buttonHovered = colors[ImGuiCol_ButtonHovered];
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+	const auto &buttonActive = colors[ImGuiCol_ButtonActive];
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+	float size = ImGui::GetWindowHeight() - 4.0f;
+	shrd<renderer::Texture2D> icon = state == State::Edit ? iconPlay : iconStop;
+	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(icon->getRendererID()), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0)) {
+		if (state == State::Edit)
+			onScenePlay();
+		else if (state == State::Play)
+			onSceneStop();
+	}
+	ImGui::PopStyleVar(2);
+	ImGui::PopStyleColor(3);
+	ImGui::End();
+}
+
 void EditorLayer::newScene() {
 	activeScene = mk_shrd<scene::Scene>();
 	activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
@@ -281,7 +323,7 @@ void EditorLayer::openScene() {
 	}
 }
 
-void EditorLayer::openScene(const std::filesystem::path scene) {
+void EditorLayer::openScene(const std::filesystem::path &scene) {
 	activeScene = mk_shrd<scene::Scene>();
 	activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 	sceneHierarchy.setContext(activeScene);
@@ -297,7 +339,7 @@ void EditorLayer::saveSceneAs() {
 	}
 }
 
-void EditorLayer::saveSceneAs(const std::filesystem::path scene) {
+void EditorLayer::saveSceneAs(const std::filesystem::path &scene) {
 	scene::SceneSerializer serializer(activeScene);
 	serializer.serialize(scene);
 	currentScenePath = scene;

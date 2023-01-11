@@ -53,7 +53,7 @@ public:
 	 * @param other Other texture to compare
 	 * @return True if same
 	 */
-	virtual bool operator==(const Texture& other) const = 0;
+	virtual bool operator==(const Texture &other) const = 0;
 	/**
 	 * @brief Access to texture's width.
 	 * @return Texture's width
@@ -64,6 +64,11 @@ public:
 	 * @return Texture's height
 	 */
 	[[nodiscard]] virtual uint32_t getHeight() const = 0;
+	/**
+	 * @brief Tells if the data effectively loaded
+	 * @return True if texture contains data
+	 */
+	[[nodiscard]] virtual bool isLoaded() const = 0;
 	/**
 	 * @brief Get renderer id
 	 * @return The renderer ID
@@ -79,7 +84,8 @@ public:
 	 * @param data Raw data
 	 * @param size Size of the data
 	 */
-	virtual void setData(void* data, uint32_t size) = 0;
+	virtual void setData(void *data, uint32_t size) = 0;
+
 private:
 };
 #ifdef __clang__
