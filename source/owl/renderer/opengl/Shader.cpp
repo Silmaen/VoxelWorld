@@ -135,6 +135,9 @@ static bool writeCachedShader(const std::filesystem::path &file, const std::vect
 	return false;
 }
 
+static std::filesystem::path getShaderCachedPath(const std::string &shaderName, const utils::CacheType& cache, const ShaderType &type) {
+	return utils::getCacheDirectory() / (shaderName + utils::getCacheExtension(cache, type));
+}
 static std::filesystem::path getShaderPath(const std::string &shaderName, const ShaderType &type) {
 	return core::Application::get().getAssetDirectory() / "shaders" / (shaderName + getExtension(type));
 }
@@ -204,13 +207,16 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 	auto &shaderData = vulkanSPIRV;
 	shaderData.clear();
 	for (auto &&[stage, source]: sources) {
-		std::filesystem::path cachedPath = cacheDirectory / (getName() + utils::getCacheExtension(utils::CacheType::Vulkan, stage));
+		std::filesystem::path basePath = utils::getShaderPath(getName() , stage);
+		std::filesystem::path cachedPath = utils::getShaderCachedPath(getName(), utils::CacheType::Vulkan, stage);
 
-		if (exists(cachedPath)) {
+		if (exists(cachedPath) && (last_write_time(cachedPath) > last_write_time(basePath))) {
 			// Cache exists: read it
 			OWL_CORE_TRACE("Using cached Vulkan Shader {}-{}", getName(), magic_enum::enum_name(stage))
 			shaderData[stage] = utils::readCachedShader(cachedPath);
 		} else {
+			if (exists(cachedPath))
+				OWL_CORE_TRACE("Origin file newer than cached one, Recompiling.")
 			shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source,
 																			 utils::shaderStageToShaderC(stage),
 																			 utils::getShaderPath(getName(), stage).string().c_str(),
@@ -243,11 +249,14 @@ void Shader::compileOrGetOpenGLBinaries() {
 	shaderData.clear();
 	openGLSource.clear();
 	for (auto &&[stage, spirv]: vulkanSPIRV) {
-		std::filesystem::path cachedPath = cacheDirectory / (getName() + utils::getCacheExtension(utils::CacheType::OpenGL, stage));
-		if (exists(cachedPath))  {
+		std::filesystem::path basePath = utils::getShaderCachedPath(getName(), utils::CacheType::Vulkan, stage);
+		std::filesystem::path cachedPath = utils::getShaderCachedPath(getName(), utils::CacheType::OpenGL, stage);
+		if (exists(cachedPath) && (last_write_time(cachedPath) > last_write_time(basePath)))  {
 			OWL_CORE_TRACE("Using cached OpenGL Shader {}-{}", getName(), magic_enum::enum_name(stage))
 			shaderData[stage] = utils::readCachedShader(cachedPath);
 		} else {
+			if (exists(cachedPath))
+				OWL_CORE_TRACE("Origin file newer than cached one, Recompiling.")
 			spirv_cross::CompilerGLSL glslCompiler(spirv);
 			openGLSource[stage] = glslCompiler.compile();
 			auto &source = openGLSource[stage];

@@ -128,8 +128,8 @@ void Renderer2D::shutdown() {
 void Renderer2D::beginScene(const CameraOrtho &camera) {
 	OWL_PROFILE_FUNCTION()
 
-	data.shader->bind();
-	data.shader->setMat4("u_ViewProjection", camera.getViewProjectionMatrix());
+	data.cameraBuffer.viewProjection = camera.getViewProjectionMatrix();
+	data.cameraUniformBuffer->setData(&data.cameraBuffer, sizeof(utils::internalData::CameraData));
 	startBatch();
 }
 
@@ -233,6 +233,8 @@ void Renderer2D::drawQuad(const Quad2DData &quadData) {
 void Renderer2D::drawSprite(const glm::mat4 &transform, scene::component::SpriteRenderer &src, int entityID) {
 	drawQuad({.transform = transform,
 			  .color = src.color,
+			  .texture = src.texture,
+			  .tilingFactor = src.tilingFactor,
 			  .entityID = entityID});
 }
 

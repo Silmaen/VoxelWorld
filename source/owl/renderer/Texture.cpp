@@ -18,8 +18,12 @@ namespace owl::renderer {
 shrd<Texture2D> Texture2D::create(const std::filesystem::path &file) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::Texture2D>(file);
+		case RenderAPI::Type::OpenGL: {
+			auto texture = mk_shrd<opengl::Texture2D>(file);
+			if (texture->getWidth() * texture->getHeight() == 0) // No data
+				return nullptr;
+			return texture;
+		}
 		case RenderAPI::Type::Vulkan:
 		case RenderAPI::Type::None:
 			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))

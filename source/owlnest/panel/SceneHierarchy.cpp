@@ -13,6 +13,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui_internal.h>
 
+#include "core/Application.h"
 #include "scene/SceneCamera.h"
 #include "scene/component/Camera.h"
 #include "scene/component/SpriteRenderer.h"
@@ -269,6 +270,16 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 	});
 	drawComponent<scene::component::SpriteRenderer>("Sprite Renderer", entity, [](auto &component) {
 		ImGui::ColorEdit4("Color", glm::value_ptr(component.color));
+		ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+		if (ImGui::BeginDragDropTarget()){
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")){
+				const char *path = reinterpret_cast<const char *>(payload->Data);
+				std::filesystem::path texturePath = core::Application::get().getAssetDirectory() / path;
+				component.texture = renderer::Texture2D::create(texturePath);
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::DragFloat("Tiling Factor", &component.tilingFactor, 0.1f, 0.0f, 100.0f);
 	});
 }
 

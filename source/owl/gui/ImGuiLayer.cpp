@@ -45,13 +45,14 @@ void ImGuiLayer::onAttach() {// Setup Dear ImGui context
 
 	// Better fonts
 	auto assetDir = core::Application::get().getAssetDirectory();
+	float fontsize = 18.0f;
 	if (exists(assetDir / "fonts" / "opensans" / "OpenSans-Bold.ttf")) {
-		io.Fonts->AddFontFromFileTTF((assetDir / "fonts" / "opensans" / "OpenSans-Bold.ttf").string().c_str(), 18.0f);
+		io.Fonts->AddFontFromFileTTF((assetDir / "fonts" / "opensans" / "OpenSans-Bold.ttf").string().c_str(), fontsize);
 	} else {
 		OWL_CORE_WARN("Unable to find OpenSans-Bold, fall back to default font")
 	}
 	if (exists(assetDir / "fonts" / "opensans" / "OpenSans-Regular.ttf")) {
-		io.FontDefault = io.Fonts->AddFontFromFileTTF((assetDir / "fonts" / "opensans" / "OpenSans-Regular.ttf").string().c_str(), 18.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF((assetDir / "fonts" / "opensans" / "OpenSans-Regular.ttf").string().c_str(), fontsize);
 	} else {
 		OWL_CORE_WARN("Unable to find OpenSans-Regular, fall back to default font")
 	}

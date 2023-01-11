@@ -15,4 +15,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}nest
         ${ENGINE_NAME}
         )
 target_compile_definitions(${CMAKE_PROJECT_NAME}nest PRIVATE OWL_ASSETS_LOCATION="source/owlnest/assets")
+
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME}nest PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/imgui.ini" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/imgui.ini"
+        VERBATIM)
 install(TARGETS ${CMAKE_PROJECT_NAME}nest)

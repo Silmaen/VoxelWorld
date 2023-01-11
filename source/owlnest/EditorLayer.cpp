@@ -74,9 +74,10 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 	}
 
 	// Update
-	if (viewportFocused)
+	if (viewportFocused) {
 		cameraController.onUpdate(ts);
-	editorCamera.onUpdate(ts);
+		editorCamera.onUpdate(ts);
+	}
 
 	// Render
 	framebuffer->bind();
@@ -127,6 +128,7 @@ void EditorLayer::onImGuiRender(const core::Timestep &ts) {
 	renderMenu();
 	//=============================================================
 	sceneHierarchy.onImGuiRender();
+	contentBrowser.onImGuiRender();
 	//=============================================================
 	renderViewport();
 }
@@ -181,6 +183,16 @@ void EditorLayer::renderViewport() {
 	viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 	uint64_t textureID = framebuffer->getColorAttachmentRendererID();
 	ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
+
+	if (ImGui::BeginDragDropTarget()) {
+		if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+			const char *path = reinterpret_cast<const char *>(payload->Data);
+			std::filesystem::path scenePath = core::Application::get().getAssetDirectory() / path;
+			if (scenePath.extension() == ".owl")
+				openScene(scenePath);
+		}
+		ImGui::EndDragDropTarget();
+	}
 
 	renderGizmo();
 
@@ -242,9 +254,11 @@ void EditorLayer::renderMenu() {
 			if (ImGui::MenuItem("New", "Ctrl+N"))
 				newScene();
 			ImGui::Separator();
-			if (ImGui::MenuItem("Open...", "Ctrl+O"))
+			if (ImGui::MenuItem("Open Scene", "Ctrl+O"))
 				openScene();
-			if (ImGui::MenuItem("Save as..", "Ctrl+Shift+S"))
+			if (ImGui::MenuItem("Save Scene", "Ctrl+S", false, !currentScenePath.empty()))
+				saveCurrentScene();
+			if (ImGui::MenuItem("Save Scene as..", "Ctrl+Shift+S"))
 				saveSceneAs();
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit")) owl::core::Application::get().close();
@@ -263,20 +277,37 @@ void EditorLayer::newScene() {
 void EditorLayer::openScene() {
 	auto filepath = core::FileDialog::openFile("Owl Scene (*.owl)|owl\n");
 	if (!filepath.empty()) {
-		activeScene = mk_shrd<scene::Scene>();
-		activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
-		sceneHierarchy.setContext(activeScene);
-		scene::SceneSerializer serializer(activeScene);
-		serializer.deserialize(filepath);
+		openScene(filepath);
 	}
+}
+
+void EditorLayer::openScene(const std::filesystem::path scene) {
+	activeScene = mk_shrd<scene::Scene>();
+	activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
+	sceneHierarchy.setContext(activeScene);
+	scene::SceneSerializer serializer(activeScene);
+	serializer.deserialize(scene);
+	currentScenePath = scene;
 }
 
 void EditorLayer::saveSceneAs() {
 	auto filepath = core::FileDialog::saveFile("Owl Scene (*.owl)|owl\n");
 	if (!filepath.empty()) {
-		scene::SceneSerializer serializer(activeScene);
-		serializer.serialize(filepath);
+		saveSceneAs(filepath);
 	}
+}
+
+void EditorLayer::saveSceneAs(const std::filesystem::path scene) {
+	scene::SceneSerializer serializer(activeScene);
+	serializer.serialize(scene);
+	currentScenePath = scene;
+}
+
+void EditorLayer::saveCurrentScene() {
+	if (currentScenePath.empty())
+		saveSceneAs();
+	else
+		saveSceneAs(currentScenePath);
 }
 
 bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
@@ -326,6 +357,7 @@ bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
 	}
 	return false;
 }
+
 bool EditorLayer::onMouseButtonPressed(event::MouseButtonPressedEvent &e) {
 	if (e.GetMouseButton() == input::mouse::ButtonLeft) {
 		if (viewportHovered && !ImGuizmo::IsOver() && !input::Input::isKeyPressed(input::key::LeftAlt))

@@ -31,7 +31,7 @@ Entities:
     TagComponent:
       Tag: Right
     TransformComponent:
-      Translation: [0.349999994, 0, 0.349999994]
+      Translation: [0.35355339, 0, 0.35355339]
       Rotation: [0, 0.785398185, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
@@ -40,7 +40,7 @@ Entities:
     TagComponent:
       Tag: Left
     TransformComponent:
-      Translation: [-0.349999994, 0, 0.349999994]
+      Translation: [-0.35355339, 0, 0.35355339]
       Rotation: [0, -0.785398185, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
