@@ -16,14 +16,10 @@
 namespace owl::scene::component {
 
 struct OWL_API Transform {
-
 	glm::vec3 translation = {0.f, 0.f, 0.f};
 	glm::vec3 rotation = {0.f, 0.f, 0.f};
 	glm::vec3 scale = {1.f, 1.f, 1.f};
 
-	Transform() = default;
-	explicit Transform(const glm::vec3 &translation_)
-		: translation(translation_) {}
 	[[nodiscard]] glm::mat4 getTransform() const {
 		return glm::translate(glm::mat4(1.0f), translation) * glm::toMat4(glm::quat(rotation)) *
 			   glm::scale(glm::mat4(1.f), scale);

@@ -73,6 +73,14 @@ public:
 	inline static void drawIndexed(const std::shared_ptr<VertexArray> &vertexArray, uint32_t index=0) {
 		renderAPI->drawIndexed(vertexArray, index);
 	}
+
+	inline static void drawLines(const shrd<VertexArray>& vertexArray, uint32_t vertexCount){
+		renderAPI->drawLines(vertexArray, vertexCount);
+	}
+
+	inline static void setLineWidth(float width){
+		renderAPI->setLineWidth(width);
+	}
 	/**
 	 * @brief Create or replace the API base on it type
 	 * @param type The type of the new render API

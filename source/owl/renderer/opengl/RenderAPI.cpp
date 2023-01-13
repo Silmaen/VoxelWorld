@@ -47,6 +47,7 @@ void RenderAPI::init() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LINE_SMOOTH);
 }
 
 void RenderAPI::setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
@@ -62,10 +63,18 @@ void RenderAPI::clear() {
 }
 
 void RenderAPI::drawIndexed(const shrd<VertexArray> &vertexArray, uint32_t indexCount) {
+	vertexArray->bind();
 	uint32_t count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
 	glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void RenderAPI::drawLines(const shrd<VertexArray>& vertexArray, uint32_t vertexCount){
+	vertexArray->bind();
+	glDrawArrays(GL_LINES, 0, vertexCount);
+}
+
+void RenderAPI::setLineWidth(float width){
+	glLineWidth(width);
+}
 
 }// namespace owl::renderer::opengl

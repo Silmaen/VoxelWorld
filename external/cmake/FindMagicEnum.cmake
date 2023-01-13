@@ -45,8 +45,9 @@ if (EXISTS ${PROJECT_SOURCE_DIR}/external/magic_enum)
     set(MagicEnum_INCLUDE_DIRS ${MagicEnum_ROOT_DIR}/include)
     set(MagicEnum_LIBRARY)
 
-    add_library(owl::MagicEnum INTERFACE IMPORTED)
-    target_include_directories(owl::MagicEnum SYSTEM INTERFACE ${MagicEnum_INCLUDE_DIRS})
+    add_library(MagicEnum INTERFACE)
+    target_include_directories(MagicEnum SYSTEM INTERFACE ${MagicEnum_INCLUDE_DIRS})
+    add_library(owl::MagicEnum ALIAS MagicEnum)
 else ()
 
     set(DebugBreak_FOUND FALSE)

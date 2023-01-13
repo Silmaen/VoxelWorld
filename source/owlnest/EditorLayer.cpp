@@ -51,7 +51,6 @@ void EditorLayer::onAttach() {
 
 	activeScene = mk_shrd<scene::Scene>();
 	editorCamera = renderer::CameraEditor(30.0f, 1.778f, 0.1f, 1000.0f);
-	sceneHierarchy.setContext(activeScene);
 
 	auto iconPath = core::Application::get().getAssetDirectory() / "icons";
 	iconPlay = renderer::Texture2D::create(iconPath / "PlayButton.png");
@@ -64,7 +63,6 @@ void EditorLayer::onDetach() {
 
 void EditorLayer::onUpdate(const core::Timestep &ts) {
 	OWL_PROFILE_FUNCTION()
-
 
 	// resize
 	auto spec = framebuffer->getSpecification();
@@ -324,12 +322,21 @@ void EditorLayer::openScene() {
 }
 
 void EditorLayer::openScene(const std::filesystem::path &scene) {
-	activeScene = mk_shrd<scene::Scene>();
-	activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
-	sceneHierarchy.setContext(activeScene);
-	scene::SceneSerializer serializer(activeScene);
-	serializer.deserialize(scene);
-	currentScenePath = scene;
+	if (scene.extension().string() != ".owl") {
+		OWL_CORE_WARN("Cannot Open file {}: not a scene", scene.string())
+		return;
+	}
+	if (state != State::Edit)
+		onSceneStop();
+	auto newScene = mk_shrd<scene::Scene>();
+	scene::SceneSerializer serializer(newScene);
+	if (serializer.deserialize(scene)) {
+		editorScene = newScene;
+		editorScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
+		sceneHierarchy.setContext(editorScene);
+		activeScene = editorScene;
+		currentScenePath = scene;
+	}
 }
 
 void EditorLayer::saveSceneAs() {
@@ -371,8 +378,18 @@ bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
 			break;
 		}
 		case input::key::S: {
-			if (control && shift)
-				saveSceneAs();
+			if (control) {
+				if (shift)
+					saveSceneAs();
+				else
+					saveCurrentScene();
+			}
+			break;
+		}
+			// Scene Commands
+		case input::key::D: {
+			if (control)
+				onDuplicateEntity();
 			break;
 		}
 		// Gizmos
@@ -406,6 +423,29 @@ bool EditorLayer::onMouseButtonPressed(event::MouseButtonPressedEvent &e) {
 			sceneHierarchy.setSelectedEntity(hoveredEntity);
 	}
 	return false;
+}
+
+void EditorLayer::onScenePlay() {
+	state = State::Play;
+	activeScene = scene::Scene::copy(editorScene);
+
+	sceneHierarchy.setContext(activeScene);
+}
+void EditorLayer::onSceneStop() {
+	state = State::Edit;
+
+	activeScene = editorScene;
+
+	sceneHierarchy.setContext(activeScene);
+}
+
+void EditorLayer::onDuplicateEntity() {
+	if (state != State::Edit)
+		return;
+
+	scene::Entity selectedEntity = sceneHierarchy.getSelectedEntity();
+	if (selectedEntity)
+		editorScene->duplicateEntity(selectedEntity);
 }
 
 }// namespace owl

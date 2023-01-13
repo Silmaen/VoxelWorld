@@ -15,10 +15,6 @@ namespace owl::scene::component {
 
 struct OWL_API Tag {
 	std::string tag;
-
-	Tag() = default;
-	Tag(const std::string &tag_)
-		: tag(tag_) {}
 };
 
 }// namespace owl::scene::component

@@ -58,13 +58,9 @@ private:
 
 	bool onKeyPressed(event::KeyPressedEvent& e);
 	bool onMouseButtonPressed(event::MouseButtonPressedEvent& e);
-	void onScenePlay() {
-		state = State::Play;
-	}
-	void onSceneStop(){
-		state = State::Edit;
-	}
-
+	void onScenePlay();
+	void onSceneStop();
+	void onDuplicateEntity();
 
 	input::CameraOrthoController cameraController;
 
@@ -80,10 +76,11 @@ private:
 	bool viewportFocused = false;
 	bool viewportHovered = false;
 	glm::vec2 viewportSize = {0.0f, 0.0f};
-	glm::vec2 viewportBounds[2];
+	glm::vec2 viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
 	shrd<renderer::Framebuffer> framebuffer;
 
 	shrd<scene::Scene> activeScene;
+	shrd<scene::Scene> editorScene;
 
 	int gizmoType = -1;
 	std::filesystem::path currentScenePath{};

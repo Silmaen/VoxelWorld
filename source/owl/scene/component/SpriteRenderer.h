@@ -14,14 +14,13 @@
 
 namespace owl::scene::component {
 
+/**
+ * @brief Struct SpriteRenderer
+ */
 struct OWL_API SpriteRenderer {
 	glm::vec4 color{1.0f, 1.0f, 1.0f, 1.0f};
 	shrd<renderer::Texture2D> texture = nullptr;
 	float tilingFactor = 1.0f;
-
-	SpriteRenderer() = default;
-	SpriteRenderer(const glm::vec4 &color_)
-		: color(color_) {}
 };
 
-}// namespace owl::scene
+}// namespace owl::scene::component

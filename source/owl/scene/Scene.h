@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include <entt.hpp>
-
 #include "core/Timestep.h"
 #include "renderer/CameraEditor.h"
+#include "core/UUID.h"
+
+#include <entt.hpp>
 
 /**
  * @brief Namespace for the Scene elements
@@ -20,7 +21,6 @@ namespace owl::scene {
 
 class Entity;
 class ScriptableEntity;
-
 
 /**
  * @brief Class Scene
@@ -40,12 +40,20 @@ public:
 	 */
 	virtual ~Scene();
 
+	static shrd<Scene> copy(shrd<Scene> other);
 	/**
 	 * @brief Create entity and add it to registry
 	 * @param name Entity's name
 	 * @return The Entity
 	 */
 	Entity createEntity(const std::string& name = std::string());
+	/**
+	 * @brief Create entity wit UUIDand add it to registry
+	 * @param name Entity's name
+	 * @param uuid The Entity's UUID
+	 * @return The Entity
+	 */
+	Entity createEntityWithUUID(core::UUID uuid, const std::string& name = std::string());
 	void destroyEntity(Entity entity);
 	/**
 	 * @brief Update actions
@@ -56,6 +64,7 @@ public:
 
 	void onViewportResize(uint32_t width, uint32_t height);
 
+	void duplicateEntity(Entity entity);
 	/**
 	 * @brief Access to the primary Camera
 	 * @return The primary camera
