@@ -8,6 +8,8 @@
 
 #pragma once
 #include "Scene.h"
+#include "component/ID.h"
+#include "component/Tag.h"
 #include "entt.hpp"
 
 namespace owl::scene {
@@ -54,14 +56,20 @@ public:
 	template<typename T, typename... Args>
 	T &addComponent(Args &&...args) {
 		OWL_CORE_ASSERT(!hasComponent<T>(), "Entity already has component!")
-		T& component = scene->registry.emplace<T>(entityHandle, std::forward<Args>(args)...);
+		T &component = scene->registry.emplace<T>(entityHandle, std::forward<Args>(args)...);
 		scene->onComponentAdded<T>(*this, component);
 		return component;
 	}
-
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
+
+	template<typename T, typename... Args>
+	T &addOrReplaceComponent(Args &&...args) {
+		T &component = scene->registry.emplace_or_replace<T>(entityHandle, std::forward<Args>(args)...);
+		scene->onComponentAdded<T>(*this, component);
+		return component;
+	}
 
 	template<typename T>
 	T &getComponent() {
@@ -81,12 +89,16 @@ public:
 	}
 
 	operator bool() const { return entityHandle != entt::null; }
-	operator uint32_t() const {return static_cast<uint32_t>(entityHandle);}
+	operator entt::entity() const { return entityHandle; }
+	operator uint32_t() const { return static_cast<uint32_t>(entityHandle); }
 
-	bool operator==(const Entity& other)const {
+	core::UUID getUUID() { return getComponent<component::ID>().id; }
+	std::string getName() { return getComponent<component::Tag>().tag; }
+
+	bool operator==(const Entity &other) const {
 		return entityHandle == other.entityHandle && scene == other.scene;
 	}
-	bool operator!=(const Entity& other)const {
+	bool operator!=(const Entity &other) const {
 		return !(*this == other);
 	}
 

@@ -59,6 +59,10 @@ public:
 	 * @param indexCount The index number
 	 */
 	void drawIndexed(const shrd<VertexArray>& vertexArray, uint32_t indexCount = 0)override;
+
+	void drawLines(const shrd<VertexArray>& vertexArray, uint32_t vertexCount) override;
+
+	void setLineWidth(float width) override;
 };
 
 }// namespace owl::renderer::opengl

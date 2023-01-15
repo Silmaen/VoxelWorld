@@ -1,47 +1,47 @@
 Scene: untitled
 Entities:
-  - Entity: 12837192831273
-    TagComponent:
-      Tag: Camera
-    TransformComponent:
-      Translation: [0, 1.70000005, 4]
-      Rotation: [-0.404916406, 0, 0]
-      Scale: [1, 1, 1]
-    CameraComponent:
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 21
-      Primary: true
-      FixedAspectRatio: false
-  - Entity: 12837192831274
-    TagComponent:
-      Tag: Top
-    TransformComponent:
-      Translation: [0, 0.5, 0]
-      Rotation: [1.57079637, 0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.874509811, 0, 0.835294127, 1]
-  - Entity: 12837192831275
-    TagComponent:
-      Tag: Right
-    TransformComponent:
-      Translation: [0.35355339, 0, 0.35355339]
-      Rotation: [0, 0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.549019635, 0, 0.588235319, 1]
-  - Entity: 12837192831276
-    TagComponent:
-      Tag: Left
-    TransformComponent:
-      Translation: [-0.35355339, 0, 0.35355339]
-      Rotation: [0, -0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [1, 0, 0.949019611, 1]
+  - Entity: 13049489337967299327
+    Tag:
+      tag: Left
+    Transform:
+      translation: [-0.353553385, 0, 0.353553385]
+      rotation: [0, -0.785398185, 0]
+      scale: [1, 1, 1]
+    SpriteRenderer:
+      color: [1, 0, 0.949019611, 1]
+  - Entity: 8277489167752238126
+    Tag:
+      tag: Right
+    Transform:
+      translation: [0.353553385, 0, 0.353553385]
+      rotation: [0, 0.785398185, 0]
+      scale: [1, 1, 1]
+    SpriteRenderer:
+      color: [0.549019635, 0, 0.588235319, 1]
+  - Entity: 15505402829428764199
+    Tag:
+      tag: Top
+    Transform:
+      translation: [0, 0.5, 0]
+      rotation: [1.57079637, 0.785398185, 0]
+      scale: [1, 1, 1]
+    SpriteRenderer:
+      color: [0.874509811, 0, 0.835294127, 1]
+  - Entity: 8873392273389724098
+    Tag:
+      tag: Camera
+    Transform:
+      translation: [0, 1.70000005, 4]
+      rotation: [-0.404916406, 0, 0]
+      scale: [1, 1, 1]
+    Camera:
+      camera:
+        projectionType: Orthographic
+        perspectiveFOV: 0.785398185
+        perspectiveNear: 0.00999999978
+        perspectiveFar: 1000
+        orthographicSize: 10
+        orthographicNear: -1
+        orthographicFar: 21
+      primary: true
+      fixedAspectRatio: false

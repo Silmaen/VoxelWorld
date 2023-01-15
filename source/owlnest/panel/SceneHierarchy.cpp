@@ -12,10 +12,12 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui_internal.h>
+#include <magic_enum.hpp>
 
 #include "core/Application.h"
 #include "scene/SceneCamera.h"
 #include "scene/component/Camera.h"
+#include "scene/component/CircleRenderer.h"
 #include "scene/component/SpriteRenderer.h"
 #include "scene/component/Tag.h"
 #include "scene/component/Transform.h"
@@ -34,21 +36,22 @@ void SceneHierarchy::setContext(const shrd<scene::Scene> &context_) {
 void SceneHierarchy::onImGuiRender() {
 	ImGui::Begin("Scene Hierarchy");
 
-	context->registry.each([&](auto entityID) {
-		scene::Entity entity{entityID, context.get()};
-		drawEntityNode(entity);
-	});
+	if (context) {
+		context->registry.each([&](auto entityID) {
+			scene::Entity entity{entityID, context.get()};
+			drawEntityNode(entity);
+		});
 
-	if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-		selection = {};
+		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+			selection = {};
 
-	// Right-click on blank space
-	if (ImGui::BeginPopupContextWindow(nullptr, 1)) {
-		if (ImGui::MenuItem("Create Empty Entity"))
-			context->createEntity("Empty Entity");
-		ImGui::EndPopup();
+		// Right-click on blank space
+		if (ImGui::BeginPopupContextWindow(nullptr, 1)) {
+			if (ImGui::MenuItem("Create Empty Entity"))
+				context->createEntity("Empty Entity");
+			ImGui::EndPopup();
+		}
 	}
-
 	ImGui::End();
 
 	ImGui::Begin("Properties");
@@ -91,7 +94,7 @@ void SceneHierarchy::drawEntityNode(scene::Entity entity) {
 }
 
 static void drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.0f, float columnWidth = 100.0f) {
-	ImGuiIO &io = ImGui::GetIO();
+	const ImGuiIO &io = ImGui::GetIO();
 	auto boldFont = io.Fonts->Fonts[0];
 	ImGui::PushID(label.c_str());
 
@@ -201,20 +204,23 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 	if (ImGui::Button("Add Component"))
 		ImGui::OpenPopup("AddComponent");
 	if (ImGui::BeginPopup("AddComponent")) {
-		if (ImGui::MenuItem("Camera")) {
-			if (!selection.hasComponent<scene::component::Camera>())
+		if (!selection.hasComponent<scene::component::Camera>()) {
+			if (ImGui::MenuItem("Camera")) {
 				selection.addComponent<scene::component::Camera>();
-			else
-				OWL_CORE_WARN("This entity already has the Camera Component!")
-
-			ImGui::CloseCurrentPopup();
+				ImGui::CloseCurrentPopup();
+			}
 		}
-		if (ImGui::MenuItem("Sprite Renderer")) {
-			if (!selection.hasComponent<scene::component::SpriteRenderer>())
+		if (!selection.hasComponent<scene::component::SpriteRenderer>()) {
+			if (ImGui::MenuItem("Sprite Renderer")) {
 				selection.addComponent<scene::component::SpriteRenderer>();
-			else
-				OWL_CORE_WARN("This entity already has the Sprite Renderer Component!")
-			ImGui::CloseCurrentPopup();
+				ImGui::CloseCurrentPopup();
+			}
+		}
+		if (!selection.hasComponent<scene::component::CircleRenderer>()) {
+			if (ImGui::MenuItem("Circle Renderer")) {
+				selection.addComponent<scene::component::CircleRenderer>();
+				ImGui::CloseCurrentPopup();
+			}
 		}
 		ImGui::EndPopup();
 	}
@@ -271,8 +277,8 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 	drawComponent<scene::component::SpriteRenderer>("Sprite Renderer", entity, [](auto &component) {
 		ImGui::ColorEdit4("Color", glm::value_ptr(component.color));
 		ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
-		if (ImGui::BeginDragDropTarget()){
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")){
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 				const char *path = reinterpret_cast<const char *>(payload->Data);
 				std::filesystem::path texturePath = core::Application::get().getAssetDirectory() / path;
 				component.texture = renderer::Texture2D::create(texturePath);
@@ -280,6 +286,11 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 			ImGui::EndDragDropTarget();
 		}
 		ImGui::DragFloat("Tiling Factor", &component.tilingFactor, 0.1f, 0.0f, 100.0f);
+	});
+	drawComponent<scene::component::CircleRenderer>("Circle Renderer", entity, [](auto &component) {
+		ImGui::ColorEdit4("Color", glm::value_ptr(component.color));
+		ImGui::DragFloat("Thickness", &component.thickness, 0.025f, 0.0f, 1.0f);
+		ImGui::DragFloat("Fade", &component.fade, 0.00025f, 0.0f, 1.0f);
 	});
 }
 

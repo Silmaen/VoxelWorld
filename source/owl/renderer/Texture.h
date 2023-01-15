@@ -80,6 +80,11 @@ public:
 	 */
 	virtual void bind(uint32_t slot = 0) const = 0;
 	/**
+	 * @brief Get Path to texture file
+	 * @return Path to texture file
+	 */
+	virtual const std::filesystem::path& getPath() const = 0;
+	/**
 	 * @brief Define the texture data
 	 * @param data Raw data
 	 * @param size Size of the data

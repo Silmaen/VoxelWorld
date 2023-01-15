@@ -18,6 +18,7 @@
 #include <fstream>
 #include <functional>
 #include <memory>
+#include <random>
 #include <ranges>
 #include <streambuf>
 #include <string>

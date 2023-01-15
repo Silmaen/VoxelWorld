@@ -90,6 +90,13 @@ public:
 	 */
 	void setData(void *data, uint32_t size) override;
 
+	/**
+	 * @brief Get Path to texture file
+	 * @return Path to texture file
+	 */
+	const std::filesystem::path& getPath() const override{
+		return path;
+	}
 private:
 	std::filesystem::path path;
 	uint32_t width = 0;

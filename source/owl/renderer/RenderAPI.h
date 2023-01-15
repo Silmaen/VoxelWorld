@@ -71,6 +71,9 @@ public:
 	 */
 	virtual void drawIndexed(const shrd<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 
+	virtual void drawLines(const shrd<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
+
+	virtual void setLineWidth(float width) = 0;
 	/**
 	 * @brief Get the actual API type
 	 * @return API Type

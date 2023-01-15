@@ -45,25 +45,28 @@ void base2D::onUpdate(const core::Timestep &ts) {
 		rotation += ts.getSeconds() * 50.f;
 		OWL_PROFILE_SCOPE("Render Draws")
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
-		renderer::Renderer2D::drawQuad({.position = {1.0f, 0.0f, 0.0f},
-											 .size = {0.8f, 0.8f},
-											 .color = {0.8f, 0.2f, 0.3f, 1.0f},
-											 .rotation = -45.f});
-		renderer::Renderer2D::drawQuad({.position = {-1.0f, 0.0f, 0.0f},
-											 .size = {0.8f, 0.8f},
-											 .color = {0.8f, 0.2f, 0.3f, 1.0f}});
-		renderer::Renderer2D::drawQuad({.position = {0.5f, -0.5f, 0.0f},
-											 .size = {0.5f, 0.75f},
-											 .color = squareColor});
-		renderer::Renderer2D::drawQuad({.position = {0.0f, 0.0f, -0.1f},
-											 .size = {20.0f, 20.0f},
-											 .texture = checkerboardTexture,
-											 .tilingFactor = 10.f});
-		renderer::Renderer2D::drawQuad({.position = {-2.0f, 0.0f, 0.0f},
-											 .size = {1.0f, 1.0f},
-											 .texture = checkerboardTexture,
-											 .rotation = rotation,
-											 .tilingFactor = 20.f});
+		renderer::Renderer2D::drawQuad({
+				.transform = renderer::utils::PRS{
+						.position = {1.0f, 0.0f, 0.0f},
+						.rotation = -45.f,
+						.size = {0.8f, 0.8f}},
+				.color = {0.8f, 0.2f, 0.3f, 1.0f},
+		});
+		renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {-1.0f, 0.0f, 0.0f},
+																		  .size = {0.8f, 0.8f}},
+										.color = {0.8f, 0.2f, 0.3f, 1.0f}});
+		renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {0.5f, -0.5f, 0.0f},
+																		  .size = {0.5f, 0.75f}},
+										.color = squareColor});
+		renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {0.0f, 0.0f, -0.1f},
+																		  .size = {20.0f, 20.0f}},
+										.texture = checkerboardTexture,
+										.tilingFactor = 10.f});
+		renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {-2.0f, 0.0f, 0.0f},
+																		  .rotation = rotation,
+																		  .size = {1.0f, 1.0f}},
+										.texture = checkerboardTexture,
+										.tilingFactor = 20.f});
 		renderer::Renderer2D::endScene();
 
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
@@ -74,8 +77,8 @@ void base2D::onUpdate(const core::Timestep &ts) {
 		for (float y = -5.0f; y < 5.0f; y += scaley) {
 			for (float x = -5.0f; x < 5.0f; x += scalex) {
 				glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f};
-				renderer::Renderer2D::drawQuad({.position = {x, y, 0},
-												.size = {scalex * marg, scaley * marg},
+				renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {x, y, 0},
+																				  .size = {scalex * marg, scaley * marg}},
 												.color = color,
 												.entityID = id});
 				id++;
