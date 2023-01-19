@@ -29,7 +29,7 @@ public:
 	[[nodiscard]] float getY() const { return mouseY; }
 
 	[[nodiscard]] std::string toString() const override {
-		return fmt::format("MouseMovedEvent: {}, {}", getX(), getY());
+		return fmt::format("MouseMovedEvent: {:.1f}, {:.1f}", mouseX, mouseY);
 	}
 	[[nodiscard]] std::string getName() const override {
 		return fmt::format("MouseMovedEvent");

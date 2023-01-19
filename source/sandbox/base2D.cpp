@@ -103,18 +103,18 @@ void base2D::onImGuiRender(const core::Timestep &ts) {
 	{
 		auto &tracker = debug::Tracker::get();
 		ImGui::Begin("Statistics");
-		ImGui::Text(fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
-		ImGui::Text(fmt::format("Current used memory: {}",
-								tracker.globals().allocatedMemory)
-							.c_str());
-		ImGui::Text(fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
-							.c_str());
+		ImGui::Text("%s", fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
+		ImGui::Text("%s", fmt::format("Current used memory: {}",
+									  tracker.globals().allocatedMemory)
+								  .c_str());
+		ImGui::Text("%s", fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
+								  .c_str());
 		ImGui::Text(
-				fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
-						.c_str());
-		ImGui::Text(fmt::format("Deallocation calls: {}",
-								tracker.globals().deallocationCalls)
-							.c_str());
+				"%s", fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
+							  .c_str());
+		ImGui::Text("%s", fmt::format("Deallocation calls: {}",
+									  tracker.globals().deallocationCalls)
+								  .c_str());
 
 		auto stats = renderer::Renderer2D::getStats();
 		ImGui::Text("Renderer2D Stats:");
