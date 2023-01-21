@@ -50,7 +50,7 @@ TEST(MouseEvent, Moved) {
 	EXPECT_EQ(event.getCategoryFlags(), category::Input | category::Mouse);
 	EXPECT_EQ(event.getX(), 144);
 	EXPECT_EQ(event.getY(), 155);
-	EXPECT_STREQ(event.toString().c_str(), "MouseMovedEvent: 144, 155");
+	EXPECT_STREQ(event.toString().c_str(), "MouseMovedEvent: 144.0, 155.0");
 	EXPECT_TRUE(event.isInCategory(category::Input));
 	EXPECT_FALSE(event.isInCategory(category::Keyboard));
 	EXPECT_FALSE(event.isInCategory(category::Application));

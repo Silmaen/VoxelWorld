@@ -57,6 +57,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         add_definitions(
                 -Wno-analyzer-null-dereference
                 -Wno-maybe-uninitialized
+                -Wno-restrict
         )
     endif ()
 endif ()

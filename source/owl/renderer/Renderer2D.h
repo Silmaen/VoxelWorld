@@ -26,7 +26,7 @@ struct PRS {
 	glm::vec2 size = glm::vec2{1.f, 1.f};
 };
 
-glm::mat4 toTransform(const PRS& transform);
+OWL_API glm::mat4 toTransform(const PRS& transform);
 
 struct Transform2D {
 	Transform2D() = delete;

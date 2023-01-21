@@ -53,7 +53,7 @@ target_link_libraries(${ENGINE_NAME} PRIVATE glad)
 target_link_libraries(${ENGINE_NAME} PRIVATE glfw)
 
 # glm
-target_link_libraries(${ENGINE_NAME} PRIVATE glm_shared)
+target_link_libraries(${ENGINE_NAME} PUBLIC glm)
 
 # ImGui
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui)

@@ -38,11 +38,11 @@ The following cache variables may also be set:
 
 #]=======================================================================]
 
-if (EXISTS ${PROJECT_SOURCE_DIR}/external/Entt)
+if (EXISTS ${PROJECT_SOURCE_DIR}/external/entt)
 
     set(Entt_FOUND TRUE)
     set(Entt_VERSION 3.11.1)
-    set(Entt_ROOT_DIR ${PROJECT_SOURCE_DIR}/external/Entt)
+    set(Entt_ROOT_DIR ${PROJECT_SOURCE_DIR}/external/entt)
     set(Entt_INCLUDE_DIRS ${Entt_ROOT_DIR}/include)
     set(Entt_LIBRARY)
 

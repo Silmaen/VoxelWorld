@@ -18,6 +18,7 @@ add_subdirectory(glad)
 add_subdirectory(glfw)
 #
 # include targets for glm
+SET(GLM_BUILD_SHARED_LIBS ON)
 add_subdirectory(glm)
 
 #

@@ -10,11 +10,15 @@
 #include "event/AppEvent.h"
 #include "testHelper.h"
 
+using namespace owl::core;
+using namespace owl::event;
 using namespace owl::core::layer;
 
 TEST(Layer, base) {
 	Layer layer("test");
-	layer.onUpdate();
+	owl::core::Timestep ts;
+	ts.update();
+	layer.onUpdate(ts);
 	layer.onAttach();
 	layer.onDetach();
 	owl::event::AppTickEvent evt;
