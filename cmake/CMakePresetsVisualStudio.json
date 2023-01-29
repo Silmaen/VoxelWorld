@@ -1,0 +1,56 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "include": [
+    "CMakePresetsBase.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "msvc-compiler",
+      "inherits": "base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe"
+      }
+    },
+    {
+      "name": "msvc-release-static",
+      "inherits": [
+        "msvc-compiler",
+        "toolset-msvc"
+      ]
+    },
+    {
+      "name": "msvc-debug-static",
+      "inherits": [
+        "msvc-release-static"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "msvc-release-shared",
+      "inherits": [
+        "msvc-release-static"
+      ],
+      "cacheVariables": {
+        "OWL_BUILD_SHARED": "ON"
+      }
+    },
+    {
+      "name": "msvc-debug-shared",
+      "inherits": [
+        "msvc-release-shared"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ]
+}

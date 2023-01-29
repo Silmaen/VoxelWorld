@@ -10,7 +10,7 @@
 #include "Scene.h"
 #include "component/ID.h"
 #include "component/Tag.h"
-#include "entt.hpp"
+#include <entt/entt.hpp>
 
 namespace owl::scene {
 

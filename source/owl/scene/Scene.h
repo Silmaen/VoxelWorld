@@ -12,7 +12,7 @@
 #include "renderer/CameraEditor.h"
 #include "core/UUID.h"
 
-#include <entt.hpp>
+#include <entt/entt.hpp>
 
 /**
  * @brief Namespace for the Scene elements

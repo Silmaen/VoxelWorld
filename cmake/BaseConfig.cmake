@@ -60,8 +60,13 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-reserved-macro-identifier
             -Wno-unused-macros
             -Wno-ctad-maybe-unsupported
-            -Wno-format-security
-            )
+            -Wno-format-security)
+    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 16)
+        target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
+                -Wno-unsafe-buffer-usage
+                -Wno-cast-function-type-strict
+                )
+    endif ()
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
@@ -87,9 +92,9 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif ()
 add_dependencies(${CMAKE_PROJECT_NAME}_Base ${CMAKE_PROJECT_NAME}_SuperBase)
 
-target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_MAJOR="${CMAKE_PROJECT_VERSION_MAJOR}")
-target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_MINOR="${CMAKE_PROJECT_VERSION_MINOR}")
-target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_PATCH="${CMAKE_PROJECT_VERSION_PATCH}")
+target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE "${PRJPREFIX}_MAJOR=\"${CMAKE_PROJECT_VERSION_MAJOR}\"")
+target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE "${PRJPREFIX}_MINOR=\"${CMAKE_PROJECT_VERSION_MINOR}\"")
+target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE "${PRJPREFIX}_PATCH=\"${CMAKE_PROJECT_VERSION_PATCH}\"")
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_AUTHOR="Silmaen")
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")

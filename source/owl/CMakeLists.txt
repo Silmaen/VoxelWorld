@@ -36,50 +36,83 @@ endif ()
 # ----==== third party ====----
 #  ---- external folder ----
 # debugbreak
-find_package(DebugBreak 1.0 REQUIRED)
-target_link_libraries(${ENGINE_NAME} PUBLIC owl::DebugBreak)
+find_package(debugbreak 1.0 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC debugbreak::debugbreak)
 
 # Entt
-find_package(Entt 3.11 REQUIRED)
-target_link_libraries(${ENGINE_NAME} PUBLIC owl::Entt)
+find_package(EnTT 3.11 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC EnTT::EnTT)
 
 # fmt
+find_package(fmt 9.1 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
 
 # glad
-target_link_libraries(${ENGINE_NAME} PRIVATE glad)
+find_package(glad 0.1.36 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PRIVATE glad::glad)
 
 # GLFW
+find_package(glfw3 3.3.8 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE glfw)
 
 # glm
-target_link_libraries(${ENGINE_NAME} PUBLIC glm)
+find_package(glm 0.9.9 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC glm::glm)
 
 # ImGui
-target_link_libraries(${ENGINE_NAME} PUBLIC imgui)
-find_package(ImGuizmo REQUIRED)
-target_link_libraries(${ENGINE_NAME} PUBLIC owl::ImGuizmo)
+find_package(imgui REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC imgui::imgui)
+find_package(imguizmo REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC imguizmo::imguizmo)
 
 # magic_enum
-find_package(MagicEnum REQUIRED)
-target_link_libraries(${ENGINE_NAME} PRIVATE owl::MagicEnum)
+find_package(magic_enum REQUIRED)
+target_link_libraries(${ENGINE_NAME} PRIVATE magic_enum::magic_enum)
 
 # yaml
-target_link_libraries(${ENGINE_NAME} PRIVATE yaml-cpp::yaml-cpp)
+find_package(yaml-cpp REQUIRED)
+target_link_libraries(${ENGINE_NAME} PRIVATE yaml-cpp)
 
 # spdlog
+find_package(spdlog REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog)
 
-# magic_enum
-find_package(StbImage REQUIRED)
-target_link_libraries(${ENGINE_NAME} PRIVATE owl::StbImage)
+# stb_image
+find_package(stb_image REQUIRED)
+target_link_libraries(${ENGINE_NAME} PRIVATE stb_image::stb_image)
 
 # NativeFile Dialog
-target_link_libraries(${ENGINE_NAME} PRIVATE nfd)
+find_package(nfd REQUIRED)
+target_link_libraries(${ENGINE_NAME} PRIVATE nfd::nfd)
 
-# Spir-V
-target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-cpp)
-target_include_directories(${ENGINE_NAME} PRIVATE ${${PRJPREFIX}_EXTERNAL_DIR}/SPIRV-Cross)
+# Spir-V cross
+if (${PRJPREFIX}_BUILD_SHARED)
+    find_package(spirv_cross_c_shared REQUIRED)
+    target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-c-shared)
+else ()
+    find_package(spirv_cross_core REQUIRED)
+    find_package(spirv_cross_glsl REQUIRED)
+    find_package(spirv_cross_hlsl REQUIRED)
+    find_package(spirv_cross_msl REQUIRED)
+    find_package(spirv_cross_cpp REQUIRED)
+    find_package(spirv_cross_reflect REQUIRED)
+    find_package(spirv_cross_c REQUIRED)
+    target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-c)
+endif ()
 # shaderc
-target_link_libraries(${ENGINE_NAME} PRIVATE shaderc_shared)
+find_package(SPIRV-Tools REQUIRED)
+find_package(SPIRV-Tools-opt REQUIRED)
+find_package(glslang REQUIRED)
+find_package(shaderc REQUIRED)
+if (${PRJPREFIX}_BUILD_SHARED)
+    target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
+else ()
+    target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc)
+endif ()
 
+if (${PRJPREFIX}_BUILD_SHARED AND WIN32)
+    add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_RUNTIME_DLLS:${ENGINE_NAME}>" "$<TARGET_FILE_DIR:${ENGINE_NAME}>"
+            COMMAND_EXPAND_LISTS
+            )
+endif ()

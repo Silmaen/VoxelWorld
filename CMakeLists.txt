@@ -1,12 +1,12 @@
 #
 #
 #
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.24)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/external/cmake" "${CMAKE_MODULE_PATH}")
 #
 # ---=== GENERALITIES ===---
 #
-project(Owl VERSION 0.0.1 LANGUAGES C CXX)
+project(Owl VERSION 0.1.0 LANGUAGES C CXX)
 set(PRJPREFIX OWL)
 set(PRJPREFIX_LOWER owl)
 set(ENGINE_NAME OwlEngine)
@@ -16,15 +16,14 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 #
 option(${PRJPREFIX}_BUILD_SHARED "If the Library must be build as shared library" OFF)
+option(${PRJPREFIX}_TESTING "Enable the unit tests" ON)
+#
+include(OwlUtils)
+include(Depmanager)
 #
 # ---=== Base Configs ===---
 #
 include(BaseConfig)
-#
-# ---=== Dependencies ===---
-#
-set(${PRJPREFIX}_EXTERNAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
-add_subdirectory(external)
 
 #
 # ---=== The Program ===---
@@ -34,7 +33,6 @@ add_subdirectory(source)
 #
 # ---=== TESTING PROCEDURES ===---
 #
-option(${PRJPREFIX}_TESTING "Enable the unit tests" ON)
 if (${PRJPREFIX}_TESTING)
     enable_testing()
     add_subdirectory(test)

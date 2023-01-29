@@ -34,6 +34,8 @@
 # IDE & Build
 cmake-*
 .idea
+output*
 
 # Cache
 *.cached_*
+/CMakeUserPresets.json

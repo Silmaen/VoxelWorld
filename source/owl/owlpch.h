@@ -12,6 +12,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundefined-func-template"
 #endif
+
 #include <algorithm>
 #include <array>
 #include <filesystem>
@@ -19,7 +20,7 @@
 #include <functional>
 #include <memory>
 #include <random>
-#include <ranges>
+//#include <ranges>
 #include <streambuf>
 #include <string>
 #include <string_view>
