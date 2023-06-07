@@ -12,7 +12,7 @@
 
 #include "core/Application.h"
 
-#include "nfd.hpp"
+#include <nfd.hpp>
 
 namespace owl::core {
 

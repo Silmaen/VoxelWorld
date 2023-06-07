@@ -1,0 +1,129 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "output/install/${presetName}"
+      },
+      "generator": "Ninja",
+      "binaryDir": "output/build/${presetName}",
+      "installDir": "output/install/${presetName}"
+    },
+    {
+      "name": "gcc-release-static",
+      "inherits": "base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "gcc-debug-static",
+      "inherits": "gcc-release-static",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "clang-release-static",
+      "inherits": "base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=lld",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=lld"
+      }
+    },
+    {
+      "name": "clang-debug-static",
+      "inherits": "clang-release-static",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "gcc-release-shared",
+      "inherits": "gcc-release-static",
+      "hidden": true,
+      "cacheVariables": {
+        "OWL_BUILD_SHARED": "ON"
+      }
+    },
+    {
+      "name": "gcc-debug-shared",
+      "inherits": "gcc-release-shared",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "clang-release-shared",
+      "inherits": "clang-release-static",
+      "hidden": true,
+      "cacheVariables": {
+        "OWL_BUILD_SHARED": "ON"
+      }
+    },
+    {
+      "name": "clang-debug-shared",
+      "inherits": "clang-release-shared",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "toolset-mingw",
+      "hidden": true,
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "MinGW"
+        }
+      }
+    },
+    {
+      "name": "toolset-wsl",
+      "hidden": true,
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "WSL"
+        }
+      }
+    },
+    {
+      "name": "toolset-raspberrypi",
+      "hidden": true,
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "RaspberryPi"
+        }
+      }
+    },
+    {
+      "name": "toolset-msvc",
+      "hidden": true,
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "VisualStudio"
+        }
+      }
+    }
+  ]
+}

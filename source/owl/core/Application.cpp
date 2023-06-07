@@ -11,14 +11,13 @@
 #include "Application.h"
 
 #include "renderer/Renderer.h"
-#include <ranges>
 
 namespace owl::core {
 
 
 Application *Application::instance = nullptr;
 
-Application::Application(const AppParams &appParams): initParams{appParams} {
+Application::Application(const AppParams &appParams) : initParams{appParams} {
 	OWL_PROFILE_FUNCTION()
 
 	OWL_CORE_ASSERT(!instance, "Application already exists!")
@@ -28,7 +27,7 @@ Application::Application(const AppParams &appParams): initParams{appParams} {
 	// Assuming present of a folder 'res' containing the data
 	workingDirectory = absolute(std::filesystem::current_path());
 	OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
-	[[maybe_unused]]bool assetFound = searchAssets(appParams.assetsPattern);
+	[[maybe_unused]] bool assetFound = searchAssets(appParams.assetsPattern);
 	OWL_CORE_ASSERT(assetFound, "Unable to find assets")
 
 	// startup the renderer
