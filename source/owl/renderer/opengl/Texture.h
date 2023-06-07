@@ -1,6 +1,6 @@
 /**
  * @file Texture.h
- * @author Silmen
+ * @author Silmaen
  * @date 12/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -9,7 +9,7 @@
 #pragma once
 #include "renderer/Texture.h"
 
-#include <glad/glad.h>
+#include "gl_46/glad.h"
 
 namespace owl::renderer::opengl {
 /**
@@ -27,6 +27,7 @@ public:
 	 * @param path_ path to the texture image file.
 	 */
 	explicit Texture2D(std::filesystem::path path_);
+
 	/**
 	 * @brief Constructor by size.
 	 * @param width_ Texture's width.
@@ -103,8 +104,8 @@ private:
 	/// OpenGL binding.
 	uint32_t rendererID = 0;
 	/// Texture internal format.
-	GLenum internalFormat;
+	gl_46::GLenum internalFormat;
 	/// Texture data format.
-	GLenum dataFormat;
+	gl_46::GLenum dataFormat;
 };
 }// namespace owl::renderer::opengl

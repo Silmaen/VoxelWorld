@@ -75,12 +75,12 @@ public:
 	 */
 	virtual void setLineWidth(float width) = 0;
 
-
 	/// Render API types.
 	enum struct Type {
-		Null = 0,  ///< Null Renderer.
-		OpenGL = 1,///< OpenGL Renderer.
-		Vulkan = 2,///< Vulkan renderer API.
+		Null = 0,         ///< Null Renderer.
+		OpenGL = 1,       ///< OpenGL 4.5 Renderer.
+		OpenGL_Legacy = 2,///< Old OpenGL 2.1 Renderer.
+		Vulkan = 3,       ///< Vulkan renderer API.
 	};
 	/// Render API states.
 	enum struct State {

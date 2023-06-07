@@ -11,6 +11,7 @@
 #include "Renderer.h"
 #include "null/Buffer.h"
 #include "opengl/Buffer.h"
+#include "opengl_legacy/Buffer.h"
 #include <magic_enum.hpp>
 
 namespace owl::renderer {
@@ -26,6 +27,8 @@ shared<VertexBuffer> VertexBuffer::create(uint32_t size) {
 			return mk_shared<null::VertexBuffer>(size);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::VertexBuffer>(size);
+		case RenderAPI::Type::OpenGL_Legacy:
+			return mk_shared<opengl_legacy::VertexBuffer>(size);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;
@@ -41,6 +44,8 @@ shared<VertexBuffer> VertexBuffer::create(float *vertices, uint32_t size) {
 			return mk_shared<null::VertexBuffer>(vertices, size);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::VertexBuffer>(vertices, size);
+		case RenderAPI::Type::OpenGL_Legacy:
+			return mk_shared<opengl_legacy::VertexBuffer>(size);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;
@@ -57,6 +62,8 @@ shared<IndexBuffer> IndexBuffer::create(uint32_t *indices, uint32_t size) {
 			return mk_shared<null::IndexBuffer>(indices, size);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::IndexBuffer>(indices, size);
+		case RenderAPI::Type::OpenGL_Legacy:
+			return mk_shared<opengl_legacy::IndexBuffer>(indices, size);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;

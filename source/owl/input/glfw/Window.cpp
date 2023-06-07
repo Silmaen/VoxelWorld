@@ -8,8 +8,6 @@
 
 #include "owlpch.h"
 
-#include <glad/glad.h>
-
 #include "Window.h"
 #include "core/Log.h"
 #include "debug/Profiler.h"

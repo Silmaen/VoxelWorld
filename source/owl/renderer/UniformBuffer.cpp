@@ -13,6 +13,7 @@
 #include "UniformBuffer.h"
 #include "null/UniformBuffer.h"
 #include "opengl/UniformBuffer.h"
+#include "opengl_legacy/UniformBuffer.h"
 
 namespace owl::renderer {
 
@@ -27,6 +28,8 @@ shared<UniformBuffer> UniformBuffer::create(uint32_t size, uint32_t binding) {
 			return mk_shared<null::UniformBuffer>(size, binding);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::UniformBuffer>(size, binding);
+		case RenderAPI::Type::OpenGL_Legacy:
+			return mk_shared<opengl_legacy::UniformBuffer>(size, binding);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;

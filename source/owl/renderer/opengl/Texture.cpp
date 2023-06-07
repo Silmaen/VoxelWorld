@@ -9,10 +9,7 @@
 
 #include "Texture.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
-#include <utility>
 
 namespace owl::renderer::opengl {
 
@@ -23,14 +20,14 @@ Texture2D::Texture2D(uint32_t width_, uint32_t height_) : width{width_}, height{
 	internalFormat = GL_RGBA8;
 	dataFormat = GL_RGBA;
 
-	glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
-	glTextureStorage2D(rendererID, 1, internalFormat, static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+	gl_46::glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
+	gl_46::glTextureStorage2D(rendererID, 1, internalFormat, static_cast<gl_46::GLsizei>(width), static_cast<gl_46::GLsizei>(height));
 
-	glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	gl_46::glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	gl_46::glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	gl_46::glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	gl_46::glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {
@@ -59,16 +56,16 @@ Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {
 	}
 
 	OWL_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!")
-	glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
-	glTextureStorage2D(rendererID, 1, internalFormat, static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+	gl_46::glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
+	gl_46::glTextureStorage2D(rendererID, 1, internalFormat, static_cast<gl_46::GLsizei>(width), static_cast<gl_46::GLsizei>(height));
 
-	glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	gl_46::glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	gl_46::glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	gl_46::glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	gl_46::glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTextureSubImage2D(rendererID, 0, 0, 0, static_cast<GLsizei>(width), static_cast<GLsizei>(height), dataFormat, GL_UNSIGNED_BYTE, data);
+	gl_46::glTextureSubImage2D(rendererID, 0, 0, 0, static_cast<gl_46::GLsizei>(width), static_cast<gl_46::GLsizei>(height), dataFormat, GL_UNSIGNED_BYTE, data);
 
 	stbi_image_free(data);
 }
@@ -76,13 +73,13 @@ Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {
 Texture2D::~Texture2D() {
 	OWL_PROFILE_FUNCTION()
 
-	glDeleteTextures(1, &rendererID);
+	gl_46::glDeleteTextures(1, &rendererID);
 }
 
 void Texture2D::bind(uint32_t slot) const {
 	OWL_PROFILE_FUNCTION()
 
-	glBindTextureUnit(slot, rendererID);
+	gl_46::glBindTextureUnit(slot, rendererID);
 }
 
 void Texture2D::setData(void *data, [[maybe_unused]] uint32_t size) {
@@ -90,7 +87,7 @@ void Texture2D::setData(void *data, [[maybe_unused]] uint32_t size) {
 
 	[[maybe_unused]] uint32_t bpp = dataFormat == GL_RGBA ? 4 : 3;
 	OWL_CORE_ASSERT(size == width * height * bpp, "Data must be entire texture!")
-	glTextureSubImage2D(rendererID, 0, 0, 0, static_cast<GLsizei>(width), static_cast<GLsizei>(height), dataFormat, GL_UNSIGNED_BYTE, data);
+	gl_46::glTextureSubImage2D(rendererID, 0, 0, 0, static_cast<gl_46::GLsizei>(width), static_cast<gl_46::GLsizei>(height), dataFormat, GL_UNSIGNED_BYTE, data);
 }
 
 }// namespace owl::renderer::opengl

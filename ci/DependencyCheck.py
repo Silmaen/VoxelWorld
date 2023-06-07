@@ -8,7 +8,6 @@ dependencies = [
     {"name": "magic_enum", "version": "*", "header": True},
     {"name": "stb_image", "version": "*", "header": True},
     {"name": "fmt", "version": "10.0.0", "header": False},
-    {"name": "glad", "version": "*", "header": False},
     {"name": "glfw", "version": "*", "header": False},
     {"name": "glm", "version": "*", "header": False},
     {"name": "imgui", "version": "*", "header": False},

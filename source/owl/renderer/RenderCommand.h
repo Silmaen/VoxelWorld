@@ -43,7 +43,7 @@ public:
 	inline static void invalidate() {
 		renderAPI.reset();
 	}
-
+	
 	/**
 	 * @brief Get the state of the API.
 	 * @return API state.

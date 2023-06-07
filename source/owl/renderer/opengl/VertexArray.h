@@ -1,6 +1,6 @@
 /**
  * @file VertexArray.h
- * @author Silmen
+ * @author Silmaen
  * @date 08/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -32,6 +32,7 @@ public:
 	 * @brief Activate the buffer in the GPU.
 	 */
 	void bind() const override;
+
 	/**
 	 * @brief Deactivate the buffer in the GPU.
 	 */

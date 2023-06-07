@@ -14,6 +14,7 @@
 #include "Renderer.h"
 #include "null/Framebuffer.h"
 #include "opengl/Framebuffer.h"
+#include "opengl_legacy/Framebuffer.h"
 
 namespace owl::renderer {
 
@@ -27,6 +28,8 @@ shared<Framebuffer> Framebuffer::create(const FramebufferSpecification &spec) {
 			return mk_shared<null::Framebuffer>(spec);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::Framebuffer>(spec);
+		case RenderAPI::Type::OpenGL_Legacy:
+			return mk_shared<opengl_legacy::Framebuffer>(spec);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;

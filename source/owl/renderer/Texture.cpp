@@ -13,6 +13,7 @@
 #include "Renderer.h"
 #include "null/Texture.h"
 #include "opengl/Texture.h"
+#include "opengl_legacy/Texture.h"
 
 namespace owl::renderer {
 
@@ -21,6 +22,12 @@ shared<Texture2D> Texture2D::create(const std::filesystem::path &file) {
 	switch (type) {
 		case RenderAPI::Type::OpenGL: {
 			auto texture = mk_shared<opengl::Texture2D>(file);
+			if (texture->isLoaded())// No data
+				return texture;
+			return nullptr;
+		}
+		case RenderAPI::Type::OpenGL_Legacy: {
+			auto texture = mk_shared<opengl_legacy::Texture2D>(file);
 			if (texture->isLoaded())// No data
 				return texture;
 			return nullptr;
@@ -44,6 +51,8 @@ shared<Texture2D> Texture2D::create(uint32_t width, uint32_t height) {
 	switch (type) {
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::Texture2D>(width, height);
+		case RenderAPI::Type::OpenGL_Legacy:
+			return mk_shared<opengl_legacy::Texture2D>(width, height);
 		case RenderAPI::Type::Null:
 			return mk_shared<null::Texture2D>(width, height);
 		case RenderAPI::Type::Vulkan:

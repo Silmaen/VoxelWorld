@@ -41,8 +41,8 @@ void base2D::onUpdate(const core::Timestep &ts) {
 		renderer::RenderCommand::clear();
 	}
 	{
-		static float rotation = 0.f;
-		rotation += ts.getSeconds() * 50.f;
+		//static float rotation = 0.f;
+		//rotation += ts.getSeconds() * 50.f;
 		OWL_PROFILE_SCOPE("Render Draws")
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
 		renderer::Renderer2D::drawQuad({
@@ -52,7 +52,7 @@ void base2D::onUpdate(const core::Timestep &ts) {
 						.size = {0.8f, 0.8f}},
 				.color = {0.8f, 0.2f, 0.3f, 1.0f},
 		});
-		renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {-1.0f, 0.0f, 0.0f},
+		/*renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {-1.0f, 0.0f, 0.0f},
 																		  .size = {0.8f, 0.8f}},
 										.color = {0.8f, 0.2f, 0.3f, 1.0f}});
 		renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {0.5f, -0.5f, 0.0f},
@@ -66,9 +66,9 @@ void base2D::onUpdate(const core::Timestep &ts) {
 																		  .rotation = rotation,
 																		  .size = {1.0f, 1.0f}},
 										.texture = checkerboardTexture,
-										.tilingFactor = 20.f});
+										.tilingFactor = 20.f});*/
 		renderer::Renderer2D::endScene();
-
+		/*
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
 		int32_t id = 0;
 		float scalex = 1.f;
@@ -85,6 +85,7 @@ void base2D::onUpdate(const core::Timestep &ts) {
 			}
 		}
 		renderer::Renderer2D::endScene();
+		*/
 	}
 }
 

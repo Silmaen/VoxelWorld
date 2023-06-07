@@ -47,7 +47,7 @@ struct OWL_API AppParams {
 	}
 };
 /**
- * @brief Class Application
+ * @brief Class Application.
  */
 class OWL_API Application {
 public:
@@ -109,6 +109,7 @@ public:
 	 * @brief Request the application to terminate.
 	 */
 	void close();
+
 	/**
 	 * @brief Request the application to terminate.
 	 */

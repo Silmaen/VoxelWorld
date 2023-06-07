@@ -11,7 +11,7 @@
 #include "core/Application.h"
 #include "core/Core.h"
 
-#include <glad/glad.h>
+#include "gl_46/glad.h"
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -174,7 +174,7 @@ Shader::Shader(const std::string &shaderName, const std::vector<std::filesystem:
 Shader::~Shader() {
 	OWL_PROFILE_FUNCTION()
 
-	glDeleteProgram(programID);
+	gl_46::glDeleteProgram(programID);
 }
 
 void Shader::compile(const std::unordered_map<ShaderType, std::string> &sources) {
@@ -270,38 +270,38 @@ void Shader::compileOrGetOpenGLBinaries() {
 }
 
 void Shader::createProgram() {
-	GLuint program = glCreateProgram();
+	gl_46::GLuint program = gl_46::glCreateProgram();
 
 	// list of shader's id
-	std::vector<GLuint> shaderIDs;
+	std::vector<gl_46::GLuint> shaderIDs;
 	for (auto &&[stage, spirv]: openGLSPIRV) {
-		GLuint shaderID = shaderIDs.emplace_back(glCreateShader(utils::shaderStageToGLShader(stage)));
+		gl_46::GLuint shaderID = shaderIDs.emplace_back(gl_46::glCreateShader(utils::shaderStageToGLShader(stage)));
 		OWL_CORE_ASSERT(!spirv.empty(), "Empty shader data")
-		glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
-		glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
-		glAttachShader(program, shaderID);
+		gl_46::glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), static_cast<gl_46::GLsizei>(spirv.size() * sizeof(uint32_t)));
+		gl_46::glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
+		gl_46::glAttachShader(program, shaderID);
 	}
-	glLinkProgram(program);
-	GLint isLinked;
-	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+	gl_46::glLinkProgram(program);
+	gl_46::GLint isLinked;
+	gl_46::glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
 	if (isLinked == GL_FALSE) {
 		OWL_CORE_ERROR("Shader linking failed ({})", getName())
-		GLint maxLength;
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+		gl_46::GLint maxLength;
+		gl_46::glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 		if (maxLength > 0) {
-			std::vector<GLchar> infoLog(static_cast<size_t>(maxLength));
-			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
+			std::vector<gl_46::GLchar> infoLog(static_cast<size_t>(maxLength));
+			gl_46::glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
 			OWL_CORE_ERROR("     Details: {}", infoLog.data())
 		}
-		glDeleteProgram(program);
+		gl_46::glDeleteProgram(program);
 		for (auto id: shaderIDs)
-			glDeleteShader(id);
+			gl_46::glDeleteShader(id);
 		OWL_CORE_ASSERT(false, fmt::format("Failed to create shader {}", getName()))
 		return;
 	}
 	for (auto id: shaderIDs) {
-		glDetachShader(program, id);
-		glDeleteShader(id);
+		gl_46::glDetachShader(program, id);
+		gl_46::glDeleteShader(id);
 	}
 	programID = program;
 }
@@ -331,13 +331,13 @@ void Shader::reflect(ShaderType stage, const std::vector<uint32_t> &shaderData) 
 void Shader::bind() const {
 	OWL_PROFILE_FUNCTION()
 
-	glUseProgram(programID);
+	gl_46::glUseProgram(programID);
 }
 
 void Shader::unbind() const {
 	OWL_PROFILE_FUNCTION()
 
-	glUseProgram(0);
+	gl_46::glUseProgram(0);
 }
 
 void Shader::setInt(const std::string &name, int value) {
@@ -383,43 +383,43 @@ void Shader::setMat4(const std::string &name, const glm::mat4 &matrix) {
 }
 
 void Shader::uploadUniformInt(const std::string &name, int data) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniform1i(location, data);
+	gl_46::GLint location = gl_46::glGetUniformLocation(programID, name.c_str());
+	gl_46::glUniform1i(location, data);
 }
 
 void Shader::uploadUniformIntArray(const std::string &name, int *values, uint32_t count) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniform1iv(location, static_cast<GLsizei>(count), values);
+	gl_46::GLint location = gl_46::glGetUniformLocation(programID, name.c_str());
+	gl_46::glUniform1iv(location, static_cast<gl_46::GLsizei>(count), values);
 }
 
 void Shader::uploadUniformFloat(const std::string &name, float value) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniform1f(location, value);
+	gl_46::GLint location = gl_46::glGetUniformLocation(programID, name.c_str());
+	gl_46::glUniform1f(location, value);
 }
 
 void Shader::uploadUniformFloat2(const std::string &name, const glm::vec2 &value) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniform2f(location, value.x, value.y);
+	gl_46::GLint location = gl_46::glGetUniformLocation(programID, name.c_str());
+	gl_46::glUniform2f(location, value.x, value.y);
 }
 
 void Shader::uploadUniformFloat3(const std::string &name, const glm::vec3 &value) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniform3f(location, value.x, value.y, value.z);
+	gl_46::GLint location = gl_46::glGetUniformLocation(programID, name.c_str());
+	gl_46::glUniform3f(location, value.x, value.y, value.z);
 }
 
 void Shader::uploadUniformFloat4(const std::string &name, const glm::vec4 &value) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniform4f(location, value.x, value.y, value.z, value.w);
+	gl_46::GLint location = gl_46::glGetUniformLocation(programID, name.c_str());
+	gl_46::glUniform4f(location, value.x, value.y, value.z, value.w);
 }
 
 void Shader::uploadUniformMat3(const std::string &name, const glm::mat3 &matrix) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+	gl_46::GLint location = gl_46::glGetUniformLocation(programID, name.c_str());
+	gl_46::glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::uploadUniformMat4(const std::string &name, const glm::mat4 &matrix) {
-	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+	gl_46::GLint location = gl_46::glGetUniformLocation(programID, name.c_str());
+	gl_46::glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 }// namespace owl::renderer::opengl

@@ -47,10 +47,6 @@ target_link_libraries(${ENGINE_NAME} PUBLIC EnTT::EnTT)
 find_package(fmt 9.1 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
 
-# glad
-find_package(glad 0.1.36 REQUIRED)
-target_link_libraries(${ENGINE_NAME} PRIVATE glad::glad)
-
 # GLFW
 find_package(glfw3 3.3.8 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE glfw)

@@ -9,7 +9,7 @@
 
 #include "RenderAPI.h"
 
-#include <glad/glad.h>
+#include "gl_46/glad.h"
 
 namespace owl::renderer::opengl {
 
@@ -35,57 +35,57 @@ namespace owl::renderer::opengl {
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
-	bool goodVersion = GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5);
+	bool goodVersion = gl_46::GLVersion.major > 4 || (gl_46::GLVersion.major == 4 && gl_46::GLVersion.minor >= 5);
 	if (!goodVersion) {
 		setState(State::Error);
-		OWL_CORE_ERROR("Owl Engine OpenGL Renderer requires at least OpenGL version 4.5 but version {}.{} found", GLVersion.major, GLVersion.minor)
+		OWL_CORE_ERROR("Owl Engine OpenGL Renderer requires at least OpenGL version 4.5 but version {}.{} found", gl_46::GLVersion.major, gl_46::GLVersion.minor)
 	}
 
 	if (getState() != State::Created)
 		return;
 #ifdef OWL_DEBUG
-	glEnable(GL_DEBUG_OUTPUT);
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glDebugMessageCallback(messageCallback, nullptr);
+	gl_46::glEnable(GL_DEBUG_OUTPUT);
+	gl_46::glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	gl_46::glDebugMessageCallback(messageCallback, nullptr);
 
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+	gl_46::glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
 #endif
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	gl_46::glEnable(GL_BLEND);
+	gl_46::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LINE_SMOOTH);
+	gl_46::glEnable(GL_DEPTH_TEST);
+	gl_46::glEnable(GL_LINE_SMOOTH);
 
 	// renderer is now ready
 	setState(State::Ready);
 }
 
 void RenderAPI::setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
-	glViewport(static_cast<int32_t>(x), static_cast<int32_t>(y), static_cast<int32_t>(width), static_cast<int32_t>(height));
+	gl_46::glViewport(static_cast<int32_t>(x), static_cast<int32_t>(y), static_cast<int32_t>(width), static_cast<int32_t>(height));
 }
 
 void RenderAPI::setClearColor(const glm::vec4 &color) {
-	glClearColor(color.r, color.g, color.b, color.a);
+	gl_46::glClearColor(color.r, color.g, color.b, color.a);
 }
 
 void RenderAPI::clear() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	gl_46::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderAPI::drawIndexed(const shared<VertexArray> &vertexArray, uint32_t indexCount) {
 	vertexArray->bind();
 	uint32_t count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
-	glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
+	gl_46::glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
 }
 
 void RenderAPI::drawLines(const shared<VertexArray> &vertexArray, uint32_t vertexCount) {
 	vertexArray->bind();
-	glDrawArrays(GL_LINES, 0, vertexCount);
+	gl_46::glDrawArrays(GL_LINES, 0, static_cast<gl_46::GLsizei>(vertexCount));
 }
 
 void RenderAPI::setLineWidth(float width) {
-	glLineWidth(width);
+	gl_46::glLineWidth(width);
 }
 
 }// namespace owl::renderer::opengl

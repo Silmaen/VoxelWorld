@@ -12,6 +12,7 @@
 #include "Renderer.h"
 #include "null/VertexArray.h"
 #include "opengl/VertexArray.h"
+#include "opengl_legacy/VertexArray.h"
 #include <magic_enum.hpp>
 
 namespace owl::renderer {
@@ -27,6 +28,8 @@ shared<VertexArray> VertexArray::create() {
 			return mk_shared<null::VertexArray>();
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::VertexArray>();
+		case RenderAPI::Type::OpenGL_Legacy:
+			return mk_shared<opengl_legacy::VertexArray>();
 	}
 
 	OWL_CORE_ERROR("Unknown Renderer API!")

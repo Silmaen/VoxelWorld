@@ -10,6 +10,7 @@
 #include "RenderAPI.h"
 #include "null/RenderAPI.h"
 #include "opengl/RenderAPI.h"
+#include "opengl_legacy/RenderAPI.h"
 
 namespace owl::renderer {
 
@@ -27,6 +28,9 @@ uniq<RenderAPI> RenderAPI::create(const RenderAPI::Type &creationType) {
 			return mk_uniq<null::RenderAPI>();
 		case RenderAPI::Type::OpenGL:
 			return mk_uniq<opengl::RenderAPI>();
+		case RenderAPI::Type::OpenGL_Legacy:
+			type = type_;
+			return mk_uniq<opengl_legacy::RenderAPI>();
 	}
 
 	OWL_CORE_ERROR("Unknown RendererAPI!")
