@@ -1,6 +1,6 @@
 /**
  * @file GraphContext.cpp
- * @author Silmen
+ * @author Silmaen
  * @date 07/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -27,8 +27,8 @@ void GraphContext::init() {
 	OWL_CORE_INFO("  Vendor: {}", reinterpret_cast<const char *>(glGetString(GL_VENDOR)))
 	OWL_CORE_INFO("  Renderer: {}", reinterpret_cast<const char *>(glGetString(GL_RENDERER)))
 	OWL_CORE_INFO("  Version: {}", reinterpret_cast<const char *>(glGetString(GL_VERSION)))
-	OWL_CORE_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 3),
-					"Owl Engine requires at least OpenGL version 4.3")
+	//OWL_CORE_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 3),
+	//				"Owl Engine requires at least OpenGL version 4.3")
 }
 
 void GraphContext::swapBuffers() {

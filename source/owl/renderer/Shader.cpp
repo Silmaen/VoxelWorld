@@ -15,7 +15,7 @@
 
 namespace owl::renderer {
 
-shrd<Shader> Shader::create(const std::string &shaderName, const std::string &vertexSrc, const std::string &fragmentSrc) {
+shared<Shader> Shader::create(const std::string &shaderName, const std::string &vertexSrc, const std::string &fragmentSrc) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
@@ -23,13 +23,13 @@ shrd<Shader> Shader::create(const std::string &shaderName, const std::string &ve
 			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::Shader>(shaderName, vertexSrc, fragmentSrc);
+			return mk_shared<opengl::Shader>(shaderName, vertexSrc, fragmentSrc);
 	}
 	OWL_CORE_ASSERT(false, "Unknown API Type!")
 	return nullptr;
 }
 
-shrd<Shader> Shader::create(const std::string &shaderName) {
+shared<Shader> Shader::create(const std::string &shaderName) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
@@ -47,14 +47,14 @@ shrd<Shader> Shader::create(const std::string &shaderName) {
 				OWL_CORE_WARN("Not able to find Shader {} in directory {}", shaderName, shaderDir.string())
 				return nullptr;
 			}
-			return mk_shrd<opengl::Shader>(shaderName, sources);
+			return mk_shared<opengl::Shader>(shaderName, sources);
 		}
 	}
 	OWL_CORE_ASSERT(false, "Unknown API Type!")
 	return nullptr;
 }
 
-shrd<Shader> Shader::create(const std::filesystem::path &file) {
+shared<Shader> Shader::create(const std::filesystem::path &file) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
@@ -72,9 +72,9 @@ shrd<Shader> Shader::create(const std::filesystem::path &file) {
 					return nullptr;
 				}
 
-				return mk_shrd<opengl::Shader>(shaderName, sources);
+				return mk_shared<opengl::Shader>(shaderName, sources);
 			} else {
-				return mk_shrd<opengl::Shader>(shaderName, std::vector<std::filesystem::path>{file});
+				return mk_shared<opengl::Shader>(shaderName, std::vector<std::filesystem::path>{file});
 			}
 		}
 	}

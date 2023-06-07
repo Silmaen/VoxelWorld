@@ -10,11 +10,11 @@
 #include <cstdint>
 
 namespace owl::input {
-/// Wrap to mouse code
+/// Wrap to mouse code.
 using MouseCode = uint16_t;
 
 /**
- * @brief Namespace for mouse codes
+ * @brief Namespace for mouse codes.
  */
 namespace mouse {
 enum : MouseCode {
@@ -34,4 +34,4 @@ enum : MouseCode {
 	ButtonMiddle = Button2
 };
 }
-} // namespace owl::core
+}// namespace owl::input

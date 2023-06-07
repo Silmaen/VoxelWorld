@@ -11,8 +11,8 @@
 #include "owl.h"
 
 #include "event/KeyEvent.h"
-#include "panel/SceneHierarchy.h"
 #include "panel/ContentBrowser.h"
+#include "panel/SceneHierarchy.h"
 #include "renderer/CameraEditor.h"
 
 namespace owl {
@@ -51,13 +51,13 @@ private:
 
 	void newScene();
 	void openScene();
-	void openScene(const std::filesystem::path& scene);
+	void openScene(const std::filesystem::path &scene);
 	void saveSceneAs();
-	void saveSceneAs(const std::filesystem::path& scene);
+	void saveSceneAs(const std::filesystem::path &scene);
 	void saveCurrentScene();
 
-	bool onKeyPressed(event::KeyPressedEvent& e);
-	bool onMouseButtonPressed(event::MouseButtonPressedEvent& e);
+	bool onKeyPressed(event::KeyPressedEvent &e);
+	bool onMouseButtonPressed(event::MouseButtonPressedEvent &e);
 	void onScenePlay();
 	void onSceneStop();
 	void onDuplicateEntity();
@@ -77,10 +77,10 @@ private:
 	bool viewportHovered = false;
 	glm::vec2 viewportSize = {0.0f, 0.0f};
 	glm::vec2 viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
-	shrd<renderer::Framebuffer> framebuffer;
+	shared<renderer::Framebuffer> framebuffer;
 
-	shrd<scene::Scene> activeScene;
-	shrd<scene::Scene> editorScene;
+	shared<scene::Scene> activeScene;
+	shared<scene::Scene> editorScene;
 
 	int gizmoType = -1;
 	std::filesystem::path currentScenePath{};
@@ -90,8 +90,8 @@ private:
 	panel::ContentBrowser contentBrowser;
 
 	// Editor resources
-	shrd<renderer::Texture2D> iconPlay;
-	shrd<renderer::Texture2D> iconStop;
+	shared<renderer::Texture2D> iconPlay;
+	shared<renderer::Texture2D> iconStop;
 };
 
 }// namespace owl

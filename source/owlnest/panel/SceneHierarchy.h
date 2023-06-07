@@ -53,12 +53,12 @@ public:
 	 * @brief Constructor
 	 * @param scene The base scene
 	 */
-	explicit SceneHierarchy(const shrd<scene::Scene> &scene);
+	explicit SceneHierarchy(const shared<scene::Scene> &scene);
 	/**
 	 * @brief Define the Scene context
 	 * @param scene The Scene
 	 */
-	void setContext(const shrd<scene::Scene> &scene);
+	void setContext(const shared<scene::Scene> &scene);
 	/**
 	 * @brief Action on Gui Render
 	 */
@@ -82,7 +82,7 @@ private:
 	 */
 	void drawComponents(scene::Entity entity);
 	/// The scene
-	shrd<scene::Scene> context;
+	shared<scene::Scene> context;
 	/// The selected item
 	scene::Entity selection;
 };

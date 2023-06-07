@@ -188,7 +188,7 @@ void ImGuiLayer::initializeDocking() {
 		ImGui::PopStyleVar(2);
 	// DockSpace
 	ImGuiIO &io = ImGui::GetIO();
-	ImGuiStyle& style = ImGui::GetStyle();
+	ImGuiStyle &style = ImGui::GetStyle();
 	float minWinSizeX = style.WindowMinSize.x;
 	style.WindowMinSize.x = 370.0f;
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {

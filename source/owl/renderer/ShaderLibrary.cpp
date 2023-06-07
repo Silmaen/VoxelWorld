@@ -11,48 +11,47 @@
 namespace owl::renderer {
 
 
-void ShaderLibrary::add(const shrd<Shader> &shader) {
-	if (exists(shader->getName())){
+void ShaderLibrary::add(const shared<Shader> &shader) {
+	if (exists(shader->getName())) {
 		OWL_CORE_WARN("Shader {} Already in the library", shader->getName())
-		return ;
+		return;
 	}
 	shaders[shader->getName()] = shader;
 }
 
-void ShaderLibrary::addNRename(const std::string &name, const shrd<Shader> &shader) {
-	if (exists(name)){
+void ShaderLibrary::addNRename(const std::string &name, const shared<Shader> &shader) {
+	if (exists(name)) {
 		OWL_CORE_WARN("Shader {} Already in the library", name)
-		return ;
+		return;
 	}
-	shader->name =name;
+	shader->name = name;
 	shaders[name] = shader;
 }
 
 void ShaderLibrary::addFromStandardPath(const std::string &name) {
-	if (exists(name)){
+	if (exists(name)) {
 		OWL_CORE_WARN("Shader {} Already in the library", name)
-		return ;
+		return;
 	}
 	shaders[name] = Shader::create(name);
 }
 
-shrd<Shader> ShaderLibrary::load(const std::filesystem::path &file) {
-	shrd<Shader> shader = Shader::create(file);
-	if(shader == nullptr){
+shared<Shader> ShaderLibrary::load(const std::filesystem::path &file) {
+	shared<Shader> shader = Shader::create(file);
+	if (shader == nullptr) {
 		OWL_CORE_WARN("Could not load shader file {}", file.string())
 		return nullptr;
 	}
 	shaders[shader->getName()] = shader;
 	return shader;
 }
-shrd<Shader> ShaderLibrary::get(const std::string &name) {
-	OWL_CORE_ASSERT(exists(name),"Shader {} not found in library",name)
+shared<Shader> ShaderLibrary::get(const std::string &name) {
+	OWL_CORE_ASSERT(exists(name), "Shader {} not found in library", name)
 	return shaders[name];
 }
 bool ShaderLibrary::exists(const std::string &name) const {
 	return shaders.find(name) != shaders.end();
-
 }
 
 
-}// namespace renderer
+}// namespace owl::renderer

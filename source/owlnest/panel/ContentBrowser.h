@@ -50,12 +50,13 @@ public:
 	 * @brief The render command
 	 */
 	void onImGuiRender();
+
 private:
 	/// The actual folder
 	std::filesystem::path currentPath;
 
-	shrd<renderer::Texture2D> fileIcon;
-	shrd<renderer::Texture2D> dirIcon;
+	shared<renderer::Texture2D> fileIcon;
+	shared<renderer::Texture2D> dirIcon;
 };
 
-}// namespace owl
+}// namespace owl::panel

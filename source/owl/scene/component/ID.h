@@ -10,14 +10,17 @@
 
 #include "core/UUID.h"
 
+/**
+ * @brief namespace for the scene components.
+ */
 namespace owl::scene::component {
 
 /**
- * @brief Class ID
+ * @brief Class ID.
  */
 struct OWL_API ID {
-	/// The ID
+	/// The ID.
 	core::UUID id;
 };
 
-}// namespace component
+}// namespace owl::scene::component

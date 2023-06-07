@@ -23,7 +23,7 @@ ContentBrowser::ContentBrowser() {
 		auto fileIconPath = assetPath / "icons" / "FileIcon.png";
 		if (exists(fileIconPath)) {
 			fileIcon = renderer::Texture2D::create(fileIconPath);
-		}else{
+		} else {
 			OWL_CORE_WARN("Unable to find file icon at {}", fileIconPath.string())
 		}
 	}
@@ -31,7 +31,7 @@ ContentBrowser::ContentBrowser() {
 		auto dirIconPath = assetPath / "icons" / "DirectoryIcon.png";
 		if (exists(dirIconPath)) {
 			dirIcon = renderer::Texture2D::create(dirIconPath);
-		}else{
+		} else {
 			OWL_CORE_WARN("Unable to find directory icon at {}", dirIconPath.string())
 		}
 	}
@@ -62,23 +62,23 @@ void ContentBrowser::onImGuiRender() {
 		auto relativePath = std::filesystem::relative(path, assetPath);
 		std::string filenameString = relativePath.filename().string();
 		ImGui::PushID(filenameString.c_str());
-		shrd<renderer::Texture2D> icon = directoryEntry.is_directory()? dirIcon : fileIcon;
+		shared<renderer::Texture2D> icon = directoryEntry.is_directory() ? dirIcon : fileIcon;
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-		if (icon){
-			ImGui::ImageButton(reinterpret_cast<ImTextureID>(icon->getRendererID()), {thumbnailSize, thumbnailSize},{0,1}, {1,0});
-			if (ImGui::BeginDragDropSource()){
+		if (icon) {
+			ImGui::ImageButton(reinterpret_cast<ImTextureID>(icon->getRendererID()), {thumbnailSize, thumbnailSize}, {0, 1}, {1, 0});
+			if (ImGui::BeginDragDropSource()) {
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", relativePath.string().c_str(), relativePath.string().size() + 1);
 				ImGui::EndDragDropSource();
 			}
 
 			ImGui::PopStyleColor();
 
-			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked((ImGuiMouseButton_Left))){
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked((ImGuiMouseButton_Left))) {
 				if (directoryEntry.is_directory())
 					currentPath /= path.filename();
 			}
 			ImGui::TextWrapped("%s", filenameString.c_str());
-		}else {
+		} else {
 			if (directoryEntry.is_directory()) {
 				if (ImGui::Button(filenameString.c_str())) {
 					currentPath /= path.filename();

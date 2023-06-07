@@ -12,17 +12,21 @@
 
 namespace owl::renderer {
 
+/// Format for the texture frame buffer.
 enum class FramebufferTextureFormat {
 	None = 0,
-	// Color
+	/// Color.
 	RGBA8,
 	RED_INTEGER,
-	// Depth/stencil
+	/// Depth/stencil.
 	DEPTH24STENCIL8,
-	// Defaults
+	/// Defaults.
 	Depth = DEPTH24STENCIL8
 };
 
+/**
+ * @brief Specification for the texture Framebuffer.
+ */
 struct FramebufferTextureSpecification {
 	FramebufferTextureSpecification() = default;
 	FramebufferTextureSpecification(FramebufferTextureFormat format)
@@ -31,6 +35,9 @@ struct FramebufferTextureSpecification {
 	// TODO: filtering/wrap
 };
 
+/**
+ * @brief Specification for the attachment Framebuffer.
+ */
 struct FramebufferAttachmentSpecification {
 	FramebufferAttachmentSpecification() = default;
 	FramebufferAttachmentSpecification(std::initializer_list<FramebufferTextureSpecification> attachments_)
@@ -39,17 +46,18 @@ struct FramebufferAttachmentSpecification {
 };
 
 /**
- * @brief Framebuffer specification
+ * @brief Framebuffer specification.
  */
 struct FramebufferSpecification {
-	/// width
+	/// width.
 	uint32_t width = 0;
-	/// height
+	/// height.
 	uint32_t height = 0;
+	/// Attachment Specs.
 	FramebufferAttachmentSpecification attachments;
-	/// Amount of sample
+	/// Amount of sample.
 	uint32_t samples = 1;
-	/// If chained target must be swap
+	/// If chained target must be swap.
 	bool swapChainTarget = false;
 };
 
@@ -58,69 +66,73 @@ struct FramebufferSpecification {
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 /**
- * @brief Class Framebuffer
+ * @brief Class Framebuffer.
  */
 class OWL_API Framebuffer {
 public:
-	/**
-	 * @brief Default copy constructor
-	 */
-	Framebuffer(const Framebuffer &) = default;
-	/**
-	 * @brief Default move constructor
-	 */
-	Framebuffer(Framebuffer &&) = default;
-	/**
-	 * @brief Default copy assignation
-	 * @return this
-	 */
-	Framebuffer &operator=(const Framebuffer &) = default;
-	/**
-	 * @brief Default move assignation
-	 * @return this
-	 */
-	Framebuffer &operator=(Framebuffer &&) = default;
-	/**
-	 * @brief Default constructor.
-	 */
 	Framebuffer() = default;
+	Framebuffer(const Framebuffer &) = default;
+	Framebuffer(Framebuffer &&) = default;
+	Framebuffer &operator=(const Framebuffer &) = default;
+	Framebuffer &operator=(Framebuffer &&) = default;
+
 	/**
 	 * @brief Destructor.
 	 */
 	virtual ~Framebuffer() = default;
+
 	/**
-	 * @brief Activate the shader on the GPU
+	 * @brief Activate the shader on the GPU.
 	 */
 	virtual void bind() = 0;
+
 	/**
-	 * @brief Deactivate the shader on the GPU
+	 * @brief Deactivate the shader on the GPU.
 	 */
 	virtual void unbind() = 0;
+
 	/**
-	 * @brief Change the size of the frame buffer
-	 * @param width New width
-	 * @param height New height
+	 * @brief Change the size of the frame buffer.
+	 * @param width New width.
+	 * @param height New height.
 	 */
 	virtual void resize(uint32_t width, uint32_t height) = 0;
-	virtual int readPixel(uint32_t attachmentIndex, int x, int y) = 0;
-	virtual void clearAttachment(uint32_t attachmentIndex, int value) = 0;
+
 	/**
-	 * @brief Get renderer id
-	 * @param index The color Index
-	 * @return The renderer ID
+	 * Get the Pixel information.
+	 * @param attachmentIndex Index in the attachment.
+	 * @param x Horizontal coordinate.
+	 * @param y Vertical coordinate.
+	 * @return Pixel index.
+	 */
+	virtual int readPixel(uint32_t attachmentIndex, int x, int y) = 0;
+
+	/**
+	 * @brief Reset an attachment with the given value.
+	 * @param attachmentIndex Index of the attachment.
+	 * @param value The new value to affect.
+	 */
+	virtual void clearAttachment(uint32_t attachmentIndex, int value) = 0;
+
+	/**
+	 * @brief Get renderer id.
+	 * @param index The color Index.
+	 * @return The renderer ID.
 	 */
 	[[nodiscard]] virtual uint32_t getColorAttachmentRendererID(uint32_t index = 0) const = 0;
+
 	/**
-	 * @brief Get the specs
-	 * @return The specs
+	 * @brief Get the specs.
+	 * @return The specs.
 	 */
-	virtual const FramebufferSpecification &getSpecification() const = 0;
+	[[nodiscard]] virtual const FramebufferSpecification &getSpecification() const = 0;
+
 	/**
-	 * @brief Create the frame buffer
-	 * @param spec Specifications
-	 * @return The Frame buffer
+	 * @brief Create the frame buffer.
+	 * @param spec Specifications.
+	 * @return The Frame buffer.
 	 */
-	static shrd<Framebuffer> create(const FramebufferSpecification &spec);
+	static shared<Framebuffer> create(const FramebufferSpecification &spec);
 
 private:
 };

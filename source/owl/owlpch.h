@@ -20,7 +20,7 @@
 #include <functional>
 #include <memory>
 #include <random>
-//#include <ranges>
+
 #include <streambuf>
 #include <string>
 #include <string_view>
@@ -31,6 +31,9 @@
 
 #include "core/Log.h"
 #include "debug/Profiler.h"
+
+// third party
+#include <magic_enum.hpp>
 
 #ifdef __clang__
 #pragma clang diagnostic pop

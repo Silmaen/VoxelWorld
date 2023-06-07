@@ -13,12 +13,15 @@
 namespace owl::scene::component {
 
 /**
- * @brief Class Camera
+ * @brief Class Camera.
  */
 struct OWL_API Camera {
+	/// If camera is the primary one.
 	bool primary = true;
+	/// Has camera fixed ratio.
 	bool fixedAspectRatio = false;
+	/// The scene camera.
 	SceneCamera camera;
 };
 
-}// namespace owl::renderer::component
+}// namespace owl::scene::component

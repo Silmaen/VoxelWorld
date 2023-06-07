@@ -47,8 +47,8 @@ Scene::Scene() = default;
 
 Scene::~Scene() = default;
 
-shrd<Scene> Scene::copy(shrd<Scene> other) {
-	shrd<Scene> newScene = mk_shrd<Scene>();
+shared<Scene> Scene::copy(shared<Scene> other) {
+	shared<Scene> newScene = mk_shared<Scene>();
 
 	newScene->viewportWidth = other->viewportWidth;
 	newScene->viewportHeight = other->viewportHeight;
@@ -143,10 +143,10 @@ void Scene::onUpdateRuntime([[maybe_unused]] const core::Timestep &ts) {
 			for (auto entity: view) {
 				auto [transform, circle] = view.get<component::Transform, component::CircleRenderer>(entity);
 				renderer::Renderer2D::drawCircle({.transform = transform.getTransform(),
-												 .color = circle.color,
-												 .thickness = circle.thickness,
-												 .fade = circle.fade,
-												 .entityID = static_cast<int>(entity)});
+												  .color = circle.color,
+												  .thickness = circle.thickness,
+												  .fade = circle.fade,
+												  .entityID = static_cast<int>(entity)});
 			}
 		}
 	}

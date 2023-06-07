@@ -13,21 +13,33 @@
 namespace owl::scene::component {
 
 /**
- * @brief Class NaticeScript
+ * @brief Class NativeScript.
  */
 struct OWL_API NativeScript {
 public:
+	/// Script instance.
 	ScriptableEntity *instance = nullptr;
 
-	ScriptableEntity* (*instantiateScript)();
-	void (*destroyScript)(NativeScript*);
+	/**
+	 * @brief Run the script.
+	 * @return the script instance.
+	 */
+	ScriptableEntity *(*instantiateScript)();
 
+	/**
+	 * @brief Run destroy script.
+	 */
+	void (*destroyScript)(NativeScript *);
+
+	/**
+	 * @brief Bind the script.
+	 * @tparam T New script.
+	 */
 	template<typename T>
 	void bind() {
-		instantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
-		destroyScript = [](NativeScript* nsc) {delete nsc->instance; nsc->instance=nullptr; };
+		instantiateScript = []() { return static_cast<ScriptableEntity *>(new T()); };
+		destroyScript = [](NativeScript *nsc) {delete nsc->instance; nsc->instance=nullptr; };
 	}
-
 };
 
 }// namespace owl::scene::component

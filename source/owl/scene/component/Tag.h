@@ -13,7 +13,11 @@
 
 namespace owl::scene::component {
 
+/**
+ * @brief A tag component.
+ */
 struct OWL_API Tag {
+	/// The tag name.
 	std::string tag;
 };
 

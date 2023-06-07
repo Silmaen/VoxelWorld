@@ -17,36 +17,34 @@ namespace owl::renderer {
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 /**
- * @brief Class GraphicContext
+ * @brief Class GraphicContext.
  */
 class GraphContext {
 public:
+	GraphContext() = default;
 	GraphContext(const GraphContext &) = delete;
 	GraphContext(GraphContext &&) = delete;
 	GraphContext &operator=(const GraphContext &) = delete;
 	GraphContext &operator=(GraphContext &&) = delete;
-	/**
-	 * @brief Default constructor.
-	 */
-	GraphContext() = default;
+
 	/**
 	 * @brief Destructor.
 	 */
 	virtual ~GraphContext() = default;//---UNCOVER---
 
 	/**
-	 * @brief Initialize the context
+	 * @brief Initialize the context.
 	 */
 	virtual void init() = 0;
 	/**
-	 * @brief Doo the buffer swap
+	 * @brief Doo the buffer swap.
 	 */
 	virtual void swapBuffers() = 0;
 
 	/**
-	 * @brief Create a Graphics context
-	 * @param window The window into render context
-	 * @return The created context
+	 * @brief Create a Graphics context.
+	 * @param window The window into render context.
+	 * @return The created context.
 	 */
 	static uniq<GraphContext> create(void *window);
 

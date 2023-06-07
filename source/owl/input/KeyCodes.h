@@ -10,13 +10,13 @@
 #include <cstdint>
 
 /**
- * @brief Namespace for Input management
+ * @brief Namespace for Input management.
  */
 namespace owl::input {
-/// Wrap Key code size
+/// Wrap Key code size.
 using KeyCode = uint16_t;
 
-/// namespace for key codes
+/// namespace for key codes.
 namespace key {
 enum : KeyCode {
 	// From glfw3.h

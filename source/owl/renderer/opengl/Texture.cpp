@@ -12,17 +12,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <utility>
+
 namespace owl::renderer::opengl {
 
 
-Texture2D::Texture2D(uint32_t width_, uint32_t height_):width{width_},height{height_} {
+Texture2D::Texture2D(uint32_t width_, uint32_t height_) : width{width_}, height{height_} {
 	OWL_PROFILE_FUNCTION()
 
 	internalFormat = GL_RGBA8;
 	dataFormat = GL_RGBA;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
-	glTextureStorage2D(rendererID, 1, internalFormat, width, height);
+	glTextureStorage2D(rendererID, 1, internalFormat, static_cast<GLsizei>(width), static_cast<GLsizei>(height));
 
 	glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -31,7 +33,7 @@ Texture2D::Texture2D(uint32_t width_, uint32_t height_):width{width_},height{hei
 	glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
-Texture2D::Texture2D(const std::filesystem::path &path_) : path{path_} {
+Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {
 	OWL_PROFILE_FUNCTION()
 
 	int width_, height_, channels;
@@ -58,7 +60,7 @@ Texture2D::Texture2D(const std::filesystem::path &path_) : path{path_} {
 
 	OWL_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!")
 	glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
-	glTextureStorage2D(rendererID, 1, internalFormat, width, height);
+	glTextureStorage2D(rendererID, 1, internalFormat, static_cast<GLsizei>(width), static_cast<GLsizei>(height));
 
 	glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -66,7 +68,7 @@ Texture2D::Texture2D(const std::filesystem::path &path_) : path{path_} {
 	glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTextureSubImage2D(rendererID, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
+	glTextureSubImage2D(rendererID, 0, 0, 0, static_cast<GLsizei>(width), static_cast<GLsizei>(height), dataFormat, GL_UNSIGNED_BYTE, data);
 
 	stbi_image_free(data);
 }
@@ -88,7 +90,7 @@ void Texture2D::setData(void *data, [[maybe_unused]] uint32_t size) {
 
 	[[maybe_unused]] uint32_t bpp = dataFormat == GL_RGBA ? 4 : 3;
 	OWL_CORE_ASSERT(size == width * height * bpp, "Data must be entire texture!")
-	glTextureSubImage2D(rendererID, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
+	glTextureSubImage2D(rendererID, 0, 0, 0, static_cast<GLsizei>(width), static_cast<GLsizei>(height), dataFormat, GL_UNSIGNED_BYTE, data);
 }
 
 }// namespace owl::renderer::opengl

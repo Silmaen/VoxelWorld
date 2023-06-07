@@ -15,7 +15,7 @@
 
 namespace owl::renderer {
 
-shrd<VertexArray> VertexArray::create() {
+shared<VertexArray> VertexArray::create() {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
@@ -23,7 +23,7 @@ shrd<VertexArray> VertexArray::create() {
 			OWL_CORE_ASSERT(false, "RenderAPI {} is currently not supported!", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::VertexArray>();
+			return mk_shared<opengl::VertexArray>();
 	}
 
 	OWL_CORE_ASSERT(false, "Unknown Renderer API!")

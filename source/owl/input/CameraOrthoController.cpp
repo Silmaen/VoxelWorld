@@ -72,7 +72,7 @@ bool CameraOrthoController::onWindowResized(event::WindowResizeEvent &e) {
 	return false;
 }
 
-void CameraOrthoController::onResize(float width, float height){
+void CameraOrthoController::onResize(float width, float height) {
 	aspectRatio = width / height;
 	camera.setProjection(-aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
 }

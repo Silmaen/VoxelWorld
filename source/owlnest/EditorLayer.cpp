@@ -49,7 +49,7 @@ void EditorLayer::onAttach() {
 	specs.height = 720;
 	framebuffer = renderer::Framebuffer::create(specs);
 
-	activeScene = mk_shrd<scene::Scene>();
+	activeScene = mk_shared<scene::Scene>();
 	editorCamera = renderer::CameraEditor(30.0f, 1.778f, 0.1f, 1000.0f);
 
 	auto iconPath = core::Application::get().getAssetDirectory() / "icons";
@@ -295,7 +295,7 @@ void EditorLayer::renderToolbar() {
 	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	float size = ImGui::GetWindowHeight() - 4.0f;
-	shrd<renderer::Texture2D> icon = state == State::Edit ? iconPlay : iconStop;
+	shared<renderer::Texture2D> icon = state == State::Edit ? iconPlay : iconStop;
 	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(icon->getRendererID()), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0)) {
 		if (state == State::Edit)
@@ -309,7 +309,7 @@ void EditorLayer::renderToolbar() {
 }
 
 void EditorLayer::newScene() {
-	activeScene = mk_shrd<scene::Scene>();
+	activeScene = mk_shared<scene::Scene>();
 	activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 	sceneHierarchy.setContext(activeScene);
 }
@@ -328,7 +328,7 @@ void EditorLayer::openScene(const std::filesystem::path &scene) {
 	}
 	if (state != State::Edit)
 		onSceneStop();
-	auto newScene = mk_shrd<scene::Scene>();
+	auto newScene = mk_shared<scene::Scene>();
 	scene::SceneSerializer serializer(newScene);
 	if (serializer.deserialize(scene)) {
 		editorScene = newScene;

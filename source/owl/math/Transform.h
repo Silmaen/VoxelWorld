@@ -14,13 +14,13 @@
 namespace owl::math {
 
 /**
- * @brief Decompose transformation's matrix into vector components
- * @param[in] transform Transformation matrix
- * @param[out] translation Translation vector
- * @param[out] rotation Rotation vector
- * @param[out] scale Scale vector
- * @return True if decomposition succeed
+ * @brief Decompose transformation's matrix into vector components.
+ * @param[in] transform Transformation matrix.
+ * @param[out] translation Translation vector.
+ * @param[out] rotation Rotation vector.
+ * @param[out] scale Scale vector.
+ * @return True if decomposition succeed.
  */
-OWL_API bool decomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale);
+OWL_API bool decomposeTransform(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &rotation, glm::vec3 &scale);
 
-}
+}// namespace owl::math

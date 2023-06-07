@@ -1,3 +1,10 @@
+/**
+* @file Profiler.h
+* @author Silmaen
+* @date 17/08/2022
+* Copyright © 2022 All rights reserved.
+* All modification must get authorization from the author.
+*/
 #pragma once
 
 #include "core/Log.h"
@@ -13,27 +20,28 @@
 
 namespace owl::debug {
 
+/// The type for microseconds.
 using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
 
 /**
- * @brief Data for profiling result
+ * @brief Data for profiling result.
  */
 struct ProfileResult {
-	std::string name; /// Result's name
-	FloatingPointMicroseconds start; /// Data's starting time point
-	std::chrono::microseconds elapsedTime; /// Data's elapsed time
-	std::thread::id threadID; /// Data's thread ID
+	std::string name;                     /// Result's name.
+	FloatingPointMicroseconds start;      /// Data's starting time point.
+	std::chrono::microseconds elapsedTime;/// Data's elapsed time.
+	std::thread::id threadID;             /// Data's thread ID.
 };
 
 /**
- * @brief Profile Session Data
+ * @brief Profile Session Data.
  */
 struct ProfileSession {
-	std::string name; /// Session's name
+	std::string name;/// Session's name.
 };
 
 /**
- * @brief class Profiler
+ * @brief class Profiler.
  */
 class OWL_API Profiler {
 public:
@@ -43,9 +51,9 @@ public:
 	Profiler &operator=(Profiler &&) = delete;
 
 	/**
-	 * @brief Begins a new profiling session
-	 * @param name_ Session's name
-	 * @param filepath Session File path to store information
+	 * @brief Begins a new profiling session.
+	 * @param name_ Session's name.
+	 * @param filepath Session File path to store information.
 	 */
 	void beginSession(const std::string &name_,
 					  const std::string &filepath = "results.json") {
@@ -81,7 +89,7 @@ public:
 	}
 
 	/**
-	 * @brief Terminate profile session
+	 * @brief Terminate profile session.
 	 */
 	void endSession() {
 		std::lock_guard lock(profilerMutex);
@@ -89,8 +97,8 @@ public:
 	}
 
 	/**
-	 * @brief Write profiling result into json file
-	 * @param result The Result to write
+	 * @brief Write profiling result into json file.
+	 * @param result The Result to write.
 	 */
 	void writeProfile(const ProfileResult &result) {
 		std::stringstream json;
@@ -114,24 +122,24 @@ public:
 	}
 
 	/**
-	 * @brief Singleton accessor
-	 * @return This instance
+	 * @brief Singleton accessor.
+	 * @return This instance.
 	 */
 	static Profiler &get();
 
 private:
 	/**
-	 * @brief Private Constructor
+	 * @brief Private Constructor.
 	 */
 	Profiler() : currentSession(nullptr) {}
 
 	/**
-	 * @brief Private destructor
+	 * @brief Private destructor.
 	 */
 	~Profiler() { endSession(); }
 
 	/**
-	 * @brief write json header
+	 * @brief write json header.
 	 */
 	void writeHeader() {
 		outputStream << R"({"otherData": {},"traceEvents":[{})";
@@ -139,7 +147,7 @@ private:
 	}
 
 	/**
-	 * @brief write json footer
+	 * @brief write json footer.
 	 */
 	void writeFooter() {
 		outputStream << "]}";
@@ -147,9 +155,9 @@ private:
 	}
 
 	/**
-	 * @brief Terminate the session
+	 * @brief Terminate the session.
 	 *
-	 * @note: you must already own lock on m_Mutex before calling InternalEndSession()
+	 * @note: you must already own lock on m_Mutex before calling InternalEndSession().
 	 */
 	void internalEndSession() {
 		if (currentSession) {
@@ -160,24 +168,35 @@ private:
 		}
 	}
 
-	std::mutex profilerMutex; /// Mutex
-	ProfileSession *currentSession; /// actual running session
-	std::ofstream outputStream; /// output file stream
+	std::mutex profilerMutex;      /// Mutex.
+	ProfileSession *currentSession;/// actual running session.
+	std::ofstream outputStream;    /// output file stream.
 };
 
 /**
- * @brief Timer used for profiling
+ * @brief Timer used for profiling.
  */
 class ProfileTimer {
 public:
+	/**
+	 * @brief Constructor.
+	 * @param name_ Scope's name.
+	 */
 	explicit ProfileTimer(const char *name_) : name(name_), startTimepoint{std::chrono::steady_clock::now()},
-													   stopped(false) {
+											   stopped(false) {
 	}
+
+	/**
+	 * @brief Destructor.
+	 */
 	~ProfileTimer() {
 		if (!stopped)
 			stop();
 	}
 
+	/**
+	 * @brief Stop the timer.
+	 */
 	void stop() {
 		auto endTimepoint = std::chrono::steady_clock::now();
 		auto highResStart =
@@ -194,20 +213,24 @@ public:
 
 		stopped = true;
 	}
+
 private:
+	/// Scope's name.
 	const char *name;
+	/// Timer starting point.
 	std::chrono::time_point<std::chrono::steady_clock> startTimepoint;
+	/// Timer state, true if not running.
 	bool stopped;
 };
 
 /**
- * @brief Namespace for profinling utility functions
+ * @brief Namespace for profiling utility functions.
  */
 namespace utils {
 
 /**
- * @brief Simple char array
- * @tparam N Size of the array
+ * @brief Simple char array.
+ * @tparam N Size of the array.
  */
 template<size_t N>
 struct ChangeResult {
@@ -215,12 +238,12 @@ struct ChangeResult {
 };
 
 /**
- * @brief Simple String cleaner
- * @tparam N Size of the string
- * @tparam K Size of pattern to remove
- * @param expr The string
- * @param remove Pattern to remove
- * @return The corrected string
+ * @brief Simple String cleaner.
+ * @tparam N Size of the string.
+ * @tparam K Size of pattern to remove.
+ * @param expr The string.
+ * @param remove Pattern to remove.
+ * @return The corrected string.
  */
 template<size_t N, size_t K>
 constexpr auto cleanupOutputString(const char (&expr)[N],
@@ -273,8 +296,8 @@ constexpr auto cleanupOutputString(const char (&expr)[N],
 #define OWL_PROFILE_BEGIN_SESSION(name, filepath) \
 	::owl::debug::Profiler::get().beginSession(name, filepath);
 #define OWL_PROFILE_END_SESSION() ::owl::debug::Profiler::get().endSession();
-#define OWL_PROFILE_SCOPE_LINE2(name, line)                                         \
-	constexpr auto fixedName##line =                                                \
+#define OWL_PROFILE_SCOPE_LINE2(name, line)                             \
+	constexpr auto fixedName##line =                                    \
 			::owl::debug::utils::cleanupOutputString(name, "__cdecl "); \
 	::owl::debug::ProfileTimer timer##line(fixedName##line.Data);
 #define OWL_PROFILE_SCOPE_LINE(name, line) OWL_PROFILE_SCOPE_LINE2(name, line)

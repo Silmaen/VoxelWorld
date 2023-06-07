@@ -17,7 +17,7 @@ namespace owl::renderer {
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 /**
- * @brief Class Camera
+ * @brief Class Camera.
  */
 class Camera {
 public:
@@ -32,14 +32,19 @@ public:
 	virtual ~Camera() = default;
 
 	/**
-	 * @brief Construct the camera with a propjection
-	 * @param proj projection matrix
+	 * @brief Construct the camera with a projection.
+	 * @param proj projection matrix.
 	 */
-	Camera(const glm::mat4& proj):projection{proj}{}
+	Camera(const glm::mat4 &proj) : projection{proj} {}
 
-	[[nodiscard]] const glm::mat4& getProjection()const{return projection;}
+	/**
+	 * @brief Get the projection matrix of the camera.
+	 * @return The camera's projection matrix.
+	 */
+	[[nodiscard]] const glm::mat4 &getProjection() const { return projection; }
+
 protected:
-	/// Camera's projection
+	/// Camera's projection.
 	glm::mat4 projection = glm::mat4(1.0f);
 };
 #ifdef __clang__

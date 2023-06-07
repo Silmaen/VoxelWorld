@@ -20,7 +20,7 @@ uniq<GraphContext> GraphContext::create(void *window) {
 	switch (type) {
 		case RenderAPI::Type::None:
 		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
+			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
 			return mk_uniq<opengl::GraphContext>(static_cast<GLFWwindow *>(window));

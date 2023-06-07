@@ -15,11 +15,21 @@
 
 namespace owl::scene::component {
 
+/**
+ * @brief The transformation component.
+ */
 struct OWL_API Transform {
+	/// The translation.
 	glm::vec3 translation = {0.f, 0.f, 0.f};
+	/// The rotation.
 	glm::vec3 rotation = {0.f, 0.f, 0.f};
+	/// The scale.
 	glm::vec3 scale = {1.f, 1.f, 1.f};
 
+	/**
+	 * @brief Get the transformation matrix based on TRS.
+	 * @return The transformation matrix.
+	 */
 	[[nodiscard]] glm::mat4 getTransform() const {
 		return glm::translate(glm::mat4(1.0f), translation) * glm::toMat4(glm::quat(rotation)) *
 			   glm::scale(glm::mat4(1.f), scale);

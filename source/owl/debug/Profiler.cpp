@@ -10,9 +10,9 @@
 
 namespace owl::debug {
 
-	Profiler &Profiler::get() {
-		static Profiler instance;
-		return instance;
-	}
+Profiler &Profiler::get() {
+	static Profiler instance;
+	return instance;
+}
 
 }// namespace owl::debug

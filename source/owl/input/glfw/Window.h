@@ -8,14 +8,17 @@
 
 #pragma once
 
-#include "renderer/GraphContext.h"
 #include "../Window.h"
 #include "core/external/glfw3.h"
+#include "renderer/GraphContext.h"
 
+/**
+ * @brief Namespace for the glfw  elements.
+ */
 namespace owl::input::glfw {
 
 /**
- * @brief Class GLFW Window
+ * @brief Class GLFW Window.
  */
 class OWL_API Window : public ::owl::input::Window {
 public:
@@ -23,9 +26,10 @@ public:
 	Window(Window &&) = delete;
 	Window &operator=(const Window &) = delete;
 	Window &operator=(Window &&) = delete;
+
 	/**
 	 * @brief Default constructor.
-	 * @param props The window properties
+	 * @param props The window properties.
 	 */
 	explicit Window(const Properties &props);
 
@@ -33,81 +37,84 @@ public:
 	 * @brief Destructor.
 	 */
 	~Window() override;
+
 	/**
-	 * @brief Function called at Update Time
+	 * @brief Function called at Update Time.
 	 */
 	void onUpdate() override;
 
 	/**
-	 * @brief Get Size attribute of width
-	 * @return The window's width
+	 * @brief Get Size attribute of width.
+	 * @return The window's width.
 	 */
 	[[nodiscard]] uint32_t getWidth() const override { return windowData.width; }
 
 	/**
-	 * @brief Get Size attribute of height
-	 * @return The window's height
+	 * @brief Get Size attribute of height.
+	 * @return The window's height.
 	 */
 	[[nodiscard]] uint32_t getHeight() const override { return windowData.height; }
 
 
 	/**
-	 * @brief Define the Event Callback function
-	 * @param callback The new callback function
+	 * @brief Define the Event Callback function.
+	 * @param callback The new callback function.
 	 */
 	void setEventCallback(const EventCallback &callback) override {
 		windowData.eventCallback = callback;
 	}
 	/**
-	 * @brief St the VSync
-	 * @param enabled Should VSync enabled
+	 * @brief St the VSync.
+	 * @param enabled Should VSync enabled.
 	 */
 	void setVSync(bool enabled) override;
+
 	/**
-	 * @brief Check for VSync
-	 * @return True if VSync enabled
+	 * @brief Check for VSync.
+	 * @return True if VSync enabled.
 	 */
 	[[nodiscard]] bool isVSync() const override;
 
 	/**
-	 * @brief Access to the Native Window
-	 * @return Native window's raw pointer
+	 * @brief Access to the Native Window.
+	 * @return Native window's raw pointer.
 	 */
 	[[nodiscard]] void *getNativeWindow() const override { return glfwWindow; }
 
 private:
 	/**
-	 * @brief Initialize the window
-	 * @param props Properties of the window
+	 * @brief Initialize the window.
+	 * @param props Properties of the window.
 	 */
 	void init(const Properties &props);
+
 	/**
-	 * @brief Terminate the window
+	 * @brief Terminate the window.
 	 */
 	void shutdown();
-	/// Pointer to the GLFW window
+	/// Pointer to the GLFW window.
 	GLFWwindow *glfwWindow{};
-	/// Pointer to the Graphic Context
+	/// Pointer to the Graphic Context.
 	uniq<renderer::GraphContext> context;
 
 	/**
-	 * @brief Window's data
+	 * @brief Window's data.
 	 */
 	struct WindowData {
-		/// Window's title
+		/// Window's title.
 		std::string title{};
-		/// Window's width
+		/// Window's width.
 		uint32_t width = 0;
-		/// Window's height
+		/// Window's height.
 		uint32_t height = 0;
-		/// Window's VSync property
+		/// Window's VSync property.
 		bool VSync = false;
-		/// Event Call back
+		/// Event Call back.
 		EventCallback eventCallback{};
 	};
 
-	/// The Window's data
+	/// The Window's data.
 	WindowData windowData{};
 };
 
-}// namespace owl::window::glfw
+}// namespace owl::input::glfw

@@ -10,6 +10,7 @@
     "cmake/CMakePresetsWSL.json",
     "cmake/CMakePresetsRaspberryPi.json",
     "cmake/CMakePresetsLinux.json",
-    "cmake/CMakePresetsVisualStudio.json"
+    "cmake/CMakePresetsVisualStudio.json",
+    "cmake/CMakePresetsCI.json"
   ]
 }

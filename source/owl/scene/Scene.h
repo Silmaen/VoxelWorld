@@ -9,8 +9,8 @@
 #pragma once
 
 #include "core/Timestep.h"
-#include "renderer/CameraEditor.h"
 #include "core/UUID.h"
+#include "renderer/CameraEditor.h"
 
 #include <entt/entt.hpp>
 
@@ -23,7 +23,7 @@ class Entity;
 class ScriptableEntity;
 
 /**
- * @brief Class Scene
+ * @brief Class Scene.
  */
 class OWL_API Scene {
 public:
@@ -40,42 +40,83 @@ public:
 	 */
 	virtual ~Scene();
 
-	static shrd<Scene> copy(shrd<Scene> other);
 	/**
-	 * @brief Create entity and add it to registry
-	 * @param name Entity's name
-	 * @return The Entity
+	 * @brief Create a copy of the scene.
+	 * @param other The scene to copy.
+	 * @return Pointer to the new scene.
 	 */
-	Entity createEntity(const std::string& name = std::string());
+	static shared<Scene> copy(shared<Scene> other);
+
 	/**
-	 * @brief Create entity wit UUIDand add it to registry
-	 * @param name Entity's name
-	 * @param uuid The Entity's UUID
-	 * @return The Entity
+	 * @brief Create entity and add it to registry.
+	 * @param name Entity's name.
+	 * @return The Entity.
 	 */
-	Entity createEntityWithUUID(core::UUID uuid, const std::string& name = std::string());
+	Entity createEntity(const std::string &name = std::string());
+
+	/**
+	 * @brief Create entity with UUID and add it to registry.
+	 * @param name Entity's name.
+	 * @param uuid The Entity's UUID.
+	 * @return The Entity.
+	 */
+	Entity createEntityWithUUID(core::UUID uuid, const std::string &name = std::string());
+
+	/**
+	 * @brief Destroy n entity.
+	 * @param entity Entity to destroy.
+	 */
 	void destroyEntity(Entity entity);
+
 	/**
-	 * @brief Update actions
-	 * @param ts The time step
+	 * @brief Update actions for the runtime.
+	 * @param ts The time step.
 	 */
 	void onUpdateRuntime(const core::Timestep &ts);
-	void onUpdateEditor(core::Timestep ts, renderer::CameraEditor& camera);
 
+	/**
+	 * @brief Update action in the editor.
+	 * @param ts The time step.
+	 * @param camera The editor camera.
+	 */
+	void onUpdateEditor(core::Timestep ts, renderer::CameraEditor &camera);
+
+	/**
+	 * @brief Action when viewport resized.
+	 * @param width New viewport's width.
+	 * @param height New viewport's height.
+	 */
 	void onViewportResize(uint32_t width, uint32_t height);
 
-	void duplicateEntity(Entity entity);
 	/**
-	 * @brief Access to the primary Camera
+	 * @brief Duplicate an entity.
+	 * @param entity Entity to duplicate.
+	 */
+	void duplicateEntity(Entity entity);
+
+	/**
+	 * @brief Access to the primary Came.ra.
 	 * @return The primary camera
 	 */
 	Entity getPrimaryCamera();
-	/// Entities registry
+
+	/// Entities registry.
 	entt::registry registry;
+
 private:
+	/**
+	 * @brief Action when component is added to an entity.
+	 * @tparam T Type of the added component.
+	 * @param entity Entity receiving new component.
+	 * @param component The new component.
+	 */
 	template<typename T>
-	void onComponentAdded(Entity entity, T& component);
+	void onComponentAdded(Entity entity, T &component);
+
+	/// The viewport's width.
 	uint32_t viewportWidth = 0;
+
+	/// The viewport's height.
 	uint32_t viewportHeight = 0;
 
 	friend class Entity;

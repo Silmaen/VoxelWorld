@@ -19,40 +19,46 @@
  */
 namespace owl::event {
 
+/**
+ * @brief Type of events.
+ */
 enum class type {
-	None = 0,
+	None = 0,/// No type.
 
-	WindowClose,
-	WindowResize,
-	WindowFocus,
-	WindowLostFocus,
-	WindowMoved,
+	WindowClose,    /// Window close.
+	WindowResize,   /// Window resize.
+	WindowFocus,    /// Window Focus.
+	WindowLostFocus,/// Window lost focus.
+	WindowMoved,    /// Window moved.
 
-	AppTick,
-	AppUpdate,
-	AppRender,
+	AppTick,  /// Application tick.
+	AppUpdate,/// Application update.
+	AppRender,/// Application render.
 
-	KeyPressed,
-	KeyReleased,
-	KeyTyped,
+	KeyPressed, /// Keyboard's key pressed.
+	KeyReleased,/// Keyboard's key released.
+	KeyTyped,   /// Keyboard's key typed.
 
-	MouseButtonPressed,
-	MouseButtonReleased,
-	MouseMoved,
-	MouseScrolled
-};
-
-enum category {
-	None = 0,
-	Application = 1,
-	Input = 2,
-	Keyboard = 4,
-	Mouse = 8,
-	MouseButton = 16
+	MouseButtonPressed, /// Mouse's button pressed.
+	MouseButtonReleased,/// Mouse's button released.
+	MouseMoved,         /// Mouse moved.
+	MouseScrolled       /// Mouse wheel scrolled.
 };
 
 /**
- * @brief Abstract Class Event
+ * @brief Event categories.
+ */
+enum category {
+	None = 0,       /// No category.
+	Application = 1,/// Application event.
+	Input = 2,      /// Input event.
+	Keyboard = 4,   /// Keyboard event.
+	Mouse = 8,      /// Mouse event.
+	MouseButton = 16/// Mouse button.
+};
+
+/**
+ * @brief Abstract Class Event.
  */
 class OWL_API Event {
 public:
@@ -60,6 +66,7 @@ public:
 	Event(Event &&) = default;
 	Event &operator=(const Event &) = default;
 	Event &operator=(Event &&) = default;
+
 	/**
 	 * @brief Default constructor.
 	 */
@@ -70,55 +77,59 @@ public:
 	virtual ~Event() = default;
 
 	/**
-	 * @brief Get the Event type
-	 * @return Event Type
+	 * @brief Get the Event type.
+	 * @return Event Type.
 	 */
 	[[nodiscard]] virtual type getType() const = 0;
+
 	/**
-	 * @brief Get the category flags for the Event
-	 * @return All the Event category flags
+	 * @brief Get the category flags for the Event.
+	 * @return All the Event category flags.
 	 */
 	[[nodiscard]] virtual uint8_t getCategoryFlags() const = 0;
+
 	/**
-	 * @brief Get the Event Name
-	 * @return Event names
+	 * @brief Get the Event Name.
+	 * @return Event names.
 	 */
 	[[nodiscard]] virtual std::string getName() const = 0;
+
 	/**
-	 * @brief Get the Event Name
-	 * @return Event names
+	 * @brief Get the Event Name;
+	 * @return Event names.
 	 */
 	[[nodiscard]] virtual std::string toString() const = 0;
 
 	/**
-	 * @brief Check if the event belongs to category
-	 * @param cat Category to check
-	 * @return True if belongs to category
+	 * @brief Check if the event belongs to category.
+	 * @param cat Category to check.
+	 * @return True if belongs to category.
 	 */
 	[[nodiscard]] bool isInCategory(const category &cat) const {
 		return (getCategoryFlags() & cat) != 0;
 	}
-	/// If event already handled
+
+	/// If event already handled.
 	bool handled = false;
 };
 
 /**
- * @brief Event Dispatcher class
+ * @brief Event Dispatcher class.
  */
 class EventDispatcher {
 public:
 	/**
-	 * @brief Constructor
-	 * @param dispatchEvent Event to dispatch
+	 * @brief Constructor.
+	 * @param dispatchEvent Event to dispatch.
 	 */
 	explicit EventDispatcher(Event &dispatchEvent) : event(dispatchEvent) {}
 
 	/**
-	 * @brief Dispatching function
-	 * @tparam T EventType
-	 * @tparam F Function type (will be deduced by the compiler)
-	 * @param func The Function
-	 * @return True if succeeded
+	 * @brief Dispatching function.
+	 * @tparam T EventType.
+	 * @tparam F Function type (will be deduced by the compiler).
+	 * @param func The Function.
+	 * @return True if succeeded.
 	 */
 	template<typename T, typename F>
 	bool dispatch(const F &func) {
@@ -130,7 +141,7 @@ public:
 	}
 
 private:
-	/// The event
+	/// The event.
 	Event &event;
 };
 

@@ -21,4 +21,4 @@ uniq<Window> Window::create(const Properties &props) {
 
 Window::~Window() = default;
 
-}// namespace owl::window
+}// namespace owl::input

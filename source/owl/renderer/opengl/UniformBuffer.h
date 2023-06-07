@@ -12,36 +12,20 @@
 namespace owl::renderer::opengl {
 
 /**
- * @brief Class UniformBuffer
+ * @brief Class UniformBuffer.
  */
-class UniformBuffer: public ::owl::renderer::UniformBuffer {
+class UniformBuffer : public ::owl::renderer::UniformBuffer {
 public:
-	/**
-	 * @brief Default copy constructor
-	 */
-	UniformBuffer(const UniformBuffer &) = default;
-	/**
-	 * @brief Default move constructor
-	 */
-	UniformBuffer(UniformBuffer &&) = default;
-	/**
-	 * @brief Default copy assignation
-	 * @return this
-	 */
-	UniformBuffer &operator=(const UniformBuffer &) = default;
-	/**
-	 * @brief Default move assignation
-	 * @return this
-	 */
-	UniformBuffer &operator=(UniformBuffer &&) = default;
-	/**
-	 * @brief Default constructor.
-	 */
 	UniformBuffer() = delete;
+	UniformBuffer(const UniformBuffer &) = default;
+	UniformBuffer(UniformBuffer &&) = default;
+	UniformBuffer &operator=(const UniformBuffer &) = default;
+	UniformBuffer &operator=(UniformBuffer &&) = default;
+
 	/**
-	 * @brief Constructor
-	 * @param size Buffer's size
-	 * @param binding Buffer's binding
+	 * @brief Constructor.
+	 * @param size Buffer's size.
+	 * @param binding Buffer's binding.
 	 */
 	UniformBuffer(uint32_t size, uint32_t binding);
 	/**
@@ -49,15 +33,16 @@ public:
 	 */
 	~UniformBuffer() override;
 	/**
-	 * @brief Push Data to GPU
-	 * @param data The data
-	 * @param size The data size
-	 * @param offset The offset to start
+	 * @brief Push Data to GPU.
+	 * @param data The data.
+	 * @param size The data size.
+	 * @param offset The offset to start.
 	 */
-	void setData(const void* data, uint32_t size, uint32_t offset = 0) override;
+	void setData(const void *data, uint32_t size, uint32_t offset = 0) override;
+
 private:
-	/// The renderer's ID
-	uint32_t rendererId =0;
+	/// The renderer's ID.
+	uint32_t rendererId = 0;
 };
 
 }// namespace owl::renderer::opengl

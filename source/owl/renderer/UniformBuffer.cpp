@@ -15,7 +15,7 @@
 
 namespace owl::renderer {
 
-shrd<UniformBuffer> UniformBuffer::create(uint32_t size, uint32_t binding) {
+shared<UniformBuffer> UniformBuffer::create(uint32_t size, uint32_t binding) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
@@ -23,7 +23,7 @@ shrd<UniformBuffer> UniformBuffer::create(uint32_t size, uint32_t binding) {
 			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::UniformBuffer>(size, binding);
+			return mk_shared<opengl::UniformBuffer>(size, binding);
 	}
 	OWL_CORE_ASSERT(false, "Unknown API Type!")
 	return nullptr;
