@@ -10,8 +10,6 @@
 #include "CameraEditor.h"
 
 #include "input/Input.h"
-#include "input/KeyCodes.h"
-#include "input/MouseCode.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>

@@ -15,11 +15,14 @@
 namespace owl::scene::component {
 
 /**
- * @brief Struct SpriteRenderer
+ * @brief Struct SpriteRenderer.
  */
 struct OWL_API SpriteRenderer {
+	/// Sprite color.
 	glm::vec4 color{1.0f, 1.0f, 1.0f, 1.0f};
-	shrd<renderer::Texture2D> texture = nullptr;
+	/// Sprite's texture.
+	shared<renderer::Texture2D> texture = nullptr;
+	/// Texture's tiling factor.
 	float tilingFactor = 1.0f;
 };
 

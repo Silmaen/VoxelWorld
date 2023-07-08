@@ -11,8 +11,8 @@
 
 namespace owl::math {
 
-float atan2(float y, float x){
+float atan2(float y, float x) {
 	return std::atan2(y, x);
 }
 
-}
+}// namespace owl::math

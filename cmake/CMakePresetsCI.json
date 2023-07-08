@@ -1,0 +1,27 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "Documentation",
+      "generator": "Ninja",
+      "binaryDir": "output/build/${presetName}",
+      "installDir": "output/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "output/install/${presetName}",
+        "OWL_DOC_ONLY": "ON",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "MinGW"
+        }
+      }
+    }
+  ]
+}

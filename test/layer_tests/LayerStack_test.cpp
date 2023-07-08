@@ -27,17 +27,17 @@ TEST(LayerStack, base) {
 TEST(LayerStack, pushLayer) {
 	{
 		LayerStack stack;
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 1"));
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 2"));
-		stack.pushOverlay(owl::mk_shrd<Layer>("Overlay 1"));
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 3"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 1"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 2"));
+		stack.pushOverlay(owl::mk_shared<Layer>("Overlay 1"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 3"));
 	}
 	{
 		LayerStack stack;
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 1"));
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 2"));
-		stack.pushOverlay(owl::mk_shrd<Layer>("Overlay 1"));
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 3"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 1"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 2"));
+		stack.pushOverlay(owl::mk_shared<Layer>("Overlay 1"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 3"));
 		auto item = *(stack.begin() + 2);
 		EXPECT_STREQ(item->getName().c_str(), "Layer 3");
 		auto item2 = *(stack.begin() + 3);
@@ -45,10 +45,10 @@ TEST(LayerStack, pushLayer) {
 	}
 	{
 		LayerStack stack;
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 1"));
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 2"));
-		stack.pushOverlay(owl::mk_shrd<Layer>("Overlay 1"));
-		stack.pushLayer(owl::mk_shrd<Layer>("Layer 3"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 1"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 2"));
+		stack.pushOverlay(owl::mk_shared<Layer>("Overlay 1"));
+		stack.pushLayer(owl::mk_shared<Layer>("Layer 3"));
 		auto item = *(stack.begin() + 2);
 		auto item2 = *(stack.begin() + 3);
 		stack.popLayer(item);

@@ -13,7 +13,9 @@
 
 namespace owl::renderer {
 
-shrd<Renderer::SceneData> Renderer::sceneData = mk_shrd<Renderer::SceneData>();
+Renderer::State Renderer::internalState = Renderer::State::Created;
+
+shared<Renderer::SceneData> Renderer::sceneData = mk_shared<Renderer::SceneData>();
 
 ShaderLibrary Renderer::shaderLibrary = ShaderLibrary();
 
@@ -21,10 +23,19 @@ void Renderer::init() {
 	OWL_PROFILE_FUNCTION()
 
 	RenderCommand::init();
+	if (RenderCommand::getState() != RenderAPI::State::Ready) {
+		internalState = State::Error;
+		return;
+	}
+
 	Renderer2D::init();
+
+	internalState = State::Running;
 }
+
 void Renderer::shutdown() {
 	Renderer2D::shutdown();
+	internalState = State::Stopped;
 }
 
 void Renderer::beginScene(const CameraOrtho &camera) {
@@ -34,7 +45,7 @@ void Renderer::beginScene(const CameraOrtho &camera) {
 void Renderer::endScene() {
 }
 
-void Renderer::submit(const shrd<Shader> &shader, const shrd<VertexArray> &object, const glm::mat4 &transform) {
+void Renderer::submit(const shared<Shader> &shader, const shared<VertexArray> &object, const glm::mat4 &transform) {
 	if (shader) {
 		shader->bind();
 		shader->setMat4("u_ViewProjection", sceneData->viewProjectionMatrix);
@@ -44,7 +55,7 @@ void Renderer::submit(const shrd<Shader> &shader, const shrd<VertexArray> &objec
 	RenderCommand::drawIndexed(object);
 }
 
-void Renderer::submit(const std::string &shaderName, const shrd<VertexArray> &object, const glm::mat4 &transform) {
+void Renderer::submit(const std::string &shaderName, const shared<VertexArray> &object, const glm::mat4 &transform) {
 	submit(shaderLibrary.get(shaderName), object, transform);
 }
 

@@ -44,7 +44,7 @@ static std::vector<nfdu8filteritem_t> parseFilter(std::string &filter) {
 		if (items[0].empty() || items[1].empty()) continue;
 		filters.push_back({items[0].data(), items[1].data()});
 	}
-	for (auto& c : filter){
+	for (auto &c: filter) {
 		if (c == '|') c = '\0';
 		if (c == '\n') c = '\0';
 	}
@@ -73,7 +73,7 @@ std::filesystem::path FileDialog::openFile(const std::string &filter) {
 	return resultPath;
 }
 
-std::filesystem::path FileDialog::saveFile([[maybe_unused]]const std::string &filter) {
+std::filesystem::path FileDialog::saveFile([[maybe_unused]] const std::string &filter) {
 	NFD::Init();
 	nfdu8char_t *outpath;
 	std::filesystem::path resultPath;

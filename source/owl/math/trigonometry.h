@@ -10,6 +10,12 @@
 
 namespace owl::math {
 
+/**
+ * @brief Arc tangent 2, safe atan(y/(x + |x,y|)).
+ * @param y Numerator.
+ * @param x Denominator.
+ * @return Arc tangent with the right quadrant.
+ */
 float atan2(float y, float x);
 
-}
+}// namespace owl::math

@@ -35,13 +35,21 @@ Application::Application(const AppParams &appParams) : initParams{appParams} {
 
 	// create main window
 	appWindow = input::Window::create({.title = appParams.name});
+	OWL_CORE_INFO("Window Created.")
+	// initialize the renderer
+	renderer::Renderer::init();
+	// check renderer initialization
+	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
+		OWL_CORE_ERROR("ERROR while Initializing Renderer")
+		state = State::Error;
+		return;
+	}
+	OWL_CORE_INFO("Renderer initiated.")
 	appWindow->setEventCallback(
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 
-	renderer::Renderer::init();
-
 	// create the GUI layer
-	imGuiLayer = mk_shrd<gui::ImGuiLayer>();
+	imGuiLayer = mk_shared<gui::ImGuiLayer>();
 	pushOverlay(imGuiLayer);
 
 	OWL_CORE_TRACE("Application creation done.")
@@ -62,13 +70,13 @@ Application::~Application() {
 }
 
 void Application::close() {
-	running = false;
+	state = State::Stopped;
 }
 
 void Application::run() {
 	OWL_PROFILE_FUNCTION()
 
-	while (running) {
+	while (state == State::Running) {
 		if (!minimized) {
 			OWL_PROFILE_SCOPE("RunLoop")
 
@@ -117,7 +125,7 @@ void Application::onEvent(event::Event &e) {
 bool Application::onWindowClosed(event::WindowCloseEvent &) {
 	OWL_PROFILE_FUNCTION()
 
-	running = false;
+	close();
 	return true;
 }
 
@@ -133,15 +141,15 @@ bool Application::onWindowResized(event::WindowResizeEvent &e) {
 	return false;
 }
 
-void Application::pushLayer(shrd<layer::Layer> &&layer) {
+void Application::pushLayer(shared<layer::Layer> &&layer) {
 	OWL_PROFILE_FUNCTION()
-
+	if (renderer::RenderCommand::getState() == renderer::RenderAPI::State::Error) return;
 	layerStack.pushLayer(std::move(layer));
 }
 
-void Application::pushOverlay(shrd<layer::Layer> &&overlay) {
+void Application::pushOverlay(shared<layer::Layer> &&overlay) {
 	OWL_PROFILE_FUNCTION()
-
+	if (renderer::RenderCommand::getState() == renderer::RenderAPI::State::Error) return;
 	layerStack.pushOverlay(std::move(overlay));
 }
 

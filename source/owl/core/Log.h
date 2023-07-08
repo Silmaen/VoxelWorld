@@ -21,34 +21,78 @@
 #pragma clang diagnostic pop
 #endif
 /**
- * @brief Namespace for the core objects
+ * @brief Namespace for the core objects.
  */
 namespace owl::core {
+
 /**
- * @brief Class Log
+ * @brief Class for the logging system.
  */
 class OWL_API Log {
 public:
+	/**
+	 * @brief initialize the logging system.
+	 */
 	static void init();
+	/**
+	 * @brief Access to the logger for the core system.
+	 * @return The Core logger.
+	 */
 	static std::shared_ptr<spdlog::logger> getCoreLogger() { return coreLogger; }
+	/**
+	 * @brief Access to the logger for the application system.
+	 * @return The application logger.
+	 */
 	static std::shared_ptr<spdlog::logger> getClientLogger() { return clientLogger; }
 
 private:
+	/// The core logger.
 	static std::shared_ptr<spdlog::logger> coreLogger;
+	/// The application logger.
 	static std::shared_ptr<spdlog::logger> clientLogger;
 };
 }// namespace owl::core
 
+/**
+ * @brief Overload stream operator for vectors.
+ * @tparam OStream The stream type.
+ * @tparam L The vector's length type.
+ * @tparam T The vector's component type.
+ * @tparam Q The vector's qualifier type.
+ * @param os The stream to write onto.
+ * @param vector The vector to write.
+ * @return The actualized stream.
+ */
 template<typename OStream, glm::length_t L, typename T, glm::qualifier Q>
 inline OStream &operator<<(OStream &os, const glm::vec<L, T, Q> &vector) {
 	return os << glm::to_string(vector);
 }
 
+/**
+ * @brief Overload stream operator for matrices.
+ * @tparam OStream The stream type.
+ * @tparam C The matrix's column length type.
+ * @tparam R The matrix's Row length type.
+ * @tparam T The matrix's component type.
+ * @tparam Q The matrix's qualifier type.
+ * @param os The stream to write onto.
+ * @param matrix The matrix to write.
+ * @return The actualized stream.
+ */
 template<typename OStream, glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
 inline OStream &operator<<(OStream &os, const glm::mat<C, R, T, Q> &matrix) {
 	return os << glm::to_string(matrix);
 }
 
+/**
+ * @brief Overload stream operator for quaternions.
+ * @tparam OStream The stream type.
+ * @tparam T The quaternion's component type.
+ * @tparam Q The quaternion's qualifier type.
+ * @param os The stream to write onto.
+ * @param quaternion The quaternion to write.
+ * @return The actualized stream.
+ */
 template<typename OStream, typename T, glm::qualifier Q>
 inline OStream &operator<<(OStream &os, glm::qua<T, Q> quaternion) {
 	return os << glm::to_string(quaternion);

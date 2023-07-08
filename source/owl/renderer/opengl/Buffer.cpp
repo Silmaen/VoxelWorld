@@ -13,8 +13,8 @@
 
 namespace owl::renderer::opengl {
 
-VertexBuffer::VertexBuffer(uint32_t size){
-	OWL_PROFILE_FUNCTION();
+VertexBuffer::VertexBuffer(uint32_t size) {
+	OWL_PROFILE_FUNCTION()
 
 	glCreateBuffers(1, &rendererID);
 	glBindBuffer(GL_ARRAY_BUFFER, rendererID);
@@ -47,7 +47,7 @@ void VertexBuffer::unbind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::setData(const void* data, uint32_t size){
+void VertexBuffer::setData(const void *data, uint32_t size) {
 	glBindBuffer(GL_ARRAY_BUFFER, rendererID);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 }

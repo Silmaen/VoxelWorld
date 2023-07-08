@@ -1,6 +1,12 @@
 #
 #
 #
+include(OwlUtils)
+include(Depmanager)
+#
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BUILD_DIR}/Install)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,6 +49,8 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
             -Wcast-qual
             -Wno-mismatched-new-delete
             )
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE
+            STBI_NO_SIMD)
 elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_CLANG_MINIMAL})
         message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler version too old: ${CMAKE_CXX_COMPILER_VERSION}, need ${${PRJPREFIX}_CLANG_MINIMAL}")

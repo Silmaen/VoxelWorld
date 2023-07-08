@@ -41,11 +41,11 @@ void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT {
  */
 void operator delete(void *memory) OWL_DEALLOC_EXCEPT {
 	free(memory);
-} //---UNCOVER---
+}//---UNCOVER---
 
 namespace owl::debug {
 
-Tracker& Tracker::get() {
+Tracker &Tracker::get() {
 	static Tracker instance;
 	return instance;
 }
@@ -54,37 +54,37 @@ void Tracker::allocate(size_t size) {
 	++currentAllocationState.allocationCalls;
 	currentAllocationState.allocatedMemory += size;
 	currentAllocationState.memoryPeek =
-		std::max(currentAllocationState.memoryPeek,
-					currentAllocationState.allocatedMemory);
+			std::max(currentAllocationState.memoryPeek,
+					 currentAllocationState.allocatedMemory);
 	++globalAllocationState.allocationCalls;
 	globalAllocationState.allocatedMemory += size;
 	globalAllocationState.memoryPeek = std::max(
-		globalAllocationState.memoryPeek, globalAllocationState.allocatedMemory);
+			globalAllocationState.memoryPeek, globalAllocationState.allocatedMemory);
 }
 void Tracker::deallocate(size_t size) {
 	++currentAllocationState.deallocationCalls;
 	currentAllocationState.allocatedMemory =
-		currentAllocationState.allocatedMemory > size
-				 ? currentAllocationState.allocatedMemory - size
-	        : 0;
-  ++globalAllocationState.deallocationCalls;
-  globalAllocationState.allocatedMemory =
-      globalAllocationState.allocatedMemory > size
-          ? globalAllocationState.allocatedMemory - size
-          : 0;
+			currentAllocationState.allocatedMemory > size
+					? currentAllocationState.allocatedMemory - size
+					: 0;
+	++globalAllocationState.deallocationCalls;
+	globalAllocationState.allocatedMemory =
+			globalAllocationState.allocatedMemory > size
+					? globalAllocationState.allocatedMemory - size
+					: 0;
 }
 
 const Tracker::AllocationState &Tracker::checkState() {
 
-  lastAllocationState.allocatedMemory = 0;
-  lastAllocationState.allocationCalls = 0;
-  lastAllocationState.deallocationCalls = 0;
-  lastAllocationState.memoryPeek = 0;
-  std::swap(currentAllocationState, lastAllocationState);
-  return lastAllocationState;
+	lastAllocationState.allocatedMemory = 0;
+	lastAllocationState.allocationCalls = 0;
+	lastAllocationState.deallocationCalls = 0;
+	lastAllocationState.memoryPeek = 0;
+	std::swap(currentAllocationState, lastAllocationState);
+	return lastAllocationState;
 }
 const Tracker::AllocationState &Tracker::globals() const {
-  return globalAllocationState;
+	return globalAllocationState;
 }
 
-} // namespace owl::debug
+}// namespace owl::debug

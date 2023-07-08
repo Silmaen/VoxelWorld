@@ -10,8 +10,8 @@
 #include <utility>
 
 #include "core/Core.h"
-#include "event/Event.h"
 #include "core/Timestep.h"
+#include "event/Event.h"
 
 /**
  * @brief Namespace for the layer definition
@@ -24,7 +24,7 @@ namespace owl::core::layer {
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 /**
- * @brief Class Layer
+ * @brief Class Layer.
  */
 class OWL_API Layer {
 public:
@@ -42,37 +42,37 @@ public:
 	virtual ~Layer() = default;
 
 	/**
-	 * @brief Action on Attach
+	 * @brief Action on Attach.
 	 */
 	virtual void onAttach() {}
 	/**
-	 * @brief Action on detach
+	 * @brief Action on detach.
 	 */
 	virtual void onDetach() {}
 	/**
-	 * @brief Action on update
-	 * @param ts The time step since last frame
+	 * @brief Action on update.
+	 * @param ts The time step since last frame.
 	 */
-	virtual void onUpdate([[maybe_unused]]const Timestep& ts) {}
+	virtual void onUpdate([[maybe_unused]] const Timestep &ts) {}
 	/**
-	 * @brief Action for that layer when gui is rendered
-	 * @param ts The time step since last frame
+	 * @brief Action for that layer when gui is rendered.
+	 * @param ts The time step since last frame.
 	 */
-	virtual void onImGuiRender([[maybe_unused]]const Timestep& ts) {}
+	virtual void onImGuiRender([[maybe_unused]] const Timestep &ts) {}
 	/**
-	 * @brief Action on event
-	 * @param event The Event to react
+	 * @brief Action on event.
+	 * @param event The Event to react.
 	 */
 	virtual void onEvent([[maybe_unused]] event::Event &event) {}
 
 	/**
-	 * @brief Get the debug name of the layer
-	 * @return Debug Name of the layer
+	 * @brief Get the debug name of the layer.
+	 * @return Debug Name of the layer.
 	 */
 	[[nodiscard]] const std::string &getName() const { return debugName; }
 
 protected:
-	/// Debug name for this layer
+	/// Debug name for this layer.
 	std::string debugName;
 };
 

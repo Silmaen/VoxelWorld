@@ -11,17 +11,17 @@
 #include <algorithm>
 
 /**
- * @brief Namespace for mathematical functions
+ * @brief Namespace for mathematical functions.
  */
 namespace owl::math {
 
 /**
- * @brief Simple clamp function with no checks
- * @tparam data Data's type to clamp (must be order-able)
- * @param input Input value
- * @param minValue min value
- * @param maxValue max value
- * @return Clamped value
+ * @brief Simple clamp function with no checks.
+ * @tparam data Data's type to clamp (must be order-able).
+ * @param input Input value.
+ * @param minValue min value.
+ * @param maxValue max value.
+ * @return Clamped value.
  */
 template<typename data>
 constexpr data clamp(const data &input, const data &minValue,
@@ -31,12 +31,12 @@ constexpr data clamp(const data &input, const data &minValue,
 }
 
 /**
- * @brief Clamp function with mix/max ordering
- * @tparam data Data's type to clamp (must be order-able)
- * @param input Input value
- * @param minValue min value
- * @param maxValue max value
- * @return Clamped value
+ * @brief Clamp function with mix/max ordering.
+ * @tparam data Data's type to clamp (must be order-able).
+ * @param input Input value.
+ * @param minValue min value.
+ * @param maxValue max value.
+ * @return Clamped value.
  */
 template<typename data>
 constexpr data clampSafe(const data &input, data minValue, data maxValue) {
@@ -47,10 +47,10 @@ constexpr data clampSafe(const data &input, data minValue, data maxValue) {
 }
 
 /**
- * @brief Heaviside function
- * @tparam data Data's type
- * @param input Value to check
- * @return 1 if input positive, else return 0
+ * @brief Heaviside function.
+ * @tparam data Data's type.
+ * @param input Value to check.
+ * @return 1 if input positive, else return 0.
  */
 template<typename data>
 constexpr data heaviside(const data &input) {
@@ -58,10 +58,10 @@ constexpr data heaviside(const data &input) {
 }
 
 /**
- * @brief Sign function
- * @tparam data Data's type
- * @param input Value to check
- * @return 0 if input is 0 1 if input positive, else return -1
+ * @brief Sign function.
+ * @tparam data Data's type.
+ * @param input Value to check.
+ * @return 0 if input is 0 1 if input positive, else return -1.
  */
 template<typename data>
 constexpr data sign(const data &input) {

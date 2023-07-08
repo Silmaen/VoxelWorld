@@ -15,43 +15,43 @@
 namespace owl::renderer {
 
 
-shrd<VertexBuffer> VertexBuffer::create( uint32_t size){
+shared<VertexBuffer> VertexBuffer::create(uint32_t size) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
 		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
+			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::VertexBuffer>(size);
+			return mk_shared<opengl::VertexBuffer>(size);
 	}
 	OWL_CORE_ASSERT(false, "Unknown API Type!")
 	return nullptr;
 }
 
-shrd<VertexBuffer> VertexBuffer::create(float *vertices, uint32_t size) {
+shared<VertexBuffer> VertexBuffer::create(float *vertices, uint32_t size) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
 		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
+			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::VertexBuffer>(vertices, size);
+			return mk_shared<opengl::VertexBuffer>(vertices, size);
 	}
 	OWL_CORE_ASSERT(false, "Unknown API Type!")
 	return nullptr;
 }
 
-shrd<IndexBuffer> IndexBuffer::create(uint32_t *indices, uint32_t size) {
+shared<IndexBuffer> IndexBuffer::create(uint32_t *indices, uint32_t size) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
 		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
+			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::IndexBuffer>(indices, size);
+			return mk_shared<opengl::IndexBuffer>(indices, size);
 	}
 	OWL_CORE_ASSERT(false, "Unknown API Type!")
 	return nullptr;

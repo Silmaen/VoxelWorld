@@ -22,9 +22,8 @@ namespace owl::input::glfw {
 
 static uint8_t s_GLFWWindowCount = 0;
 
-static void GLFWErrorCallback(int error, const char *description) {
-	OWL_CORE_ERROR("GLFW Error ({}): {}", error, description)
-}
+static void GLFWErrorCallback(int error, const char *description){
+		OWL_CORE_ERROR("GLFW Error ({}): {}", error, description)}
 
 Window::Window(const Properties &props) : ::owl::input::Window() {
 	OWL_PROFILE_FUNCTION()
@@ -49,17 +48,17 @@ void Window::init(const Properties &props) {
 				  props.height)
 
 	if (s_GLFWWindowCount == 0) {
-		OWL_PROFILE_SCOPE("glfwInit");
+		OWL_PROFILE_SCOPE("glfwInit")
 		[[maybe_unused]] int success = glfwInit();
 		OWL_CORE_ASSERT(success, "Could not initialize GLFW!")
 		glfwSetErrorCallback(GLFWErrorCallback);
 	}
 
 	{
-		OWL_PROFILE_SCOPE("glfwCreateWindow");
+		OWL_PROFILE_SCOPE("glfwCreateWindow")
 #if defined(OWL_DEBUG)
 		if (renderer::Renderer::getAPI() == renderer::RenderAPI::Type::OpenGL)
-		   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 		glfwWindow = glfwCreateWindow(static_cast<int>(props.width),
 									  static_cast<int>(props.height),
@@ -203,4 +202,4 @@ void Window::setVSync(bool enabled) {
 
 bool Window::isVSync() const { return windowData.VSync; }
 
-}// namespace owl::window::glfw
+}// namespace owl::input::glfw

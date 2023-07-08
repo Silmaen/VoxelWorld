@@ -24,11 +24,11 @@
 
 namespace owl::panel {
 
-SceneHierarchy::SceneHierarchy(const shrd<scene::Scene> &context_) {
+SceneHierarchy::SceneHierarchy(const shared<scene::Scene> &context_) {
 	setContext(context_);
 }
 
-void SceneHierarchy::setContext(const shrd<scene::Scene> &context_) {
+void SceneHierarchy::setContext(const shared<scene::Scene> &context_) {
 	context = context_;
 	selection = {};
 }

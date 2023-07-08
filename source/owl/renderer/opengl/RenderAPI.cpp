@@ -13,19 +13,19 @@
 
 namespace owl::renderer::opengl {
 
-[[maybe_unused]]static void messageCallback(unsigned source, unsigned type, unsigned id, unsigned severity, [[maybe_unused]] int length, const char *message, const void *userParam) {
+[[maybe_unused]] static void messageCallback(unsigned source, unsigned type, unsigned id, unsigned severity, [[maybe_unused]] int length, const char *message, const void *userParam) {
 	switch (severity) {
 		case GL_DEBUG_SEVERITY_HIGH:
-			OWL_CORE_CRITICAL("OpenGL: {}({})-{} : {} / {}", source,type,id, message, userParam)
+			OWL_CORE_CRITICAL("OpenGL: {}({})-{} : {} / {}", source, type, id, message, userParam)
 			return;
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			OWL_CORE_ERROR("OpenGL: {}({})-{} : {} / {}", source,type,id, message, userParam)
+			OWL_CORE_ERROR("OpenGL: {}({})-{} : {} / {}", source, type, id, message, userParam)
 			return;
 		case GL_DEBUG_SEVERITY_LOW:
-			OWL_CORE_WARN("OpenGL: {}({})-{} : {} / {}", source,type,id, message, userParam)
+			OWL_CORE_WARN("OpenGL: {}({})-{} : {} / {}", source, type, id, message, userParam)
 			return;
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
-			OWL_CORE_TRACE("OpenGL: {}({})-{} : {} / {}", source,type,id, message, userParam)
+			OWL_CORE_TRACE("OpenGL: {}({})-{} : {} / {}", source, type, id, message, userParam)
 			return;
 	}
 
@@ -35,6 +35,14 @@ namespace owl::renderer::opengl {
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
+	bool goodVersion = GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5);
+	if (!goodVersion) {
+		setState(State::Error);
+		OWL_CORE_ERROR("Owl Engine OpenGL Renderer requires at least OpenGL version 4.5 but version {}.{} found", GLVersion.major, GLVersion.minor)
+	}
+
+	if (getState() != State::Created)
+		return;
 #ifdef OWL_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -48,6 +56,9 @@ void RenderAPI::init() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LINE_SMOOTH);
+
+	// renderer is now ready
+	setState(State::Ready);
 }
 
 void RenderAPI::setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
@@ -62,18 +73,18 @@ void RenderAPI::clear() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderAPI::drawIndexed(const shrd<VertexArray> &vertexArray, uint32_t indexCount) {
+void RenderAPI::drawIndexed(const shared<VertexArray> &vertexArray, uint32_t indexCount) {
 	vertexArray->bind();
 	uint32_t count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
 	glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
 }
 
-void RenderAPI::drawLines(const shrd<VertexArray>& vertexArray, uint32_t vertexCount){
+void RenderAPI::drawLines(const shared<VertexArray> &vertexArray, uint32_t vertexCount) {
 	vertexArray->bind();
 	glDrawArrays(GL_LINES, 0, vertexCount);
 }
 
-void RenderAPI::setLineWidth(float width){
+void RenderAPI::setLineWidth(float width) {
 	glLineWidth(width);
 }
 

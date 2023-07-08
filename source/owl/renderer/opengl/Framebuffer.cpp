@@ -166,7 +166,7 @@ void Framebuffer::invalidate() {
 
 	bool completeFramebuffer = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	OWL_CORE_ASSERT(completeFramebuffer, "Framebuffer is incomplete!")
-	if(!completeFramebuffer) {
+	if (!completeFramebuffer) {
 		OWL_CORE_WARN("Incomplete Framebuffer")
 	}
 

@@ -16,13 +16,14 @@ namespace owl {
 class OwlNest : public core::Application {
 public:
 	OwlNest() = delete;
-	explicit OwlNest(const core::AppParams& param) : core::Application(param) {
-		pushLayer(mk_shrd<EditorLayer>());
+	explicit OwlNest(const core::AppParams &param) : core::Application(param) {
+		if (getState() == core::Application::State::Running)
+			pushLayer(mk_shared<EditorLayer>());
 	}
 };
 
-shrd<core::Application> core::createApplication(int argc, char **argv) {
-	return mk_shrd<OwlNest>(core::AppParams{
+shared<core::Application> core::createApplication(int argc, char **argv) {
+	return mk_shared<OwlNest>(core::AppParams{
 			.name = "Owl Nest - Owl Engine Editor",
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,

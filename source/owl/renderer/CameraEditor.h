@@ -18,23 +18,26 @@
 namespace owl::renderer {
 
 /**
- * @brief Class CameraEditor
+ * @brief Class CameraEditor.
  */
 class OWL_API CameraEditor : public Camera {
 public:
-	/**
-	 * @brief Default constructor.
-	 */
 	CameraEditor() = default;
-	CameraEditor(float fov, float aspectRatio, float nearClip, float farClip);
-	/**
-	 * @brief Destructor.
-	 */
 	~CameraEditor() override = default;
-	CameraEditor(const CameraEditor&) = default;
-	CameraEditor(CameraEditor&&) = default;
-	CameraEditor& operator=(const CameraEditor&) =default;
-	CameraEditor& operator=(CameraEditor&&) =default;
+	CameraEditor(const CameraEditor &) = default;
+	CameraEditor(CameraEditor &&) = default;
+	CameraEditor &operator=(const CameraEditor &) = default;
+	CameraEditor &operator=(CameraEditor &&) = default;
+
+	/**
+	 * @brief Constructor
+	 * @param fov Field of view.
+	 * @param aspectRatio Aspect rtio.
+	 * @param nearClip Near clip distance.
+	 * @param farClip Far clip distance.
+	 */
+	CameraEditor(float fov, float aspectRatio, float nearClip, float farClip);
+
 
 	void onUpdate(core::Timestep ts);
 
@@ -64,10 +67,10 @@ private:
 	void updateProjection();
 	void updateView();
 
-	bool onMouseScroll(event::MouseScrolledEvent& e);
+	bool onMouseScroll(event::MouseScrolledEvent &e);
 
-	void mousePan(const glm::vec2& delta);
-	void mouseRotate(const glm::vec2& delta);
+	void mousePan(const glm::vec2 &delta);
+	void mouseRotate(const glm::vec2 &delta);
 	void mouseZoom(float delta);
 
 	[[nodiscard]] glm::vec3 calculatePosition() const;
@@ -81,7 +84,7 @@ private:
 	float nearClip = 0.1f;
 	float farClip = 1000.0f;
 
-	glm::mat4 viewMatrix;
+	glm::mat4 viewMatrix{};
 	glm::vec3 position = {0.0f, 0.0f, 0.0f};
 	glm::vec3 focalPoint = {0.0f, 0.0f, 0.0f};
 

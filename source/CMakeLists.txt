@@ -2,5 +2,9 @@
 #
 #
 add_subdirectory(owl)
-add_subdirectory(owlnest)
-add_subdirectory(sandbox)
+if (${PRJPREFIX}_BUILD_NEST)
+    add_subdirectory(owlnest)
+endif ()
+if (${PRJPREFIX}_BUILD_SANDBOX)
+    add_subdirectory(sandbox)
+endif ()

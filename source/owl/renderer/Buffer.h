@@ -14,7 +14,7 @@
 namespace owl::renderer {
 
 /**
- * @brief Type of data
+ * @brief Type of data.
  */
 enum class ShaderDataType {
 	None = 0,
@@ -63,31 +63,33 @@ static uint32_t ShaderDataTypeSize(ShaderDataType type) {
 }
 
 /**
- * @brief Class BufferElement
+ * @brief Class BufferElement.
  */
 struct OWL_API BufferElement {
-	/// Element Name
+	/// Element Name.
 	std::string name;
-	/// Data's type
+	/// Data's type.
 	ShaderDataType type;
-	/// Data's size
+	/// Data's size.
 	uint32_t size = 0;
-	/// Data's offset
+	/// Data's offset.
 	uint32_t offset = 0;
-	/// If data's normalized
+	/// If data's normalized.
 	bool normalized = false;
+
 	/**
-	 * @brief Constructor
-	 * @param name_ Element Name
-	 * @param type_ Data's type
-	 * @param normalized_ If data's normalized
+	 * @brief Constructor.
+	 * @param name_ Element Name.
+	 * @param type_ Data's type.
+	 * @param normalized_ If data's normalized.
 	 */
-	BufferElement(std::string&& name_, ShaderDataType type_, bool normalized_ = false)
+	BufferElement(std::string &&name_, ShaderDataType type_, bool normalized_ = false)
 		: name(std::move(name_)), type(type_), size(ShaderDataTypeSize(type_)), offset(0), normalized(normalized_) {
 	}
+
 	/**
-	 * @brief Get component's count
-	 * @return Component's count
+	 * @brief Get component's count.
+	 * @return Component's count.
 	 */
 	[[nodiscard]] uint32_t getComponentCount() const {
 		switch (type) {
@@ -122,7 +124,7 @@ struct OWL_API BufferElement {
 };
 
 /**
- * @brief Class BufferLayout
+ * @brief Class BufferLayout.
  */
 class OWL_API BufferLayout {
 public:
@@ -130,21 +132,23 @@ public:
 	using iterator = element_type::iterator;
 	using const_iterator = element_type::const_iterator;
 	/**
-	 * @brief Constructor
-	 * @param elements_ Elements in the layout
+	 * @brief Constructor.
+	 * @param elements_ Elements in the layout.
 	 */
 	BufferLayout(const std::initializer_list<BufferElement> &elements_)
 		: elements(elements_) {
 		CalculateOffsetsAndStride();
 	}
+
 	/**
-	 * @brief Get buffer stride
-	 * @return The buffer stride
+	 * @brief Get buffer stride.
+	 * @return The buffer stride.
 	 */
 	[[nodiscard]] uint32_t getStride() const { return stride; }
+
 	/**
-	 * @brief Get the buffer Elements
-	 * @return Buffer elements
+	 * @brief Get the buffer Elements.
+	 * @return Buffer elements.
 	 */
 	[[nodiscard]] const std::vector<BufferElement> &getElements() const { return elements; }
 
@@ -154,12 +158,12 @@ public:
 	[[nodiscard]] const_iterator end() const { return elements.end(); }
 
 private:
-	/// List of element in the buffer data
+	/// List of element in the buffer data.
 	element_type elements;
-	/// Stride of the data
+	/// Stride of the data.
 	uint32_t stride = 0;
 	/**
-	 * @brief Automate computation of the offsets and stride
+	 * @brief Automate computation of the offsets and stride.
 	 */
 	void CalculateOffsetsAndStride() {
 		uint32_t offset = 0;
@@ -178,7 +182,7 @@ private:
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 /**
- * @brief Class VertexBuffer
+ * @brief Class VertexBuffer.
  */
 class OWL_API VertexBuffer {
 public:
@@ -191,51 +195,54 @@ public:
 	 * @brief Destructor.
 	 */
 	virtual ~VertexBuffer() = default;//---UNCOVER---
+
 	/**
-	 * @brief Activate the buffer in the GPU
+	 * @brief Activate the buffer in the GPU.
 	 */
 	virtual void bind() const = 0;
 
 	/**
-	 * @brief Deactivate the buffer in the GPU
+	 * @brief Deactivate the buffer in the GPU.
 	 */
 	virtual void unbind() const = 0;
 
 	/**
-	 * @brief Defines the data of the vertex buffer
-	 * @param data The raw data
-	 * @param size Number of data
+	 * @brief Defines the data of the vertex buffer.
+	 * @param data The raw data.
+	 * @param size Number of data.
 	 */
-	virtual void setData(const void* data, uint32_t size) = 0;
+	virtual void setData(const void *data, uint32_t size) = 0;
+
 	/**
-	 * @brief Create a new empty Vertex buffer in the GPU memory
-	 * @param size Amount of data to read
-	 * @return Pointer to the created buffer
+	 * @brief Create a new empty Vertex buffer in the GPU memory.
+	 * @param size Amount of data to read.
+	 * @return Pointer to the created buffer.
 	 */
-	static shrd<VertexBuffer> create( uint32_t size);
+	static shared<VertexBuffer> create(uint32_t size);
+
 	/**
-	 * @brief Create a new Vertex buffer in the GPU memory
-	 * @param vertices List of vertices data
-	 * @param size Amount of data to read
-	 * @return Pointer to the created buffer
+	 * @brief Create a new Vertex buffer in the GPU memory.
+	 * @param vertices List of vertices data.
+	 * @param size Amount of data to read.
+	 * @return Pointer to the created buffer.
 	 */
-	static shrd<VertexBuffer> create(float *vertices, uint32_t size);
+	static shared<VertexBuffer> create(float *vertices, uint32_t size);
 
 
 	/**
-	 * @brief Get the buffer data layout
-	 * @return Data layout
+	 * @brief Get the buffer data layout.
+	 * @return Data layout.
 	 */
 	[[nodiscard]] const BufferLayout &getLayout() const { return layout; }
 
 	/**
-	 * @brief Define the data layout
-	 * @param layout_ New data layout
+	 * @brief Define the data layout.
+	 * @param layout_ New data layout.
 	 */
 	void setLayout(const BufferLayout &layout_) { layout = layout_; }
 
 private:
-	/// Data layout description
+	/// Data layout description.
 	BufferLayout layout{};
 };
 #ifdef __clang__
@@ -247,7 +254,7 @@ private:
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
 /**
- * @brief Class IndexBuffer
+ * @brief Class IndexBuffer.
  */
 class OWL_API IndexBuffer {
 public:
@@ -264,27 +271,27 @@ public:
 	 */
 	virtual ~IndexBuffer() = default;//---UNCOVER---
 	/**
-	 * @brief Activate the buffer in the GPU
+	 * @brief Activate the buffer in the GPU.
 	 */
 	virtual void bind() const = 0;
 
 	/**
-	 * @brief Deactivate the buffer in the GPU
+	 * @brief Deactivate the buffer in the GPU.
 	 */
 	virtual void unbind() const = 0;
 
 	/**
-	 * @brief Get the number of element in the buffer
-	 * @return Number of element in the buffer
+	 * @brief Get the number of element in the buffer.
+	 * @return Number of element in the buffer.
 	 */
 	[[nodiscard]] virtual uint32_t getCount() const = 0;
 	/**
-	 * @brief Create a new Index buffer in the GPU memory
-	 * @param indices List of indices data
-	 * @param count Amount of data to read
-	 * @return Pointer to the created buffer
+	 * @brief Create a new Index buffer in the GPU memory.
+	 * @param indices List of indices data.
+	 * @param count Amount of data to read.
+	 * @return Pointer to the created buffer.
 	 */
-	static shrd<IndexBuffer> create(uint32_t *indices, uint32_t count);
+	static shared<IndexBuffer> create(uint32_t *indices, uint32_t count);
 
 private:
 };

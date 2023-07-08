@@ -122,7 +122,7 @@ static std::vector<uint32_t> readCachedShader(const std::filesystem::path &file)
 	return result;
 }
 
-static bool writeCachedShader(const std::filesystem::path &file, const std::vector<uint32_t> data) {
+static bool writeCachedShader(const std::filesystem::path &file, const std::vector<uint32_t> &data) {
 	OWL_PROFILE_FUNCTION()
 
 	std::ofstream out(file, std::ios::out | std::ios::binary);
@@ -135,7 +135,7 @@ static bool writeCachedShader(const std::filesystem::path &file, const std::vect
 	return false;
 }
 
-static std::filesystem::path getShaderCachedPath(const std::string &shaderName, const utils::CacheType& cache, const ShaderType &type) {
+static std::filesystem::path getShaderCachedPath(const std::string &shaderName, const utils::CacheType &cache, const ShaderType &type) {
 	return utils::getCacheDirectory() / (shaderName + utils::getCacheExtension(cache, type));
 }
 static std::filesystem::path getShaderPath(const std::string &shaderName, const ShaderType &type) {
@@ -189,7 +189,7 @@ void Shader::compile(const std::unordered_map<ShaderType, std::string> &sources)
 
 	auto timer = std::chrono::steady_clock::now() - start;
 	double duration = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) / 1000.0;
-	OWL_CORE_INFO("Compilation of shader {} in {} ms",getName(), duration)
+	OWL_CORE_INFO("Compilation of shader {} in {} ms", getName(), duration)
 }
 
 void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string> &sources) {
@@ -198,16 +198,14 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 	shaderc::Compiler compiler;
 	shaderc::CompileOptions options;
 	options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
-	const bool optimize = true;
-	if (optimize)
-		options.SetOptimizationLevel(shaderc_optimization_level_performance);
+	options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
 	std::filesystem::path cacheDirectory = utils::getCacheDirectory();
 
 	auto &shaderData = vulkanSPIRV;
 	shaderData.clear();
 	for (auto &&[stage, source]: sources) {
-		std::filesystem::path basePath = utils::getShaderPath(getName() , stage);
+		std::filesystem::path basePath = utils::getShaderPath(getName(), stage);
 		std::filesystem::path cachedPath = utils::getShaderCachedPath(getName(), utils::CacheType::Vulkan, stage);
 
 		if (exists(cachedPath) && (last_write_time(cachedPath) > last_write_time(basePath))) {
@@ -241,9 +239,7 @@ void Shader::compileOrGetOpenGLBinaries() {
 	shaderc::Compiler compiler;
 	shaderc::CompileOptions options;
 	options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-	const bool optimize = true;
-	if (optimize)
-		options.SetOptimizationLevel(shaderc_optimization_level_performance);
+	options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
 	std::filesystem::path cacheDirectory = utils::getCacheDirectory();
 	shaderData.clear();
@@ -251,7 +247,7 @@ void Shader::compileOrGetOpenGLBinaries() {
 	for (auto &&[stage, spirv]: vulkanSPIRV) {
 		std::filesystem::path basePath = utils::getShaderCachedPath(getName(), utils::CacheType::Vulkan, stage);
 		std::filesystem::path cachedPath = utils::getShaderCachedPath(getName(), utils::CacheType::OpenGL, stage);
-		if (exists(cachedPath) && (last_write_time(cachedPath) > last_write_time(basePath)))  {
+		if (exists(cachedPath) && (last_write_time(cachedPath) > last_write_time(basePath))) {
 			OWL_CORE_TRACE("Using cached OpenGL Shader {}-{}", getName(), magic_enum::enum_name(stage))
 			shaderData[stage] = utils::readCachedShader(cachedPath);
 		} else {
@@ -280,7 +276,7 @@ void Shader::createProgram() {
 	std::vector<GLuint> shaderIDs;
 	for (auto &&[stage, spirv]: openGLSPIRV) {
 		GLuint shaderID = shaderIDs.emplace_back(glCreateShader(utils::shaderStageToGLShader(stage)));
-		OWL_CORE_ASSERT(!spirv.empty(),"Empty shader data")
+		OWL_CORE_ASSERT(!spirv.empty(), "Empty shader data")
 		glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
 		glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
 		glAttachShader(program, shaderID);
@@ -292,7 +288,7 @@ void Shader::createProgram() {
 		OWL_CORE_ERROR("Shader linking failed ({})", getName())
 		GLint maxLength;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-		if (maxLength>0) {
+		if (maxLength > 0) {
 			std::vector<GLchar> infoLog(static_cast<size_t>(maxLength));
 			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
 			OWL_CORE_ERROR("     Details: {}", infoLog.data())
@@ -393,7 +389,7 @@ void Shader::uploadUniformInt(const std::string &name, int data) {
 
 void Shader::uploadUniformIntArray(const std::string &name, int *values, uint32_t count) {
 	GLint location = glGetUniformLocation(programID, name.c_str());
-	glUniform1iv(location, count, values);
+	glUniform1iv(location, static_cast<GLsizei>(count), values);
 }
 
 void Shader::uploadUniformFloat(const std::string &name, float value) {

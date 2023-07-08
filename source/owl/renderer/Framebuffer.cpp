@@ -16,7 +16,7 @@
 
 namespace owl::renderer {
 
-shrd<Framebuffer> Framebuffer::create(const FramebufferSpecification &spec) {
+shared<Framebuffer> Framebuffer::create(const FramebufferSpecification &spec) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::None:
@@ -24,7 +24,7 @@ shrd<Framebuffer> Framebuffer::create(const FramebufferSpecification &spec) {
 			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
-			return mk_shrd<opengl::Framebuffer>(spec);
+			return mk_shared<opengl::Framebuffer>(spec);
 	}
 	OWL_CORE_ASSERT(false, "Unknown API Type!")
 	return nullptr;

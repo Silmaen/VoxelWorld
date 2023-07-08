@@ -10,21 +10,20 @@
 #include "RenderAPI.h"
 #include "opengl/RenderAPI.h"
 
-#include <magic_enum.hpp>
-
 namespace owl::renderer {
 
 RenderAPI::Type RenderAPI::type = RenderAPI::Type::None;
+RenderAPI::State RenderAPI::state = RenderAPI::State::Created;
 
-uniq<RenderAPI> RenderAPI::create(const RenderAPI::Type& type_){
+uniq<RenderAPI> RenderAPI::create(const RenderAPI::Type &type_) {
 	switch (type_) {
 		case RenderAPI::Type::None:
 		case RenderAPI::Type::Vulkan:
-			type =type_;
-			OWL_CORE_ASSERT(false,"Render API {} is not yet supported", magic_enum::enum_name(type))
+			type = type_;
+			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::OpenGL:
-			type =type_;
+			type = type_;
 			return mk_uniq<opengl::RenderAPI>();
 	}
 

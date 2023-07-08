@@ -19,7 +19,7 @@ constexpr float zero = 0.f;
 constexpr float one = 1.f;
 constexpr float epsi = glm::epsilon<float>();
 
-bool decomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale){
+bool decomposeTransform(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &rotation, glm::vec3 &scale) {
 	// From glm::decompose in matrix_decompose.inl
 
 	glm::mat4 localMatrix(transform);
@@ -30,7 +30,7 @@ bool decomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm:
 	// first Isolate perspective. this is the messiest
 	if (glm::epsilonEqual(localMatrix[0][3], zero, epsi) ||
 		glm::epsilonEqual(localMatrix[1][3], zero, epsi) ||
-		glm::epsilonEqual(localMatrix[2][3], zero, epsi)){
+		glm::epsilonEqual(localMatrix[2][3], zero, epsi)) {
 		// clear the perspective part
 		localMatrix[0][3] = localMatrix[1][3] = localMatrix[2][3] = zero;
 		localMatrix[3][3] = one;
@@ -79,4 +79,4 @@ bool decomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm:
 	return true;
 }
 
-}
+}// namespace owl::math

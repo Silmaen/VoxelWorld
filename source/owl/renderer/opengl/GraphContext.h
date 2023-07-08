@@ -14,7 +14,7 @@
 namespace owl::renderer::opengl {
 
 /**
- * @brief Class GraphContext
+ * @brief Class GraphContext.
  */
 class OWL_API GraphContext : public ::owl::renderer::GraphContext {
 public:
@@ -22,27 +22,29 @@ public:
 	GraphContext(GraphContext &&) = delete;
 	GraphContext &operator=(const GraphContext &) = delete;
 	GraphContext &operator=(GraphContext &&) = delete;
+
 	/**
 	 * @brief Default constructor.
 	 */
 	explicit GraphContext(GLFWwindow *window);
+
 	/**
 	 * @brief Destructor.
 	 */
 	~GraphContext() override = default;//---UNCOVER---
 
 	/**
-	 * @brief Initialize the context
+	 * @brief Initialize the context.
 	 */
 	void init() override;
 
 	/**
-	 * @brief Doo the buffer swap
+	 * @brief Doo the buffer swap.
 	 */
 	void swapBuffers() override;
 
 private:
-	/// Link to the parent window
+	/// Link to the parent window.
 	GLFWwindow *windowHandle;
 };
 

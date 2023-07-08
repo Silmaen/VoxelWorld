@@ -45,37 +45,37 @@
 #endif
 
 /**
- * @brief Base Namespace for the project
+ * @brief Base Namespace for the project.
  */
 namespace owl {
 
-/// Wrap to unique pointer
+/// Wrap to unique pointer.
 template<typename T>
 using uniq = std::unique_ptr<T>;
 /**
- * @brief	Wrap to unique pointer creator
- * @tparam T Type of data
- * @tparam Args Args type to pass to the constructor
- * @param args Args to pass to the constructor
- * @return Unique pointer
+ * @brief Wrap to unique pointer creator.
+ * @tparam T Type of data.
+ * @tparam Args Args type to pass to the constructor.
+ * @param args Args to pass to the constructor.
+ * @return Unique pointer.
  */
 template<typename T, typename... Args>
 constexpr uniq<T> mk_uniq(Args &&...args) {
 	return std::make_unique<T>(std::forward<Args>(args)...);
 }
 
-/// Wrap to shared pointer
+/// Wrap to shared pointer.
 template<typename T>
-using shrd = std::shared_ptr<T>;
+using shared = std::shared_ptr<T>;
 /**
- * @brief Wrap to shared pointer creator
-* @tparam T Type of data
-* @tparam Args Args type to pass to the constructor
-* @param args Args to pass to the constructor
-* @return Shared pointer
+ * @brief Wrap to shared pointer creator.
+* @tparam T Type of data.
+* @tparam Args Args type to pass to the constructor.
+* @param args Args to pass to the constructor.
+* @return Shared pointer.
 */
 template<typename T, typename... Args>
-constexpr shrd<T> mk_shrd(Args &&...args) {
+constexpr shared<T> mk_shared(Args &&...args) {
 	return std::make_shared<T>(std::forward<Args>(args)...);
 }
 

@@ -37,8 +37,8 @@ private:
 
 	glm::vec2 viewportSize = {0.0f, 0.0f};
 
-	shrd<renderer::VertexArray> squareVA;
-	shrd<renderer::Texture> checkerboardTexture;
+	shared<renderer::VertexArray> squareVA;
+	shared<renderer::Texture> checkerboardTexture;
 	glm::vec4 squareColor = {0.2f, 0.3f, 0.8f, 1.0f};
 };
 

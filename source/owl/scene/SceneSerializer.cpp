@@ -107,11 +107,11 @@ static Emitter &operator<<(Emitter &out, const glm::vec4 &v) {
 
 namespace owl::scene {
 
-SceneSerializer::SceneSerializer(const shrd<Scene> &scene_) : scene(scene_) {
+SceneSerializer::SceneSerializer(const shared<Scene> &scene_) : scene(scene_) {
 }
 
 static void serializeEntity(YAML::Emitter &out, Entity entity) {
-	out << YAML::BeginMap;                                          // Entity
+	out << YAML::BeginMap;// Entity
 	out << YAML::Key << "Entity" << YAML::Value << entity.getUUID();
 
 	if (entity.hasComponent<component::Tag>()) {

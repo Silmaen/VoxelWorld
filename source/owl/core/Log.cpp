@@ -31,7 +31,7 @@ void Log::init() {
 #ifdef WIN32
 	logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(L"Owl.log", true));
 #else
-    logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Owl.log", true));
+	logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Owl.log", true));
 #endif
 
 	logSinks[0]->set_pattern("%^[%T] %n: %v%$");

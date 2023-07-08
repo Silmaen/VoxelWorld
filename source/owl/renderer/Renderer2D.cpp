@@ -15,7 +15,6 @@
 #include "UniformBuffer.h"
 #include "VertexArray.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 namespace owl::renderer {
 
@@ -71,9 +70,9 @@ struct LineVertex {
  */
 template<typename VertexType>
 struct DrawData {
-	shrd<VertexArray> vertexArray;
-	shrd<VertexBuffer> vertexBuffer;
-	shrd<Shader> shader;
+	shared<VertexArray> vertexArray;
+	shared<VertexBuffer> vertexBuffer;
+	shared<Shader> shader;
 	uint32_t indexCount = 0;
 	std::vector<VertexType> vertexBuf;
 };
@@ -87,7 +86,7 @@ static void resetDrawData(DrawData<VertexType> &data_) {
 }
 
 template<typename VertexType>
-static void initDrawData(DrawData<VertexType> &data_, const BufferLayout &layout_, std::vector<uint32_t>& indices, const std::string& shaderName) {
+static void initDrawData(DrawData<VertexType> &data_, const BufferLayout &layout_, std::vector<uint32_t> &indices, const std::string &shaderName) {
 	data_.vertexArray = VertexArray::create();
 	data_.vertexBuffer = VertexBuffer::create(utils::maxVertices * sizeof(VertexType));
 	data_.vertexBuffer->setLayout(layout_);
@@ -103,28 +102,29 @@ static void initDrawData(DrawData<VertexType> &data_, const BufferLayout &layout
  * @brief Structure holding static internal data
  */
 struct internalData {
-	// Quad Data
+	/// Quad Data
 	DrawData<QuadVertex> quad;
-	// Circle Data
+	/// Circle Data
 	DrawData<CircleVertex> circle;
-	// Line Data
+	/// Line Data
 	DrawData<LineVertex> line;
 	float lineWidth = 2.0f;
 
 	// Textures Data
-	shrd<Texture2D> whiteTexture;
-	std::array<shrd<Texture2D>, maxTextureSlots> textureSlots;
+	shared<Texture2D> whiteTexture;
+	std::array<shared<Texture2D>, maxTextureSlots> textureSlots;
 	uint32_t textureSlotIndex = 1;// 0 = white texture
 
-	// Statistics
+	/// Statistics
 	Renderer2D::Statistics stats;
 
-	// Camera Data
+	/// Camera Data
 	struct CameraData {
+		/// Camera projection
 		glm::mat4 viewProjection;
 	};
 	CameraData cameraBuffer;
-	shrd<UniformBuffer> cameraUniformBuffer;
+	shared<UniformBuffer> cameraUniformBuffer;
 };
 
 glm::mat4 toTransform(const PRS &transform) {
@@ -155,33 +155,35 @@ void Renderer2D::init() {
 
 			offset += 4;
 		}
-
 	}
 	// quads
-	utils::initDrawData(data.quad,{
-			{"a_Position",     ShaderDataType::Float3},
-			{"a_Color",        ShaderDataType::Float4},
-			{"a_TexCoord",     ShaderDataType::Float2},
-			{"a_TexIndex",     ShaderDataType::Float},
-			{"a_TilingFactor", ShaderDataType::Float},
-			{"a_EntityID",     ShaderDataType::Int},
-	}, quadIndices, "renderer2D_quad");
+	utils::initDrawData(data.quad, {
+										   {"a_Position", ShaderDataType::Float3},
+										   {"a_Color", ShaderDataType::Float4},
+										   {"a_TexCoord", ShaderDataType::Float2},
+										   {"a_TexIndex", ShaderDataType::Float},
+										   {"a_TilingFactor", ShaderDataType::Float},
+										   {"a_EntityID", ShaderDataType::Int},
+								   },
+						quadIndices, "renderer2D_quad");
 	data.quad.vertexArray->setIndexBuffer(IndexBuffer::create(quadIndices.data(), utils::maxIndices));
 	// circles
-	utils::initDrawData(data.circle,{
-			{"a_WorldPosition", ShaderDataType::Float3},
-			{"a_LocalPosition", ShaderDataType::Float3},
-			{"a_Color",         ShaderDataType::Float4},
-			{"a_Thickness",     ShaderDataType::Float},
-			{"a_Fade",          ShaderDataType::Float},
-			{"a_EntityID",      ShaderDataType::Int},
-	}, quadIndices, "renderer2D_circle");
+	utils::initDrawData(data.circle, {
+											 {"a_WorldPosition", ShaderDataType::Float3},
+											 {"a_LocalPosition", ShaderDataType::Float3},
+											 {"a_Color", ShaderDataType::Float4},
+											 {"a_Thickness", ShaderDataType::Float},
+											 {"a_Fade", ShaderDataType::Float},
+											 {"a_EntityID", ShaderDataType::Int},
+									 },
+						quadIndices, "renderer2D_circle");
 	// Lines
-	utils::initDrawData(data.line,{
-			{"a_Position", ShaderDataType::Float3},
-			{"a_Color",    ShaderDataType::Float4},
-			{"a_EntityID", ShaderDataType::Int},
-	}, quadIndices, "renderer2D_line");
+	utils::initDrawData(data.line, {
+										   {"a_Position", ShaderDataType::Float3},
+										   {"a_Color", ShaderDataType::Float4},
+										   {"a_EntityID", ShaderDataType::Int},
+								   },
+						quadIndices, "renderer2D_line");
 
 	data.whiteTexture = Texture2D::create(1, 1);
 	uint32_t whiteTextureData = 0xffffffff;
@@ -200,6 +202,13 @@ void Renderer2D::init() {
 
 void Renderer2D::shutdown() {
 	OWL_PROFILE_FUNCTION()
+	// clearing the internal data
+	data.cameraUniformBuffer.reset();
+	data.whiteTexture.reset();
+	for (auto &text: data.textureSlots) {
+		if (text == nullptr) continue;
+		text.reset();
+	}
 }
 
 void Renderer2D::beginScene(const CameraOrtho &camera) {
@@ -211,7 +220,7 @@ void Renderer2D::beginScene(const CameraOrtho &camera) {
 }
 
 void Renderer2D::beginScene(const CameraEditor &camera) {
-	OWL_PROFILE_FUNCTION();
+	OWL_PROFILE_FUNCTION()
 
 	data.cameraBuffer.viewProjection = camera.getViewProjection();
 	data.cameraUniformBuffer->setData(&data.cameraBuffer, sizeof(utils::internalData::CameraData));
@@ -256,7 +265,7 @@ void Renderer2D::flush() {
 	}
 	if (data.line.indexCount > 0) {
 		data.line.vertexBuffer->setData(data.line.vertexBuf.data(),
-										  static_cast<uint32_t>(data.line.vertexBuf.size() * sizeof(utils::CircleVertex)));
+										static_cast<uint32_t>(data.line.vertexBuf.size() * sizeof(utils::CircleVertex)));
 		// bind shader
 		data.line.shader->bind();
 		// draw call
@@ -287,39 +296,39 @@ void Renderer2D::setLineWidth(float width) {
 }
 
 void Renderer2D::drawLine(const LineData &lineData) {
-	data.line.vertexBuf.emplace_back(utils::LineVertex{lineData.point1,lineData.color, lineData.entityID});
-	data.line.vertexBuf.emplace_back(utils::LineVertex{lineData.point2,lineData.color, lineData.entityID});
+	data.line.vertexBuf.emplace_back(utils::LineVertex{lineData.point1, lineData.color, lineData.entityID});
+	data.line.vertexBuf.emplace_back(utils::LineVertex{lineData.point2, lineData.color, lineData.entityID});
 	data.line.indexCount += 2;
 }
 
 void Renderer2D::drawRect(const RectData &lineData) {
 	glm::mat4 trans = lineData.transform.transform;
 	std::vector<glm::vec3> points;
-	static const std::vector<std::pair<uint8_t ,uint8_t>> idx = {{0,1},{1,2},{2,3},{3,0}};
-	for(const auto& vtx : utils::quadVertexPositions)
+	static const std::vector<std::pair<uint8_t, uint8_t>> idx = {{0, 1}, {1, 2}, {2, 3}, {3, 0}};
+	for (const auto &vtx: utils::quadVertexPositions)
 		points.emplace_back(trans * vtx);
-	for(const auto& [p1, p2] : idx)
+	for (const auto &[p1, p2]: idx)
 		drawLine({points[p1], points[p2], lineData.color, lineData.entityID});
 }
 
 void Renderer2D::drawPolyLine(const PolyLineData &lineData) {
-	if (lineData.points.size() < 2){
+	if (lineData.points.size() < 2) {
 		OWL_CORE_WARN("Too few points in the multiline with ID {}", lineData.entityID)
 		return;
 	}
 	glm::mat4 trans = lineData.transform.transform;
 	std::vector<glm::vec3> points;
-	std::vector<std::pair<uint32_t ,uint32_t>> link;
+	std::vector<std::pair<uint32_t, uint32_t>> link;
 	uint32_t i = 0;
-	for(const auto& vtx: lineData.points){
+	for (const auto &vtx: lineData.points) {
 		points.emplace_back(trans * glm::vec4{vtx.x, vtx.y, vtx.z, 1.f});
-		if (i < lineData.points.size()-1)
-			link.emplace_back(std::pair<uint32_t ,uint32_t>{i,i+1});
+		if (i < lineData.points.size() - 1)
+			link.emplace_back(std::pair<uint32_t, uint32_t>{i, i + 1});
 		++i;
 	}
 	if (lineData.closed)
-		link.emplace_back(std::pair<uint32_t ,uint32_t>{lineData.points.size()-1,0});
-	for(const auto& [p1, p2] : link)
+		link.emplace_back(std::pair<uint32_t, uint32_t>{lineData.points.size() - 1, 0});
+	for (const auto &[p1, p2]: link)
 		drawLine({points[p1], points[p2], lineData.color, lineData.entityID});
 }
 
@@ -330,7 +339,7 @@ void Renderer2D::drawCircle(const CircleData &circleData) {
 	// if (data.circleIndexCount >= utils::maxIndices)
 	// 	nextBatch();
 
-	for(const auto& vtx : utils::quadVertexPositions) {
+	for (const auto &vtx: utils::quadVertexPositions) {
 		data.circle.vertexBuf.emplace_back(utils::CircleVertex{
 				.worldPosition = circleData.transform.transform * vtx,
 				.localPosition = vtx * 2.0f,
