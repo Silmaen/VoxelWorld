@@ -104,8 +104,14 @@ find_package(SPIRV-Tools REQUIRED)
 find_package(SPIRV-Tools-opt REQUIRED)
 find_package(glslang REQUIRED)
 find_package(shaderc REQUIRED)
-if (${PRJPREFIX}_BUILD_SHARED)
+if (${PRJPREFIX}_BUILD_SHARED OR WIN32)
     target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
+    if (WIN32)
+        add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/libshaderc_shared.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                COMMAND_EXPAND_LISTS
+                )
+    endif ()
 else ()
     target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc)
 endif ()
