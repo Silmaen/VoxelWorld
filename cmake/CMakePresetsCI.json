@@ -5,22 +5,42 @@
     "minor": 24,
     "patch": 0
   },
+  "include": [
+    "CMakePresetsBase.json",
+    "CMakePresetsMinGW.json"
+  ],
   "configurePresets": [
     {
       "name": "Documentation",
-      "generator": "Ninja",
-      "binaryDir": "output/build/${presetName}",
-      "installDir": "output/install/${presetName}",
+      "inherits": "base",
       "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "output/install/${presetName}",
         "OWL_DOC_ONLY": "ON",
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "CodeCoverage",
+      "inherits": "gcc-debug-static",
+      "cacheVariables": {
+        "OWL_COVERAGE": "ON"
       },
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "MinGW"
-        }
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "CodeCoverage_mingw",
+      "inherits": "mingw-gcc-debug-static",
+      "cacheVariables": {
+        "OWL_COVERAGE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
       }
     }
   ]
