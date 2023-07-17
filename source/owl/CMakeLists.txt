@@ -86,7 +86,7 @@ find_package(nfd REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE nfd::nfd)
 
 # Spir-V cross
-if (${PRJPREFIX}_BUILD_SHARED)
+if (${PRJPREFIX}_BUILD_SHARED AND WIN32)
     find_package(spirv_cross_c_shared REQUIRED)
     target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-c-shared)
 else ()
@@ -97,7 +97,7 @@ else ()
     find_package(spirv_cross_cpp REQUIRED)
     find_package(spirv_cross_reflect REQUIRED)
     find_package(spirv_cross_c REQUIRED)
-    target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-c)
+    target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-cpp)
 endif ()
 # shaderc
 find_package(SPIRV-Tools REQUIRED)
@@ -108,7 +108,7 @@ if (${PRJPREFIX}_BUILD_SHARED OR WIN32)
     target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
     if (WIN32)
         add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/libshaderc_shared.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/libshaderc_shared$<$<CONFIG:Debug>:d>.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
                 COMMAND_EXPAND_LISTS
                 )
     endif ()

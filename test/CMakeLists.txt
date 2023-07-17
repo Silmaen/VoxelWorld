@@ -22,8 +22,16 @@ foreach (child ${children})
             target_include_directories(${PRJPREFIX_LOWER}_${child}_unit_test PUBLIC test_helper)
             target_link_libraries(${PRJPREFIX_LOWER}_${child}_unit_test GTest::gtest GTest::gtest_main)
             target_link_libraries(${PRJPREFIX_LOWER}_${child}_unit_test ${ENGINE_NAME})
-            add_test(${PRJPREFIX_LOWER}_${child}_UTests ./${PRJPREFIX_LOWER}_${child}_unit_test --gtest_output=xml:test/${child}_UTest_Report.xml)
+            add_test(${PRJPREFIX_LOWER}_${child}_UTests ${CMAKE_BINARY_DIR}/bin/${PRJPREFIX_LOWER}_${child}_unit_test --gtest_output=xml:test/${child}_UTest_Report.xml)
             set_tests_properties(${PRJPREFIX_LOWER}_${child}_UTests PROPERTIES TIMEOUT 3600)
+            if (${PRJPREFIX}_BUILD_SHARED AND WIN32)
+                add_custom_command(TARGET ${PRJPREFIX_LOWER}_${child}_unit_test POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GTest_DIR}/../../../bin/libgtest.dll" "${CMAKE_BINARY_DIR}/bin"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GTest_DIR}/../../../bin/libgtest_main.dll" "${CMAKE_BINARY_DIR}/bin"
+                        COMMAND_EXPAND_LISTS
+                        )
+            endif ()
+
             add_dependencies(All_Tests ${PRJPREFIX_LOWER}_${child}_unit_test)
             add_custom_command(TARGET All_Tests POST_BUILD
                     COMMAND ${PRJPREFIX_LOWER}_${child}_unit_test
@@ -37,16 +45,20 @@ if (${PRJPREFIX}_COVERAGE)
     set(COVERAGE_RESULT_DIR ${CMAKE_BINARY_DIR}/Coverage)
     file(MAKE_DIRECTORY ${COVERAGE_RESULT_DIR})
     set(COVERAGE_TITLE "Owl: tests coverage")
-    set(COVERAGE_HTML --html --html-details --html-details-syntax-highlighting --html-title ${COVERAGE_TITLE} --source-encoding utf-8)
-    set(COVERAGE_FILTER "-e\".*external/.*\" -e\".*test/.*\" -e\".*owlnest.*\"  -e\".*sandbox.*\" -e\".*autogen.*\"")
-    set(COVERAGE_OPTION "-buds -j 4 --exclude-throw-branches --exclude-unreachable-branches --exclude-lines-by-pattern \".*---UNCOVER---.*\"")
+    set(COVERAGE_HTML --html --html-details-syntax-highlighting --html-nested --html-title ${COVERAGE_TITLE} --source-encoding utf-8)
+    set(COVERAGE_FILTER "-e\".*test/.*\" -e\".*owlnest.*\"  -e\".*sandbox.*\" -e\".*autogen.*\"")
+    set(COVERAGE_OPTION "-bpds" --exclude-unreachable-branches --exclude-noncode-lines --exclude-throw-branches -j 4 --exclude-lines-by-pattern \".*---UNCOVER---.*\")
     if ("d${${PRJPREFIX}_GCOV}" STREQUAL "d")
         set(COVERAGE_GCOV)
     else ()
         set(COVERAGE_GCOV "--gcov-executable \"llvm-cov gcov\" --gcov-ignore-parse-errors")
     endif ()
+    set(CMD ${GCOVR} ${COVERAGE_OPTION} -r ${CMAKE_SOURCE_DIR} -o ${COVERAGE_RESULT_DIR}/index.html ${COVERAGE_GCOV} ${COVERAGE_HTML} ${COVERAGE_FILTER} .)
+
     add_custom_command(TARGET All_Tests POST_BUILD
-            COMMAND ${GCOVR} ${COVERAGE_OPTION} -r ${CMAKE_SOURCE_DIR} -o ${COVERAGE_RESULT_DIR}/index.html ${COVERAGE_GCOV} ${COVERAGE_HTML} ${COVERAGE_FILTER} .
+            COMMAND echo "command: ${CMD}")
+    add_custom_command(TARGET All_Tests POST_BUILD
+            COMMAND ${CMD}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             USES_TERMINAL)
     add_custom_command(TARGET All_Tests POST_BUILD

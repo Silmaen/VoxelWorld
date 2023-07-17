@@ -2,23 +2,21 @@
 if (NOT CMAKE_BUILD_TYPE MATCHES "Debug")
     message(FATAL_ERROR "Coverage only works on debug builds")
 endif ()
-find_program(GCOVR gcovr)
-if (${GCOVR} STREQUAL GCOVR-NOTFOUND)
-    message(FATAL_ERROR "unable to find gcovr: no coverage report is possible")
-else ()
-    # Get gcov version
-    execute_process(COMMAND ${GCOVR} --version
-            OUTPUT_VARIABLE GCOVR_VERSION)
-    string(REPLACE "\n" ";" GCOVR_VERSION ${GCOVR_VERSION})
-    list(SUBLIST GCOVR_VERSION 0 1 GCOVR_VERSION)
-    string(REPLACE " " ";" GCOVR_VERSION ${GCOVR_VERSION})
-    list(SUBLIST GCOVR_VERSION 1 1 GCOVR_VERSION)
+find_package(Python REQUIRED)
+set(GCOVR ${Python_EXECUTABLE} -u -m gcovr)
+# Get gcov version
+execute_process(COMMAND ${GCOVR} --version
+        OUTPUT_VARIABLE GCOVR_VERSION)
+string(REPLACE "\n" ";" GCOVR_VERSION "${GCOVR_VERSION}")
+list(SUBLIST GCOVR_VERSION 0 1 GCOVR_VERSION)
+string(REPLACE " " ";" GCOVR_VERSION ${GCOVR_VERSION})
+list(SUBLIST GCOVR_VERSION 1 1 GCOVR_VERSION)
 
-    message(STATUS "Found gcovr version ${GCOVR_VERSION} at location: ${GCOVR} ")
-    if (${GCOVR_VERSION} VERSION_LESS 5.0)
-        message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 5.0")
-    endif ()
+message(STATUS "Found gcovr version ${GCOVR_VERSION}.")
+if (${GCOVR_VERSION} VERSION_LESS 6.0)
+    message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 6.0")
 endif ()
+
 # options for coverage
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE --coverage)

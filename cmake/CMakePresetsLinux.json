@@ -13,13 +13,21 @@
       "name": "linux-gcc-release-static",
       "inherits": [
         "gcc-release-static"
-      ]
+      ],
+      "cacheVariables": {
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold"
+      }
     },
     {
       "name": "linux-gcc-debug-static",
       "inherits": [
         "gcc-debug-static"
-      ]
+      ],
+      "cacheVariables": {
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold"
+      }
     },
     {
       "name": "linux-clang-release-static",
@@ -37,13 +45,21 @@
       "name": "linux-gcc-release-shared",
       "inherits": [
         "gcc-release-shared"
-      ]
+      ],
+      "cacheVariables": {
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold"
+      }
     },
     {
       "name": "linux-gcc-debug-shared",
       "inherits": [
         "gcc-debug-shared"
-      ]
+      ],
+      "cacheVariables": {
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold"
+      }
     },
     {
       "name": "linux-clang-release-shared",
