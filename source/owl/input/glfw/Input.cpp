@@ -7,37 +7,30 @@
  */
 #include "owlpch.h"
 
-#include "../Input.h"
+#include "Input.h"
 #include "core/Application.h"
 #include "core/external/glfw3.h"
 
 
-namespace owl::input {
+namespace owl::input::glfw {
 
-bool Input::isKeyPressed(KeyCode keycode) {
+bool Input::isKeyPressed_impl(KeyCode keycode) {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
 	auto state = glfwGetKey(windows, keycode);
 	return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-bool Input::isMouseButtonPressed(MouseCode mouseCode) {
+bool Input::isMouseButtonPressed_impl(MouseCode mouseCode) {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
 	auto state = glfwGetMouseButton(windows, mouseCode);
 	return state == GLFW_PRESS;
 }
 
-float Input::getMouseX() {
-	return getMousePos().x;
-}
-
-float Input::getMouseY() {
-	return getMousePos().y;
-}
-glm::vec2 Input::getMousePos() {
+glm::vec2 Input::getMousePos_impl() {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
 	double X, Y;
 	glfwGetCursorPos(windows, &X, &Y);
 	return {X, Y};
 }
 
-}// namespace owl::input
+}// namespace owl::input::glfw

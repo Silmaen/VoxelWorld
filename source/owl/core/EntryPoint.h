@@ -31,5 +31,6 @@ int main(int argc, char *argv[]) {
 	OWL_PROFILE_BEGIN_SESSION("Shutdown", "OwlProfile-shutdown.json")
 	app.reset();
 	OWL_PROFILE_END_SESSION()
+	owl::core::Log::invalidate();
 	return 0;
 }

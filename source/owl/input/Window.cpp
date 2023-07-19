@@ -10,12 +10,17 @@
 
 #include "Window.h"
 #include "glfw/Window.h"
+#include "null/Window.h"
 
 namespace owl::input {
 
 uniq<Window> Window::create(const Properties &props) {
-	if (props.winType == Type::GLFW)
-		return mk_uniq<glfw::Window>(props);
+	switch (props.winType) {
+		case Type::GLFW:
+			return mk_uniq<glfw::Window>(props);
+		case Type::Null:
+			return mk_uniq<null::Window>(props);
+	}
 	return nullptr;
 }
 

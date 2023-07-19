@@ -45,7 +45,7 @@ public:
 	 * @param other The scene to copy.
 	 * @return Pointer to the new scene.
 	 */
-	static shared<Scene> copy(shared<Scene> other);
+	static shared<Scene> copy(const shared<Scene> &other);
 
 	/**
 	 * @brief Create entity and add it to registry.
@@ -66,7 +66,7 @@ public:
 	 * @brief Destroy n entity.
 	 * @param entity Entity to destroy.
 	 */
-	void destroyEntity(Entity entity);
+	void destroyEntity(Entity &entity);
 
 	/**
 	 * @brief Update actions for the runtime.
@@ -91,8 +91,9 @@ public:
 	/**
 	 * @brief Duplicate an entity.
 	 * @param entity Entity to duplicate.
+	 * @return The created entity.
 	 */
-	void duplicateEntity(Entity entity);
+	Entity duplicateEntity(const Entity &entity);
 
 	/**
 	 * @brief Access to the primary Came.ra.
@@ -111,7 +112,7 @@ private:
 	 * @param component The new component.
 	 */
 	template<typename T>
-	void onComponentAdded(Entity entity, T &component);
+	void onComponentAdded(const Entity &entity, T &component);
 
 	/// The viewport's width.
 	uint32_t viewportWidth = 0;

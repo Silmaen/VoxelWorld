@@ -23,6 +23,7 @@ public:
 	 * @return A valid file path or null if canceled.
 	 */
 	static std::filesystem::path openFile(const std::string &filter);
+
 	/**
 	 * @brief Open a file dialog to define a file to create.
 	 * @param filter Filter to apply during the search.

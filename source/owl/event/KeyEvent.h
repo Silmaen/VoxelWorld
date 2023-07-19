@@ -91,6 +91,7 @@ public:
 	[[nodiscard]] type getType() const override { return getStaticType(); }
 
 private:
+	/// Counter of repet.
 	uint16_t repeatCount;
 };
 

@@ -35,7 +35,8 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	~Tracker() = default;//---UNCOVER---
+	~Tracker() = default;
+
 	/**
 	 * @brief Get engine instance.
 	 * @return The engine instance.
@@ -69,6 +70,7 @@ public:
 	 * @return Status since last call to check.
 	 */
 	const AllocationState &checkState();
+
 	/**
 	 * @brief Get the memory state since the start of the program.
 	 * @return Memory state.

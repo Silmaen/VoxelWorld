@@ -14,15 +14,10 @@
 namespace owl::renderer {
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
-
 /**
  * @brief Class RenderAPI
  */
-class RenderAPI {
+class OWL_API RenderAPI {
 public:
 	RenderAPI() = default;
 	RenderAPI(const RenderAPI &) = delete;
@@ -33,7 +28,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~RenderAPI() = default;
+	virtual ~RenderAPI();
 
 	/**
 	 * @brief Initialize the renderer.
@@ -83,7 +78,7 @@ public:
 
 	/// Render API types.
 	enum struct Type {
-		None = 0,  ///< Null Renderer.
+		Null = 0,  ///< Null Renderer.
 		OpenGL = 1,///< OpenGL Renderer.
 		Vulkan = 2,///< Vulkan renderer API.
 	};
@@ -125,9 +120,5 @@ private:
 	/// Type of Renderer API.
 	static Type type;
 };
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

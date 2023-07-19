@@ -61,10 +61,6 @@ struct FramebufferSpecification {
 	bool swapChainTarget = false;
 };
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class Framebuffer.
  */
@@ -79,7 +75,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Framebuffer() = default;
+	virtual ~Framebuffer();
 
 	/**
 	 * @brief Activate the shader on the GPU.
@@ -136,8 +132,5 @@ public:
 
 private:
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

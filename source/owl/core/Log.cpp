@@ -24,8 +24,13 @@ namespace owl::core {
 
 std::shared_ptr<spdlog::logger> Log::coreLogger;
 std::shared_ptr<spdlog::logger> Log::clientLogger;
+spdlog::level::level_enum Log::verbosity = spdlog::level::trace;
 
-void Log::init() {
+void Log::init(const spdlog::level::level_enum &level) {
+	if (coreLogger != nullptr) {
+		OWL_CORE_INFO("Logger already initiated.")
+		return;
+	}
 	std::vector<spdlog::sink_ptr> logSinks;
 	logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 #ifdef WIN32
@@ -39,13 +44,28 @@ void Log::init() {
 
 	coreLogger = std::make_shared<spdlog::logger>("OWL", begin(logSinks), end(logSinks));
 	spdlog::register_logger(coreLogger);
-	coreLogger->set_level(spdlog::level::trace);
-	coreLogger->flush_on(spdlog::level::trace);
 
 	clientLogger = std::make_shared<spdlog::logger>("APP", begin(logSinks), end(logSinks));
 	spdlog::register_logger(clientLogger);
-	clientLogger->set_level(spdlog::level::trace);
-	clientLogger->flush_on(spdlog::level::trace);
+	setVerbosityLevel(level);
+}
+
+void Log::setVerbosityLevel(const spdlog::level::level_enum &level) {
+	verbosity = level;
+	if (coreLogger) {
+		coreLogger->set_level(verbosity);
+		coreLogger->flush_on(verbosity);
+	}
+	if (clientLogger) {
+		clientLogger->set_level(verbosity);
+		clientLogger->flush_on(verbosity);
+	}
+}
+
+void Log::invalidate() {
+	spdlog::drop_all();
+	coreLogger.reset();
+	clientLogger.reset();
 }
 
 }// namespace owl::core

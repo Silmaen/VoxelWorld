@@ -34,6 +34,7 @@ static std::vector<std::string_view> split(const std::string_view str, const cha
 	result.push_back(finalColumn);
 	return result;
 }
+
 static std::vector<nfdu8filteritem_t> parseFilter(std::string &filter) {
 	std::vector<nfdu8filteritem_t> filters;
 	auto filterStr = split(filter);

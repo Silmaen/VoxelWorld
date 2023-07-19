@@ -15,6 +15,7 @@
 #include "gui/ImGuiLayer.h"
 #include "input/Window.h"
 #include "layer/LayerStack.h"
+#include "renderer/RenderAPI.h"
 
 int main(int argc, char *argv[]);
 
@@ -28,10 +29,13 @@ struct OWL_API AppParams {
 	std::string name = "Owl Engine";
 	/// Application's assets pattern.
 	std::string assetsPattern = "assets";
+	/// Renderer's type.
+	renderer::RenderAPI::Type renderer = renderer::RenderAPI::Type::OpenGL;
 	/// Number of command line arguments.
 	int argCount = 0;
 	/// List of command line argument.
 	char **args = nullptr;
+
 	/**
 	 * @brief Access to the given command line argument.
 	 * @param index Id of the argument.
@@ -105,6 +109,10 @@ public:
 	 * @brief Request the application to terminate.
 	 */
 	void close();
+	/**
+	 * @brief Request the application to terminate.
+	 */
+	static void invalidate();
 
 	/**
 	 * @brief Get the working directory.
@@ -153,6 +161,7 @@ public:
 		Stopped,/// Application Stopped.
 		Error   /// Application in error.
 	};
+
 	/**
 	 * @brief Get the application's state.
 	 * @return The current application's state.
@@ -164,18 +173,21 @@ private:
 	 * @brief Runs the application.
 	 */
 	void run();
+
 	/**
 	* @brief Action on window close.
 	* @param e The close event.
 	* @return True if succeeded.
 	*/
 	bool onWindowClosed(event::WindowCloseEvent &e);
+
 	/**
 	* @brief Action on window resize.
 	* @param e the resize event.
 	* @return True if succeeded.
 	*/
 	bool onWindowResized(event::WindowResizeEvent &e);
+
 	/// Pointer to the window.
 	uniq<input::Window> appWindow;
 	/// Pointer to the GUI Layer.

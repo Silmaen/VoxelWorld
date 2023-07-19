@@ -13,10 +13,6 @@
 
 namespace owl::renderer {
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class RenderCommand
  */
@@ -31,22 +27,28 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~RenderCommand() = default;
+	virtual ~RenderCommand();
 
 	/**
 	 * @brief Initialize the renderer.
 	 */
 	inline static void init() {
-		renderAPI->init();
+		if (renderAPI)
+			renderAPI->init();
+	}
+
+	/**
+	 * @brief Reset RenderAPI.
+	 */
+	inline static void invalidate() {
+		renderAPI.reset();
 	}
 
 	/**
 	 * @brief Get the state of the API.
 	 * @return API state.
 	 */
-	inline static RenderAPI::State getState() {
-		return renderAPI->getState();
-	}
+	static RenderAPI::State getState();
 
 	/**
 	 * @brief Define the view port for this API.
@@ -116,8 +118,5 @@ private:
 	/// Pointer to the render API
 	static uniq<RenderAPI> renderAPI;
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

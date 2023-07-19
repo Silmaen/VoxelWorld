@@ -16,10 +16,6 @@
  */
 namespace owl::renderer {
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class Renderer.
  */
@@ -34,7 +30,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Renderer() = default;//---UNCOVER---
+	virtual ~Renderer();
 
 	/**
 	 * @brief Initialize the renderer.
@@ -45,6 +41,11 @@ public:
 	 * @brief Stops the renderer.
 	 */
 	static void shutdown();
+
+	/**
+	 * @brief Reset the renderer.
+	 */
+	static void reset();
 
 	/**
 	 * @brief Get the actual type of rendering API.
@@ -118,8 +119,5 @@ private:
 	/// Actual library of shaders.
 	static ShaderLibrary shaderLibrary;
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

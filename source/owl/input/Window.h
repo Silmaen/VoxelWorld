@@ -17,7 +17,8 @@ namespace owl::input {
  * @brief Types of input Manager.
  */
 enum struct Type {
-	GLFW/// Windows managed by Glfw library.
+	Null,/// Windows null
+	GLFW /// Windows managed by Glfw library.
 };
 
 /**
@@ -69,6 +70,12 @@ public:
 	 * @return The window's height.
 	 */
 	[[nodiscard]] virtual uint32_t getHeight() const = 0;
+
+	/**
+	 * @brief Get the type of window manager.
+	 * @return The window manager's type.
+	 */
+	[[nodiscard]] virtual Type getType() const = 0;
 
 	/**
 	 * @brief Define the Event Callback function.

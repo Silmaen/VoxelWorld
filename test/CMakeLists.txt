@@ -13,7 +13,7 @@ foreach (child ${children})
         file(GLOB_RECURSE
                 SRCS
                 ${CMAKE_CURRENT_SOURCE_DIR}/${child}/*.cpp
-                )
+        )
         if ("${SRCS} " STREQUAL " ")
             message(STATUS "Test folder '${child}' is empty, skipping")
         else ()
@@ -29,7 +29,7 @@ foreach (child ${children})
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GTest_DIR}/../../../bin/libgtest.dll" "${CMAKE_BINARY_DIR}/bin"
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GTest_DIR}/../../../bin/libgtest_main.dll" "${CMAKE_BINARY_DIR}/bin"
                         COMMAND_EXPAND_LISTS
-                        )
+                )
             endif ()
 
             add_dependencies(All_Tests ${PRJPREFIX_LOWER}_${child}_unit_test)
@@ -46,8 +46,8 @@ if (${PRJPREFIX}_COVERAGE)
     file(MAKE_DIRECTORY ${COVERAGE_RESULT_DIR})
     set(COVERAGE_TITLE "Owl: tests coverage")
     set(COVERAGE_HTML --html --html-details-syntax-highlighting --html-nested --html-title ${COVERAGE_TITLE} --source-encoding utf-8)
-    set(COVERAGE_FILTER "-e\".*test/.*\" -e\".*owlnest.*\"  -e\".*sandbox.*\" -e\".*autogen.*\"")
-    set(COVERAGE_OPTION "-bpds" --exclude-unreachable-branches --exclude-noncode-lines --exclude-throw-branches -j 4 --exclude-lines-by-pattern \".*---UNCOVER---.*\")
+    set(COVERAGE_FILTER -e\".*test.*\" -e\".*owlnest.*\" -e\".*sandbox.*\" -e\".*autogen.*\")
+    set(COVERAGE_OPTION -bpds --exclude-unreachable-branches --exclude-noncode-lines --exclude-throw-branches -j 4 --exclude-lines-by-pattern \".*---UNCOVER---.*\")
     if ("d${${PRJPREFIX}_GCOV}" STREQUAL "d")
         set(COVERAGE_GCOV)
     else ()
@@ -56,9 +56,10 @@ if (${PRJPREFIX}_COVERAGE)
     set(CMD ${GCOVR} ${COVERAGE_OPTION} -r ${CMAKE_SOURCE_DIR} -o ${COVERAGE_RESULT_DIR}/index.html ${COVERAGE_GCOV} ${COVERAGE_HTML} ${COVERAGE_FILTER} .)
 
     add_custom_command(TARGET All_Tests POST_BUILD
-            COMMAND echo "command: ${CMD}")
+            COMMAND echo "command: '${CMD}'")
     add_custom_command(TARGET All_Tests POST_BUILD
             COMMAND ${CMD}
+            COMMAND_EXPAND_LISTS
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             USES_TERMINAL)
     add_custom_command(TARGET All_Tests POST_BUILD

@@ -66,11 +66,8 @@ public:
 	Event(Event &&) = default;
 	Event &operator=(const Event &) = default;
 	Event &operator=(Event &&) = default;
-
-	/**
-	 * @brief Default constructor.
-	 */
 	Event() = default;
+
 	/**
 	 * @brief Destructor.
 	 */
