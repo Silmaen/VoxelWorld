@@ -26,11 +26,28 @@ int main(int argc, char *argv[]) {
 		OWL_PROFILE_END_SESSION()
 		// runtime
 		OWL_PROFILE_BEGIN_SESSION("Runtime", "OwlProfile-runtime.json")
+		OWL_CORE_TRACE("run!")
 		app->run();
 		OWL_PROFILE_END_SESSION()
 		// Shutdown
 		OWL_PROFILE_BEGIN_SESSION("Shutdown", "OwlProfile-shutdown.json")
 		app.reset();
+		{
+			OWL_SCOPE_UNTRACK
+			const auto &memState = owl::debug::Tracker::get().checkState();
+			if (memState.allocationCalls > memState.deallocationCalls) {
+				OWL_CORE_TRACE("----------------------------------")
+				OWL_CORE_TRACE("Leak Detected during App release")
+				OWL_CORE_TRACE("-----------------------------------")
+				OWL_CORE_TRACE("")
+				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory, memState.allocs.size())
+				for (const auto &chunk: memState.allocs) {
+					OWL_CORE_TRACE(" ** {}", chunk.toStr())
+				}
+				OWL_CORE_TRACE("----------------------------------")
+				OWL_CORE_TRACE("")
+			}
+		}
 		OWL_PROFILE_END_SESSION()
 	}
 	{

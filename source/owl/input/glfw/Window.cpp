@@ -8,15 +8,12 @@
 
 #include "owlpch.h"
 
-#include <glad/glad.h>
-
 #include "Window.h"
 #include "core/Log.h"
 #include "debug/Profiler.h"
 #include "event/AppEvent.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
-#include "renderer/Renderer.h"
 
 namespace owl::input::glfw {
 
@@ -57,8 +54,7 @@ void Window::init(const Properties &props) {
 	{
 		OWL_PROFILE_SCOPE("glfwCreateWindow")
 #if defined(OWL_DEBUG)
-		if (renderer::Renderer::getAPI() == renderer::RenderAPI::Type::OpenGL)
-			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 		glfwWindow = glfwCreateWindow(static_cast<int>(props.width),
 									  static_cast<int>(props.height),

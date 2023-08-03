@@ -73,19 +73,20 @@ void RenderAPI::clear() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderAPI::drawIndexed(const shared<VertexArray> &vertexArray, uint32_t indexCount) {
-	vertexArray->bind();
-	uint32_t count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
+void RenderAPI::drawData(const shared<DrawData> &data, uint32_t indexCount) {
+	data->bind();
+	uint32_t count = indexCount ? indexCount : data->getIndexCount();
 	glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
-}
-
-void RenderAPI::drawLines(const shared<VertexArray> &vertexArray, uint32_t vertexCount) {
-	vertexArray->bind();
-	glDrawArrays(GL_LINES, 0, vertexCount);
 }
 
 void RenderAPI::setLineWidth(float width) {
 	glLineWidth(width);
+}
+
+uint32_t RenderAPI::getMaxTextureSlots() const {
+	int32_t textureUnits;
+	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &textureUnits);
+	return std::min(32u, static_cast<uint32_t>(textureUnits));
 }
 
 }// namespace owl::renderer::opengl

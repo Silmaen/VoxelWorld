@@ -28,10 +28,6 @@ TEST(Renderer, fakeScene) {
 	Renderer::init();
 	CameraOrtho cam(0, 0, 800, 600);
 	Renderer::beginScene(cam);
-	auto obj = VertexArray::create();
-	Renderer::submit("toto", obj);
-	auto shad = Shader::create(std::string("bob"));
-	Renderer::submit(shad, obj);
 	Renderer::endScene();
 
 	RenderCommand::invalidate();

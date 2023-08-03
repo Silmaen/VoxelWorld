@@ -1,6 +1,6 @@
 /**
  * @file Scene.h
- * @author Silmen
+ * @author Silmaen
  * @date 22/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.

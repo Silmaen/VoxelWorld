@@ -28,10 +28,17 @@ public:
 	 * @param binding Buffer's binding.
 	 */
 	UniformBuffer(uint32_t size, uint32_t binding);
+	
 	/**
 	 * @brief Destructor.
 	 */
 	~UniformBuffer() override;
+
+	/**
+	 * @brief bind this uniform buffer.
+	 */
+	void bind() override {}
+
 	/**
 	 * @brief Push Data to GPU.
 	 * @param data The data.

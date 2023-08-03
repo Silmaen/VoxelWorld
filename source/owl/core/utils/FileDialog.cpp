@@ -7,14 +7,14 @@
  */
 #include "owlpch.h"
 
+#include "FileDialog.h"
 #include "core/Core.h"
-#include "core/PlatformUtils.h"
 
 #include "core/Application.h"
 
 #include <nfd.hpp>
 
-namespace owl::core {
+namespace owl::core::utils {
 
 static std::vector<std::string_view> split(const std::string_view str, const char delim = '\n') {
 	std::vector<std::string_view> result;
@@ -25,7 +25,7 @@ static std::vector<std::string_view> split(const std::string_view str, const cha
 			indexCommaToLeftOfColumn = indexCommaToRightOfColumn;
 			indexCommaToRightOfColumn = static_cast<int>(i);
 			int32_t index = indexCommaToLeftOfColumn + 1;
-			uint32_t length = static_cast<uint32_t>(indexCommaToRightOfColumn - index);
+			auto length = static_cast<uint32_t>(indexCommaToRightOfColumn - index);
 			std::string_view column(str.data() + index, length);
 			result.push_back(column);
 		}
@@ -94,4 +94,4 @@ std::filesystem::path FileDialog::saveFile([[maybe_unused]] const std::string &f
 	return resultPath;
 }
 
-}// namespace owl::core
+}// namespace owl::core::utils

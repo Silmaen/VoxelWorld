@@ -58,23 +58,22 @@ public:
 
 	/**
 	 * @brief Binding the draw of vertex array.
-	 * @param vertexArray VA to render.
+	 * @param data Draw data to render.
 	 * @param indexCount Number of vertex to draw (=0 all).
 	 */
-	void drawIndexed(const shared<VertexArray> &vertexArray, uint32_t indexCount = 0) override;
-
-	/**
-	 * @brief Draw lines.
-	 * @param vertexArray VA tpo render as lines.
-	 * @param vertexCount Number of vertex to draw (=0 all).
-	 */
-	void drawLines(const shared<VertexArray> &vertexArray, uint32_t vertexCount) override;
+	void drawData(const shared<DrawData> &data, uint32_t indexCount = 0) override;
 
 	/**
 	 * @brief Define the line width.
 	 * @param width New line width.
 	 */
 	void setLineWidth(float width) override;
+
+	/**
+	 * @brief Get the maximum number of texture slots.
+	 * @return Number of texture slots.
+	 */
+	[[nodiscard]] uint32_t getMaxTextureSlots() const override { return 16; }
 };
 
 }// namespace owl::renderer::null

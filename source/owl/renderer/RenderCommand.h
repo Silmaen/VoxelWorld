@@ -78,20 +78,11 @@ public:
 
 	/**
 	 * @brief Binding the draw of vertex array.
-	 * @param vertexArray VA to render.
+	 * @param data Draw data to render.
 	 * @param indexCount Number of vertex to draw (=0 all).
 	 */
-	inline static void drawIndexed(const std::shared_ptr<VertexArray> &vertexArray, uint32_t indexCount = 0) {
-		renderAPI->drawIndexed(vertexArray, indexCount);
-	}
-
-	/**
-	 * @brief Draw lines.
-	 * @param vertexArray VA tpo render as lines.
-	 * @param vertexCount Number of vertex to draw (=0 all).
-	 */
-	inline static void drawLines(const shared<VertexArray> &vertexArray, uint32_t vertexCount) {
-		renderAPI->drawLines(vertexArray, vertexCount);
+	inline static void drawData(const shared<DrawData> &data, uint32_t indexCount = 0) {
+		renderAPI->drawData(data, indexCount);
 	}
 
 	/**
@@ -113,6 +104,12 @@ public:
 	 * @return API Type.
 	 */
 	inline static RenderAPI::Type getAPI() { return renderAPI->getAPI(); }
+
+	/**
+	 * @brief Get the maximum number of texture slots.
+	 * @return Number of texture slots.
+	 */
+	inline static uint32_t getMaxTextureSlots() { return renderAPI->getMaxTextureSlots(); }
 
 private:
 	/// Pointer to the render API

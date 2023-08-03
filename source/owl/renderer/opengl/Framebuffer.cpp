@@ -172,6 +172,7 @@ void Framebuffer::invalidate() {
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
 void Framebuffer::bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 	glViewport(0, 0, specs.width, specs.height);

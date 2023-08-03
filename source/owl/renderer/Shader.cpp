@@ -12,6 +12,7 @@
 #include "core/Application.h"
 #include "null/Shader.h"
 #include "opengl/Shader.h"
+#include "opengl_legacy/Shader.h"
 #include <magic_enum.hpp>
 
 namespace owl::renderer {
@@ -23,9 +24,11 @@ shared<Shader> Shader::create(const std::string &shaderName, const std::string &
 			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
 		case RenderAPI::Type::Null:
-			return mk_shared<opengl::Shader>(shaderName, vertexSrc, fragmentSrc);
-		case RenderAPI::Type::OpenGL:
 			return mk_shared<null::Shader>(shaderName, vertexSrc, fragmentSrc);
+		case RenderAPI::Type::OpenGL:
+			return mk_shared<opengl::Shader>(shaderName, vertexSrc, fragmentSrc);
+		case RenderAPI::Type::OpenglLegacy:
+			return mk_shared<opengl_legacy::Shader>(shaderName, vertexSrc, fragmentSrc);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;
@@ -53,6 +56,19 @@ shared<Shader> Shader::create(const std::string &shaderName) {
 				return nullptr;
 			}
 			return mk_shared<opengl::Shader>(shaderName, sources);
+		}
+		case RenderAPI::Type::OpenglLegacy: {
+			std::vector<std::filesystem::path> sources;
+			auto shaderDir = core::Application::get().getAssetDirectory() / "shaders";
+			for (const auto &file: std::filesystem::directory_iterator(shaderDir)) {
+				if (file.path().stem().string() == shaderName + "_ogl21")
+					sources.push_back(file);
+			}
+			if (sources.empty()) {
+				OWL_CORE_WARN("Not able to find Shader {} in directory {}", shaderName, shaderDir.string())
+				return nullptr;
+			}
+			return mk_shared<opengl_legacy::Shader>(shaderName, sources);
 		}
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
@@ -84,6 +100,10 @@ shared<Shader> Shader::create(const std::filesystem::path &file) {
 			} else {
 				return mk_shared<opengl::Shader>(shaderName, std::vector<std::filesystem::path>{file});
 			}
+		}
+		case RenderAPI::Type::OpenglLegacy: {
+			std::string shaderName = file.stem().string();
+			return mk_shared<opengl_legacy::Shader>(shaderName, std::vector<std::filesystem::path>{file});
 		}
 	}
 	OWL_CORE_ERROR("Unknown API Type!")

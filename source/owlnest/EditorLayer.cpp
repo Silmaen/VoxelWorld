@@ -8,7 +8,7 @@
 
 #include "EditorLayer.h"
 #include "core/Application.h"
-#include "core/PlatformUtils.h"
+#include "core/utils/FileDialog.h"
 #include "event/KeyEvent.h"
 #include "math/Transform.h"
 #include "scene/SceneSerializer.h"
@@ -163,7 +163,8 @@ void EditorLayer::renderStats(const core::Timestep &ts) {
 	ImGui::Separator();
 	std::string name = "None";
 	if (hoveredEntity)
-		name = hoveredEntity.getComponent<scene::component::Tag>().tag;
+		if (hoveredEntity.hasComponent<scene::component::Tag>())
+			name = hoveredEntity.getComponent<scene::component::Tag>().tag;
 	ImGui::Text("Hovered Entity: %s", name.c_str());
 	ImGui::Separator();
 	auto stats = renderer::Renderer2D::getStats();
@@ -193,7 +194,8 @@ void EditorLayer::renderViewport() {
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 	uint64_t textureID = framebuffer->getColorAttachmentRendererID();
-	ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
+	if (textureID != 0)
+		ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
 
 	if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -315,7 +317,7 @@ void EditorLayer::newScene() {
 }
 
 void EditorLayer::openScene() {
-	auto filepath = core::FileDialog::openFile("Owl Scene (*.owl)|owl\n");
+	auto filepath = core::utils::FileDialog::openFile("Owl Scene (*.owl)|owl\n");
 	if (!filepath.empty()) {
 		openScene(filepath);
 	}
@@ -340,7 +342,7 @@ void EditorLayer::openScene(const std::filesystem::path &scene) {
 }
 
 void EditorLayer::saveSceneAs() {
-	auto filepath = core::FileDialog::saveFile("Owl Scene (*.owl)|owl\n");
+	auto filepath = core::utils::FileDialog::saveFile("Owl Scene (*.owl)|owl\n");
 	if (!filepath.empty()) {
 		saveSceneAs(filepath);
 	}

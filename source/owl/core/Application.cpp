@@ -79,12 +79,16 @@ void Application::disableDocking() {
 Application::~Application() {
 	OWL_PROFILE_FUNCTION()
 
-	imGuiLayer.reset();
-	input::Input::invalidate();
-	appWindow.reset();
-
-	if (renderer::RenderAPI::getState() != renderer::RenderAPI::State::Error)
+	if (renderer::RenderAPI::getState() != renderer::RenderAPI::State::Error) {
+		for (auto &layer: layerStack) {
+			layerStack.popLayer(layer);
+			layerStack.popOverlay(layer);
+		}
+		input::Input::invalidate();
 		renderer::Renderer::shutdown();
+		renderer::RenderCommand::invalidate();
+		appWindow.reset();
+	}
 }
 
 void Application::close() {
@@ -99,7 +103,7 @@ void Application::invalidate() {
 void Application::run() {
 	OWL_PROFILE_FUNCTION()
 
-
+	uint64_t frameCount = 0;
 	while (state == State::Running) {
 		if (!minimized) {
 			OWL_PROFILE_SCOPE("RunLoop")
@@ -113,17 +117,35 @@ void Application::run() {
 					for (auto &layer: layerStack)
 						layer->onUpdate(stepper);
 				}
-				imGuiLayer->begin();
 				{
-					OWL_PROFILE_SCOPE("LayerStack onImUpdate")
+					imGuiLayer->begin();
+					{
+						OWL_PROFILE_SCOPE("LayerStack onImUpdate")
 
-					for (auto &layer: layerStack)
-						layer->onImGuiRender(stepper);
+						for (auto &layer: layerStack)
+							layer->onImGuiRender(stepper);
+					}
+					imGuiLayer->end();
 				}
-				imGuiLayer->end();
 			}
 		}
 		appWindow->onUpdate();
+		{
+			const auto &memState = debug::Tracker::get().checkState();
+			if (memState.allocationCalls > memState.deallocationCalls && frameCount > 0) {
+				OWL_CORE_TRACE("----------------------------------")
+				OWL_CORE_TRACE("Frame Leak Detected")
+				OWL_CORE_TRACE("-----------------------------------")
+				OWL_CORE_TRACE("")
+				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory, memState.allocs.size())
+				for (const auto &chunk: memState.allocs) {
+					OWL_CORE_TRACE(" ** {}", chunk.toStr())
+				}
+				OWL_CORE_TRACE("----------------------------------")
+				OWL_CORE_TRACE("")
+			}
+		}
+		++frameCount;
 	}
 }
 

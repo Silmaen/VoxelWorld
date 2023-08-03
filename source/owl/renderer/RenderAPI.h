@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include "VertexArray.h"
+#include "DrawData.h"
+
 #include <glm/glm.hpp>
 
 namespace owl::renderer {
-
 
 /**
  * @brief Class RenderAPI
@@ -57,17 +57,10 @@ public:
 
 	/**
 	 * @brief Binding the draw of vertex array.
-	 * @param vertexArray VA to render.
+	 * @param data Draw data to render.
 	 * @param indexCount Number of vertex to draw (=0 all).
 	 */
-	virtual void drawIndexed(const shared<VertexArray> &vertexArray, uint32_t indexCount) = 0;
-
-	/**
-	 * @brief Draw lines.
-	 * @param vertexArray VA tpo render as lines.
-	 * @param vertexCount Number of vertex to draw (=0 all).
-	 */
-	virtual void drawLines(const shared<VertexArray> &vertexArray, uint32_t vertexCount) = 0;
+	virtual void drawData(const shared<DrawData> &data, uint32_t indexCount = 0) = 0;
 
 	/**
 	 * @brief Define the line width.
@@ -75,12 +68,18 @@ public:
 	 */
 	virtual void setLineWidth(float width) = 0;
 
+	/**
+	 * @brief Get the maximum number of texture slots.
+	 * @return Number of texture slots.
+	 */
+	[[nodiscard]] virtual uint32_t getMaxTextureSlots() const = 0;
 
 	/// Render API types.
 	enum struct Type {
-		Null = 0,  ///< Null Renderer.
-		OpenGL = 1,///< OpenGL Renderer.
-		Vulkan = 2,///< Vulkan renderer API.
+		Null = 0,       ///< Null Renderer.
+		OpenGL = 1,     ///< OpenGL Renderer.
+		Vulkan = 2,     ///< Vulkan renderer API.
+		OpenglLegacy = 3///< OpenGL 2.1 renderer
 	};
 	/// Render API states.
 	enum struct State {

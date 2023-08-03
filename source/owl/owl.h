@@ -16,6 +16,8 @@
 
 #include "core/Timestep.h"
 #include "core/layer/Layer.h"
+#include "core/utils/FileDialog.h"
+#include "core/utils/FileUtils.h"
 #include "gui/ImGuiLayer.h"
 #include "input/CameraOrthoController.h"
 #include "input/Input.h"
@@ -34,7 +36,6 @@
 #include "renderer/Renderer2D.h"
 #include "renderer/ShaderLibrary.h"
 #include "renderer/Texture.h"
-#include "renderer/VertexArray.h"
 // -------------------------
 
 // ------ Debugging --------

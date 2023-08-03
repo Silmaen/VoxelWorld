@@ -10,6 +10,7 @@
 #include "Shader.h"
 #include "core/Application.h"
 #include "core/Core.h"
+#include "core/utils/FileUtils.h"
 
 #include <glad/glad.h>
 
@@ -39,21 +40,6 @@
 namespace owl::renderer::opengl {
 
 namespace utils {
-
-static std::string fileToString(const std::filesystem::path &file) {
-	if (!exists(file)) {
-		OWL_CORE_WARN("Shader file '{}' does not exists", file.string())
-		return "";
-	}
-	std::ifstream t(file);
-	std::string str;
-	t.seekg(0, std::ios::end);
-	str.reserve(static_cast<size_t>(t.tellg()));
-	t.seekg(0, std::ios::beg);
-	str.assign((std::istreambuf_iterator<char>(t)),
-			   std::istreambuf_iterator<char>());
-	return str;
-}
 
 static std::filesystem::path getCacheDirectory() {
 	return core::Application::get().getAssetDirectory() / "cache" / "shader" / "opengl";
@@ -166,7 +152,7 @@ Shader::Shader(const std::string &shaderName, const std::vector<std::filesystem:
 			OWL_CORE_ASSERT(false, "Unknown Shader Type")
 			continue;
 		}
-		strSources.emplace(type, utils::fileToString(src));
+		strSources.emplace(type, core::utils::fileToString(src));
 	}
 	compile(strSources);
 }

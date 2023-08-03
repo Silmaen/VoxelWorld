@@ -1,6 +1,6 @@
 /**
  * @file GraphContext.h
- * @author Silmen
+ * @author Silmaen
  * @date 30/07/2023
  * Copyright © 2023 All rights reserved.
  * All modification must get authorization from the author.
@@ -42,10 +42,6 @@ public:
 	 * @brief Doo the buffer swap.
 	 */
 	void swapBuffers() override;
-
-private:
-	/// Link to the parent window.
-	GLFWwindow *windowHandle;
 };
 
 }// namespace owl::renderer::null

@@ -32,6 +32,12 @@ public:
 	 * @brief Destructor.
 	 */
 	~UniformBuffer() override;
+
+	/**
+	 * @brief bind this uniform buffer.
+	 */
+	void bind() override {}
+
 	/**
 	 * @brief Push Data to GPU.
 	 * @param data The data.
