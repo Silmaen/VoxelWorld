@@ -8,14 +8,11 @@
 
 #pragma once
 
+#include "core/Core.h"
 #include "renderer/Camera.h"
 
 namespace owl::scene {
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class SceneCamera.
  */
@@ -33,7 +30,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	~SceneCamera() override = default;
+	~SceneCamera() override;
 
 	/**
 	 * @brief Defines otho-graphic limits.
@@ -194,8 +191,5 @@ private:
 	/// Aspect ratio.
 	float aspectRatio = 0.0f;
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::scene

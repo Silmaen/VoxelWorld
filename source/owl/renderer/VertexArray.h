@@ -13,10 +13,6 @@
 
 namespace owl::renderer {
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class VertexArray.
  */
@@ -35,7 +31,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~VertexArray() = default;//---UNCOVER---
+	virtual ~VertexArray();
 
 	/**
 	 * @brief Activate the buffer in the GPU.
@@ -76,8 +72,5 @@ public:
 
 private:
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

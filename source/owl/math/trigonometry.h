@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "core/Core.h"
+
 namespace owl::math {
 
 /**
@@ -16,6 +18,6 @@ namespace owl::math {
  * @param x Denominator.
  * @return Arc tangent with the right quadrant.
  */
-float atan2(float y, float x);
+OWL_API float atan2(float y, float x);
 
 }// namespace owl::math

@@ -12,11 +12,6 @@
 
 namespace owl::renderer {
 
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class Texture.
  */
@@ -30,7 +25,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Texture() = default;//---UNCOVER---
+	virtual ~Texture();
 
 	/**
 	 * @brief Comparison operator.
@@ -84,9 +79,6 @@ public:
 
 private:
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 #ifdef __clang__

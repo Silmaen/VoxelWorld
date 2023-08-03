@@ -47,7 +47,7 @@ Scene::Scene() = default;
 
 Scene::~Scene() = default;
 
-shared<Scene> Scene::copy(shared<Scene> other) {
+shared<Scene> Scene::copy(const shared<Scene> &other) {
 	shared<Scene> newScene = mk_shared<Scene>();
 
 	newScene->viewportWidth = other->viewportWidth;
@@ -93,8 +93,9 @@ Entity Scene::createEntityWithUUID(core::UUID uuid, const std::string &name) {
 	return entity;
 }
 
-void Scene::destroyEntity(Entity entity) {
+void Scene::destroyEntity(Entity &entity) {
 	registry.destroy(entity.entityHandle);
+	entity.entityHandle = entt::null;
 }
 
 void Scene::onUpdateRuntime([[maybe_unused]] const core::Timestep &ts) {
@@ -149,9 +150,9 @@ void Scene::onUpdateRuntime([[maybe_unused]] const core::Timestep &ts) {
 												  .entityID = static_cast<int>(entity)});
 			}
 		}
-	}
 
-	renderer::Renderer2D::endScene();
+		renderer::Renderer2D::endScene();
+	}
 }
 
 void Scene::onUpdateEditor([[maybe_unused]] core::Timestep ts, renderer::CameraEditor &camera) {
@@ -195,7 +196,7 @@ void Scene::onViewportResize(uint32_t width, uint32_t height) {
 	}
 }
 
-void Scene::duplicateEntity(Entity entity) {
+Entity Scene::duplicateEntity(const Entity &entity) {
 	std::string name = entity.getName();
 	Entity newEntity = createEntity(name);
 
@@ -206,6 +207,8 @@ void Scene::duplicateEntity(Entity entity) {
 	copyComponentIfExists<component::NativeScript>(newEntity, entity);
 	//copyComponentIfExists<component::Rigidbody2D>(newEntity, entity);
 	//copyComponentIfExists<component::BoxCollider2D>(newEntity, entity);
+
+	return newEntity;
 }
 
 Entity Scene::getPrimaryCamera() {
@@ -219,38 +222,38 @@ Entity Scene::getPrimaryCamera() {
 }
 
 template<typename T>
-void Scene::onComponentAdded([[maybe_unused]] Entity entity, [[maybe_unused]] T &component) {
+void Scene::onComponentAdded([[maybe_unused]] const Entity &entity, [[maybe_unused]] T &component) {
 	OWL_ASSERT(false, "Unknown component")
 }
 
 template<>
-OWL_API void Scene::onComponentAdded<component::ID>([[maybe_unused]] Entity entity, [[maybe_unused]] component::ID &component) {
+OWL_API void Scene::onComponentAdded<component::ID>([[maybe_unused]] const Entity &entity, [[maybe_unused]] component::ID &component) {
 }
 
 template<>
-OWL_API void Scene::onComponentAdded<component::Tag>([[maybe_unused]] Entity entity, [[maybe_unused]] component::Tag &component) {
+OWL_API void Scene::onComponentAdded<component::Tag>([[maybe_unused]] const Entity &entity, [[maybe_unused]] component::Tag &component) {
 }
 
 template<>
-OWL_API void Scene::onComponentAdded<component::Transform>([[maybe_unused]] Entity entity, [[maybe_unused]] component::Transform &component) {
+OWL_API void Scene::onComponentAdded<component::Transform>([[maybe_unused]] const Entity &entity, [[maybe_unused]] component::Transform &component) {
 }
 
 template<>
-OWL_API void Scene::onComponentAdded<component::Camera>([[maybe_unused]] Entity entity, component::Camera &component) {
+OWL_API void Scene::onComponentAdded<component::Camera>([[maybe_unused]] const Entity &entity, component::Camera &component) {
 	if (viewportWidth > 0 && viewportHeight > 0)
 		component.camera.setViewportSize(viewportWidth, viewportHeight);
 }
 
 template<>
-OWL_API void Scene::onComponentAdded<component::SpriteRenderer>([[maybe_unused]] Entity entity, [[maybe_unused]] component::SpriteRenderer &component) {
+OWL_API void Scene::onComponentAdded<component::SpriteRenderer>([[maybe_unused]] const Entity &entity, [[maybe_unused]] component::SpriteRenderer &component) {
 }
 
 template<>
-OWL_API void Scene::onComponentAdded<component::CircleRenderer>([[maybe_unused]] Entity entity, [[maybe_unused]] component::CircleRenderer &component) {
+OWL_API void Scene::onComponentAdded<component::CircleRenderer>([[maybe_unused]] const Entity &entity, [[maybe_unused]] component::CircleRenderer &component) {
 }
 
 template<>
-OWL_API void Scene::onComponentAdded<component::NativeScript>([[maybe_unused]] Entity entity, [[maybe_unused]] component::NativeScript &component) {
+OWL_API void Scene::onComponentAdded<component::NativeScript>([[maybe_unused]] const Entity &entity, [[maybe_unused]] component::NativeScript &component) {
 }
 
 }// namespace owl::scene

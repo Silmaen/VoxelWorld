@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "core/Core.h"
 #include <functional>
 
 namespace owl::core {
@@ -15,26 +16,11 @@ namespace owl::core {
 /**
  * @brief Class UUID.
  */
-class UUID {
+class OWL_API UUID {
 public:
-	/**
-	 * @brief Default copy constructor.
-	 */
 	UUID(const UUID &) = default;
-
-	/**
-	 * @brief Default move constructor.
-	 */
 	UUID(UUID &&) = default;
-
-	/**
-	 * @brief Default copy assignment.
-	 */
 	UUID &operator=(const UUID &) = default;
-
-	/**
-	 * @brief Default move assignment.
-	 */
 	UUID &operator=(UUID &&) = default;
 
 	/**

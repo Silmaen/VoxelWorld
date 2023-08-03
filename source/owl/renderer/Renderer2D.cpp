@@ -299,6 +299,7 @@ void Renderer2D::drawLine(const LineData &lineData) {
 	data.line.vertexBuf.emplace_back(utils::LineVertex{lineData.point1, lineData.color, lineData.entityID});
 	data.line.vertexBuf.emplace_back(utils::LineVertex{lineData.point2, lineData.color, lineData.entityID});
 	data.line.indexCount += 2;
+	data.stats.drawCalls++;
 }
 
 void Renderer2D::drawRect(const RectData &lineData) {

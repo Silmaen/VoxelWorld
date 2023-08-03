@@ -54,5 +54,7 @@ void SceneCamera::recalculateProjection() {
 	}
 }
 
+SceneCamera::~SceneCamera() = default;
+
 
 }// namespace owl::scene

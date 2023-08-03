@@ -176,11 +176,6 @@ private:
 	}
 };
 
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class VertexBuffer.
  */
@@ -194,7 +189,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~VertexBuffer() = default;//---UNCOVER---
+	virtual ~VertexBuffer();
 
 	/**
 	 * @brief Activate the buffer in the GPU.
@@ -245,14 +240,7 @@ private:
 	/// Data layout description.
 	BufferLayout layout{};
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class IndexBuffer.
  */
@@ -269,7 +257,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~IndexBuffer() = default;//---UNCOVER---
+	virtual ~IndexBuffer();
 	/**
 	 * @brief Activate the buffer in the GPU.
 	 */
@@ -295,8 +283,5 @@ public:
 
 private:
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

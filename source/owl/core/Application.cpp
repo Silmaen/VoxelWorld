@@ -10,6 +10,7 @@
 
 #include "Application.h"
 
+#include "input/Input.h"
 #include "renderer/Renderer.h"
 
 namespace owl::core {
@@ -31,10 +32,17 @@ Application::Application(const AppParams &appParams) : initParams{appParams} {
 	OWL_CORE_ASSERT(assetFound, "Unable to find assets")
 
 	// startup the renderer
-	renderer::RenderCommand::create(renderer::RenderAPI::Type::OpenGL);
+	renderer::RenderCommand::create(appParams.renderer);
+	// check renderer creation
+	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Created) {
+		OWL_CORE_ERROR("ERROR while Creating Renderer")
+		state = State::Error;
+		return;
+	}
 
 	// create main window
 	appWindow = input::Window::create({.title = appParams.name});
+	input::Input::init();
 	OWL_CORE_INFO("Window Created.")
 	// initialize the renderer
 	renderer::Renderer::init();
@@ -66,11 +74,21 @@ void Application::disableDocking() {
 Application::~Application() {
 	OWL_PROFILE_FUNCTION()
 
-	renderer::Renderer::shutdown();
+	imGuiLayer.reset();
+	input::Input::invalidate();
+	appWindow.reset();
+
+	if (renderer::RenderAPI::getState() != renderer::RenderAPI::State::Error)
+		renderer::Renderer::shutdown();
 }
 
 void Application::close() {
 	state = State::Stopped;
+}
+
+
+void Application::invalidate() {
+	instance = nullptr;
 }
 
 void Application::run() {

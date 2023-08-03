@@ -33,23 +33,38 @@ public:
 	/**
 	 * @brief initialize the logging system.
 	 */
-	static void init();
+	static void init(const spdlog::level::level_enum &level = spdlog::level::trace);
+
 	/**
 	 * @brief Access to the logger for the core system.
 	 * @return The Core logger.
 	 */
 	static std::shared_ptr<spdlog::logger> getCoreLogger() { return coreLogger; }
+
 	/**
 	 * @brief Access to the logger for the application system.
 	 * @return The application logger.
 	 */
 	static std::shared_ptr<spdlog::logger> getClientLogger() { return clientLogger; }
 
+	/**
+	 * @brief Defines the Verbosity level
+	 * @param level Verbosity level.
+	 */
+	static void setVerbosityLevel(const spdlog::level::level_enum &level);
+
+	/**
+	 * @brief Destroy the logger.
+	 */
+	static void invalidate();
+
 private:
 	/// The core logger.
 	static std::shared_ptr<spdlog::logger> coreLogger;
 	/// The application logger.
 	static std::shared_ptr<spdlog::logger> clientLogger;
+	/// The level of verbosity
+	static spdlog::level::level_enum verbosity;
 };
 }// namespace owl::core
 

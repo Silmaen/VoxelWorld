@@ -35,6 +35,7 @@ public:
 	 * @return X mouse position.
 	 */
 	[[nodiscard]] float getX() const { return mouseX; }
+
 	/**
 	 * @brief Get X mouse position.
 	 * @return X mouse position.

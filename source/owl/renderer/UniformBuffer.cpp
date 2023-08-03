@@ -11,22 +11,26 @@
 
 #include "Renderer.h"
 #include "UniformBuffer.h"
-#include "renderer/opengl/UniformBuffer.h"
+#include "null/UniformBuffer.h"
+#include "opengl/UniformBuffer.h"
 
 namespace owl::renderer {
 
 shared<UniformBuffer> UniformBuffer::create(uint32_t size, uint32_t binding) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::None:
+		//case RenderAPI::Type::None:
 		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
+			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
+		case RenderAPI::Type::Null:
+			return mk_shared<null::UniformBuffer>(size, binding);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::UniformBuffer>(size, binding);
 	}
-	OWL_CORE_ASSERT(false, "Unknown API Type!")
+	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;
 }
+UniformBuffer::~UniformBuffer() = default;
 
 }// namespace owl::renderer

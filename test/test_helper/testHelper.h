@@ -9,3 +9,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
+
+// This macro is used to generate a disabled test case.
+#define TEST_DISABLED(test_case_name, test_name) \
+	GTEST_TEST_(test_case_name, DISABLED_UNIT##_##test_name, ::testing::Test, ::testing::internal::GetTestTypeId())

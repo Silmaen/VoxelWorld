@@ -52,6 +52,7 @@ namespace owl {
 /// Wrap to unique pointer.
 template<typename T>
 using uniq = std::unique_ptr<T>;
+
 /**
  * @brief Wrap to unique pointer creator.
  * @tparam T Type of data.
@@ -67,6 +68,7 @@ constexpr uniq<T> mk_uniq(Args &&...args) {
 /// Wrap to shared pointer.
 template<typename T>
 using shared = std::shared_ptr<T>;
+
 /**
  * @brief Wrap to shared pointer creator.
 * @tparam T Type of data.

@@ -12,6 +12,7 @@
 #include "Framebuffer.h"
 #include "RenderAPI.h"
 #include "Renderer.h"
+#include "null/Framebuffer.h"
 #include "opengl/Framebuffer.h"
 
 namespace owl::renderer {
@@ -19,15 +20,17 @@ namespace owl::renderer {
 shared<Framebuffer> Framebuffer::create(const FramebufferSpecification &spec) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::None:
 		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ASSERT(false, "Render API {} is not yet supported", magic_enum::enum_name(type))
+			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
 			return nullptr;
+		case RenderAPI::Type::Null:
+			return mk_shared<null::Framebuffer>(spec);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::Framebuffer>(spec);
 	}
-	OWL_CORE_ASSERT(false, "Unknown API Type!")
+	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;
 }
+Framebuffer::~Framebuffer() = default;
 
 }// namespace owl::renderer

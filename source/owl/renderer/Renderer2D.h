@@ -272,16 +272,16 @@ public:
 	 */
 	static Statistics getStats();
 
+	/**
+	 * @brief Start the next batch.
+	 */
+	static void nextBatch();
+
 private:
 	/**
 	 * @brief Combine flush and reset.
 	 */
 	static void startBatch();
-
-	/**
-	 * @brief Start the next batch.
-	 */
-	static void nextBatch();
 };
 #ifdef __clang__
 #pragma clang diagnostic pop

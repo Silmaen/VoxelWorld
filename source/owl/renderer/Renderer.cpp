@@ -38,6 +38,12 @@ void Renderer::shutdown() {
 	internalState = State::Stopped;
 }
 
+void Renderer::reset() {
+	internalState = Renderer::State::Created;
+	sceneData = mk_shared<Renderer::SceneData>();
+	shaderLibrary = ShaderLibrary();
+}
+
 void Renderer::beginScene(const CameraOrtho &camera) {
 	sceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
 }
@@ -62,5 +68,6 @@ void Renderer::submit(const std::string &shaderName, const shared<VertexArray> &
 void Renderer::onWindowResized(uint32_t width, uint32_t height) {
 	RenderCommand::setViewport(0, 0, width, height);
 }
+Renderer::~Renderer() = default;
 
 }// namespace owl::renderer

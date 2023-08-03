@@ -46,12 +46,15 @@ shared<Shader> ShaderLibrary::load(const std::filesystem::path &file) {
 	return shader;
 }
 shared<Shader> ShaderLibrary::get(const std::string &name) {
-	OWL_CORE_ASSERT(exists(name), "Shader {} not found in library", name)
+	if (!exists(name)) {
+		OWL_CORE_ERROR("Shader {} not found in library", name)
+		return nullptr;
+	}
 	return shaders[name];
 }
 bool ShaderLibrary::exists(const std::string &name) const {
 	return shaders.find(name) != shaders.end();
 }
-
+ShaderLibrary::~ShaderLibrary() = default;
 
 }// namespace owl::renderer

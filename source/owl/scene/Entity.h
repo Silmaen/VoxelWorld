@@ -56,9 +56,6 @@ public:
 		scene->onComponentAdded<T>(*this, component);
 		return component;
 	}
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 	/**
 	 * @brief Add or replace component to this entity.
@@ -73,6 +70,9 @@ public:
 		scene->onComponentAdded<T>(*this, component);
 		return component;
 	}
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 	/**
 	 * @brief Access to the component of the given type.
@@ -80,7 +80,7 @@ public:
 	 * @return The entity's component.
 	 */
 	template<typename T>
-	T &getComponent() {
+	[[nodiscard]] T &getComponent() const {
 		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!")
 		return scene->registry.get<T>(entityHandle);
 	}
@@ -91,7 +91,7 @@ public:
 	 * @return true if the entity has the component.
 	 */
 	template<typename T>
-	bool hasComponent() {
+	[[nodiscard]] bool hasComponent() const {
 		return scene->registry.all_of<T>(entityHandle);
 	}
 
@@ -109,31 +109,31 @@ public:
 	 * @brief Get entity as boolean.
 	 * @return True if handle exists.
 	 */
-	operator bool() const { return entityHandle != entt::null; }
+	explicit operator bool() const { return entityHandle != entt::null; }
 
 	/**
 	 * @brief Get entity as handle.
 	 * @return The entity's handle.
 	 */
-	operator entt::entity() const { return entityHandle; }
+	explicit operator entt::entity() const { return entityHandle; }
 
 	/**
 	 * @brief Get the entity as unsigned int.
 	 * @return The entity's handle code.
 	 */
-	operator uint32_t() const { return static_cast<uint32_t>(entityHandle); }
+	explicit operator uint32_t() const { return static_cast<uint32_t>(entityHandle); }
 
 	/**
 	 * @brief Get entity's UUID.
 	 * @return Entity's UUID.
 	 */
-	core::UUID getUUID() { return getComponent<component::ID>().id; }
+	[[nodiscard]] core::UUID getUUID() const { return getComponent<component::ID>().id; }
 
 	/**
 	 * @brief Get entity's name.
 	 * @return Entity's name.
 	 */
-	std::string getName() { return getComponent<component::Tag>().tag; }
+	[[nodiscard]] std::string getName() const { return getComponent<component::Tag>().tag; }
 
 	/**
 	 * @brief Comparison operator.

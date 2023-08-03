@@ -10,14 +10,10 @@
 
 namespace owl::renderer {
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class UniformBuffer.
  */
-class UniformBuffer {
+class OWL_API UniformBuffer {
 public:
 	UniformBuffer() = default;
 	UniformBuffer(const UniformBuffer &) = default;
@@ -28,7 +24,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~UniformBuffer() = default;
+	virtual ~UniformBuffer();
 	/**
 	 * @brief Push Data to GPU.
 	 * @param data The data.
@@ -44,8 +40,5 @@ public:
 	 */
 	static shared<UniformBuffer> create(uint32_t size, uint32_t binding);
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

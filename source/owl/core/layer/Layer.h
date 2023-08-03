@@ -32,10 +32,12 @@ public:
 	Layer(Layer &&) = delete;
 	Layer &operator=(const Layer &) = delete;
 	Layer &operator=(Layer &&) = delete;
+
 	/**
 	 * @brief Default constructor.
 	 */
 	explicit Layer(std::string name = "Layer") : debugName(std::move(name)) {}
+
 	/**
 	 * @brief Destructor.
 	 */
@@ -45,20 +47,24 @@ public:
 	 * @brief Action on Attach.
 	 */
 	virtual void onAttach() {}
+
 	/**
 	 * @brief Action on detach.
 	 */
 	virtual void onDetach() {}
+
 	/**
 	 * @brief Action on update.
 	 * @param ts The time step since last frame.
 	 */
 	virtual void onUpdate([[maybe_unused]] const Timestep &ts) {}
+
 	/**
 	 * @brief Action for that layer when gui is rendered.
 	 * @param ts The time step since last frame.
 	 */
 	virtual void onImGuiRender([[maybe_unused]] const Timestep &ts) {}
+
 	/**
 	 * @brief Action on event.
 	 * @param event The Event to react.

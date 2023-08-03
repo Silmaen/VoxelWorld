@@ -21,10 +21,6 @@ enum class ShaderType {
 	Fragment
 };
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class Shader.
  */
@@ -43,7 +39,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Shader() = default;
+	virtual ~Shader();
 
 	/**
 	 * @brief Activate the shader on the GPU.
@@ -140,8 +136,5 @@ private:
 	/// Library is a friend to be able to modify name.
 	friend class ShaderLibrary;
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

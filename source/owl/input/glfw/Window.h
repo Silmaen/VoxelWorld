@@ -55,6 +55,11 @@ public:
 	 */
 	[[nodiscard]] uint32_t getHeight() const override { return windowData.height; }
 
+	/**
+	 * @brief Get the type of window manager.
+	 * @return The window manager's type.
+	 */
+	[[nodiscard]] Type getType() const override { return Type::GLFW; }
 
 	/**
 	 * @brief Define the Event Callback function.
