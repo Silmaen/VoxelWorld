@@ -10,6 +10,14 @@
 
 #include "core/Core.h"
 
+#ifdef OWL_DEBUG
+#define OWL_STACKTRACE
+#endif
+
+#ifdef OWL_STACKTRACE
+#include <cpptrace/cpptrace.hpp>
+#endif
+
 using size_t = std::size_t;
 
 /**
@@ -45,24 +53,40 @@ public:
 
 	/**
 	 * @brief Function called at each allocation.
+	 * @param memoryPtr Memory pointer where allocation is done.
 	 * @param size The Allocated size.
 	 */
-	void allocate(size_t size);
+	void allocate(void *memoryPtr, size_t size);
 
 	/**
 	 * @brief Function called each de-allocation.
+	 * @param memoryPtr Memory pointer to deallocate.
 	 * @param size De-allocation size.
 	 */
-	void deallocate(size_t size);
+	void deallocate(void *memoryPtr, size_t size = 0);
+
+	/**
+	 * @brief Information about memory chunk.
+	 */
+	struct AllocationInfo {
+		void *location = nullptr;///< location in memory.
+		size_t size = 0;         ///< size of the memory chunk.
+#ifdef OWL_STACKTRACE
+		cpptrace::stacktrace_frame traceAlloc;  ///< Stack trace of the allocation.
+		cpptrace::stacktrace_frame traceDealloc;///< Stack trace of the de-allocation.
+#endif
+		[[nodiscard]] std::string toStr() const;
+	};
 
 	/**
 	 * @brief Result structure of allocation state.
 	 */
 	struct AllocationState {
-		size_t allocatedMemory = 0;  ///< Amount of allocated memory.
-		size_t allocationCalls = 0;  ///< Amount of memory allocation calls.
-		size_t deallocationCalls = 0;///< Amount of de-allocation calls.
-		size_t memoryPeek = 0;       ///< Max seen amount of memory.
+		size_t allocatedMemory = 0;        ///< Amount of allocated memory.
+		size_t allocationCalls = 0;        ///< Amount of memory allocation calls.
+		size_t deallocationCalls = 0;      ///< Amount of de-allocation calls.
+		size_t memoryPeek = 0;             ///< Max seen amount of memory.
+		std::vector<AllocationInfo> allocs;///< list of allocated chunks of memory.
 	};
 
 	/**

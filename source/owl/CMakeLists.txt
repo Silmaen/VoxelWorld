@@ -3,10 +3,10 @@
 #
 file(GLOB_RECURSE SRCS
         *.cpp
-        )
+)
 file(GLOB_RECURSE HDRS
         *.h
-        )
+)
 list(REMOVE_ITEM
         SRCS
         owlpch.cpp)
@@ -34,7 +34,11 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h")
 endif ()
 
 # ----==== third party ====----
-#  ---- external folder ----
+
+# cpptrace
+find_package(cpptrace 0.1 REQUIRED)
+target_link_libraries(${ENGINE_NAME} PUBLIC cpptrace::cpptrace)
+
 # debugbreak
 find_package(debugbreak 1.0 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC debugbreak::debugbreak)
@@ -110,7 +114,7 @@ if (${PRJPREFIX}_BUILD_SHARED OR WIN32)
         add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/libshaderc_shared$<$<CONFIG:Debug>:d>.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
                 COMMAND_EXPAND_LISTS
-                )
+        )
     endif ()
 else ()
     target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc)
@@ -120,5 +124,5 @@ if (${PRJPREFIX}_BUILD_SHARED AND WIN32)
     add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_RUNTIME_DLLS:${ENGINE_NAME}>" "$<TARGET_FILE_DIR:${ENGINE_NAME}>"
             COMMAND_EXPAND_LISTS
-            )
+    )
 endif ()

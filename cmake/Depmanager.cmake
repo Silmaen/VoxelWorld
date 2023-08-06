@@ -17,6 +17,7 @@ else ()
     set(LOCAL_KIND static)
 endif ()
 
+dm_load_package(cpptrace)
 dm_load_package(debugbreak)
 dm_load_package(entt)
 dm_load_package(magic_enum)
