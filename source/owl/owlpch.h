@@ -18,9 +18,9 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <list>
 #include <memory>
 #include <random>
-
 #include <streambuf>
 #include <string>
 #include <string_view>

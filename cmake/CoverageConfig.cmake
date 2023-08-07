@@ -17,6 +17,8 @@ if (${GCOVR_VERSION} VERSION_LESS 6.0)
     message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 6.0")
 endif ()
 
+target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_COVERAGE)
+
 # options for coverage
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE --coverage)

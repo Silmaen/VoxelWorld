@@ -7,11 +7,16 @@
  */
 
 #include "owlpch.h"
-#include <GLFW/glfw3.h>
 
 #include "Tracker.h"
 
+
 #define OWL_DEALLOC_EXCEPT noexcept
+
+static bool doTrack = true;
+#ifdef OWL_STACKTRACE
+static bool doTrace = false;
+#endif
 
 #if !defined(__cpp_sized_deallocation) || __cpp_sized_deallocation == 0
 void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT;
@@ -35,99 +40,36 @@ void operator delete(void *memory) OWL_DEALLOC_EXCEPT {
 
 namespace owl::debug {
 
+Tracker::Tracker() {
+	doTrack = true;
+}
+
+Tracker::~Tracker() {
+	doTrack = false;
+}
+
 Tracker &Tracker::get() {
 	static Tracker instance;
 	return instance;
 }
 
 void Tracker::allocate(void *memoryPtr, size_t size) {
-	auto chunk = std::find_if(globalAllocationState.allocs.begin(),
-							  globalAllocationState.allocs.end(),
-							  [&memoryPtr](const AllocationInfo &cc) { return cc.location == memoryPtr; });
-	if (chunk != globalAllocationState.allocs.end()) {
-		OWL_CORE_WARN("Try to allocate already reserved {}.", chunk->toStr())
-		deallocate(chunk->location, chunk->size);
-	}
-	globalAllocationState.allocs.emplace_back(memoryPtr, size
-#ifdef OWL_STACKTRACE
-											  ,
-											  cpptrace::generate_trace(2).front()
-#endif
-	);
-	++currentAllocationState.allocationCalls;
-	currentAllocationState.allocs.emplace_back(memoryPtr, size
-#ifdef OWL_STACKTRACE
-											   ,
-											   cpptrace::generate_trace(2).front()
-#endif
-	);
-
-	++currentAllocationState.allocationCalls;
-	currentAllocationState.allocatedMemory += size;
-	currentAllocationState.memoryPeek =
-			std::max(currentAllocationState.memoryPeek,
-					 currentAllocationState.allocatedMemory);
-	++globalAllocationState.allocationCalls;
-	globalAllocationState.allocatedMemory += size;
-	globalAllocationState.memoryPeek = std::max(
-			globalAllocationState.memoryPeek, globalAllocationState.allocatedMemory);
+	if (!doTrack) return;
+	currentAllocationState.pushMemory(memoryPtr, size);
+	globalAllocationState.pushMemory(memoryPtr, size);
 }
 
 void Tracker::deallocate(void *memoryPtr, size_t size) {
-	auto chunkGlobal = std::find_if(globalAllocationState.allocs.begin(),
-									globalAllocationState.allocs.end(),
-									[&memoryPtr](const AllocationInfo &cc) { return cc.location == memoryPtr; });
-	auto chunkCurrent = std::find_if(globalAllocationState.allocs.begin(),
-									 globalAllocationState.allocs.end(),
-									 [&memoryPtr](const AllocationInfo &cc) { return cc.location == memoryPtr; });
-	if (chunkGlobal == globalAllocationState.allocs.end()) {
-		OWL_CORE_WARN("Try to deallocate un registered memory.")
-	}
-
-	cpptrace::stacktrace_frame fr = cpptrace::generate_trace(2).front();
-	if (chunkCurrent != currentAllocationState.allocs.end()) {
-		chunkCurrent->traceDealloc = fr;
-		uint32_t trueSize = size;
-		if (size == 0)
-			trueSize = chunkCurrent->size;
-		if (trueSize != chunkCurrent->size)
-			OWL_CORE_WARN("Memory dealloc size missmatch {} {}", trueSize, chunkCurrent->toStr())
-		++currentAllocationState.deallocationCalls;
-		currentAllocationState.allocatedMemory =
-				currentAllocationState.allocatedMemory > trueSize
-						? currentAllocationState.allocatedMemory - trueSize
-						: 0;
-		currentAllocationState.allocs.erase(chunkCurrent);
-	}
-	if (chunkGlobal != globalAllocationState.allocs.end()) {
-		chunkGlobal->traceDealloc = fr;
-		uint32_t trueSize = size;
-		if (size == 0)
-			trueSize = chunkCurrent->size;
-		if (trueSize != chunkCurrent->size)
-			OWL_CORE_WARN("Memory dealloc size missmatch {} {}", trueSize, chunkGlobal->toStr())
-		++globalAllocationState.deallocationCalls;
-		globalAllocationState.allocatedMemory =
-				globalAllocationState.allocatedMemory > size
-						? globalAllocationState.allocatedMemory - size
-						: 0;
-		globalAllocationState.allocs.erase(chunkGlobal);
-	}
+	if (!doTrack) return;
+	currentAllocationState.freeMemory(memoryPtr, size);
+	globalAllocationState.freeMemory(memoryPtr, size);
 }
 
 const Tracker::AllocationState &Tracker::checkState() {
-	lastAllocationState.allocatedMemory = 0;
-	lastAllocationState.allocationCalls = 0;
-	lastAllocationState.deallocationCalls = 0;
-	lastAllocationState.memoryPeek = 0;
-	lastAllocationState.allocs.clear();
-	if (!currentAllocationState.allocs.empty()) {
-		OWL_CORE_TRACE("Memory leak{} detected since last checks:", currentAllocationState.allocs.size() > 1 ? "s" : "")
-		for (const auto &trace: currentAllocationState.allocs) {
-			OWL_CORE_TRACE("Leak: {}.", trace.toStr())
-		}
-	}
+	doTrack = false;
+	lastAllocationState.reset();
 	std::swap(currentAllocationState, lastAllocationState);
+	doTrack = true;
 	return lastAllocationState;
 }
 
@@ -137,16 +79,69 @@ const Tracker::AllocationState &Tracker::globals() const {
 
 std::string Tracker::AllocationInfo::toStr() const {
 #ifdef OWL_STACKTRACE
-	if (traceDealloc.address == 0)
-		return fmt::format("memory chunk at {} size ({}) allocated {} ({}:{}:{})", location, size,
-						   traceAlloc.symbol, traceAlloc.filename, traceAlloc.line, traceAlloc.col);
-	else
-		return fmt::format("memory chunk at {} size ({}) allocated {} ({}:{}:{}) // deallocated {} ({}:{}:{})",
-						   location, size,
-						   traceAlloc.symbol, traceAlloc.filename, traceAlloc.line, traceAlloc.col,
-						   traceDealloc.symbol, traceDealloc.filename, traceDealloc.line, traceDealloc.col);
+	return fmt::format("memory chunk at {} size ({}) allocated {} ({}:{}:{})", location, size,
+					   traceAlloc.symbol, traceAlloc.filename, traceAlloc.line, traceAlloc.col);
 #else
 	return fmt::format("memory chunk at {} size ({})", location, size);
 #endif
 }
+
+void Tracker::AllocationState::pushMemory(void *memPtr, size_t size) {
+	doTrack = false;
+	allocationCalls++;
+	allocatedMemory += size;
+	memoryPeek = std::max(memoryPeek, allocatedMemory);
+	allocs.emplace_back(memPtr, size);
+#ifdef OWL_STACKTRACE
+	if (doTrace) {
+		auto trace = cpptrace::generate_trace(3);
+		auto bob = std::find_if(trace.begin(), trace.end(),
+								[](const cpptrace::stacktrace_frame itrace) { return itrace.symbol.starts_with("owl::") || itrace.symbol.contains("main"); });
+		if (bob != trace.end())
+			allocs.back().traceAlloc = *bob;
+	}
+#endif
+	doTrack = true;
+}
+
+void Tracker::AllocationState::freeMemory(void *memPtr, size_t size) {
+	doTrack = false;
+	size_t trueSize = size;
+	auto chunk = std::find_if(allocs.begin(), allocs.end(), [&memPtr](const AllocationInfo &cc) { return cc.location == memPtr; });
+	if (chunk != allocs.end()) {
+		if (trueSize == 0) {
+			trueSize = chunk->size;
+		}
+		allocs.erase(chunk);
+		deallocationCalls++;
+		allocatedMemory -= trueSize;
+	}
+	doTrack = true;
+}
+
+void Tracker::AllocationState::reset() {
+	allocs.clear();
+	allocatedMemory = 0;
+	allocationCalls = 0;
+	deallocationCalls = 0;
+	memoryPeek = 0;
+}
+
+#ifdef OWL_STACKTRACE
+ScopeTrace::ScopeTrace() {
+	doTrace = true;
+}
+ScopeTrace::~ScopeTrace() {
+	doTrace = false;
+}
+#endif
+
+ScopeUntrack::ScopeUntrack() {
+	doTrack = false;
+}
+
+ScopeUntrack::~ScopeUntrack() {
+	doTrack = true;
+}
+
 }// namespace owl::debug
