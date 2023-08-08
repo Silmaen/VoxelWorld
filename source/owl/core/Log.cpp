@@ -19,6 +19,7 @@
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
+#include "debug/Tracker.h"
 
 namespace owl::core {
 
@@ -27,6 +28,7 @@ std::shared_ptr<spdlog::logger> Log::clientLogger;
 spdlog::level::level_enum Log::verbosity = spdlog::level::trace;
 
 void Log::init(const spdlog::level::level_enum &level) {
+	OWL_SCOPE_UNTRACK
 	if (coreLogger != nullptr) {
 		OWL_CORE_INFO("Logger already initiated.")
 		return;
@@ -63,6 +65,7 @@ void Log::setVerbosityLevel(const spdlog::level::level_enum &level) {
 }
 
 void Log::invalidate() {
+	OWL_SCOPE_UNTRACK
 	spdlog::drop_all();
 	coreLogger.reset();
 	clientLogger.reset();

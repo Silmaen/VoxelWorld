@@ -10,6 +10,7 @@
 
 #include "Application.h"
 
+#include "debug/Tracker.h"
 #include "input/Input.h"
 #include "renderer/Renderer.h"
 
@@ -23,43 +24,47 @@ Application::Application(const AppParams &appParams) : initParams{appParams} {
 
 	OWL_CORE_ASSERT(!instance, "Application already exists!")
 	instance = this;
+	{
+		OWL_SCOPE_TRACE
+		// Setup a working directory
+		// Assuming present of a folder 'res' containing the data
+		workingDirectory = absolute(std::filesystem::current_path());
+		OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
+		[[maybe_unused]] bool assetFound = searchAssets(appParams.assetsPattern);
+		OWL_CORE_ASSERT(assetFound, "Unable to find assets")
 
-	// Setup a working directory
-	// Assuming present of a folder 'res' containing the data
-	workingDirectory = absolute(std::filesystem::current_path());
-	OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
-	[[maybe_unused]] bool assetFound = searchAssets(appParams.assetsPattern);
-	OWL_CORE_ASSERT(assetFound, "Unable to find assets")
+		// startup the renderer
+		renderer::RenderCommand::create(appParams.renderer);
+		// check renderer creation
+		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Created) {
+			OWL_CORE_ERROR("ERROR while Creating Renderer")
+			state = State::Error;
+			return;
+		}
 
-	// startup the renderer
-	renderer::RenderCommand::create(appParams.renderer);
-	// check renderer creation
-	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Created) {
-		OWL_CORE_ERROR("ERROR while Creating Renderer")
-		state = State::Error;
-		return;
+		// create main window
+		appWindow = input::Window::create({.title = appParams.name});
+		input::Input::init();
+		OWL_CORE_INFO("Window Created.")
 	}
-
-	// create main window
-	appWindow = input::Window::create({.title = appParams.name});
-	input::Input::init();
-	OWL_CORE_INFO("Window Created.")
 	// initialize the renderer
 	renderer::Renderer::init();
-	// check renderer initialization
-	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
-		OWL_CORE_ERROR("ERROR while Initializing Renderer")
-		state = State::Error;
-		return;
+	{
+		OWL_SCOPE_TRACE
+		// check renderer initialization
+		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
+			OWL_CORE_ERROR("ERROR while Initializing Renderer")
+			state = State::Error;
+			return;
+		}
+		OWL_CORE_INFO("Renderer initiated.")
+		appWindow->setEventCallback(
+				[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
+
+		// create the GUI layer
+		imGuiLayer = mk_shared<gui::ImGuiLayer>();
+		pushOverlay(imGuiLayer);
 	}
-	OWL_CORE_INFO("Renderer initiated.")
-	appWindow->setEventCallback(
-			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
-
-	// create the GUI layer
-	imGuiLayer = mk_shared<gui::ImGuiLayer>();
-	pushOverlay(imGuiLayer);
-
 	OWL_CORE_TRACE("Application creation done.")
 }
 
@@ -93,6 +98,7 @@ void Application::invalidate() {
 
 void Application::run() {
 	OWL_PROFILE_FUNCTION()
+
 
 	while (state == State::Running) {
 		if (!minimized) {
@@ -178,11 +184,13 @@ bool Application::searchAssets(const std::string &pattern) {
 	std::filesystem::path assets = parent / pattern;
 	while (parent != parent.root_path()) {
 		if (exists(assets)) {
-			assetDirectory = assets;
+			assetDirectory = std::move(assets);
 			return true;
 		}
+		assets.clear();
 		parent = parent.parent_path();
-		assets = parent / pattern;
+		assets = parent;
+		assets /= pattern;
 	}
 	assetDirectory = workingDirectory;
 	return false;

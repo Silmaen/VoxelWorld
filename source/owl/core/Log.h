@@ -58,6 +58,12 @@ public:
 	 */
 	static void invalidate();
 
+	/**
+	 * @brief Check if logger is initiated.
+	 * @return True if initiated.
+	 */
+	static bool initiated() { return coreLogger != nullptr; }
+
 private:
 	/// The core logger.
 	static std::shared_ptr<spdlog::logger> coreLogger;
