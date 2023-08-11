@@ -59,6 +59,11 @@ void EditorLayer::onAttach() {
 
 void EditorLayer::onDetach() {
 	OWL_PROFILE_FUNCTION()
+
+	iconPlay.reset();
+	iconStop.reset();
+	framebuffer.reset();
+	activeScene.reset();
 }
 
 void EditorLayer::onUpdate(const core::Timestep &ts) {
@@ -433,6 +438,7 @@ void EditorLayer::onScenePlay() {
 
 	sceneHierarchy.setContext(activeScene);
 }
+
 void EditorLayer::onSceneStop() {
 	state = State::Edit;
 

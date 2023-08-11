@@ -14,13 +14,18 @@
 namespace owl::renderer {
 
 Renderer::State Renderer::internalState = Renderer::State::Created;
+shared<Renderer::SceneData> Renderer::sceneData = nullptr;
+shared<ShaderLibrary> Renderer::shaderLibrary = nullptr;
 
-shared<Renderer::SceneData> Renderer::sceneData = mk_shared<Renderer::SceneData>();
-
-ShaderLibrary Renderer::shaderLibrary = ShaderLibrary();
+Renderer::~Renderer() {
+	reset();
+};
 
 void Renderer::init() {
 	OWL_PROFILE_FUNCTION()
+
+	sceneData = mk_shared<SceneData>();
+	shaderLibrary = mk_shared<ShaderLibrary>();
 
 	RenderCommand::init();
 	if (RenderCommand::getState() != RenderAPI::State::Ready) {
@@ -35,13 +40,14 @@ void Renderer::init() {
 
 void Renderer::shutdown() {
 	Renderer2D::shutdown();
+	reset();
 	internalState = State::Stopped;
 }
 
 void Renderer::reset() {
 	internalState = Renderer::State::Created;
-	sceneData = mk_shared<Renderer::SceneData>();
-	shaderLibrary = ShaderLibrary();
+	sceneData.reset();
+	shaderLibrary.reset();
 }
 
 void Renderer::beginScene(const CameraOrtho &camera) {
@@ -54,6 +60,5 @@ void Renderer::endScene() {
 void Renderer::onWindowResized(uint32_t width, uint32_t height) {
 	RenderCommand::setViewport(0, 0, width, height);
 }
-Renderer::~Renderer() = default;
 
 }// namespace owl::renderer

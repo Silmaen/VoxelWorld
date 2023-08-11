@@ -12,7 +12,7 @@
 #include "Log.h"
 #include "Timestep.h"
 #include "event/AppEvent.h"
-#include "gui/ImGuiLayer.h"
+#include "gui/UILayer.h"
 #include "input/Window.h"
 #include "layer/LayerStack.h"
 #include "renderer/RenderAPI.h"
@@ -29,6 +29,12 @@ struct OWL_API AppParams {
 	std::string name = "Owl Engine";
 	/// Application's assets pattern.
 	std::string assetsPattern = "assets";
+	/// Application's icon.
+	std::string icon = "";
+	/// Windows width.
+	uint32_t width = 1600;
+	/// Windows height.
+	uint32_t height = 960;
 	/// Renderer's type.
 	renderer::RenderAPI::Type renderer = renderer::RenderAPI::Type::OpenGL;
 	/// Number of command line arguments.
@@ -103,7 +109,7 @@ public:
 	 * @brief Access to the Gui layer.
 	 * @return The gui layer.
 	 */
-	shared<gui::ImGuiLayer> getImGuiLayer() { return imGuiLayer; }
+	shared<gui::UILayer> getImGuiLayer() { return imGuiLayer; }
 
 	/**
 	 * @brief Request the application to terminate.
@@ -191,7 +197,7 @@ private:
 	/// Pointer to the window.
 	uniq<input::Window> appWindow;
 	/// Pointer to the GUI Layer.
-	shared<gui::ImGuiLayer> imGuiLayer;
+	shared<gui::UILayer> imGuiLayer;
 	/// Running state.
 	State state = State::Running;
 	/// If Window minimized.

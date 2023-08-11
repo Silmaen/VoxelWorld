@@ -18,6 +18,7 @@
  * @return Execution code.
  */
 int main(int argc, char *argv[]) {
+	OWL_SCOPE_TRACE
 	owl::core::Log::init();
 	{
 		// Startup
@@ -32,6 +33,7 @@ int main(int argc, char *argv[]) {
 		// Shutdown
 		OWL_PROFILE_BEGIN_SESSION("Shutdown", "OwlProfile-shutdown.json")
 		app.reset();
+#if OWL_TRACKER_VERBOSITY >= 1
 		{
 			OWL_SCOPE_UNTRACK
 			const auto &memState = owl::debug::Tracker::get().checkState();
@@ -41,30 +43,37 @@ int main(int argc, char *argv[]) {
 				OWL_CORE_TRACE("-----------------------------------")
 				OWL_CORE_TRACE("")
 				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory, memState.allocs.size())
+#if OWL_TRACKER_VERBOSITY >= 2
 				for (const auto &chunk: memState.allocs) {
 					OWL_CORE_TRACE(" ** {}", chunk.toStr())
 				}
+#endif
 				OWL_CORE_TRACE("----------------------------------")
 				OWL_CORE_TRACE("")
 			}
 		}
+#endif
 		OWL_PROFILE_END_SESSION()
 	}
 	{
 		OWL_SCOPE_UNTRACK
 		// ==================== Print Memory informations ========================
+#if OWL_TRACKER_VERBOSITY >= 1
 		OWL_CORE_INFO("Memory State at the end of execution:")
 		auto &memoryState = owl::debug::Tracker::get().globals();
 		OWL_CORE_INFO("Residual memory          : {}", memoryState.allocatedMemory)
 		OWL_CORE_INFO("Memory peek              : {}", memoryState.memoryPeek)
 		OWL_CORE_INFO("Total Allocation calls   : {}", memoryState.allocationCalls)
 		OWL_CORE_INFO("Total Deallocation calls : {}", memoryState.deallocationCalls)
+#if OWL_TRACKER_VERBOSITY >= 2
 		if (memoryState.allocationCalls > memoryState.deallocationCalls) {
 			OWL_CORE_INFO("Remaining memory chunks  :", memoryState.allocationCalls)
 			for (const auto &alloc: memoryState.allocs) {
 				OWL_CORE_INFO("* {}", alloc.toStr())
 			}
 		}
+#endif
+#endif
 	}
 	// Destroy the logger
 	owl::core::Log::invalidate();

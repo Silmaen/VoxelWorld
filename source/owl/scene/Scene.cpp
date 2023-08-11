@@ -98,8 +98,7 @@ void Scene::destroyEntity(Entity &entity) {
 	entity.entityHandle = entt::null;
 }
 
-void Scene::onUpdateRuntime([[maybe_unused]] const core::Timestep &ts) {
-	renderer::Renderer2D::resetStats();
+void Scene::onUpdateRuntime(const core::Timestep &ts) {
 	// update scripts
 	{
 		registry.view<component::NativeScript>().each([=, this](auto entity, auto &nsc) {
@@ -127,6 +126,7 @@ void Scene::onUpdateRuntime([[maybe_unused]] const core::Timestep &ts) {
 	}
 
 	if (mainCamera) {
+		renderer::Renderer2D::resetStats();
 		renderer::Renderer2D::beginScene(*mainCamera, cameraTransform);
 		//draw sprites
 		{

@@ -1,5 +1,5 @@
 /**
- * @file ImGuiLayer.h
+ * @file UILayer.h
  * @author Silmaen
  * @date 05/12/2022
  * Copyright © 2022 All rights reserved.
@@ -7,6 +7,7 @@
  */
 
 #pragma once
+#include "Theme.h"
 #include "core/layer/Layer.h"
 
 /**
@@ -17,22 +18,22 @@ namespace owl::gui {
 /**
  * @brief Class ImGuiLayer
  */
-class OWL_API ImGuiLayer : public core::layer::Layer {
+class OWL_API UILayer : public core::layer::Layer {
 public:
-	ImGuiLayer(const ImGuiLayer &) = delete;
-	ImGuiLayer(ImGuiLayer &&) = delete;
-	ImGuiLayer &operator=(const ImGuiLayer &) = delete;
-	ImGuiLayer &operator=(ImGuiLayer &&) = delete;
+	UILayer(const UILayer &) = delete;
+	UILayer(UILayer &&) = delete;
+	UILayer &operator=(const UILayer &) = delete;
+	UILayer &operator=(UILayer &&) = delete;
 
 	/**
 	 * @brief Default constructor.
 	 */
-	ImGuiLayer();
+	UILayer();
 
 	/**
 	 * @brief Destructor.
 	 */
-	~ImGuiLayer() override;
+	~UILayer() override;
 
 	/**
 	 * @brief Action on Attach.
@@ -67,9 +68,10 @@ public:
 	void blockEvents(bool block) { blockEvent = block; }
 
 	/**
-	 * @brief Defines the dark theme mode.
+	 * @brief Defines the theme for the UI.
+	 * @param theme The them to apply.
 	 */
-	void setDarkThemeColors();
+	void setTheme(const Theme &theme = Theme());
 
 	/**
 	 * @brief Enable docking of windows.

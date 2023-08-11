@@ -18,9 +18,11 @@
 #include "core/layer/Layer.h"
 #include "core/utils/FileDialog.h"
 #include "core/utils/FileUtils.h"
-#include "gui/ImGuiLayer.h"
+#include "gui/Theme.h"
+#include "gui/UILayer.h"
 #include "input/CameraOrthoController.h"
 #include "input/Input.h"
+#include "input/Window.h"
 
 // ------- scene -----------
 #include "scene/Entity.h"
