@@ -1,6 +1,6 @@
 /**
  * @file Texture.h
- * @author Silmen
+ * @author Silmaen
  * @date 12/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -9,7 +9,6 @@
 #pragma once
 #include "renderer/Texture.h"
 
-#include <glad/glad.h>
 
 namespace owl::renderer::opengl {
 /**
@@ -24,15 +23,15 @@ public:
 
 	/**
 	 * @brief Default constructor.
-	 * @param path_ path to the texture image file.
+	 * @param path path to the texture image file.
 	 */
-	explicit Texture2D(std::filesystem::path path_);
+	explicit Texture2D(std::filesystem::path path);
 	/**
 	 * @brief Constructor by size.
-	 * @param width_ Texture's width.
-	 * @param height_ Texture's height.
+	 * @param width Texture's width.
+	 * @param height Texture's height.
 	 */
-	Texture2D(uint32_t width_, uint32_t height_);
+	Texture2D(uint32_t width, uint32_t height);
 
 	/**
 	 * @brief Destructor.
@@ -45,7 +44,7 @@ public:
 	 * @return True if same.
 	 */
 	bool operator==(const Texture &other) const override {
-		return rendererID == (dynamic_cast<const Texture2D &>(other)).rendererID;
+		return textureId == (dynamic_cast<const Texture2D &>(other)).textureId;
 	}
 
 	/**
@@ -70,7 +69,7 @@ public:
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getRendererID() const override { return rendererID; }
+	[[nodiscard]] uint32_t getRendererID() const override { return textureId; }
 
 	/**
 	 * @brief Activate the texture in the GPU.
@@ -101,10 +100,8 @@ private:
 	/// Texture's height
 	uint32_t height = 0;
 	/// OpenGL binding.
-	uint32_t rendererID = 0;
-	/// Texture internal format.
-	GLenum internalFormat;
-	/// Texture data format.
-	GLenum dataFormat;
+	uint32_t textureId = 0;
+	/// If the image has Alpha channel.
+	bool hasAlpha = true;
 };
 }// namespace owl::renderer::opengl

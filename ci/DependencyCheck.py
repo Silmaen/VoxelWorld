@@ -41,10 +41,15 @@ class HostInfo:
     def __analyse(self):
         import platform
         if Path("/etc/os-release").exists():
-            rel = platform.freedesktop_os_release()
+            rel = {}
+            with open(Path("/etc/os-release"), "r") as fp:
+                lines = fp.readlines()
+                for line in lines:
+                    line = line.replace('"', '')
+                    it = line.split("=", 1)
+                    rel[it[0]] = it[1]
             self.release = f"{rel['NAME']} {rel['VERSION']}"
             self.libc = " ".join(platform.libc_ver())
-        # print(f"linux_distribution     : {platform.linux_distribution()}")
         self.os = platform.system()
         self.arch = platform.machine()
         if self.arch == "AMD64":

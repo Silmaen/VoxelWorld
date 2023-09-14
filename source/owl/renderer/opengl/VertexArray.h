@@ -1,6 +1,6 @@
 /**
  * @file VertexArray.h
- * @author Silmen
+ * @author Silmaen
  * @date 08/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include "../VertexArray.h"
+#include "Buffer.h"
 
 namespace owl::renderer::opengl {
 
 /**
  * @brief Class VertexArray.
  */
-class VertexArray : public ::owl::renderer::VertexArray {
+class VertexArray {
 public:
 	VertexArray();
 	VertexArray(const VertexArray &) = default;
@@ -23,43 +23,47 @@ public:
 	VertexArray &operator=(const VertexArray &) = default;
 	VertexArray &operator=(VertexArray &&) = default;
 
+	using vertexBuf = shared<VertexBuffer>;
+	using vertBufs = std::vector<vertexBuf>;
+	using indexBuf = shared<IndexBuffer>;
+
 	/**
 	 * @brief Destructor.
 	 */
-	~VertexArray() override;//---UNCOVER---
+	~VertexArray();
 
 	/**
 	 * @brief Activate the buffer in the GPU.
 	 */
-	void bind() const override;
+	void bind() const;
 	/**
 	 * @brief Deactivate the buffer in the GPU.
 	 */
-	void unbind() const override;
+	void unbind() const;
 
 	/**
 	 * @brief Append a vertex buffer to the list.
 	 * @param vertexBuffer Vertex buffer to add.
 	 */
-	void addVertexBuffer(const vertexBuf &vertexBuffer) override;
+	void addVertexBuffer(const vertexBuf &vertexBuffer);
 
 	/**
 	 * @brief Define the Index buffer.
 	 * @param indexBuffer New Index Buffer.
 	 */
-	void setIndexBuffer(const indexBuf &indexBuffer) override;
+	void setIndexBuffer(const indexBuf &indexBuffer);
 
 	/**
 	 * @brief Access to vertex buffers.
 	 * @return Vertex buffers.
 	 */
-	[[nodiscard]] const vertBufs &getVertexBuffers() const override { return vertexBuffers; }
+	[[nodiscard]] const vertBufs &getVertexBuffers() const { return vertexBuffers; }
 
 	/**
 	 * @brief Access to index buffer.
 	 * @return Index buffer.
 	 */
-	[[nodiscard]] const indexBuf &getIndexBuffer() const override { return indexBuffer; }
+	[[nodiscard]] const indexBuf &getIndexBuffer() const { return indexBuffer; }
 
 private:
 	/// Id in the OpenGL context.

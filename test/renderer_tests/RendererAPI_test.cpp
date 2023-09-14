@@ -37,14 +37,8 @@ TEST(RenderAPI, badCreation) {
 	owl::core::Log::init(spdlog::level::off);
 	owl::uniq<RenderAPI> api = RenderAPI::create(RenderAPI::Type{-1});
 	auto gf = GraphContext::create(nullptr);
-	auto vb = VertexBuffer::create(0);
-	float bob[3];
-	uint32_t data[1];
-	auto vb2 = VertexBuffer::create(bob, 3);
-	auto ib = IndexBuffer::create(data, 1);
 	auto fb = Framebuffer::create({});
 	auto ub = UniformBuffer::create(0, 0);
-	auto va = VertexArray::create();
 	auto tex = Texture2D::create(std::filesystem::path());
 	auto tex2 = Texture2D::create(1, 1);
 	auto shader = Shader::create(std::filesystem::path());
@@ -52,12 +46,8 @@ TEST(RenderAPI, badCreation) {
 	auto shader3 = Shader::create("bob2", "", "");
 	EXPECT_TRUE(api == nullptr);
 	EXPECT_TRUE(gf == nullptr);
-	EXPECT_TRUE(vb == nullptr);
-	EXPECT_TRUE(vb2 == nullptr);
-	EXPECT_TRUE(ib == nullptr);
 	EXPECT_TRUE(fb == nullptr);
 	EXPECT_TRUE(ub == nullptr);
-	EXPECT_TRUE(va == nullptr);
 	EXPECT_TRUE(tex == nullptr);
 	EXPECT_TRUE(tex2 == nullptr);
 	EXPECT_TRUE(shader == nullptr);
@@ -66,12 +56,8 @@ TEST(RenderAPI, badCreation) {
 	// vulkan not implemented
 	api = RenderAPI::create(RenderAPI::Type::Vulkan);
 	gf = GraphContext::create(nullptr);
-	vb = VertexBuffer::create(0);
-	vb2 = VertexBuffer::create(bob, 3);
-	ib = IndexBuffer::create(data, 1);
 	fb = Framebuffer::create({});
 	ub = UniformBuffer::create(0, 0);
-	va = VertexArray::create();
 	tex = Texture2D::create(std::filesystem::path());
 	tex2 = Texture2D::create(1, 1);
 	shader = Shader::create(std::filesystem::path());
@@ -79,12 +65,8 @@ TEST(RenderAPI, badCreation) {
 	shader3 = Shader::create("bob2", "", "");
 	EXPECT_TRUE(api == nullptr);
 	EXPECT_TRUE(gf == nullptr);
-	EXPECT_TRUE(vb == nullptr);
-	EXPECT_TRUE(vb2 == nullptr);
-	EXPECT_TRUE(ib == nullptr);
 	EXPECT_TRUE(fb == nullptr);
 	EXPECT_TRUE(ub == nullptr);
-	EXPECT_TRUE(va == nullptr);
 	EXPECT_TRUE(tex == nullptr);
 	EXPECT_TRUE(tex2 == nullptr);
 	EXPECT_TRUE(shader == nullptr);

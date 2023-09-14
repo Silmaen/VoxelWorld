@@ -22,22 +22,14 @@ void RenderAPI::init() {
 	setState(State::Ready);
 }
 
-void RenderAPI::setViewport(uint32_t, uint32_t, uint32_t, uint32_t) {
-}
+void RenderAPI::setViewport(uint32_t, uint32_t, uint32_t, uint32_t) {}
 
-void RenderAPI::setClearColor(const glm::vec4 &) {
-}
+void RenderAPI::setClearColor(const glm::vec4 &) {}
 
-void RenderAPI::clear() {
-}
+void RenderAPI::clear() {}
 
-void RenderAPI::drawIndexed(const shared<VertexArray> &, uint32_t) {
-}
+void RenderAPI::drawData(const shared<DrawData> &, uint32_t) {}
 
-void RenderAPI::drawLines(const shared<VertexArray> &, uint32_t) {
-}
-
-void RenderAPI::setLineWidth(float) {
-}
+void RenderAPI::setLineWidth(float) {}
 
 }// namespace owl::renderer::null

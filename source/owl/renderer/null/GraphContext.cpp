@@ -11,20 +11,10 @@
 
 namespace owl::renderer::null {
 
-GraphContext::GraphContext(GLFWwindow *window) : windowHandle(window) {
-	OWL_CORE_ASSERT(window, "Windows handle is nullptr")
-}
+GraphContext::GraphContext(GLFWwindow *) {}
 
-void GraphContext::init() {
-	OWL_PROFILE_FUNCTION()
+void GraphContext::init() {}
 
-	glfwMakeContextCurrent(windowHandle);
-}
-
-void GraphContext::swapBuffers() {
-	OWL_PROFILE_FUNCTION()
-
-	glfwSwapBuffers(windowHandle);
-}
+void GraphContext::swapBuffers() {}
 
 }// namespace owl::renderer::null

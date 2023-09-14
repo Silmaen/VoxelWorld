@@ -16,8 +16,10 @@ add_library(${CMAKE_PROJECT_NAME}_Base INTERFACE)
 #
 # ---=== Supported OS ===---
 #
-set(${PRJPREFIX}_GNU_MINIMAL 11)
-set(${PRJPREFIX}_CLANG_MINIMAL 14)
+set(${PRJPREFIX}_GNU_MINIMAL 10)
+set(${PRJPREFIX}_CLANG_MINIMAL 13)
+set(${PRJPREFIX}_GNU_MINIMAL_CPP23 11)
+set(${PRJPREFIX}_CLANG_MINIMAL_CPP23 14)
 
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(EXE_EXT ".exe")
@@ -40,6 +42,10 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_GNU_MINIMAL})
         message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler version too old: ${CMAKE_CXX_COMPILER_VERSION}, need ${${PRJPREFIX}_GNU_MINIMAL}")
     endif ()
+    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_GNU_MINIMAL_CPP23})
+        message(WARNING "${CMAKE_CXX_COMPILER_ID} compiler version ${CMAKE_CXX_COMPILER_VERSION} is too old for cpp 23 downgrading")
+        set(CMAKE_CXX_STANDARD 20)
+    endif ()
     message(STATUS "Using GNU compiler")
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
             -Werror -Wall -Wextra -pedantic
@@ -48,12 +54,16 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
             -Wcast-align
             -Wcast-qual
             -Wno-mismatched-new-delete
-            )
+    )
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE
             STBI_NO_SIMD)
 elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_CLANG_MINIMAL})
         message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler version too old: ${CMAKE_CXX_COMPILER_VERSION}, need ${${PRJPREFIX}_CLANG_MINIMAL}")
+    endif ()
+    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_CLANG_MINIMAL_CPP23})
+        message(WARNING "${CMAKE_CXX_COMPILER_ID} compiler version ${CMAKE_CXX_COMPILER_VERSION} is too old for cpp 23 downgrading")
+        set(CMAKE_CXX_STANDARD 20)
     endif ()
     message(STATUS "Using Clang compiler")
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
@@ -73,7 +83,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
         target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
                 -Wno-unsafe-buffer-usage
                 -Wno-cast-function-type-strict
-                )
+        )
     endif ()
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")

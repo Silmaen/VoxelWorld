@@ -10,7 +10,10 @@
 
 #include <filesystem>
 
-namespace owl::core {
+/**
+ * @brief Namespace for utility functions
+ */
+namespace owl::core::utils {
 
 /**
  * @brief class FileDialog.
@@ -32,4 +35,4 @@ public:
 	static std::filesystem::path saveFile(const std::string &filter);
 };
 
-}// namespace owl::core
+}// namespace owl::core::utils

@@ -25,6 +25,7 @@ public:
 	 * @brief Destructor.
 	 */
 	virtual ~UniformBuffer();
+
 	/**
 	 * @brief Push Data to GPU.
 	 * @param data The data.
@@ -32,6 +33,12 @@ public:
 	 * @param offset The offset to start.
 	 */
 	virtual void setData(const void *data, uint32_t size, uint32_t offset = 0) = 0;
+
+	/**
+	 * @brief bind this uniform buffer.
+	 */
+	virtual void bind() = 0;
+
 	/**
 	 * @brief Create a new instance of UniformBuffer.
 	 * @param size The buffer size.

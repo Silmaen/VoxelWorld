@@ -1,6 +1,6 @@
 /**
  * @file GraphContext.h
- * @author Silmen
+ * @author Silmaen
  * @date 07/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.

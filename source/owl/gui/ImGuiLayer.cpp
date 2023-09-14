@@ -27,6 +27,9 @@ namespace owl::gui {
 ImGuiLayer::ImGuiLayer() : core::layer::Layer("ImGuiLayer") {}
 ImGuiLayer::~ImGuiLayer() = default;
 
+static const std::string opSansBold = "fonts/opensans/OpenSans-Bold.ttf";
+static const std::string opSansRegular = "fonts/opensans/OpenSans-Regular.ttf";
+
 void ImGuiLayer::onAttach() {// Setup Dear ImGui context
 	OWL_PROFILE_FUNCTION()
 
@@ -44,17 +47,23 @@ void ImGuiLayer::onAttach() {// Setup Dear ImGui context
 	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
 	// Better fonts
-	auto assetDir = core::Application::get().getAssetDirectory();
+	const auto assetDir = core::Application::get().getAssetDirectory();
 	float fontsize = 18.0f;
-	if (exists(assetDir / "fonts" / "opensans" / "OpenSans-Bold.ttf")) {
-		io.Fonts->AddFontFromFileTTF((assetDir / "fonts" / "opensans" / "OpenSans-Bold.ttf").string().c_str(), fontsize);
-	} else {
-		OWL_CORE_WARN("Unable to find OpenSans-Bold, fall back to default font")
+	{
+		const auto fontFile = assetDir / opSansBold;
+		if (exists(fontFile)) {
+			io.Fonts->AddFontFromFileTTF(fontFile.string().c_str(), fontsize);
+		} else {
+			OWL_CORE_WARN("Unable to find OpenSans-Bold, fall back to default font")
+		}
 	}
-	if (exists(assetDir / "fonts" / "opensans" / "OpenSans-Regular.ttf")) {
-		io.FontDefault = io.Fonts->AddFontFromFileTTF((assetDir / "fonts" / "opensans" / "OpenSans-Regular.ttf").string().c_str(), fontsize);
-	} else {
-		OWL_CORE_WARN("Unable to find OpenSans-Regular, fall back to default font")
+	{
+		const auto fontFile = assetDir / opSansRegular;
+		if (exists(fontFile)) {
+			io.FontDefault = io.Fonts->AddFontFromFileTTF(fontFile.string().c_str(), fontsize);
+		} else {
+			OWL_CORE_WARN("Unable to find OpenSans-Regular, fall back to default font")
+		}
 	}
 
 	// Setup Dear ImGui style
@@ -73,13 +82,19 @@ void ImGuiLayer::onAttach() {// Setup Dear ImGui context
 	auto *window = static_cast<GLFWwindow *>(
 			core::Application::get().getWindow().getNativeWindow());
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 410");
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
+		ImGui_ImplOpenGL3_Init("#version 410");
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+		ImGui_ImplOpenGL2_Init();
 }
 
 void ImGuiLayer::onDetach() {
 	OWL_PROFILE_FUNCTION()
 
-	ImGui_ImplOpenGL3_Shutdown();
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
+		ImGui_ImplOpenGL3_Shutdown();
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+		ImGui_ImplOpenGL2_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
@@ -93,7 +108,11 @@ void ImGuiLayer::onEvent([[maybe_unused]] event::Event &event) {
 }
 
 void ImGuiLayer::begin() {
-	ImGui_ImplOpenGL3_NewFrame();
+
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
+		ImGui_ImplOpenGL3_NewFrame();
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+		ImGui_ImplOpenGL2_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
@@ -113,7 +132,10 @@ void ImGuiLayer::end() {
 							static_cast<float>(app.getWindow().getHeight()));
 	// Rendering
 	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 		GLFWwindow *backup_current_context = glfwGetCurrentContext();

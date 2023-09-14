@@ -64,9 +64,8 @@ public:
 	 * @param index The color index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getColorAttachmentRendererID(uint32_t index = 0) const override {
-		OWL_CORE_ASSERT(index < colorAttachments.size(), "ColorAttachment out of bounds")
-		return colorAttachments[index];
+	[[nodiscard]] uint32_t getColorAttachmentRendererID([[maybe_unused]] uint32_t index = 0) const override {
+		return 0;
 	}
 
 	/**
@@ -76,16 +75,8 @@ public:
 	[[nodiscard]] const FramebufferSpecification &getSpecification() const override { return specs; }
 
 private:
-	/// The renderer ID.
-	uint32_t rendererID = 0;
-	/// The color attachment.
-	std::vector<uint32_t> colorAttachments;
-	/// The depth attachment.
-	uint32_t depthAttachment = 0;
 	/// The specs.
 	FramebufferSpecification specs;
-	std::vector<FramebufferTextureSpecification> colorAttachmentSpecifications;
-	FramebufferTextureSpecification depthAttachmentSpecification = FramebufferTextureFormat::None;
 };
 
 }// namespace owl::renderer::null

@@ -1,6 +1,6 @@
 /**
  * @file Texture.h
- * @author Silmen
+ * @author Silmaen
  * @date 30/07/2023
  * Copyright © 2023 All rights reserved.
  * All modification must get authorization from the author.

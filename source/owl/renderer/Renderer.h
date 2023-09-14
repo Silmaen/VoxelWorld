@@ -1,6 +1,6 @@
 /**
  * @file Renderer.h
- * @author Silmen
+ * @author Silmaen
  * @date 08/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -80,22 +80,6 @@ public:
 	 * @brief Ends a scene.
 	 */
 	static void endScene();
-
-	/**
-	 * @brief Add an object to the scene.
-	 * @param shader The shader to use for rendering.
-	 * @param object Object to add.
-	 * @param transform The transform to apply to object.
-	 */
-	static void submit(const shared<Shader> &shader, const shared<VertexArray> &object, const glm::mat4 &transform = glm::mat4(1.0f));
-
-	/**
-	 * @brief Add an object to the scene.
-	 * @param shaderName The shader's name to use for rendering.
-	 * @param object Object to add.
-	 * @param transform The transform to apply to object.
-	 */
-	static void submit(const std::string &shaderName, const shared<VertexArray> &object, const glm::mat4 &transform = glm::mat4(1.0f));
 
 	/**
 	 * @brief Access to the shader Library.

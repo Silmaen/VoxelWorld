@@ -23,12 +23,14 @@ void GraphContext::init() {
 	[[maybe_unused]] int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 	OWL_CORE_ASSERT(status, "Failed to initialize GLAD")
 
-	OWL_CORE_INFO("OpenGL Info:")
+	OWL_CORE_INFO("OpenGL Renderer Initiated.")
+	OWL_CORE_INFO("Device Info:")
 	OWL_CORE_INFO("  Vendor: {}", reinterpret_cast<const char *>(glGetString(GL_VENDOR)))
 	OWL_CORE_INFO("  Renderer: {}", reinterpret_cast<const char *>(glGetString(GL_RENDERER)))
 	OWL_CORE_INFO("  Version: {}", reinterpret_cast<const char *>(glGetString(GL_VERSION)))
-	//OWL_CORE_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 3),
-	//				"Owl Engine requires at least OpenGL version 4.3")
+	int32_t textureUnits;
+	glGetIntegerv(GL_MAX_TEXTURE_UNITS, &textureUnits);
+	OWL_CORE_INFO(" Max texture slot per Shader: {}", textureUnits)
 }
 
 void GraphContext::swapBuffers() {

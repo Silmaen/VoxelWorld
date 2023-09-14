@@ -28,6 +28,7 @@ shared<core::Application> core::createApplication(int argc, char **argv) {
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,
 #endif
+			.renderer = renderer::RenderAPI::Type::OpenGL,
 			.argCount = argc,
 			.args = argv,
 	});

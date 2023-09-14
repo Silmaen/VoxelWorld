@@ -1,6 +1,6 @@
 /**
  * @file Buffer.h
- * @author Silmen
+ * @author Silmaen
  * @date 08/12/2022
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
@@ -209,22 +209,6 @@ public:
 	virtual void setData(const void *data, uint32_t size) = 0;
 
 	/**
-	 * @brief Create a new empty Vertex buffer in the GPU memory.
-	 * @param size Amount of data to read.
-	 * @return Pointer to the created buffer.
-	 */
-	static shared<VertexBuffer> create(uint32_t size);
-
-	/**
-	 * @brief Create a new Vertex buffer in the GPU memory.
-	 * @param vertices List of vertices data.
-	 * @param size Amount of data to read.
-	 * @return Pointer to the created buffer.
-	 */
-	static shared<VertexBuffer> create(float *vertices, uint32_t size);
-
-
-	/**
 	 * @brief Get the buffer data layout.
 	 * @return Data layout.
 	 */
@@ -273,15 +257,6 @@ public:
 	 * @return Number of element in the buffer.
 	 */
 	[[nodiscard]] virtual uint32_t getCount() const = 0;
-	/**
-	 * @brief Create a new Index buffer in the GPU memory.
-	 * @param indices List of indices data.
-	 * @param count Amount of data to read.
-	 * @return Pointer to the created buffer.
-	 */
-	static shared<IndexBuffer> create(uint32_t *indices, uint32_t count);
-
-private:
 };
 
 }// namespace owl::renderer

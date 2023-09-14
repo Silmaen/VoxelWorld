@@ -10,10 +10,11 @@
 #include "Renderer.h"
 #include "Renderer2D.h"
 
+#include "DrawData.h"
 #include "RenderCommand.h"
 #include "Shader.h"
 #include "UniformBuffer.h"
-#include "VertexArray.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace owl::renderer {
@@ -24,15 +25,16 @@ constexpr uint32_t maxQuads = 20000;
 constexpr size_t quadVertexCount = 4;
 constexpr uint32_t maxVertices = maxQuads * quadVertexCount;
 constexpr uint32_t maxIndices = maxQuads * 6;
-constexpr int32_t maxTextureSlots = 32;// TODO: RenderCaps
 constexpr glm::vec2 textureCoords[] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
 constexpr glm::vec4 quadVertexPositions[] = {{-0.5f, -0.5f, 0.0f, 1.0f},
 											 {0.5f, -0.5f, 0.0f, 1.0f},
 											 {0.5f, 0.5f, 0.0f, 1.0f},
 											 {-0.5f, 0.5f, 0.0f, 1.0f}};
 
+static uint32_t maxTextureSlots = 0;
+
 /**
- * @brief Structure holding quad vertex informations
+ * @brief Structure holding quad vertex information.
  */
 struct QuadVertex {
 	glm::vec3 position;
@@ -44,7 +46,7 @@ struct QuadVertex {
 };
 
 /**
- * @brief Structure holding circle vertex informations
+ * @brief Structure holding circle vertex information.
  */
 struct CircleVertex {
 	glm::vec3 worldPosition;
@@ -56,7 +58,7 @@ struct CircleVertex {
 };
 
 /**
- * @brief Structure holding line vertex informations
+ * @brief Structure holding line vertex information.
  */
 struct LineVertex {
 	glm::vec3 position;
@@ -64,38 +66,17 @@ struct LineVertex {
 	int entityID;
 };
 
-/**
- * @brief Base structure for rendering an object type
- * @tparam VertexType Object's vertex data
- */
 template<typename VertexType>
-struct DrawData {
-	shared<VertexArray> vertexArray;
-	shared<VertexBuffer> vertexBuffer;
-	shared<Shader> shader;
+struct VertexData {
 	uint32_t indexCount = 0;
 	std::vector<VertexType> vertexBuf;
 };
 
-
 template<typename VertexType>
-static void resetDrawData(DrawData<VertexType> &data_) {
+static void resetDrawData(VertexData<VertexType> &data_) {
 	data_.indexCount = 0;
 	data_.vertexBuf.clear();
 	data_.vertexBuf.reserve(utils::maxVertices);
-}
-
-template<typename VertexType>
-static void initDrawData(DrawData<VertexType> &data_, const BufferLayout &layout_, std::vector<uint32_t> &indices, const std::string &shaderName) {
-	data_.vertexArray = VertexArray::create();
-	data_.vertexBuffer = VertexBuffer::create(utils::maxVertices * sizeof(VertexType));
-	data_.vertexBuffer->setLayout(layout_);
-	data_.vertexArray->addVertexBuffer(data_.vertexBuffer);
-	data_.vertexBuf.reserve(utils::maxVertices);
-	data_.vertexArray->setIndexBuffer(IndexBuffer::create(indices.data(), utils::maxIndices));
-	auto &shLib = Renderer::getShaderLibrary();
-	shLib.addFromStandardPath(shaderName);
-	data_.shader = shLib.get(shaderName);
 }
 
 /**
@@ -103,16 +84,22 @@ static void initDrawData(DrawData<VertexType> &data_, const BufferLayout &layout
  */
 struct internalData {
 	/// Quad Data
-	DrawData<QuadVertex> quad;
+	VertexData<QuadVertex> quad;
+	shared<DrawData> drawQuad;
 	/// Circle Data
-	DrawData<CircleVertex> circle;
+	VertexData<CircleVertex> circle;
+	shared<DrawData> drawCircle;
 	/// Line Data
-	DrawData<LineVertex> line;
+	VertexData<LineVertex> line;
+	shared<DrawData> drawLine;
 	float lineWidth = 2.0f;
 
 	// Textures Data
+	/// One white texture for coloring
 	shared<Texture2D> whiteTexture;
-	std::array<shared<Texture2D>, maxTextureSlots> textureSlots;
+	/// Array of textures
+	std::vector<shared<Texture2D>> textureSlots;
+	/// next texture index
 	uint32_t textureSlotIndex = 1;// 0 = white texture
 
 	/// Statistics
@@ -123,7 +110,7 @@ struct internalData {
 		/// Camera projection
 		glm::mat4 viewProjection;
 	};
-	CameraData cameraBuffer;
+	CameraData cameraBuffer{};
 	shared<UniformBuffer> cameraUniformBuffer;
 };
 
@@ -157,47 +144,47 @@ void Renderer2D::init() {
 		}
 	}
 	// quads
-	utils::initDrawData(data.quad, {
-										   {"a_Position", ShaderDataType::Float3},
-										   {"a_Color", ShaderDataType::Float4},
-										   {"a_TexCoord", ShaderDataType::Float2},
-										   {"a_TexIndex", ShaderDataType::Float},
-										   {"a_TilingFactor", ShaderDataType::Float},
-										   {"a_EntityID", ShaderDataType::Int},
-								   },
+	data.drawQuad = DrawData::create();
+	data.drawQuad->init({
+								{"a_Position", ShaderDataType::Float3},
+								{"a_Color", ShaderDataType::Float4},
+								{"a_TexCoord", ShaderDataType::Float2},
+								{"a_TexIndex", ShaderDataType::Float},
+								{"a_TilingFactor", ShaderDataType::Float},
+								{"a_EntityID", ShaderDataType::Int},
+						},
 						quadIndices, "renderer2D_quad");
-	data.quad.vertexArray->setIndexBuffer(IndexBuffer::create(quadIndices.data(), utils::maxIndices));
 	// circles
-	utils::initDrawData(data.circle, {
-											 {"a_WorldPosition", ShaderDataType::Float3},
-											 {"a_LocalPosition", ShaderDataType::Float3},
-											 {"a_Color", ShaderDataType::Float4},
-											 {"a_Thickness", ShaderDataType::Float},
-											 {"a_Fade", ShaderDataType::Float},
-											 {"a_EntityID", ShaderDataType::Int},
-									 },
-						quadIndices, "renderer2D_circle");
+	data.drawCircle = DrawData::create();
+	data.drawCircle->init({
+								  {"a_WorldPosition", ShaderDataType::Float3},
+								  {"a_LocalPosition", ShaderDataType::Float3},
+								  {"a_Color", ShaderDataType::Float4},
+								  {"a_Thickness", ShaderDataType::Float},
+								  {"a_Fade", ShaderDataType::Float},
+								  {"a_EntityID", ShaderDataType::Int},
+						  },
+						  quadIndices, "renderer2D_circle");
 	// Lines
-	utils::initDrawData(data.line, {
-										   {"a_Position", ShaderDataType::Float3},
-										   {"a_Color", ShaderDataType::Float4},
-										   {"a_EntityID", ShaderDataType::Int},
-								   },
+	data.drawLine = DrawData::create();
+	data.drawLine->init({
+								{"a_Position", ShaderDataType::Float3},
+								{"a_Color", ShaderDataType::Float4},
+								{"a_EntityID", ShaderDataType::Int},
+						},
 						quadIndices, "renderer2D_line");
 
 	data.whiteTexture = Texture2D::create(1, 1);
 	uint32_t whiteTextureData = 0xffffffff;
 	data.whiteTexture->setData(&whiteTextureData, sizeof(uint32_t));
 
-	std::vector<int32_t> samplers;
-	samplers.resize(utils::maxTextureSlots);
-	int32_t i = 0;
-	for (auto &sampler: samplers)
-		sampler = i++;
 
 	// Set all texture slots to 0
+	utils::maxTextureSlots = RenderCommand::getMaxTextureSlots();
+	data.textureSlots.resize(utils::maxTextureSlots);
 	data.textureSlots[0] = data.whiteTexture;
 	data.cameraUniformBuffer = UniformBuffer::create(sizeof(utils::internalData::CameraData), 0);
+	data.cameraUniformBuffer->bind();
 }
 
 void Renderer2D::shutdown() {
@@ -209,6 +196,9 @@ void Renderer2D::shutdown() {
 		if (text == nullptr) continue;
 		text.reset();
 	}
+	data.drawQuad.reset();
+	data.drawCircle.reset();
+	data.drawLine.reset();
 }
 
 void Renderer2D::beginScene(const CameraOrtho &camera) {
@@ -243,33 +233,27 @@ void Renderer2D::endScene() {
 
 void Renderer2D::flush() {
 	if (data.quad.indexCount > 0) {
-		data.quad.vertexBuffer->setData(data.quad.vertexBuf.data(),
-										static_cast<uint32_t>(data.quad.vertexBuf.size() * sizeof(utils::QuadVertex)));
+		data.drawQuad->setVertexData(data.quad.vertexBuf.data(),
+									 static_cast<uint32_t>(data.quad.vertexBuf.size() * sizeof(utils::QuadVertex)));
 		// bind textures
 		for (uint32_t i = 0; i < data.textureSlotIndex; i++)
 			data.textureSlots[i]->bind(i);
-		// bind shader
-		data.quad.shader->bind();
 		// draw call
-		RenderCommand::drawIndexed(data.quad.vertexArray, data.quad.indexCount);
+		RenderCommand::drawData(data.drawQuad, data.quad.indexCount);
 		data.stats.drawCalls++;
 	}
 	if (data.circle.indexCount > 0) {
-		data.circle.vertexBuffer->setData(data.circle.vertexBuf.data(),
-										  static_cast<uint32_t>(data.circle.vertexBuf.size() * sizeof(utils::CircleVertex)));
-		// bind shader
-		data.circle.shader->bind();
+		data.drawCircle->setVertexData(data.circle.vertexBuf.data(),
+									   static_cast<uint32_t>(data.circle.vertexBuf.size() * sizeof(utils::CircleVertex)));
 		// draw call
-		RenderCommand::drawIndexed(data.circle.vertexArray, data.circle.indexCount);
+		RenderCommand::drawData(data.drawCircle, data.circle.indexCount);
 		data.stats.drawCalls++;
 	}
 	if (data.line.indexCount > 0) {
-		data.line.vertexBuffer->setData(data.line.vertexBuf.data(),
-										static_cast<uint32_t>(data.line.vertexBuf.size() * sizeof(utils::CircleVertex)));
-		// bind shader
-		data.line.shader->bind();
+		data.drawLine->setVertexData(data.line.vertexBuf.data(),
+									 static_cast<uint32_t>(data.line.vertexBuf.size() * sizeof(utils::LineVertex)));
 		// draw call
-		RenderCommand::drawIndexed(data.line.vertexArray, data.line.indexCount);
+		RenderCommand::drawData(data.drawLine, data.line.indexCount);
 		data.stats.drawCalls++;
 	}
 }
@@ -324,11 +308,11 @@ void Renderer2D::drawPolyLine(const PolyLineData &lineData) {
 	for (const auto &vtx: lineData.points) {
 		points.emplace_back(trans * glm::vec4{vtx.x, vtx.y, vtx.z, 1.f});
 		if (i < lineData.points.size() - 1)
-			link.emplace_back(std::pair<uint32_t, uint32_t>{i, i + 1});
+			link.emplace_back(i, i + 1);
 		++i;
 	}
 	if (lineData.closed)
-		link.emplace_back(std::pair<uint32_t, uint32_t>{lineData.points.size() - 1, 0});
+		link.emplace_back(lineData.points.size() - 1, 0);
 	for (const auto &[p1, p2]: link)
 		drawLine({points[p1], points[p2], lineData.color, lineData.entityID});
 }
