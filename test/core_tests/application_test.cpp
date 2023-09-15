@@ -26,3 +26,22 @@ TEST_DISABLED(Core, Application_basic) {
 	Application::invalidate();
 	app.reset();
 }
+
+TEST(Core, AppParams_serialize) {
+	AppParams paramsIni;
+	paramsIni.width = 785;
+	paramsIni.height = 7415;
+	paramsIni.renderer = owl::renderer::RenderAPI::Type::Vulkan;
+	auto tmpFile = std::filesystem::temp_directory_path() / "param.yml";
+	paramsIni.saveToFile(tmpFile);
+
+	AppParams paramsLoad;
+	EXPECT_NE(paramsIni.width, paramsLoad.width);
+	EXPECT_NE(paramsIni.height, paramsLoad.height);
+	EXPECT_NE(paramsIni.renderer, paramsLoad.renderer);
+	paramsLoad.loadFromFile(tmpFile);
+	EXPECT_EQ(paramsIni.width, paramsLoad.width);
+	EXPECT_EQ(paramsIni.height, paramsLoad.height);
+	EXPECT_EQ(paramsIni.renderer, paramsLoad.renderer);
+	remove(tmpFile);
+}

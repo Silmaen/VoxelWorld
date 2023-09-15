@@ -23,7 +23,6 @@ owl::shared<owl::core::Application> owl::core::createApplication(int argc, char 
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,
 #endif
-			.renderer = renderer::RenderAPI::Type::OpenGL,
 			.argCount = argc,
 			.args = argv,
 	});

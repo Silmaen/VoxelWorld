@@ -16,39 +16,12 @@
 #include "scene/component/Tag.h"
 #include "scene/component/Transform.h"
 
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-#pragma clang diagnostic ignored "-Wshadow"
-#endif
-#include <yaml-cpp/yaml.h>
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#include "core/external/yaml.h"
 
 #include <magic_enum.hpp>
 
+
 namespace YAML {
-
-template<>
-struct convert<glm::vec2> {
-	static Node encode(const glm::vec2 &rhs) {
-		Node node;
-		node.push_back(rhs.x);
-		node.push_back(rhs.y);
-		node.SetStyle(EmitterStyle::Flow);
-		return node;
-	}
-
-	static bool decode(const Node &node, glm::vec2 &rhs) {
-		if (!node.IsSequence() || node.size() != 2)
-			return false;
-		rhs.x = node[0].as<float>();
-		rhs.y = node[1].as<float>();
-		return true;
-	}
-};
 
 template<>
 struct convert<glm::vec3> {
@@ -103,6 +76,7 @@ static Emitter &operator<<(Emitter &out, const glm::vec4 &v) {
 	out << BeginSeq << v.x << v.y << v.z << v.w << EndSeq;
 	return out;
 }
+
 }// namespace YAML
 
 namespace owl::scene {
@@ -263,4 +237,5 @@ bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
 
 	return true;
 }
+
 }// namespace owl::scene
