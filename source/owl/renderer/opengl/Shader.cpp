@@ -11,6 +11,7 @@
 #include "core/Application.h"
 #include "core/Core.h"
 #include "core/utils/FileUtils.h"
+#include "debug/Tracker.h"
 
 #include <glad/glad.h>
 
@@ -164,6 +165,7 @@ Shader::~Shader() {
 }
 
 void Shader::compile(const std::unordered_map<ShaderType, std::string> &sources) {
+	OWL_SCOPE_UNTRACK
 	OWL_PROFILE_FUNCTION()
 
 	auto start = std::chrono::steady_clock::now();

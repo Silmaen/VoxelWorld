@@ -10,11 +10,23 @@
 
 #include "core/Core.h"
 
+#ifndef OWL_TRACKER_VERBOSITY
+#define OWL_TRACKER_VERBOSITY 0
+#endif
+
 #if defined(OWL_DEBUG) && !defined(OWL_COVERAGE)
-#define OWL_STACKTRACE
+#if OWL_TRACKER_VERBOSITY < 1
+#undef OWL_TRACKER_VERBOSITY
+#define OWL_TRACKER_VERBOSITY 1
+#endif
+//#define OWL_STACKTRACE
 #endif
 
 #ifdef OWL_STACKTRACE
+#if OWL_TRACKER_VERBOSITY < 3
+#undef OWL_TRACKER_VERBOSITY
+#define OWL_TRACKER_VERBOSITY 3
+#endif
 #include <cpptrace/cpptrace.hpp>
 #endif
 #include <list>

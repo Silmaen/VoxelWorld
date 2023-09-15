@@ -8,6 +8,9 @@
 
 #include "owlpch.h"
 
+#include <glad/glad.h>
+#include <stb_image.h>
+
 #include "Window.h"
 #include "core/Log.h"
 #include "debug/Profiler.h"
@@ -60,6 +63,14 @@ void Window::init(const Properties &props) {
 									  static_cast<int>(props.height),
 									  windowData.title.c_str(), nullptr, nullptr);
 		++s_GLFWWindowCount;
+	}
+	// Set icon
+	GLFWimage icon;
+	int channels;
+	if (!props.iconPath.empty()) {
+		icon.pixels = stbi_load(props.iconPath.c_str(), &icon.width, &icon.height, &channels, 4);
+		glfwSetWindowIcon(glfwWindow, 1, &icon);
+		stbi_image_free(icon.pixels);
 	}
 
 	context = renderer::GraphContext::create(glfwWindow);

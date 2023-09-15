@@ -81,6 +81,17 @@ constexpr shared<T> mk_shared(Args &&...args) {
 	return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
+/**
+ * @brief Convert a const pointer to raw data pointer.
+ * @tparam T Initial data type.
+ * @param data The actual data.
+ * @return Raw data pointer.
+ */
+template<typename T>
+void *toRawData(const T *data) {
+	return const_cast<void *>(static_cast<const void *>(data));
+}
+
 }// namespace owl
 
 #include "Assert.h"

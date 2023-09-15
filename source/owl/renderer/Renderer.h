@@ -85,7 +85,7 @@ public:
 	 * @brief Access to the shader Library.
 	 * @return The shader library.
 	 */
-	static ShaderLibrary &getShaderLibrary() { return shaderLibrary; }
+	static ShaderLibrary &getShaderLibrary() { return *shaderLibrary; }
 
 private:
 	/// The state of the renderer.
@@ -101,7 +101,7 @@ private:
 	/// The actual sceneData.
 	static shared<SceneData> sceneData;
 	/// Actual library of shaders.
-	static ShaderLibrary shaderLibrary;
+	static shared<ShaderLibrary> shaderLibrary;
 };
 
 }// namespace owl::renderer

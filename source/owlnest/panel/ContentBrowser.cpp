@@ -9,6 +9,7 @@
 #include "ContentBrowser.h"
 
 #include "core/Application.h"
+#include "debug/Tracker.h"
 
 #include <imgui.h>
 
@@ -17,6 +18,7 @@ namespace owl::panel {
 static std::filesystem::path assetPath;
 
 ContentBrowser::ContentBrowser() {
+	OWL_SCOPE_UNTRACK
 	assetPath = core::Application::get().getAssetDirectory();
 	currentPath = assetPath;
 	{

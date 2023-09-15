@@ -29,6 +29,8 @@ struct Properties {
 	Type winType = Type::GLFW;
 	/// Window title.
 	std::string title = "Owl Engine";
+	/// Path to the icons in the assets.
+	std::string iconPath;
 	/// Width.
 	uint32_t width = 1600;
 	/// Height.

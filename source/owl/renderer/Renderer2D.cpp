@@ -66,6 +66,9 @@ struct LineVertex {
 	int entityID;
 };
 
+/**
+ * @brief Base structure for rendering an object type
+ */
 template<typename VertexType>
 struct VertexData {
 	uint32_t indexCount = 0;
@@ -122,10 +125,16 @@ glm::mat4 toTransform(const PRS &transform) {
 
 }// namespace utils
 
-static utils::internalData data;
+static shared<utils::internalData> data;
 
 void Renderer2D::init() {
 	OWL_PROFILE_FUNCTION()
+
+	if (data) {
+		OWL_CORE_WARN("Renderer2D already initiated.")
+		data.reset();
+	}
+	data = mk_shared<utils::internalData>();
 
 	std::vector<uint32_t> quadIndices;
 	{
@@ -144,8 +153,8 @@ void Renderer2D::init() {
 		}
 	}
 	// quads
-	data.drawQuad = DrawData::create();
-	data.drawQuad->init({
+	data->drawQuad = DrawData::create();
+	data->drawQuad->init({
 								{"a_Position", ShaderDataType::Float3},
 								{"a_Color", ShaderDataType::Float4},
 								{"a_TexCoord", ShaderDataType::Float2},
@@ -155,8 +164,8 @@ void Renderer2D::init() {
 						},
 						quadIndices, "renderer2D_quad");
 	// circles
-	data.drawCircle = DrawData::create();
-	data.drawCircle->init({
+	data->drawCircle = DrawData::create();
+	data->drawCircle->init({
 								  {"a_WorldPosition", ShaderDataType::Float3},
 								  {"a_LocalPosition", ShaderDataType::Float3},
 								  {"a_Color", ShaderDataType::Float4},
@@ -166,62 +175,69 @@ void Renderer2D::init() {
 						  },
 						  quadIndices, "renderer2D_circle");
 	// Lines
-	data.drawLine = DrawData::create();
-	data.drawLine->init({
+	data->drawLine = DrawData::create();
+	data->drawLine->init({
 								{"a_Position", ShaderDataType::Float3},
 								{"a_Color", ShaderDataType::Float4},
 								{"a_EntityID", ShaderDataType::Int},
 						},
 						quadIndices, "renderer2D_line");
 
-	data.whiteTexture = Texture2D::create(1, 1);
+	data->whiteTexture = Texture2D::create(1, 1);
 	uint32_t whiteTextureData = 0xffffffff;
-	data.whiteTexture->setData(&whiteTextureData, sizeof(uint32_t));
+	data->whiteTexture->setData(&whiteTextureData, sizeof(uint32_t));
 
 
 	// Set all texture slots to 0
 	utils::maxTextureSlots = RenderCommand::getMaxTextureSlots();
-	data.textureSlots.resize(utils::maxTextureSlots);
-	data.textureSlots[0] = data.whiteTexture;
-	data.cameraUniformBuffer = UniformBuffer::create(sizeof(utils::internalData::CameraData), 0);
-	data.cameraUniformBuffer->bind();
+	data->textureSlots.resize(utils::maxTextureSlots);
+	data->textureSlots[0] = data->whiteTexture;
+	data->cameraUniformBuffer = UniformBuffer::create(sizeof(utils::internalData::CameraData), 0);
+	data->cameraUniformBuffer->bind();
 }
 
 void Renderer2D::shutdown() {
 	OWL_PROFILE_FUNCTION()
+
+	if (!data) {
+		OWL_CORE_WARN("Renderer2D already shutdown.")
+		return;
+	}
+
 	// clearing the internal data
-	data.cameraUniformBuffer.reset();
-	data.whiteTexture.reset();
-	for (auto &text: data.textureSlots) {
+	data->cameraUniformBuffer.reset();
+	data->whiteTexture.reset();
+	for (auto &text: data->textureSlots) {
 		if (text == nullptr) continue;
 		text.reset();
 	}
-	data.drawQuad.reset();
-	data.drawCircle.reset();
-	data.drawLine.reset();
+	data->drawQuad.reset();
+	data->drawCircle.reset();
+	data->drawLine.reset();
+	data.reset();
 }
 
 void Renderer2D::beginScene(const CameraOrtho &camera) {
 	OWL_PROFILE_FUNCTION()
 
-	data.cameraBuffer.viewProjection = camera.getViewProjectionMatrix();
-	data.cameraUniformBuffer->setData(&data.cameraBuffer, sizeof(utils::internalData::CameraData));
+	data->cameraBuffer.viewProjection = camera.getViewProjectionMatrix();
+	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData));
 	startBatch();
 }
 
 void Renderer2D::beginScene(const CameraEditor &camera) {
 	OWL_PROFILE_FUNCTION()
 
-	data.cameraBuffer.viewProjection = camera.getViewProjection();
-	data.cameraUniformBuffer->setData(&data.cameraBuffer, sizeof(utils::internalData::CameraData));
+	data->cameraBuffer.viewProjection = camera.getViewProjection();
+	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData));
 	startBatch();
 }
 
 void Renderer2D::beginScene(const Camera &camera, const glm::mat4 &transform) {
 	OWL_PROFILE_FUNCTION()
 
-	data.cameraBuffer.viewProjection = camera.getProjection() * glm::inverse(transform);
-	data.cameraUniformBuffer->setData(&data.cameraBuffer, sizeof(utils::internalData::CameraData));
+	data->cameraBuffer.viewProjection = camera.getProjection() * glm::inverse(transform);
+	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData));
 	startBatch();
 }
 
@@ -232,38 +248,38 @@ void Renderer2D::endScene() {
 }
 
 void Renderer2D::flush() {
-	if (data.quad.indexCount > 0) {
-		data.drawQuad->setVertexData(data.quad.vertexBuf.data(),
-									 static_cast<uint32_t>(data.quad.vertexBuf.size() * sizeof(utils::QuadVertex)));
+	if (data->quad.indexCount > 0) {
+		data->drawQuad->setVertexData(data->quad.vertexBuf.data(),
+									 static_cast<uint32_t>(data->quad.vertexBuf.size() * sizeof(utils::QuadVertex)));
 		// bind textures
-		for (uint32_t i = 0; i < data.textureSlotIndex; i++)
-			data.textureSlots[i]->bind(i);
+		for (uint32_t i = 0; i < data->textureSlotIndex; i++)
+			data->textureSlots[i]->bind(i);
 		// draw call
-		RenderCommand::drawData(data.drawQuad, data.quad.indexCount);
-		data.stats.drawCalls++;
+		RenderCommand::drawData(data->drawQuad, data->quad.indexCount);
+		data->stats.drawCalls++;
 	}
-	if (data.circle.indexCount > 0) {
-		data.drawCircle->setVertexData(data.circle.vertexBuf.data(),
-									   static_cast<uint32_t>(data.circle.vertexBuf.size() * sizeof(utils::CircleVertex)));
+	if (data->circle.indexCount > 0) {
+		data->drawCircle->setVertexData(data->circle.vertexBuf.data(),
+									   static_cast<uint32_t>(data->circle.vertexBuf.size() * sizeof(utils::CircleVertex)));
 		// draw call
-		RenderCommand::drawData(data.drawCircle, data.circle.indexCount);
-		data.stats.drawCalls++;
+		RenderCommand::drawData(data->drawCircle, data->circle.indexCount);
+		data->stats.drawCalls++;
 	}
-	if (data.line.indexCount > 0) {
-		data.drawLine->setVertexData(data.line.vertexBuf.data(),
-									 static_cast<uint32_t>(data.line.vertexBuf.size() * sizeof(utils::LineVertex)));
+	if (data->line.indexCount > 0) {
+		data->drawLine->setVertexData(data->line.vertexBuf.data(),
+									 static_cast<uint32_t>(data->line.vertexBuf.size() * sizeof(utils::LineVertex)));
 		// draw call
-		RenderCommand::drawData(data.drawLine, data.line.indexCount);
-		data.stats.drawCalls++;
+		RenderCommand::drawData(data->drawLine, data->line.indexCount);
+		data->stats.drawCalls++;
 	}
 }
 
 void Renderer2D::startBatch() {
-	utils::resetDrawData(data.quad);
-	utils::resetDrawData(data.circle);
-	utils::resetDrawData(data.line);
+	utils::resetDrawData(data->quad);
+	utils::resetDrawData(data->circle);
+	utils::resetDrawData(data->line);
 
-	data.textureSlotIndex = 1;
+	data->textureSlotIndex = 1;
 }
 
 void Renderer2D::nextBatch() {
@@ -272,18 +288,18 @@ void Renderer2D::nextBatch() {
 }
 
 float Renderer2D::getLineWidth() {
-	return data.lineWidth;
+	return data->lineWidth;
 }
 
 void Renderer2D::setLineWidth(float width) {
-	data.lineWidth = width;
+	data->lineWidth = width;
 }
 
 void Renderer2D::drawLine(const LineData &lineData) {
-	data.line.vertexBuf.emplace_back(utils::LineVertex{lineData.point1, lineData.color, lineData.entityID});
-	data.line.vertexBuf.emplace_back(utils::LineVertex{lineData.point2, lineData.color, lineData.entityID});
-	data.line.indexCount += 2;
-	data.stats.drawCalls++;
+	data->line.vertexBuf.emplace_back(utils::LineVertex{lineData.point1, lineData.color, lineData.entityID});
+	data->line.vertexBuf.emplace_back(utils::LineVertex{lineData.point2, lineData.color, lineData.entityID});
+	data->line.indexCount += 2;
+	data->stats.drawCalls++;
 }
 
 void Renderer2D::drawRect(const RectData &lineData) {
@@ -321,11 +337,11 @@ void Renderer2D::drawCircle(const CircleData &circleData) {
 	OWL_PROFILE_FUNCTION()
 
 	// TODO: implement for circles
-	// if (data.circleIndexCount >= utils::maxIndices)
+	// if (data->circleIndexCount >= utils::maxIndices)
 	// 	nextBatch();
 
 	for (const auto &vtx: utils::quadVertexPositions) {
-		data.circle.vertexBuf.emplace_back(utils::CircleVertex{
+		data->circle.vertexBuf.emplace_back(utils::CircleVertex{
 				.worldPosition = circleData.transform.transform * vtx,
 				.localPosition = vtx * 2.0f,
 				.color = circleData.color,
@@ -334,33 +350,33 @@ void Renderer2D::drawCircle(const CircleData &circleData) {
 				.entityID = circleData.entityID});
 	}
 
-	data.circle.indexCount += 6;
+	data->circle.indexCount += 6;
 
-	data.stats.quadCount++;
+	data->stats.quadCount++;
 }
 
 void Renderer2D::drawQuad(const Quad2DData &quadData) {
 	OWL_PROFILE_FUNCTION()
-	if (data.quad.indexCount >= utils::maxIndices)
+	if (data->quad.indexCount >= utils::maxIndices)
 		nextBatch();
 	float textureIndex = 0.0f;
 	if (quadData.texture != nullptr) {
-		for (uint32_t i = 1; i < data.textureSlotIndex; i++) {
-			if (*data.textureSlots[i] == *quadData.texture) {
+		for (uint32_t i = 1; i < data->textureSlotIndex; i++) {
+			if (*data->textureSlots[i] == *quadData.texture) {
 				textureIndex = static_cast<float>(i);
 				break;
 			}
 		}
 		if (textureIndex == 0.0f) {
-			if (data.textureSlotIndex >= utils::maxTextureSlots)
+			if (data->textureSlotIndex >= utils::maxTextureSlots)
 				nextBatch();
-			textureIndex = static_cast<float>(data.textureSlotIndex);
-			data.textureSlots[data.textureSlotIndex] = std::static_pointer_cast<Texture2D>(quadData.texture);
-			data.textureSlotIndex++;
+			textureIndex = static_cast<float>(data->textureSlotIndex);
+			data->textureSlots[data->textureSlotIndex] = std::static_pointer_cast<Texture2D>(quadData.texture);
+			data->textureSlotIndex++;
 		}
 	}
 	for (size_t i = 0; i < utils::quadVertexCount; i++) {
-		data.quad.vertexBuf.emplace_back(utils::QuadVertex{
+		data->quad.vertexBuf.emplace_back(utils::QuadVertex{
 				.position = quadData.transform.transform * utils::quadVertexPositions[i],
 				.color = quadData.color,
 				.texCoord = utils::textureCoords[i],
@@ -368,9 +384,9 @@ void Renderer2D::drawQuad(const Quad2DData &quadData) {
 				.tilingFactor = quadData.tilingFactor,
 				.entityID = quadData.entityID});
 	}
-	data.quad.indexCount += 6;
+	data->quad.indexCount += 6;
 
-	data.stats.quadCount++;
+	data->stats.quadCount++;
 }
 
 void Renderer2D::drawSprite(const glm::mat4 &transform, scene::component::SpriteRenderer &src, int entityID) {
@@ -382,12 +398,12 @@ void Renderer2D::drawSprite(const glm::mat4 &transform, scene::component::Sprite
 }
 
 void Renderer2D::resetStats() {
-	data.stats.drawCalls = 0;
-	data.stats.quadCount = 0;
+	data->stats.drawCalls = 0;
+	data->stats.quadCount = 0;
 }
 
 Renderer2D::Statistics Renderer2D::getStats() {
-	return data.stats;
+	return data->stats;
 }
 
 }// namespace owl::renderer

@@ -55,6 +55,10 @@ shared<Shader> ShaderLibrary::get(const std::string &name) {
 bool ShaderLibrary::exists(const std::string &name) const {
 	return shaders.find(name) != shaders.end();
 }
-ShaderLibrary::~ShaderLibrary() = default;
+ShaderLibrary::~ShaderLibrary() {
+	for (auto &shader: shaders)
+		shader.second.reset();
+	shaders.clear();
+}
 
 }// namespace owl::renderer
