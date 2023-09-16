@@ -10,6 +10,7 @@
 
 #include "Application.h"
 
+#include "core/external/yaml.h"
 #include "debug/Tracker.h"
 #include "input/Input.h"
 #include "renderer/Renderer.h"
@@ -29,11 +30,19 @@ Application::Application(const AppParams &appParams) : initParams{appParams} {
 	// Assuming present of a folder 'res' containing the data
 	workingDirectory = absolute(std::filesystem::current_path());
 	OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
-	[[maybe_unused]] bool assetFound = searchAssets(appParams.assetsPattern);
+
+	// load config file if any
+	auto configPath = workingDirectory / "config.yml";
+	if (exists(configPath))
+		initParams.loadFromFile(configPath);
+	// save config
+	initParams.saveToFile(configPath);
+
+	[[maybe_unused]] bool assetFound = searchAssets(initParams.assetsPattern);
 	OWL_CORE_ASSERT(assetFound, "Unable to find assets")
 
 	// startup the renderer
-	renderer::RenderCommand::create(appParams.renderer);
+	renderer::RenderCommand::create(initParams.renderer);
 	// check renderer creation
 	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Created) {
 		OWL_CORE_ERROR("ERROR while Creating Renderer")
@@ -43,10 +52,10 @@ Application::Application(const AppParams &appParams) : initParams{appParams} {
 
 	// create main window
 	appWindow = input::Window::create({
-			.title = appParams.name,
-			.iconPath = appParams.icon.empty() ? "" : (assetDirectory / appParams.icon).string(),
-			.width = appParams.width,
-			.height = appParams.height,
+			.title = initParams.name,
+			.iconPath = initParams.icon.empty() ? "" : (assetDirectory / initParams.icon).string(),
+			.width = initParams.width,
+			.height = initParams.height,
 	});
 	input::Input::init();
 	OWL_CORE_INFO("Window Created.")
@@ -223,5 +232,36 @@ bool Application::searchAssets(const std::string &pattern) {
 	assetDirectory = workingDirectory;
 	return false;
 }
+
+void AppParams::loadFromFile(const std::filesystem::path &file) {
+	YAML::Node data = YAML::LoadFile(file.string());
+	auto appConfig = data["AppConfig"];
+	if (appConfig) {
+		if (appConfig["width"]) width = appConfig["width"].as<uint32_t>();
+		if (appConfig["height"]) height = appConfig["height"].as<uint32_t>();
+		if (appConfig["renderer"]) {
+			auto d_renderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(appConfig["renderer"].as<std::string>());
+			if (d_renderer.has_value())
+				renderer = d_renderer.value();
+		}
+	}
+}
+
+void AppParams::saveToFile(const std::filesystem::path &file) const {
+	YAML::Emitter out;
+	out << YAML::BeginMap;
+	out << YAML::Key << "AppConfig" << YAML::Value << YAML::BeginMap;
+
+	out << YAML::Key << "width" << YAML::Value << width;
+	out << YAML::Key << "height" << YAML::Value << height;
+	out << YAML::Key << "renderer" << YAML::Value << std::string(magic_enum::enum_name(renderer));
+
+	out << YAML::EndMap;
+	out << YAML::EndMap;
+	std::ofstream fileOut(file);
+	fileOut << out.c_str();
+	fileOut.close();
+}
+
 
 }// namespace owl::core

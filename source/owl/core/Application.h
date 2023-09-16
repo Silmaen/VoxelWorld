@@ -51,6 +51,16 @@ struct OWL_API AppParams {
 		OWL_CORE_ASSERT(index < argCount, "Bad command line index.")
 		return args[index];
 	}
+	/**
+	 * @brief Load from a yaml config file.
+	 * @param file The file to load.
+	 */
+	void loadFromFile(const std::filesystem::path &file);
+	/**
+	 * @brief Save To a yaml file.
+	 * @param file The file to save.
+	 */
+	void saveToFile(const std::filesystem::path &file) const;
 };
 /**
  * @brief Class Application

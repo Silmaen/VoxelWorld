@@ -29,9 +29,6 @@ shared<core::Application> core::createApplication(int argc, char **argv) {
 			.assetsPattern = OWL_ASSETS_LOCATION,
 #endif
 			.icon = "icons/logo_owl_icon.png",
-			.width = 1600,
-			.height = 960,
-			.renderer = renderer::RenderAPI::Type::OpenGL,
 			.argCount = argc,
 			.args = argv,
 	});
