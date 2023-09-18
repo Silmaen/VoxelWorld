@@ -105,6 +105,9 @@ void base2D::onEvent(event::Event &event) {
 }
 
 void base2D::onImGuiRender(const core::Timestep &ts) {
+	{
+		ImGui::ShowDemoWindow();
+	}
 	// ==================================================================
 	{
 		ImGui::Begin("Settings");
