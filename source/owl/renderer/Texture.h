@@ -12,6 +12,7 @@
 
 namespace owl::renderer {
 
+class TextureLibrary;
 /**
  * @brief Class Texture.
  */
@@ -77,7 +78,17 @@ public:
 	 */
 	virtual void setData(void *data, uint32_t size) = 0;
 
+	/**
+	 * @brief Get access to the texture's name.
+	 * @return The texture's name.
+	 */
+	const std::string &getName() const { return name; }
+
 private:
+	/// The texture's name.
+	std::string name;
+	/// Library is a friend to be able to modify name.
+	friend class TextureLibrary;
 };
 
 
@@ -96,6 +107,13 @@ public:
 	 * @return Resulting texture.
 	 */
 	static shared<Texture2D> create(const std::filesystem::path &file);
+
+	/**
+	 * @brief Create a new texture.
+	 * @param textureName Name of the files in the standard path.
+	 * @return Pointer to the texture.
+	 */
+	static shared<Texture2D> create(const std::string &textureName);
 	/**
 	 * @brief Creates the texture with the given size.
 	 * @param width The texture's width.

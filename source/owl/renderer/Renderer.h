@@ -10,6 +10,7 @@
 #include "CameraOrtho.h"
 #include "RenderCommand.h"
 #include "ShaderLibrary.h"
+#include "TextureLibrary.h"
 
 /**
  * @brief Namespace for the renderer elements.
@@ -87,6 +88,12 @@ public:
 	 */
 	static ShaderLibrary &getShaderLibrary() { return *shaderLibrary; }
 
+	/**
+	 * @brief Access to the texture Library.
+	 * @return The texture library.
+	 */
+	static TextureLibrary &getTextureLibrary() { return *textureLibrary; }
+
 private:
 	/// The state of the renderer.
 	static State internalState;
@@ -102,6 +109,8 @@ private:
 	static shared<SceneData> sceneData;
 	/// Actual library of shaders.
 	static shared<ShaderLibrary> shaderLibrary;
+	/// Actual library of textures.
+	static shared<TextureLibrary> textureLibrary;
 };
 
 }// namespace owl::renderer

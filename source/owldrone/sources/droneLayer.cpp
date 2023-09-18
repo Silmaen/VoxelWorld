@@ -7,7 +7,13 @@
  */
 
 #include "droneLayer.h"
+
 #include "event/KeyEvent.h"
+#include "panels/Gauges.h"
+#include "panels/Information.h"
+#include "panels/Settings.h"
+#include "panels/Viewport.h"
+
 #include <imgui.h>
 
 using namespace owl;
@@ -22,56 +28,49 @@ void droneLayer::onAttach() {
 	OWL_PROFILE_FUNCTION()
 	core::Application::get().enableDocking();
 
-	renderer::FramebufferSpecification specs;
-	specs.attachments = {
-			renderer::FramebufferTextureFormat::RGBA8,
-			renderer::FramebufferTextureFormat::RED_INTEGER,
-			renderer::FramebufferTextureFormat::Depth};
-	specs.width = 1280;
-	specs.height = 720;
-	framebuffer = renderer::Framebuffer::create(specs);
+	// icons
+	auto &textureLib = renderer::Renderer::getTextureLibrary();
+	textureLib.addFromStandardPath("icons/exit");
+	textureLib.addFromStandardPath("icons/gauges");
+	textureLib.addFromStandardPath("icons/settings");
+	textureLib.addFromStandardPath("icons/connected");
+	textureLib.addFromStandardPath("icons/connect");
 
-	auto iconPath = core::Application::get().getAssetDirectory() / "icons";
-	iconExit = renderer::Texture2D::create(iconPath / "exit.png");
-	iconGauges = renderer::Texture2D::create(iconPath / "gauges.png");
-	iconSettings = renderer::Texture2D::create(iconPath / "settings.png");
-	iconConnected = renderer::Texture2D::create(iconPath / "connected.png");
-	iconConnect = renderer::Texture2D::create(iconPath / "connect.png");
+	// remote controller
+	rc = owl::mk_shared<controller::RemoteController>();
+
+	// Panels
+	settings = owl::mk_shared<panels::Settings>();
+	gauges = owl::mk_shared<panels::Gauges>();
+	information = owl::mk_shared<panels::Information>();
+	viewport = owl::mk_shared<panels::Viewport>();
+
+	// attach remote controller
+	settings->setRemoteController(rc);
+	gauges->setRemoteController(rc);
+	information->setRemoteController(rc);
+	viewport->setRemoteController(rc);
 }
 
 void droneLayer::onDetach() {
 	OWL_PROFILE_FUNCTION()
 
-	iconExit.reset();
-	iconGauges.reset();
-	iconSettings.reset();
-	iconConnected.reset();
-	iconConnect.reset();
-	framebuffer.reset();
+	rc.reset();
+	settings.reset();
+	gauges.reset();
+	information.reset();
+	viewport.reset();
 }
 
-void droneLayer::onUpdate(const core::Timestep &) {
+void droneLayer::onUpdate(const core::Timestep &ts) {
 	OWL_PROFILE_FUNCTION()
-	auto spec = framebuffer->getSpecification();
-	auto width = static_cast<uint32_t>(viewportSize.x);
-	auto height = static_cast<uint32_t>(viewportSize.y);
-	if (width > 0 && height > 0 && (width != spec.width || height != spec.height)) {
-		framebuffer->resize(width, height);
-	}
-	// Render
-	framebuffer->bind();
-	renderer::RenderCommand::setClearColor({0.1f, 0.1f, 0.1f, 1});
-	renderer::RenderCommand::clear();
 
-	// Clear our entity ID attachment to -1
-	framebuffer->clearAttachment(1, -1);
+	renderer::Renderer2D::resetStats();
 
-	// Do the drawings!
-	// ===============================================================
-
-	// ===============================================================
-	// free the frame buffer.
-	framebuffer->unbind();
+	viewport->onUpdate(ts);
+	gauges->onUpdate(ts);
+	settings->onUpdate(ts);
+	information->onUpdate(ts);
 }
 
 void droneLayer::onEvent(event::Event &event) {
@@ -91,17 +90,19 @@ void droneLayer::onImGuiRender(const core::Timestep &ts) {
 	// ==================================================================
 	if (showStats)
 		renderStats(ts);
+	if (showFakeDrone)
+		renderFakeDrone(ts);
 	//=============================================================
 	renderMenu();
 	//============================================================
 	switch (mode) {
 		case DisplayMode::Settings:
-			renderSettings();
+			settings->onRender();
 			break;
 		case DisplayMode::Gauges:
-			renderViewport();
-			renderGauges();
-			renderMisc();
+			viewport->onRender();
+			gauges->onRender();
+			information->onRender();
 			break;
 	}
 	// ===== Toolbar: last, to be on top ========================
@@ -125,13 +126,49 @@ void droneLayer::renderStats(const core::Timestep &ts) {
 								  tracker.globals().deallocationCalls)
 							  .c_str());
 	ImGui::Separator();
-	ImGui::Separator();
 	auto stats = renderer::Renderer2D::getStats();
 	ImGui::Text("Renderer2D Stats:");
 	ImGui::Text("Draw Calls: %d", stats.drawCalls);
 	ImGui::Text("Quads: %d", stats.quadCount);
 	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
 	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
+	ImGui::Separator();
+	ImGui::Text("%s", fmt::format("UAV stats").c_str());
+	ImGui::Text("%s", fmt::format("Vel: {}", rc->getHorizontalVelocity()).c_str());
+	ImGui::Text("%s", fmt::format("VSI: {} ", rc->getVerticalVelocity()).c_str());
+	ImGui::End();
+}
+
+
+void droneLayer::renderFakeDrone(const owl::core::Timestep &) {
+	ImGui::Begin("FakeDrone");
+	float vel = rc->getHorizontalVelocity();
+	if (ImGui::SliderFloat("Velocity", &vel, -5, 100))
+		rc->setHorizontalVelocity(vel);
+
+	float verVel = rc->getVerticalVelocity();
+	if (ImGui::SliderFloat("VerticalVelocity", &verVel, -25, 25))
+		rc->setVerticalVelocity(verVel);
+
+	float alt = rc->getAltitude();
+	if (ImGui::SliderFloat("Altitude", &alt, -10, 250))
+		rc->setAltitude(alt);
+
+	glm::vec3 rot = rc->getRotations();
+	if (ImGui::SliderFloat3("Rotations", static_cast<float *>(&rot.x), -180, 180))
+		rc->setRotation(rot);
+
+	auto motors = rc->getMotorRates();
+	bool modif = false;
+	int motorId = 1;
+	for (auto &mot: motors) {
+		modif |= ImGui::SliderFloat(fmt::format("motor {}", motorId).c_str(), &mot, -10, 9000);
+		motorId++;
+	}
+	if (modif)
+		rc->setMotorRates(motors);
+
+
 	ImGui::End();
 }
 
@@ -143,6 +180,8 @@ void droneLayer::renderMenu() {
 		}
 		if (ImGui::BeginMenu("Debug")) {
 			ImGui::MenuItem("Show Stats", nullptr, &showStats, true);
+			ImGui::MenuItem("Show fake drone", nullptr, &showFakeDrone, true);
+
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help")) {
@@ -187,13 +226,15 @@ void droneLayer::renderToolbar() {
 	float posX = padding;
 	ImVec2 vsize = ImVec2(size, size);
 
+	auto &textureLib = renderer::Renderer::getTextureLibrary();
+
 	ImGui::SetCursorPos(ImVec2(posX, padding));
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(iconSettings->getRendererID()), vsize, ImVec2(0, 0), ImVec2(1, 1), 0)) {
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureLib.get("icons/settings")->getRendererID()), vsize, ImVec2(0, 0), ImVec2(1, 1), 0)) {
 		mode = DisplayMode::Settings;
 	}
 	posX += size + 2.f * padding;
 	ImGui::SetCursorPos(ImVec2(posX, padding));
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(iconGauges->getRendererID()), vsize, ImVec2(0, 1), ImVec2(1, 0), 0)) {
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureLib.get("icons/gauges")->getRendererID()), vsize, ImVec2(0, 1), ImVec2(1, 0), 0)) {
 		mode = DisplayMode::Gauges;
 	}
 	/*
@@ -202,76 +243,18 @@ void droneLayer::renderToolbar() {
 	if (ImGui::Button("btn3", vsize)) {
 	}
 */
-	shared<renderer::Texture2D> iconCC = isConnected() ? iconConnected : iconConnect;
+	shared<renderer::Texture> iconCC = isConnected() ? textureLib.get("icons/connected") : textureLib.get("icons/connect");
 	ImGui::SetCursorPos(ImVec2((ImGui::GetWindowContentRegionMax().x) - (2.f * size + 3.f * padding), padding));
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(iconCC->getRendererID()), ImVec2(size, size), ImVec2(0, 1), ImVec2(1, 0), 0)) {
 		toggleConnect();
 	}
 	ImGui::SetCursorPos(ImVec2((ImGui::GetWindowContentRegionMax().x) - (size + padding), padding));
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(iconExit->getRendererID()), vsize, ImVec2(0, 1), ImVec2(1, 0), 0)) {
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureLib.get("icons/exit")->getRendererID()), vsize, ImVec2(0, 1), ImVec2(1, 0), 0)) {
 		owl::core::Application::get().close();
 	}
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor(3);
 	ImGui::End();
-}
-
-void droneLayer::renderViewport() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-	ImGui::Begin("Drone Viewport");
-	auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-	auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-	auto viewportOffset = ImGui::GetWindowPos();
-	viewportBounds[0] = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
-	viewportBounds[1] = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
-
-	viewportFocused = ImGui::IsWindowFocused();
-	viewportHovered = ImGui::IsWindowHovered();
-	core::Application::get().getImGuiLayer()->blockEvents(!viewportFocused && !viewportHovered);
-
-	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
-	uint64_t textureID = framebuffer->getColorAttachmentRendererID();
-	if (textureID != 0)
-		ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
-
-	if (ImGui::BeginDragDropTarget()) {
-		if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-			const char *path = reinterpret_cast<const char *>(payload->Data);
-			std::filesystem::path scenePath = core::Application::get().getAssetDirectory() / path;
-			OWL_CORE_WARN("Could not load file {}: unsupported format.", scenePath.string())
-		}
-		ImGui::EndDragDropTarget();
-	}
-
-
-	ImGui::End();
-	ImGui::PopStyleVar();
-}
-
-
-void droneLayer::renderSettings() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-	ImGui::Begin("Drone Settings");
-
-	ImGui::End();
-	ImGui::PopStyleVar();
-}
-
-void droneLayer::renderGauges() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-	ImGui::Begin("Drone Gauges");
-
-	ImGui::End();
-	ImGui::PopStyleVar();
-}
-
-void droneLayer::renderMisc() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-	ImGui::Begin("Drone Misc");
-
-	ImGui::End();
-	ImGui::PopStyleVar();
 }
 
 

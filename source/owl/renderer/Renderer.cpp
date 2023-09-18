@@ -16,6 +16,7 @@ namespace owl::renderer {
 Renderer::State Renderer::internalState = Renderer::State::Created;
 shared<Renderer::SceneData> Renderer::sceneData = nullptr;
 shared<ShaderLibrary> Renderer::shaderLibrary = nullptr;
+shared<TextureLibrary> Renderer::textureLibrary = nullptr;
 
 Renderer::~Renderer() {
 	reset();
@@ -26,6 +27,7 @@ void Renderer::init() {
 
 	sceneData = mk_shared<SceneData>();
 	shaderLibrary = mk_shared<ShaderLibrary>();
+	textureLibrary = mk_shared<TextureLibrary>();
 
 	RenderCommand::init();
 	if (RenderCommand::getState() != RenderAPI::State::Ready) {
@@ -48,6 +50,7 @@ void Renderer::reset() {
 	internalState = Renderer::State::Created;
 	sceneData.reset();
 	shaderLibrary.reset();
+	textureLibrary.reset();
 }
 
 void Renderer::beginScene(const CameraOrtho &camera) {
