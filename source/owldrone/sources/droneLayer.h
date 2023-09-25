@@ -7,8 +7,11 @@
  */
 #pragma once
 
+#include "controller/RemoteController.h"
 #include "event/KeyEvent.h"
-#include "owl.h"
+#include "panels/BasePanel.h"
+#include <owl.h>
+
 
 namespace drone {
 
@@ -35,14 +38,9 @@ public:
 
 private:
 	void renderStats(const owl::core::Timestep &ts);
+	void renderFakeDrone(const owl::core::Timestep &ts);
 	void renderMenu();
 	void renderToolbar();
-
-	// to be placed in separate classes
-	void renderSettings();
-	void renderViewport();
-	void renderGauges();
-	void renderMisc();
 
 	bool onKeyPressed(owl::event::KeyPressedEvent &e);
 	bool onMouseButtonPressed(owl::event::MouseButtonPressedEvent &e);
@@ -50,14 +48,9 @@ private:
 	bool isConnected() const;
 	void toggleConnect();
 
-	bool viewportFocused = false;
-	bool viewportHovered = false;
-	glm::vec2 viewportSize = {0.0f, 0.0f};
-	glm::vec2 viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
-	owl::shared<owl::renderer::Framebuffer> framebuffer;
-
 	bool connected = false;
 	bool showStats = true;
+	bool showFakeDrone = true;
 
 	enum struct DisplayMode {
 		Settings,
@@ -65,12 +58,14 @@ private:
 	};
 	DisplayMode mode = DisplayMode::Gauges;
 
-	// Icon resources
-	owl::shared<owl::renderer::Texture2D> iconExit;
-	owl::shared<owl::renderer::Texture2D> iconGauges;
-	owl::shared<owl::renderer::Texture2D> iconSettings;
-	owl::shared<owl::renderer::Texture2D> iconConnected;
-	owl::shared<owl::renderer::Texture2D> iconConnect;
+	// remote controller
+	owl::shared<controller::RemoteController> rc;
+
+	// Panels
+	owl::shared<panels::BasePanel> gauges;
+	owl::shared<panels::BasePanel> information;
+	owl::shared<panels::BasePanel> settings;
+	owl::shared<panels::BasePanel> viewport;
 };
 
 }// namespace drone

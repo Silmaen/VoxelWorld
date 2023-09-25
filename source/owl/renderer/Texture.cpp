@@ -11,6 +11,7 @@
 #include "Texture.h"
 
 #include "Renderer.h"
+#include "core/Application.h"
 #include "null/Texture.h"
 #include "opengl/Texture.h"
 #include "opengl_legacy/Texture.h"
@@ -46,6 +47,11 @@ shared<Texture2D> Texture2D::create(const std::filesystem::path &file) {
 	OWL_CORE_ERROR("Unknown RendererAPI!")
 	return nullptr;
 }
+
+shared<Texture2D> Texture2D::create(const std::string &textureName) {
+	return create(core::Application::get().getAssetDirectory() / (textureName + ".png"));
+}
+
 shared<Texture2D> Texture2D::create(uint32_t width, uint32_t height) {
 	auto type = Renderer::getAPI();
 	switch (type) {
