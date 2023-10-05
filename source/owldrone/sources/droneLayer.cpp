@@ -8,6 +8,7 @@
 
 #include "droneLayer.h"
 
+#include "IO/DroneSettings.h"
 #include "event/KeyEvent.h"
 #include "panels/Gauges.h"
 #include "panels/Information.h"
@@ -27,6 +28,11 @@ droneLayer::droneLayer() : core::layer::Layer("droneLayer") {
 void droneLayer::onAttach() {
 	OWL_PROFILE_FUNCTION()
 	core::Application::get().enableDocking();
+
+	// read settings
+	auto file = core::Application::get().getWorkingDirectory() / "droneConfig.yml";
+	if (exists(file))
+		IO::DroneSettings::get().readFromFile(file);
 
 	// icons
 	auto &textureLib = renderer::Renderer::getTextureLibrary();
@@ -60,6 +66,9 @@ void droneLayer::onDetach() {
 	gauges.reset();
 	information.reset();
 	viewport.reset();
+
+	auto file = core::Application::get().getWorkingDirectory() / "droneConfig.yml";
+	IO::DroneSettings::get().saveToFile(file);
 }
 
 void droneLayer::onUpdate(const core::Timestep &ts) {
@@ -67,10 +76,16 @@ void droneLayer::onUpdate(const core::Timestep &ts) {
 
 	renderer::Renderer2D::resetStats();
 
-	viewport->onUpdate(ts);
-	gauges->onUpdate(ts);
-	settings->onUpdate(ts);
-	information->onUpdate(ts);
+	switch (mode) {
+		case DisplayMode::Settings:
+			settings->onUpdate(ts);
+			break;
+		case DisplayMode::Gauges:
+			viewport->onUpdate(ts);
+			gauges->onUpdate(ts);
+			information->onUpdate(ts);
+			break;
+	}
 }
 
 void droneLayer::onEvent(event::Event &event) {
@@ -90,8 +105,6 @@ void droneLayer::onImGuiRender(const core::Timestep &ts) {
 	// ==================================================================
 	if (showStats)
 		renderStats(ts);
-	if (showFakeDrone)
-		renderFakeDrone(ts);
 	//=============================================================
 	renderMenu();
 	//============================================================
@@ -100,6 +113,8 @@ void droneLayer::onImGuiRender(const core::Timestep &ts) {
 			settings->onRender();
 			break;
 		case DisplayMode::Gauges:
+			if (showFakeDrone)
+				renderFakeDrone(ts);
 			viewport->onRender();
 			gauges->onRender();
 			information->onRender();

@@ -10,6 +10,8 @@
 
 #include "core/Core.h"
 #include <chrono>
+#include <numeric>
+#include <queue>
 
 namespace owl::core {
 
@@ -28,7 +30,10 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	Timestep() : lastCall{clock::now()} { update(); }
+	Timestep() : lastCall{clock::now()} {
+		statFps.resize(maxIndex, 0.0);
+		update();
+	}
 
 	/**
 	 * @brief Time step update.
@@ -37,6 +42,10 @@ public:
 		time_point tp = clock::now();
 		delta = tp - lastCall;
 		lastCall = tp;
+		if (delta.count() > 0) {
+			statFps[index] = getFps();
+			index = (index + 1) % maxIndex;
+		}
 	}
 
 	/**
@@ -57,11 +66,25 @@ public:
 	 */
 	[[nodiscard]] float getFps() const { return 1e3f / getMilliseconds(); }
 
+	/**
+	 * @brief Get the mean number of update call in one second.
+	 * @return The Frame per second number.
+	 */
+	[[nodiscard]] float getStabilizedFps() const {
+		return statFps.empty() ? 0 : std::accumulate(statFps.begin(), statFps.end(), 0.f) / static_cast<float>(statFps.size());
+	}
+
 private:
 	/// Last update call point.
 	time_point lastCall{};
 	/// The delta with the previous update call.
 	duration delta{};
+	/// Stabilized fps counters.
+	std::vector<float> statFps;
+	/// index in the stats.
+	size_t index = 0;
+	/// Max va in stats.
+	static constexpr size_t maxIndex = 20;
 };
 
 }// namespace owl::core

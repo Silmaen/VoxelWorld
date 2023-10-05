@@ -7,6 +7,7 @@
  */
 #include "Viewport.h"
 
+#include "IO/CameraSystem.h"
 #include <imgui.h>
 
 using namespace owl;
@@ -22,19 +23,28 @@ Viewport::Viewport() {
 	specs.width = 1280;
 	specs.height = 720;
 	framebuffer = renderer::Framebuffer::create(specs);
+	// camera
+	camera = mk_shared<owl::renderer::CameraOrtho>(0, 1280, 0, 720);
 }
 
 Viewport::~Viewport() = default;
 
-void Viewport::onUpdate(const owl::core::Timestep &) {
+void Viewport::onUpdate(const owl::core::Timestep &ts) {
 	OWL_PROFILE_FUNCTION()
+
+	auto &cam = IO::CameraSystem::get();
+	cam.onUpdate(ts);
 
 	auto spec = framebuffer->getSpecification();
 	auto width = static_cast<uint32_t>(viewportSize.x);
 	auto height = static_cast<uint32_t>(viewportSize.y);
+	float aspectRatio = viewportSize.x / viewportSize.y;
+	float scaling = std::min(aspectRatio, 2.f);
+
 	if (width > 0 && height > 0 && (width != spec.width || height != spec.height)) {
 		framebuffer->resize(width, height);
 		viewportSize = glm::vec2(width, height);
+		camera->setProjection(-aspectRatio, aspectRatio, -1, 1);
 	}
 	// Render
 	framebuffer->bind();
@@ -46,8 +56,15 @@ void Viewport::onUpdate(const owl::core::Timestep &) {
 
 	// Do the drawings!
 	// ===============================================================
-
-
+	renderer::Renderer2D::beginScene(*camera);
+	float ratio = static_cast<float>(cam.getFrame()->getWidth()) / static_cast<float>(cam.getFrame()->getHeight());
+	owl::renderer::utils::PRS tran{
+			.position = {0, 0, 0},
+			.rotation = 180,
+			.size = {ratio * scaling, 1 * scaling}};
+	owl::renderer::Renderer2D::drawQuad({.transform = tran,
+										 .texture = cam.getFrame()});
+	renderer::Renderer2D::endScene();
 	// ===============================================================
 	// free the frame buffer.
 	framebuffer->unbind();
@@ -82,7 +99,6 @@ void Viewport::onRender() {
 		}
 		ImGui::EndDragDropTarget();
 	}
-
 
 	ImGui::End();
 	ImGui::PopStyleVar();

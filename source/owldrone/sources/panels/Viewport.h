@@ -67,6 +67,8 @@ private:
 
 	bool viewportFocused = false;
 	bool viewportHovered = false;
+	/// The camera
+	owl::shared<owl::renderer::CameraOrtho> camera;
 };
 
 }// namespace drone::panels
