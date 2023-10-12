@@ -52,7 +52,7 @@ shared<Texture2D> Texture2D::create(const std::string &textureName) {
 	return create(core::Application::get().getAssetDirectory() / (textureName + ".png"));
 }
 
-shared<Texture2D> Texture2D::create(uint32_t width, uint32_t height) {
+shared<Texture2D> Texture2D::create(uint32_t width, uint32_t height, bool withAlpha) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::Vulkan:
@@ -61,9 +61,9 @@ shared<Texture2D> Texture2D::create(uint32_t width, uint32_t height) {
 		case RenderAPI::Type::Null:
 			return mk_shared<null::Texture2D>(width, height);
 		case RenderAPI::Type::OpenGL:
-			return mk_shared<opengl::Texture2D>(width, height);
+			return mk_shared<opengl::Texture2D>(width, height, withAlpha);
 		case RenderAPI::Type::OpenglLegacy:
-			return mk_shared<opengl_legacy::Texture2D>(width, height);
+			return mk_shared<opengl_legacy::Texture2D>(width, height, withAlpha);
 	}
 
 	OWL_CORE_ERROR("Unknown RendererAPI!")

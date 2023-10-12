@@ -69,7 +69,7 @@ public:
 	 * @brief Get Path to texture file.
 	 * @return Path to texture file.
 	 */
-	virtual const std::filesystem::path &getPath() const = 0;
+	[[nodiscard]] virtual const std::filesystem::path &getPath() const = 0;
 
 	/**
 	 * @brief Define the texture data.
@@ -82,7 +82,7 @@ public:
 	 * @brief Get access to the texture's name.
 	 * @return The texture's name.
 	 */
-	const std::string &getName() const { return name; }
+	[[nodiscard]] const std::string &getName() const { return name; }
 
 private:
 	/// The texture's name.
@@ -118,9 +118,10 @@ public:
 	 * @brief Creates the texture with the given size.
 	 * @param width The texture's width.
 	 * @param height The texture's height.
+	 * @param withAlpha If the texture has alpha channel.
 	 * @return Resulting texture.
 	 */
-	static shared<Texture2D> create(uint32_t width, uint32_t height);
+	static shared<Texture2D> create(uint32_t width, uint32_t height, bool withAlpha = true);
 };
 #ifdef __clang__
 #pragma clang diagnostic pop

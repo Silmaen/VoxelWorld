@@ -14,6 +14,7 @@ dependencies = [
     {"name": "glm", "version": "*", "header": False},
     {"name": "imgui", "version": "*", "header": False},
     {"name": "imguizmo", "version": "*", "header": False},
+    {"name": "mavsdk", "version": "*", "header": False},
     {"name": "shaderc", "version": "*", "header": False},
     {"name": "spdlog", "version": "1.11.0", "header": False},
     {"name": "spirv-cross", "version": "*", "header": False},

@@ -30,8 +30,9 @@ public:
 	 * @brief Constructor by size.
 	 * @param width Texture's width.
 	 * @param height Texture's height.
+	 * @param withAlpha If the texture has alpha channel.
 	 */
-	Texture2D(uint32_t width, uint32_t height);
+	Texture2D(uint32_t width, uint32_t height, bool withAlpha = true);
 
 	/**
 	 * @brief Destructor.

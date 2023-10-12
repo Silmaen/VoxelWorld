@@ -14,7 +14,7 @@
 
 namespace owl::renderer::opengl_legacy {
 
-Texture2D::Texture2D(uint32_t width_, uint32_t height_) : width{width_}, height{height_} {
+Texture2D::Texture2D(uint32_t width_, uint32_t height_, bool withAlpha) : width{width_}, height{height_}, hasAlpha{withAlpha} {
 	OWL_PROFILE_FUNCTION()
 
 	// functions safe for openGL 2.1
