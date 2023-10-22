@@ -29,8 +29,12 @@ struct Device {
 	std::string port{};
 	/// The device's type.
 	DeviceType type{DeviceType::None};
+	/// Camera Id.
 	int32_t id = -1;
+	/// Device Name.
 	std::string name{};
+	/// Bus information.
+	std::string busInfo;
 };
 
 /**

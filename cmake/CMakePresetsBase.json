@@ -88,6 +88,11 @@
     {
       "name": "toolset-mingw",
       "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "vendor": {
         "jetbrains.com/clion": {
           "toolchain": "MinGW"
@@ -97,6 +102,11 @@
     {
       "name": "toolset-wsl",
       "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "vendor": {
         "jetbrains.com/clion": {
           "toolchain": "WSL"
@@ -115,6 +125,11 @@
     {
       "name": "toolset-msvc",
       "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "architecture": {
         "value": "x64",
         "strategy": "external"

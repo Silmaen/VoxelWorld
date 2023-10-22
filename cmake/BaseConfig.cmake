@@ -34,6 +34,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 else ()
     message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")
 endif ()
+set(CMAKE_INSTALL_RPATH $ORIGIN)
 
 #
 # ---=== Supported Compiler ===----
@@ -90,7 +91,7 @@ else ()
 endif ()
 
 add_custom_target(${CMAKE_PROJECT_NAME}_SuperBase)
-if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+if (OWL_PLATFORM_WINDOWS)
     if (MINGW)
         cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH COMPILER_PATH)
         message(STATUS "MinGW environment detected: add dependence to dlls from ${COMPILER_PATH}")

@@ -50,7 +50,7 @@ public:
 	 * @param recompute Recompute the number of camera.
 	 * @return Get the number of camera.
 	 */
-	[[nodiscard]] int32_t getNbCamera(bool recompute = false);
+	[[nodiscard]] static size_t getNbCamera(bool recompute = false);
 
 	/**
 	 * @brief Set the camera by its ID.
@@ -65,11 +65,6 @@ public:
 	 * @return The current camera ID.
 	 */
 	[[nodiscard]] int32_t getCurrentCamera() const;
-
-	/**
-	 * @brief Research for CameraDevices.
-	 */
-	void updateCamList();
 
 private:
 	/**
@@ -86,8 +81,6 @@ private:
 	int32_t frameSkip = 0;
 	int32_t frameCheck = 50;
 	int32_t frameCount = 0;
-
-	int32_t nbCam = -1;
 
 	owl::shared<owl::renderer::Texture> frame;
 };

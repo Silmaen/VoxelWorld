@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #include "CameraSystem.h"
+#include "DeviceManager.h"
 #include "DroneSettings.h"
 #include <opencv2/opencv.hpp>
 
@@ -15,7 +16,6 @@ static cv::VideoCapture cama;
 
 CameraSystem::CameraSystem() {
 	resize(1, 1);
-	updateCamList();
 }
 
 CameraSystem::~CameraSystem() = default;
@@ -26,12 +26,18 @@ void CameraSystem::onUpdate(const owl::core::Timestep &ts) {
 
 	// read image from camera
 	if (frameCount % frameCheck == 0) {
+		size_t nbCam = getNbCamera();
+		if (nbCam == 0) {
+			settings.useCamera = false;
+		} else {
+			if (settings.cameraId > static_cast<int32_t>(nbCam)) {
+				settings.cameraId = 0;
+			}
+		}
 		if (!cama.isOpened()) {
 			// open the right one
 			if (settings.useCamera) {
 				cama.open(settings.cameraId);
-				if (!cama.isOpened())// something is wrong, recheck camera list
-					updateCamList();
 			}
 		}
 		if (cama.isOpened()) {
@@ -72,33 +78,10 @@ void CameraSystem::resize(uint32_t nw, uint32_t nh) {
 	frame = owl::renderer::Texture2D::create(width, height, false);
 }
 
-void CameraSystem::updateCamList() {
-	auto &settings = IO::DroneSettings::get();
-	{
-		// actualize list
-		constexpr uint8_t maxCamList = 10;
-		cama.release();
-		nbCam = 0;
-		for (uint8_t id = 0; id < maxCamList; ++id) {
-			cv::VideoCapture cam;
-			cam.open(id);
-			if (cam.isOpened()) {
-				++nbCam;
-			} else {
-				break;
-			}
-			cam.release();
-		}
-	}
-	OWL_TRACE("Camera devices actualized. {} found.", nbCam)
-	if (settings.cameraId > nbCam)
-		settings.cameraId = 0;
-}
-
 void CameraSystem::setCamera(int32_t id) {
 	auto &settings = IO::DroneSettings::get();
 	int32_t last = settings.cameraId;
-	if (id > nbCam || id < 0)
+	if (id > static_cast<int32_t>(getNbCamera()) || id < 0)
 		settings.cameraId = 0;
 	else
 		settings.cameraId = id;
@@ -109,10 +92,10 @@ void CameraSystem::setCamera(int32_t id) {
 		cama.open(settings.cameraId);
 	}
 }
-int32_t CameraSystem::getNbCamera(bool recompute) {
+size_t CameraSystem::getNbCamera(bool recompute) {
 	if (recompute)
-		updateCamList();
-	return nbCam;
+		IO::DeviceManager::get().updateList();
+	return IO::DeviceManager::get().getDeviceCount(Device::DeviceType::Camera);
 }
 int32_t CameraSystem::getCurrentCamera() const {
 	return IO::DroneSettings::get().cameraId;

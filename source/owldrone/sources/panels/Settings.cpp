@@ -7,6 +7,7 @@
  */
 #include "Settings.h"
 #include "IO/CameraSystem.h"
+#include "IO/DeviceManager.h"
 #include "IO/DroneSettings.h"
 
 #include <imgui.h>
@@ -24,35 +25,36 @@ void Settings::onRender() {
 	auto &settings = IO::DroneSettings::get();
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
 	ImGui::Begin("Drone Settings");
+	auto &deviceManager = IO::DeviceManager::get();
+	auto &devices = deviceManager.getAllDevices();
 	if (ImGui::CollapsingHeader("Camera Settings")) {
 		bool val = settings.useCamera;
+		size_t nbCam = drone::IO::CameraSystem::getNbCamera();
 		if (ImGui::Checkbox("Use the camera", &val)) {
-			settings.useCamera = val;
+			settings.useCamera = val && (nbCam > 0);
 		}
-		if (val) {
+		if (val && (nbCam > 0)) {
 			auto &camSys = IO::CameraSystem::get();
-			int32_t nbCam = camSys.getNbCamera();
-			if (nbCam > 0) {
-				int32_t nCam = camSys.getCurrentCamera();
-				int32_t sCam = nCam;
-				if (ImGui::BeginCombo("Camera", fmt::format("Camera {}", nCam).c_str())) {
-					for (int32_t iCam = 0; iCam < nbCam; ++iCam) {
-						const bool is_selected = (iCam == nCam);
-						if (ImGui::Selectable(fmt::format("Camera {}", iCam).c_str(), is_selected))
-							sCam = iCam;
-						// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-					if (sCam != nCam) {
-						camSys.setCamera(sCam);
-					}
+			int32_t nCam = camSys.getCurrentCamera();
+			int32_t sCam = nCam;
+			if (ImGui::BeginCombo("Camera", fmt::format("Camera {}", nCam).c_str())) {
+				for (const auto &device: devices) {
+					if (device.type != IO::Device::DeviceType::Camera) continue;
+					const bool isSelected = (device.id == nCam);
+					if (ImGui::Selectable(fmt::format("Camera {}: {}", device.id, device.name).c_str(), isSelected))
+						sCam = device.id;
+					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
 				}
-				ImGui::SameLine();
-				if (ImGui::Button("Refresh List")) {
-					camSys.updateCamList();
+				ImGui::EndCombo();
+				if (sCam != nCam) {
+					camSys.setCamera(sCam);
 				}
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Refresh List")) {
+				deviceManager.updateList();
 			}
 		}
 	}
