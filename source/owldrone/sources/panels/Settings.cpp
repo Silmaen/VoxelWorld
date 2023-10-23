@@ -26,10 +26,10 @@ void Settings::onRender() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
 	ImGui::Begin("Drone Settings");
 	auto &deviceManager = IO::DeviceManager::get();
-	auto &devices = deviceManager.getAllDevices();
 	if (ImGui::CollapsingHeader("Camera Settings")) {
 		bool val = settings.useCamera;
-		size_t nbCam = drone::IO::CameraSystem::getNbCamera();
+		const auto &cameras = drone::IO::CameraSystem::get().getListOfCamera();
+		size_t nbCam = cameras.size();
 		if (ImGui::Checkbox("Use the camera", &val)) {
 			settings.useCamera = val && (nbCam > 0);
 		}
@@ -38,11 +38,10 @@ void Settings::onRender() {
 			int32_t nCam = camSys.getCurrentCamera();
 			int32_t sCam = nCam;
 			if (ImGui::BeginCombo("Camera", fmt::format("Camera {}", nCam).c_str())) {
-				for (const auto &device: devices) {
-					if (device.type != IO::Device::DeviceType::Camera) continue;
-					const bool isSelected = (device.id == nCam);
-					if (ImGui::Selectable(fmt::format("Camera {}: {}", device.id, device.name).c_str(), isSelected))
-						sCam = device.id;
+				for (const auto &camera: cameras) {
+					const bool isSelected = (camera.id == nCam);
+					if (ImGui::Selectable(fmt::format("Camera {}: {}", camera.id, camera.name).c_str(), isSelected))
+						sCam = camera.id;
 					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
 					if (isSelected)
 						ImGui::SetItemDefaultFocus();

@@ -20,7 +20,6 @@ struct Device {
 	 */
 	enum struct DeviceType {
 		None,            ///< No type.
-		Camera,          ///< Camera.
 		FlightController,///< Flight Controller.
 		Radio            ///< Radio device.
 	};

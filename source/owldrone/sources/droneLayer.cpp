@@ -8,6 +8,7 @@
 
 #include "droneLayer.h"
 
+#include "IO/CameraSystem.h"
 #include "IO/DeviceManager.h"
 #include "IO/DroneSettings.h"
 #include "event/KeyEvent.h"
@@ -37,6 +38,7 @@ void droneLayer::onAttach() {
 
 	// device manager
 	IO::DeviceManager::get().updateList();
+	IO::CameraSystem::get().actualiseList();
 
 	// icons
 	auto &textureLib = renderer::Renderer::getTextureLibrary();

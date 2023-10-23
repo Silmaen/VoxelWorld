@@ -50,7 +50,7 @@ public:
 	 * @param recompute Recompute the number of camera.
 	 * @return Get the number of camera.
 	 */
-	[[nodiscard]] static size_t getNbCamera(bool recompute = false);
+	[[nodiscard]] size_t getNbCamera(bool recompute = false);
 
 	/**
 	 * @brief Set the camera by its ID.
@@ -66,12 +66,38 @@ public:
 	 */
 	[[nodiscard]] int32_t getCurrentCamera() const;
 
+	/**
+	 * @brief Actualize the list of available cameras.
+	 */
+	void actualiseList();
+
+	/**
+	 * @brief object for camera list.
+	 */
+	struct CameraInfo {
+		/// The camera port.
+		std::string port{};
+		/// Camera Id.
+		int32_t id = -1;
+		/// Device Name.
+		std::string name{};
+		/// Bus information.
+		std::string busInfo{};
+	};
+
+	using CameraList = std::vector<CameraInfo>;
+
+	/**
+	 * @brief Gat the list of camera.
+	 * @return Lit of Camera.
+	 */
+	[[nodiscard]] const CameraList &getListOfCamera() const { return cameraList; }
+
 private:
 	/**
 	 * @brief Constructor.
 	 */
 	CameraSystem();
-
 
 	void resize(uint32_t nw, uint32_t nh);
 
@@ -83,6 +109,7 @@ private:
 	int32_t frameCount = 0;
 
 	owl::shared<owl::renderer::Texture> frame;
+	CameraList cameraList;
 };
 
 }// namespace drone::IO
