@@ -35,11 +35,11 @@ void Settings::onRender() {
 		}
 		if (val && (nbCam > 0)) {
 			auto &camSys = IO::CameraSystem::get();
-			int32_t nCam = camSys.getCurrentCamera();
-			int32_t sCam = nCam;
-			if (ImGui::BeginCombo("Camera", fmt::format("Camera {}", nCam).c_str())) {
+			auto Cam = camSys.getCurrentCamera();
+			int32_t sCam = Cam.id;
+			if (ImGui::BeginCombo("Camera", fmt::format("Camera {}: {}", Cam.id, Cam.name).c_str())) {
 				for (const auto &camera: cameras) {
-					const bool isSelected = (camera.id == nCam);
+					const bool isSelected = (camera.id == Cam.id);
 					if (ImGui::Selectable(fmt::format("Camera {}: {}", camera.id, camera.name).c_str(), isSelected))
 						sCam = camera.id;
 					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -47,7 +47,7 @@ void Settings::onRender() {
 						ImGui::SetItemDefaultFocus();
 				}
 				ImGui::EndCombo();
-				if (sCam != nCam) {
+				if (sCam != Cam.id) {
 					camSys.setCamera(sCam);
 				}
 			}

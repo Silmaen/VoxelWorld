@@ -35,6 +35,22 @@ public:
 	}
 
 	/**
+	 * @brief object for camera list.
+	 */
+	struct CameraInfo {
+		/// The camera port.
+		std::string port{};
+		/// Camera Id.
+		int32_t id = -1;
+		/// Device Name.
+		std::string name{};
+		/// Bus information.
+		std::string busInfo{};
+	};
+
+	using CameraList = std::vector<CameraInfo>;
+
+	/**
 	 * @brief Frame update of the camera
 	 */
 	void onUpdate(const owl::core::Timestep &ts);
@@ -64,28 +80,13 @@ public:
 	 * @brief Get the current Camera Id.
 	 * @return The current camera ID.
 	 */
-	[[nodiscard]] int32_t getCurrentCamera() const;
+	[[nodiscard]] CameraInfo getCurrentCamera() const;
 
 	/**
 	 * @brief Actualize the list of available cameras.
 	 */
 	void actualiseList();
 
-	/**
-	 * @brief object for camera list.
-	 */
-	struct CameraInfo {
-		/// The camera port.
-		std::string port{};
-		/// Camera Id.
-		int32_t id = -1;
-		/// Device Name.
-		std::string name{};
-		/// Bus information.
-		std::string busInfo{};
-	};
-
-	using CameraList = std::vector<CameraInfo>;
 
 	/**
 	 * @brief Gat the list of camera.

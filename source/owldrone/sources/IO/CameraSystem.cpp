@@ -14,6 +14,24 @@
 #include <windows.h>
 
 namespace drone::IO {
+
+/**
+ * @brief Convert a variant to a string.
+ * @param var The variant to convert.
+ * @return A stgring of the variant.
+ */
+static std::string variantToString(const VARIANT &var) {
+	char *p = var.pcVal;
+	std::string name;
+	size_t ii = 0;
+	while (*p != '\0' && ii < 250) {
+		name += *p;
+		p += 2;
+		++ii;
+	}
+	return name;
+}
+
 /**
  * @brief List the Camera Devices.
  * @param listToUpdate The device's list to update.
@@ -23,38 +41,66 @@ namespace drone::IO {
 static void enumerateCameraDevices(CameraSystem::CameraList &listToUpdate) {
 	int32_t id = 0;
 	HRESULT hr;
+	hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if (FAILED(hr))
+		return;
 	ICreateDevEnum *pSysDevEnum = nullptr;
-	hr = CoCreateInstance(CLSID_SystemDeviceEnum, nullptr, CLSCTX_INPROC_SERVER,
-						  IID_ICreateDevEnum, reinterpret_cast<void **>(&pSysDevEnum));
+	hr = CoCreateInstance(CLSID_SystemDeviceEnum, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pSysDevEnum));
 	if (FAILED(hr))
 		return;
 	// Obtain a class enumerator for the video compressor category.
 	IEnumMoniker *pEnumCat = nullptr;
-	hr = pSysDevEnum->CreateClassEnumerator(CLSID_VideoCompressorCategory, &pEnumCat, 0);
-	if (hr == S_OK) {
-		// Enumerate the monikers.
-		IMoniker *pMoniker = nullptr;
-		ULONG cFetched;
-		while (pEnumCat->Next(1, &pMoniker, &cFetched) == S_OK) {
-			IPropertyBag *pPropBag;
-			hr = pMoniker->BindToStorage(nullptr, nullptr, IID_IPropertyBag,
-										 reinterpret_cast<void **>(&pPropBag));
-			if (SUCCEEDED(hr)) {
-				VARIANT varName;
-				VariantInit(&varName);
-				hr = pPropBag->Read(L"FriendlyName", &varName, nullptr);
-				if (SUCCEEDED(hr)) {
-					listToUpdate.push_back({.id = id, .name = varName.pcVal});
-					++id;
-				}
-				VariantClear(&varName);
-				pPropBag->Release();
-			}
-			pMoniker->Release();
-		}
-		pEnumCat->Release();
+	hr = pSysDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnumCat, 0);
+	if (hr != S_OK) {
+		pSysDevEnum->Release();
+		CoUninitialize();
+		return;
 	}
+	// Enumerate the monikers.
+	IMoniker *pMoniker = nullptr;
+	ULONG cFetched;
+	while (pEnumCat->Next(1, &pMoniker, &cFetched) == S_OK) {
+		IPropertyBag *pPropBag;
+		hr = pMoniker->BindToStorage(nullptr, nullptr, IID_PPV_ARGS(&pPropBag));
+		if (FAILED(hr)) {
+			pMoniker->Release();
+			continue;
+		}
+		VARIANT varName;
+		VariantInit(&varName);
+		// get description of friendly name
+		hr = pPropBag->Read(L"Description", &varName, nullptr);
+		if (FAILED(hr))
+			hr = pPropBag->Read(L"FriendlyName", &varName, nullptr);
+		if (FAILED(hr)) {
+			OWL_WARN("Unable to get information from device.")
+			VariantClear(&varName);
+			pPropBag->Release();
+			pMoniker->Release();
+			continue;
+		}
+		std::string name = variantToString(varName);
+		VariantClear(&varName);
+		pPropBag->Write(L"FriendlyName", &varName);
+		// get device path
+		hr = pPropBag->Read(L"DevicePath", &varName, nullptr);
+		if (FAILED(hr)) {
+			OWL_WARN("Unable to get DevicePath from device {}.", name.c_str())
+			VariantClear(&varName);
+			pPropBag->Release();
+			pMoniker->Release();
+			continue;
+		}
+		listToUpdate.push_back({.id = id, .name = std::move(name), .busInfo = variantToString(varName)});
+		OWL_TRACE("{} Found: ({}) [{}] ", listToUpdate.back().id, listToUpdate.back().name.c_str(), listToUpdate.back().busInfo.c_str())
+		++id;
+		VariantClear(&varName);
+		pPropBag->Release();
+		pMoniker->Release();
+	}
+	pEnumCat->Release();
 	pSysDevEnum->Release();
+	CoUninitialize();
 }
 
 }// namespace drone::IO
@@ -91,27 +137,24 @@ static void enumerateCameraDevices(CameraSystem::CameraList &listToUpdate) {
 		}
 		std::string busInfo;
 		std::string card;
-		std::string driver;
 		if (vcap == 0) {
 			OWL_TRACE("First Method {} {} {}.", capability.capabilities, capability.reserved[0], capability.version)
 			card = reinterpret_cast<const char *>(capability.card);
 			busInfo = reinterpret_cast<const char *>(capability.bus_info);
-			driver = reinterpret_cast<const char *>(capability.driver);
 		} else {
 			OWL_TRACE("Second Method.")
 			// second method
 			struct media_device_info mdi {};
 			int mdiRes = ioctl(fd, MEDIA_IOC_DEVICE_INFO, &mdi);
 			if (!mdiRes) {
-				driver = mdi.driver;
 				if (mdi.bus_info[0])
 					busInfo = mdi.bus_info;
 				else
-					busInfo = fmt::format("platform: {}", driver);
+					busInfo = fmt::format("platform: {}", mdi.driver);
 				if (mdi.model[0])
 					card = mdi.model;
 				else
-					card = driver;
+					card = mdi.driver;
 			}
 		}
 		close(fd);
@@ -120,7 +163,7 @@ static void enumerateCameraDevices(CameraSystem::CameraList &listToUpdate) {
 		if (std::find_if(listToUpdate.begin(), listToUpdate.end(),
 						 [&busInfo](const Device &dev) { return busInfo == dev.busInfo; }) != listToUpdate.end())
 			continue;
-		OWL_TRACE("{} Found: ({}) [{}] '{}'", iCam, card.c_str(), busInfo.c_str(), driver.c_str())
+		OWL_TRACE("{} Found: ({}) [{}] ", iCam, card.c_str(), busInfo.c_str())
 		listToUpdate.push_back(Device{
 				.port = std::move(test),
 				.id = iCam,
@@ -223,8 +266,12 @@ size_t CameraSystem::getNbCamera(bool recompute) {
 		actualiseList();
 	return cameraList.size();
 }
-int32_t CameraSystem::getCurrentCamera() const {
-	return IO::DroneSettings::get().cameraId;
+
+CameraSystem::CameraInfo CameraSystem::getCurrentCamera() const {
+	auto res = std::find_if(cameraList.begin(), cameraList.end(), [](const CameraInfo &cam) {   return cam.id == IO::DroneSettings::get().cameraId; });
+	if (res == cameraList.end())
+		return {};
+	return *res;
 }
 void CameraSystem::actualiseList() {
 	cameraList.clear();
