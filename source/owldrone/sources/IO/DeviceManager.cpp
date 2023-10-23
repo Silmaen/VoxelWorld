@@ -53,9 +53,9 @@ static void enumerateCameraDevices(DeviceManager::DeviceList &listToUpdate) {
 				VariantClear(&varName);
 
 				// To create an instance of the filter, do the following:
-				IBaseFilter *pFilter;
-				hr = pMoniker->BindToObject(NULL, NULL, IID_IBaseFilter,
-											(void **) &pFilter);
+				//IBaseFilter *pFilter;
+				//hr = pMoniker->BindToObject(NULL, NULL, IID_IBaseFilter,
+				//							(void **) &pFilter);
 				// Now add the filter to the graph.
 				//Remember to release pFilter later.
 				pPropBag->Release();

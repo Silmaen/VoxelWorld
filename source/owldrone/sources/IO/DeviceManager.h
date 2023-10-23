@@ -34,7 +34,7 @@ struct Device {
 	/// Device Name.
 	std::string name{};
 	/// Bus information.
-	std::string busInfo;
+	std::string busInfo{};
 };
 
 /**

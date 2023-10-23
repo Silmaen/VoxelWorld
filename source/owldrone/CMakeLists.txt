@@ -29,6 +29,11 @@ target_link_libraries(${CMAKE_PROJECT_NAME}drone PUBLIC opencv_videoio)
 find_package(yaml-cpp REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}drone PRIVATE yaml-cpp)
 
+if (OWL_PLATFORM_WINDOWS)
+    # for web cam identification
+    target_link_libraries(${CMAKE_PROJECT_NAME}drone PRIVATE strmiids)
+endif ()
+
 # ----==== third party ====----
 
 if (${PRJPREFIX}_BUILD_SHARED AND WIN32)
