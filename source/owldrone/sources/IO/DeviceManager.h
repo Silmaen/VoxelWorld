@@ -11,29 +11,31 @@
 
 namespace drone::IO {
 
+static const std::string s_deviceFriendlyName{"unknown"};
 /**
  * @brief Description of a device
  */
 struct Device {
-	/**
-	 * @brief The different types of devices.
-	 */
-	enum struct DeviceType {
-		None,            ///< No type.
-		FlightController,///< Flight Controller.
-		Radio            ///< Radio device.
-	};
-
 	/// The port of the device.
 	std::string port{};
-	/// The device's type.
-	DeviceType type{DeviceType::None};
-	/// Camera Id.
-	int32_t id = -1;
-	/// Device Name.
+	/// Devine Name
 	std::string name{};
-	/// Bus information.
-	std::string busInfo{};
+	/**
+	 * @brief Access to a friendly name for the device
+	 * @return Friendly name of the device.
+	 */
+	[[nodiscard]] const std::string &getFriendlyName() const {
+		if (name.empty())
+			return s_deviceFriendlyName;
+		return name;
+	}
+	/**
+	 * @brief Hashing function.
+	 * @return Device's hash.
+	 */
+	[[nodiscard]] size_t hash() const {
+		return std::hash<std::string>{}(port) ^ (std::hash<std::string>{}(name) << 1);
+	}
 };
 
 /**
@@ -62,7 +64,6 @@ public:
 		return instance;
 	}
 
-
 	/**
 	 * @brief Update the list of devices.
 	 */
@@ -76,15 +77,41 @@ public:
 
 	/**
 	 * @brief Get the number of device by type.
-	 * @param type Type of the devices, None means 'all'.
 	 * @return The number of devices.
 	 */
-	[[nodiscard]] size_t getDeviceCount(const Device::DeviceType &type) const;
+	[[nodiscard]] size_t getDeviceCount() const { return devices.size(); }
+
+	/**
+	 * @brief Get device by its name.
+	 * @param name Name of device.
+	 * @return Pointer to the device of nullptr if not exists.
+	 */
+	[[nodiscard]] owl::shared<Device> getDeviceByName(const std::string &name) const;
+
+	/**
+	* @brief Get device by its port.
+	* @param port Port of device.
+	* @return Pointer to the device of nullptr if not exists.
+	*/
+	[[nodiscard]] owl::shared<Device> getDeviceByPort(const std::string &port) const;
+
+	/**
+	 * @brief Define the new current device.
+	 * @param port The port of the new current device.
+	 */
+	void setCurrentDevice(const std::string &port);
+
+	/**
+	 * @brief Get a pointer to the current Device.
+	 * @return Pointer to the current device.
+	 */
+	[[nodiscard]] const owl::shared<Device> &getCurrentDevice() const { return currentDevice; }
 
 private:
 	/// List of devices.
 	DeviceList devices;
-
+	/// Pointer to the current device.
+	owl::shared<Device> currentDevice = nullptr;
 	/**
 	 * @brief Constructor.
 	 */

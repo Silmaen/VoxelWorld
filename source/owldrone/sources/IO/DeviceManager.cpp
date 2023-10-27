@@ -9,7 +9,6 @@
 #include "DeviceManager.h"
 
 #ifdef OWL_PLATFORM_WINDOWS
-#include <dshow.h>
 #include <windows.h>
 
 namespace drone::IO {
@@ -30,7 +29,7 @@ static void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
 		test = QueryDosDevice(reinterpret_cast<LPCSTR>(ComName.c_str()), static_cast<LPSTR>(lpTargetPath), 5000);
 		// Test the return value and error if any
 		if (test != 0)//QueryDosDevice returns zero if it didn't find an object
-			listToUpdate.push_back({.port = "COM" + std::to_string(i), .type = Device::DeviceType::FlightController});
+			listToUpdate.push_back({.port = "COM" + std::to_string(i)});
 		if (::GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
 		}
 	}
@@ -66,15 +65,24 @@ void DeviceManager::updateList() {
 	devices.clear();
 	// list COM Ports
 	enumerateSerialDevices(devices);
+	setCurrentDevice(currentDevice->port);
 }
 
-size_t DeviceManager::getDeviceCount(const Device::DeviceType &type) const {
-	if (type == Device::DeviceType::None)
-		return devices.size();
-	return static_cast<size_t>(std::count_if(devices.begin(), devices.end(),
-											 [&type](const Device &T) {
-												 return T.type == type;
-											 }));
+owl::shared<Device> DeviceManager::getDeviceByName(const std::string &name) const {
+	auto it = std::find_if(devices.begin(), devices.end(), [&name](const Device &T) { return T.name == name; });
+	if (it == devices.end()) return nullptr;
+	return owl::mk_shared<Device>(*it);
 }
+
+owl::shared<Device> DeviceManager::getDeviceByPort(const std::string &port) const {
+	auto it = std::find_if(devices.begin(), devices.end(), [&port](const Device &T) { return T.port == port; });
+	if (it == devices.end()) return nullptr;
+	return owl::mk_shared<Device>(*it);
+}
+
+void DeviceManager::setCurrentDevice(const std::string &port) {
+	currentDevice = getDeviceByPort(port);
+}
+
 
 }// namespace drone::IO
