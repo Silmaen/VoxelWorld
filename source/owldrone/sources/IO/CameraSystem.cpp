@@ -161,14 +161,13 @@ static void enumerateCameraDevices(CameraSystem::CameraList &listToUpdate) {
 		if (busInfo.empty())
 			continue;
 		if (std::find_if(listToUpdate.begin(), listToUpdate.end(),
-						 [&busInfo](const Device &dev) { return busInfo == dev.busInfo; }) != listToUpdate.end())
+						 [&busInfo](const CameraSystem::CameraInfo &dev) { return busInfo == dev.busInfo; }) != listToUpdate.end())
 			continue;
 		OWL_TRACE("{} Found: ({}) [{}] ", iCam, card.c_str(), busInfo.c_str())
-		listToUpdate.push_back(Device{
-				.port = std::move(test),
-				.id = iCam,
-				.name = std::move(card),
-				.busInfo = std::move(busInfo)});
+		listToUpdate.push_back({.port = std::move(test),
+								.id = iCam,
+								.name = std::move(card),
+								.busInfo = std::move(busInfo)});
 	}
 }
 
@@ -268,7 +267,7 @@ size_t CameraSystem::getNbCamera(bool recompute) {
 }
 
 CameraSystem::CameraInfo CameraSystem::getCurrentCamera() const {
-	auto res = std::find_if(cameraList.begin(), cameraList.end(), [](const CameraInfo &cam) {   return cam.id == IO::DroneSettings::get().cameraId; });
+	auto res = std::find_if(cameraList.begin(), cameraList.end(), [](const CameraInfo &cam) { return cam.id == IO::DroneSettings::get().cameraId; });
 	if (res == cameraList.end())
 		return {};
 	return *res;

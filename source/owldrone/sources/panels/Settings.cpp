@@ -59,29 +59,41 @@ void Settings::onRender() {
 	}
 	static bool comOpen = true;
 	if (ImGui::CollapsingHeader("Serial Port Setting", comOpen)) {
+		bool val = settings.useSerialPort;
 		auto &deviceManager = IO::DeviceManager::get();
 		const auto &devices = deviceManager.getAllDevices();
-		auto device = deviceManager.getCurrentDevice();
-		if (!device)
-			device = owl::mk_shared<IO::Device>();
-		std::string c_port = device->port;
-		if (ImGui::BeginCombo("Serial port", fmt::format("Serial {} ({})", device->getFriendlyName(), device->port).c_str())) {
-			for (const auto &dev: devices) {
-				const bool isSelected = (dev.port == device->port);
-				if (ImGui::Selectable(fmt::format("Serial {} ({})", dev.getFriendlyName(), dev.port).c_str(), isSelected))
-					c_port = dev.port;
-				// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-				if (isSelected)
-					ImGui::SetItemDefaultFocus();
-			}
-			ImGui::EndCombo();
-			if (c_port != device->port) {
-				deviceManager.setCurrentDevice(c_port);
-			}
+		size_t nbCom = devices.size();
+		if (ImGui::Checkbox("Use the serial ports", &val)) {
+			settings.useSerialPort = val && (nbCom > 0);
 		}
-		ImGui::SameLine();
-		if (ImGui::Button("Refresh List")) {
-			drone::IO::CameraSystem::get().actualiseList();
+		if (val && (nbCom > 0)) {
+			auto device = deviceManager.getCurrentDevice();
+			std::string cName = "No device";
+			std::string cPort{};
+			if (device) {
+				cName = device->getFriendlyName();
+				cPort = device->port;
+			}
+			if (ImGui::BeginCombo("Serial port", fmt::format("Serial {} ({})", cName, cPort).c_str())) {
+				for (const auto &dev: devices) {
+					const bool isSelected = (dev.port == cPort);
+					if (ImGui::Selectable(fmt::format("Serial {} ({})", dev.getFriendlyName(), dev.port).c_str(), isSelected))
+						cPort = dev.port;
+					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+				if (!cPort.empty()) {
+					if (!device || cPort != device->port) {
+						deviceManager.setCurrentDevice(cPort);
+					}
+				}
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Refresh List")) {
+				drone::IO::CameraSystem::get().actualiseList();
+			}
 		}
 	}
 	ImGui::End();

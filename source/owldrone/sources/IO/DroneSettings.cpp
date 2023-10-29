@@ -21,6 +21,8 @@ void DroneSettings::readFromFile(const std::filesystem::path &file) {
 	if (appConfig) {
 		if (appConfig["useCamera"]) useCamera = appConfig["useCamera"].as<bool>();
 		if (appConfig["cameraId"]) cameraId = appConfig["cameraId"].as<int>();
+		if (appConfig["useSerialPort"]) useSerialPort = appConfig["useSerialPort"].as<bool>();
+		if (appConfig["SerialPort"]) serialPort = appConfig["SerialPort"].as<std::string>();
 	}
 }
 
@@ -30,6 +32,8 @@ void DroneSettings::saveToFile(const std::filesystem::path &file) const {
 	out << YAML::Key << "DroneConfig" << YAML::Value << YAML::BeginMap;
 	out << YAML::Key << "useCamera" << YAML::Value << useCamera;
 	out << YAML::Key << "cameraId" << YAML::Value << cameraId;
+	out << YAML::Key << "useSerialPort" << YAML::Value << useSerialPort;
+	out << YAML::Key << "SerialPort" << YAML::Value << serialPort;
 	out << YAML::EndMap;
 	out << YAML::EndMap;
 

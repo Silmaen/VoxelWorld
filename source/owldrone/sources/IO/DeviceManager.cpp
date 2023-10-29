@@ -38,6 +38,11 @@ static void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
 }// namespace drone::IO
 #elif OWL_PLATFORM_LINUX
 
+#include <cerrno>
+#include <fcntl.h>
+#include <linux/serial.h>
+#include <sys/ioctl.h>
+
 namespace drone::IO {
 
 
@@ -45,8 +50,22 @@ namespace drone::IO {
  * @brief List The serial Port Available
  * @param listToUpdate The device's list to update.
  */
-static void enumerateSerialDevices([[maybe_unused]] DeviceManager::DeviceList &listToUpdate) {
-	// TODO
+static void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
+	std::filesystem::path base{"/dev/serial/by-id"};
+	if (exists(base)) {
+		for (auto devLink: std::filesystem::directory_iterator(base)) {
+			if (is_symlink(devLink.symlink_status())) {
+				std::string port = std::filesystem::canonical(base / read_symlink(devLink)).string();
+				// todo: get device informations
+				std::string name = "usbserial";
+				OWL_TRACE("Serial Found: ({}) [{}] ", port.c_str(), name.c_str())
+				listToUpdate.push_back({.port = std::move(port),
+										.name = std::move(name)});
+			}
+		}
+	} else {
+		OWL_WARN("Unable to list serial devices by Id.")
+	}
 }
 
 }// namespace drone::IO
@@ -65,7 +84,8 @@ void DeviceManager::updateList() {
 	devices.clear();
 	// list COM Ports
 	enumerateSerialDevices(devices);
-	setCurrentDevice(currentDevice->port);
+	if (currentDevice)
+		setCurrentDevice(currentDevice->port);
 }
 
 owl::shared<Device> DeviceManager::getDeviceByName(const std::string &name) const {

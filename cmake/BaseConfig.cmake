@@ -36,7 +36,6 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 else ()
     message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")
 endif ()
-set(CMAKE_INSTALL_RPATH $ORIGIN)
 
 #
 # ---=== Supported Compiler ===----
