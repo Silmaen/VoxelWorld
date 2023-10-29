@@ -20,6 +20,8 @@ struct Device {
 	std::string port{};
 	/// Devine Name
 	std::string name{};
+	/// Devine Name
+	std::string busInfo{};
 	/**
 	 * @brief Access to a friendly name for the device
 	 * @return Friendly name of the device.

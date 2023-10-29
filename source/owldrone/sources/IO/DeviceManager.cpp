@@ -21,15 +21,20 @@ namespace drone::IO {
  */
 static void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
 	constexpr int maxPort = 32;
-	TCHAR lpTargetPath[5000];// buffer to store the path of the COMPORTS
+	char lpTargetPath[5000];// buffer to store the path of the COMPORTS
 	DWORD test;
 	for (int i = 0; i < maxPort; i++)// checking ports from COM0 to COM255
 	{
-		std::wstring ComName = L"COM" + std::to_wstring(i);// converting to COM0, COM1, COM2
-		test = QueryDosDevice(reinterpret_cast<LPCSTR>(ComName.c_str()), static_cast<LPSTR>(lpTargetPath), 5000);
+		std::string ComName = "COM" + std::to_string(i);// converting to COM0, COM1, COM2
+		test = QueryDosDevice(reinterpret_cast<LPCSTR>(ComName.c_str()), reinterpret_cast<LPSTR>(lpTargetPath), 5000);
+
 		// Test the return value and error if any
-		if (test != 0)//QueryDosDevice returns zero if it didn't find an object
-			listToUpdate.push_back({.port = "COM" + std::to_string(i)});
+		if (test != 0) {//QueryDosDevice returns zero if it didn't find an object
+			std::string name{"usbserial"};
+			std::string path{lpTargetPath};
+			OWL_TRACE("Serial Found: ({}) [{}] ", ComName.c_str(), path.c_str())
+			listToUpdate.push_back({.port = "COM" + std::to_string(i), .name = name, .busInfo = path});
+		}
 		if (::GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
 		}
 	}
