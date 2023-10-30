@@ -35,6 +35,22 @@ public:
 	}
 
 	/**
+	 * @brief object for camera list.
+	 */
+	struct CameraInfo {
+		/// The camera port.
+		std::string port{};
+		/// Camera Id.
+		int32_t id = -1;
+		/// Device Name.
+		std::string name{};
+		/// Bus information.
+		std::string busInfo{};
+	};
+
+	using CameraList = std::vector<CameraInfo>;
+
+	/**
 	 * @brief Frame update of the camera
 	 */
 	void onUpdate(const owl::core::Timestep &ts);
@@ -50,7 +66,7 @@ public:
 	 * @param recompute Recompute the number of camera.
 	 * @return Get the number of camera.
 	 */
-	[[nodiscard]] int32_t getNbCamera(bool recompute = false);
+	[[nodiscard]] size_t getNbCamera(bool recompute = false);
 
 	/**
 	 * @brief Set the camera by its ID.
@@ -64,19 +80,25 @@ public:
 	 * @brief Get the current Camera Id.
 	 * @return The current camera ID.
 	 */
-	[[nodiscard]] int32_t getCurrentCamera() const;
+	[[nodiscard]] CameraInfo getCurrentCamera() const;
 
 	/**
-	 * @brief Research for CameraDevices.
+	 * @brief Actualize the list of available cameras.
 	 */
-	void updateCamList();
+	void actualiseList();
+
+
+	/**
+	 * @brief Gat the list of camera.
+	 * @return Lit of Camera.
+	 */
+	[[nodiscard]] const CameraList &getListOfCamera() const { return cameraList; }
 
 private:
 	/**
 	 * @brief Constructor.
 	 */
 	CameraSystem();
-
 
 	void resize(uint32_t nw, uint32_t nh);
 
@@ -87,9 +109,8 @@ private:
 	int32_t frameCheck = 50;
 	int32_t frameCount = 0;
 
-	int32_t nbCam = -1;
-
 	owl::shared<owl::renderer::Texture> frame;
+	CameraList cameraList;
 };
 
 }// namespace drone::IO

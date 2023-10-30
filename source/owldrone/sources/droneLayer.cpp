@@ -8,6 +8,8 @@
 
 #include "droneLayer.h"
 
+#include "IO/CameraSystem.h"
+#include "IO/DeviceManager.h"
 #include "IO/DroneSettings.h"
 #include "event/KeyEvent.h"
 #include "panels/Gauges.h"
@@ -33,6 +35,10 @@ void droneLayer::onAttach() {
 	auto file = core::Application::get().getWorkingDirectory() / "droneConfig.yml";
 	if (exists(file))
 		IO::DroneSettings::get().readFromFile(file);
+
+	// device manager
+	IO::DeviceManager::get().updateList();
+	IO::CameraSystem::get().actualiseList();
 
 	// icons
 	auto &textureLib = renderer::Renderer::getTextureLibrary();

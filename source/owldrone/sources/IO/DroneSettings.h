@@ -49,8 +49,12 @@ public:
 
 	/// If the camera should be used.
 	bool useCamera = true;
+	/// If a serial port should be used.
+	bool useSerialPort = true;
 	/// Id of the last used camera.
 	int32_t cameraId = 1;
+	/// The serial port in use.
+	std::string serialPort{};
 
 private:
 	/**

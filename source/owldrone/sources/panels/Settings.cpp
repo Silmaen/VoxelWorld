@@ -7,6 +7,7 @@
  */
 #include "Settings.h"
 #include "IO/CameraSystem.h"
+#include "IO/DeviceManager.h"
 #include "IO/DroneSettings.h"
 
 #include <imgui.h>
@@ -24,35 +25,74 @@ void Settings::onRender() {
 	auto &settings = IO::DroneSettings::get();
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
 	ImGui::Begin("Drone Settings");
-	if (ImGui::CollapsingHeader("Camera Settings")) {
+	static bool camOpen = true;
+	if (ImGui::CollapsingHeader("Camera Settings", camOpen)) {
 		bool val = settings.useCamera;
+		auto &camSys = IO::CameraSystem::get();
+		const auto &cameras = camSys.getListOfCamera();
+		size_t nbCam = cameras.size();
 		if (ImGui::Checkbox("Use the camera", &val)) {
-			settings.useCamera = val;
+			settings.useCamera = val && (nbCam > 0);
 		}
-		if (val) {
-			auto &camSys = IO::CameraSystem::get();
-			int32_t nbCam = camSys.getNbCamera();
-			if (nbCam > 0) {
-				int32_t nCam = camSys.getCurrentCamera();
-				int32_t sCam = nCam;
-				if (ImGui::BeginCombo("Camera", fmt::format("Camera {}", nCam).c_str())) {
-					for (int32_t iCam = 0; iCam < nbCam; ++iCam) {
-						const bool is_selected = (iCam == nCam);
-						if (ImGui::Selectable(fmt::format("Camera {}", iCam).c_str(), is_selected))
-							sCam = iCam;
-						// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-					if (sCam != nCam) {
-						camSys.setCamera(sCam);
+		if (val && (nbCam > 0)) {
+			auto Cam = camSys.getCurrentCamera();
+			int32_t sCam = Cam.id;
+			if (ImGui::BeginCombo("Camera", fmt::format("Camera {}: {}", Cam.id, Cam.name).c_str())) {
+				for (const auto &camera: cameras) {
+					const bool isSelected = (camera.id == Cam.id);
+					if (ImGui::Selectable(fmt::format("Camera {}: {}", camera.id, camera.name).c_str(), isSelected))
+						sCam = camera.id;
+					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+				if (sCam != Cam.id) {
+					camSys.setCamera(sCam);
+				}
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Refresh List")) {
+				camSys.actualiseList();
+			}
+		}
+	}
+	static bool comOpen = true;
+	if (ImGui::CollapsingHeader("Serial Port Setting", comOpen)) {
+		bool val = settings.useSerialPort;
+		auto &deviceManager = IO::DeviceManager::get();
+		const auto &devices = deviceManager.getAllDevices();
+		size_t nbCom = devices.size();
+		if (ImGui::Checkbox("Use the serial ports", &val)) {
+			settings.useSerialPort = val && (nbCom > 0);
+		}
+		if (val && (nbCom > 0)) {
+			auto device = deviceManager.getCurrentDevice();
+			std::string cName = "No device";
+			std::string cPort{};
+			if (device) {
+				cName = device->getFriendlyName();
+				cPort = device->port;
+			}
+			if (ImGui::BeginCombo("Serial port", fmt::format("Serial {} ({})", cName, cPort).c_str())) {
+				for (const auto &dev: devices) {
+					const bool isSelected = (dev.port == cPort);
+					if (ImGui::Selectable(fmt::format("Serial {} ({})", dev.getFriendlyName(), dev.port).c_str(), isSelected))
+						cPort = dev.port;
+					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+				if (!cPort.empty()) {
+					if (!device || cPort != device->port) {
+						deviceManager.setCurrentDevice(cPort);
 					}
 				}
-				ImGui::SameLine();
-				if (ImGui::Button("Refresh List")) {
-					camSys.updateCamList();
-				}
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Refresh List")) {
+				drone::IO::CameraSystem::get().actualiseList();
 			}
 		}
 	}
