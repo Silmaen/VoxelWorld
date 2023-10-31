@@ -143,8 +143,14 @@ def check_remote(remote: dict):
     remotes = RemotesManager(verbosity=4)
     rem = remotes.get_safe_remote(name=remote["name"])
     if rem is None:
+        url = remote["url"]
+        kind = "ftp"
+        if "://" in url:
+            kind, url = url.split("://", 1)
+            url = url.replace("/", "")
         remotes.add_remote(name=remote["name"],
-                           url=remote["url"],
+                           url=url,
+                           kind=kind,
                            default=True,
                            login=remote["login"],
                            passwd=remote["passwd"])
