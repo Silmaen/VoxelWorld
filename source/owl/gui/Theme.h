@@ -1,5 +1,5 @@
 /**
- * @file UITheme.h
+ * @file Theme.h
  * @author Silmaen
  * @date 10/08/2023
  * Copyright (c) 2023 All rights reserved.
