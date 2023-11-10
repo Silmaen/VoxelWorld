@@ -1,12 +1,11 @@
 /**
- * @file UITheme.h
+ * @file Theme.h
  * @author Silmaen
  * @date 10/08/2023
  * Copyright (c) 2023 All rights reserved.
  * All modification must get authorization from the author.
  */
-#ifndef OWL_UITHEME_H
-#define OWL_UITHEME_H
+#pragma once
 
 #include "glm/glm.hpp"
 
@@ -27,5 +26,3 @@ struct Theme {
 };
 
 }// namespace owl::gui
-
-#endif//OWL_UITHEME_H

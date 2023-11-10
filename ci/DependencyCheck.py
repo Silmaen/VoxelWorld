@@ -134,20 +134,62 @@ def check_dependencies(target: dict):
                 exit(1)
 
 
+def check_remote(remote: dict):
+    if "url" not in remote:
+        return
+    if remote["url"] in ["", None]:
+        return
+    from depmanager.api.remotes import RemotesManager
+    remotes = RemotesManager(verbosity=4)
+    rem = remotes.get_safe_remote(name=remote["name"])
+    if rem is None:
+        url = remote["url"]
+        kind = "ftp"
+        if "://" in url:
+            kind, url = url.split("://", 1)
+            url = url.replace("/", "")
+        remotes.add_remote(name=remote["name"],
+                           url=url,
+                           kind=kind,
+                           default=True,
+                           login=remote["login"],
+                           passwd=remote["passwd"])
+
+
 def main():
     from argparse import ArgumentParser as ap
     arg_p = ap()
     arg_p.add_argument("--kind", "-k",
                        type=str,
-                       default="both", choices=["both", "static", "shared"])
+                       default="both",
+                       choices=["both", "static", "shared"],
+                       help="The targeted libraries kind.")
     arg_p.add_argument("--os", "-o",
                        type=str,
-                       default="")
+                       default="",
+                       help="The targeted os.")
     arg_p.add_argument("--arch", "-a",
                        type=str,
-                       default="")
+                       default="",
+                       help="The targeted architecture")
+    arg_p.add_argument("--remote-url", "-r",
+                       type=str,
+                       default="Remote url to use")
+    arg_p.add_argument("--remote-login", "-l",
+                       type=str,
+                       default="Remote login to use")
+    arg_p.add_argument("--remote-passwd", "-p",
+                       type=str,
+                       default="Remote password to use")
     args = arg_p.parse_args()
     has_depmanager()
+    remote = {
+        "name": "remote",
+        "url": args.remote_url,
+        "login": args.remote_login,
+        "passwd": args.remote_passwd
+    }
+    check_remote(remote)
     target = {
         "kind": args.kind,
         "os": hi.os,
