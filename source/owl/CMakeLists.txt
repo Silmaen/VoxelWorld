@@ -48,11 +48,11 @@ find_package(EnTT 3.11 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC EnTT::EnTT)
 
 # fmt
-find_package(fmt 9.1 REQUIRED)
+find_package(fmt 10.1 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
 
 # glad
-find_package(glad 0.1.36 REQUIRED)
+find_package(glad 2.0 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE glad::glad)
 
 # GLFW
@@ -64,6 +64,9 @@ find_package(glm 0.9.9 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC glm::glm)
 
 # ImGui
+if (NOT ${PRJPREFIX}_BUILD_SHARED)
+    find_package(Vulkan REQUIRED)
+endif ()
 find_package(imgui REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui::imgui)
 find_package(imguizmo REQUIRED)

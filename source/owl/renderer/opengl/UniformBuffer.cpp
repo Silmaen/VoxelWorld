@@ -8,8 +8,7 @@
 #include "owlpch.h"
 
 #include "UniformBuffer.h"
-
-#include <glad/glad.h>
+#include "core/external/opengl46.h"
 
 namespace owl::renderer::opengl {
 

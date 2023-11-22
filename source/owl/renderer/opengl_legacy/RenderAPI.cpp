@@ -9,18 +9,20 @@
 
 #include "RenderAPI.h"
 
-#include "glad21/glad.h"
+#include "core/Application.h"
+#include "core/external/opengl21.h"
 
 namespace owl::renderer::opengl_legacy {
-
 
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
-	bool goodVersion = GLVersion.major > 2 || (GLVersion.major == 2 && GLVersion.minor >= 1);
+	auto vers = core::Application::get().getWindow().getGraphContext()->getVersion();
+
+	bool goodVersion = vers.major > 2 || (vers.major == 2 && vers.minor >= 1);
 	if (!goodVersion) {
 		setState(State::Error);
-		OWL_CORE_ERROR("Owl Engine legacy OpenGL Renderer requires at least OpenGL version 2.1 but version {}.{} found", GLVersion.major, GLVersion.minor)
+		OWL_CORE_ERROR("Owl Engine legacy OpenGL Renderer requires at least OpenGL version 2.1 but version {}.{} found", vers.major, vers.minor)
 	}
 
 

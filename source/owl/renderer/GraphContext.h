@@ -44,6 +44,19 @@ public:
 	 */
 	static uniq<GraphContext> create(void *window);
 
+	/**
+	 * @brief Structure for holding version number.
+	 */
+	struct Version {
+		int major;///< major version number.
+		int minor;///< minor version number.
+	};
+	/**
+	 * @brief Get version number of the backend API.
+	 * @return The version number.
+	 */
+	virtual Version getVersion() const = 0;
+
 private:
 };
 

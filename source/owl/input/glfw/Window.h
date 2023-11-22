@@ -99,8 +99,6 @@ private:
 	void shutdown();
 	/// Pointer to the GLFW window.
 	GLFWwindow *glfwWindow{};
-	/// Pointer to the Graphic Context.
-	uniq<renderer::GraphContext> context;
 
 	/**
 	 * @brief Window's data.

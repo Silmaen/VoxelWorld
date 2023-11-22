@@ -9,6 +9,7 @@
 #pragma once
 #include "core/Core.h"
 #include "event/Event.h"
+#include "renderer/GraphContext.h"
 #include <functional>
 
 namespace owl::input {
@@ -109,6 +110,18 @@ public:
 	 * @return Pointer to the window.
 	 */
 	static uniq<Window> create(const Properties &props = Properties());
+
+	/**
+	 * @brief Access to the graph context.
+	 * @return Graph context.
+	 */
+	[[nodiscard]] renderer::GraphContext *getGraphContext() const {
+		return context.get();
+	}
+
+protected:
+	/// Pointer to the Graphic Context.
+	uniq<renderer::GraphContext> context;
 };
 
 }// namespace owl::input

@@ -43,9 +43,17 @@ public:
 	 */
 	void swapBuffers() override;
 
+	/**
+	 * @brief Get version number of the backend API.
+	 * @return The version number.
+	 */
+	Version getVersion() const override;
+
 private:
 	/// Link to the parent window.
 	GLFWwindow *windowHandle;
+	/// OpenGL version
+	int version;
 };
 
 }// namespace owl::renderer::opengl_legacy

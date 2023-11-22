@@ -9,8 +9,8 @@
 
 #include "Shader.h"
 #include "UniformBindingLibrary.h"
+#include "core/external/opengl21.h"
 #include "core/utils/FileUtils.h"
-#include "glad21/glad.h"
 #include "renderer/RenderCommand.h"
 #ifdef __clang__
 #pragma clang diagnostic push

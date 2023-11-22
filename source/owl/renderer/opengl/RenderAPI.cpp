@@ -8,8 +8,8 @@
 #include "owlpch.h"
 
 #include "RenderAPI.h"
-
-#include <glad/glad.h>
+#include "core/Application.h"
+#include "core/external/opengl46.h"
 
 namespace owl::renderer::opengl {
 
@@ -35,10 +35,12 @@ namespace owl::renderer::opengl {
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
-	bool goodVersion = GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5);
+	auto vers = core::Application::get().getWindow().getGraphContext()->getVersion();
+
+	bool goodVersion = vers.major > 4 || (vers.major == 4 && vers.minor >= 5);
 	if (!goodVersion) {
 		setState(State::Error);
-		OWL_CORE_ERROR("Owl Engine OpenGL Renderer requires at least OpenGL version 4.5 but version {}.{} found", GLVersion.major, GLVersion.minor)
+		OWL_CORE_ERROR("Owl Engine OpenGL Renderer requires at least OpenGL version 4.5 but version {}.{} found", vers.major, vers.minor)
 	}
 
 	if (getState() != State::Created)

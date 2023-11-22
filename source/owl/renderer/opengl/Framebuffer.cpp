@@ -9,7 +9,7 @@
 #include "owlpch.h"
 
 #include "Framebuffer.h"
-#include <glad/glad.h>
+#include "core/external/opengl46.h"
 
 #include <utility>
 

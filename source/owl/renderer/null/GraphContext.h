@@ -20,8 +20,6 @@ class OWL_API GraphContext : public ::owl::renderer::GraphContext {
 public:
 	GraphContext(const GraphContext &) = delete;
 	GraphContext(GraphContext &&) = delete;
-	GraphContext &operator=(const GraphContext &) = delete;
-	GraphContext &operator=(GraphContext &&) = delete;
 
 	/**
 	 * @brief Default constructor.
@@ -42,6 +40,11 @@ public:
 	 * @brief Doo the buffer swap.
 	 */
 	void swapBuffers() override;
+	/**
+	 * @brief Get version number of the backend API.
+	 * @return The version number.
+	 */
+	Version getVersion() const override { return {0, 0}; }
 };
 
 }// namespace owl::renderer::null

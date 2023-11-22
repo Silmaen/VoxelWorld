@@ -10,10 +10,9 @@
 #include "Shader.h"
 #include "core/Application.h"
 #include "core/Core.h"
+#include "core/external/opengl46.h"
 #include "core/utils/FileUtils.h"
 #include "debug/Tracker.h"
-
-#include <glad/glad.h>
 
 #ifdef __clang__
 #pragma clang diagnostic push
