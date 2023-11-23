@@ -8,7 +8,7 @@
 #include "owlpch.h"
 
 #include "Texture.h"
-#include <glad/glad.h>
+#include "core/external/opengl46.h"
 #include <stb_image.h>
 #include <utility>
 

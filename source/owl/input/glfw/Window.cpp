@@ -8,7 +8,6 @@
 
 #include "owlpch.h"
 
-#include <glad/glad.h>
 #include <stb_image.h>
 
 #include "Window.h"

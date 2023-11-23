@@ -5,9 +5,9 @@
  * Copyright © 2023 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "owlpch.h"
 
-
-#include "glad21/glad.h"
+#include "core/external/opengl21.h"
 
 #include "GraphContext.h"
 
@@ -21,8 +21,12 @@ void GraphContext::init() {
 	OWL_PROFILE_FUNCTION()
 
 	glfwMakeContextCurrent(windowHandle);
-	[[maybe_unused]] int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-	OWL_CORE_ASSERT(status, "Failed to initialize GLAD")
+#ifdef OLD_GLAD
+	version = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+#else
+	version = gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress));
+#endif
+	OWL_CORE_ASSERT(version, "Failed to initialize GLAD")
 
 	OWL_CORE_INFO("OLdOpengl Renderer Initiated.")
 	OWL_CORE_INFO("Device Info:")
@@ -38,6 +42,14 @@ void GraphContext::swapBuffers() {
 	OWL_PROFILE_FUNCTION()
 
 	glfwSwapBuffers(windowHandle);
+}
+
+GraphContext::Version GraphContext::getVersion() const {
+#ifdef OLD_GLAD
+	return {GLVersion.major, GLVersion.minor};
+#else
+	return {GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version)};
+#endif
 }
 
 }// namespace owl::renderer::opengl_legacy

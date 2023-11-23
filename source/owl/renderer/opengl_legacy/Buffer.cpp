@@ -8,7 +8,8 @@
 #include "owlpch.h"
 
 #include "Buffer.h"
-#include "glad21/glad.h"
+
+#include "core/external/opengl21.h"
 
 namespace owl::renderer::opengl_legacy {
 

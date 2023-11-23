@@ -9,7 +9,6 @@
 #pragma once
 
 #include "../Window.h"
-#include "renderer/GraphContext.h"
 
 /**
  * @brief Namespace for the glfw  elements.
@@ -23,8 +22,6 @@ class OWL_API Window : public ::owl::input::Window {
 public:
 	Window(const Window &) = delete;
 	Window(Window &&) = delete;
-	Window &operator=(const Window &) = delete;
-	Window &operator=(Window &&) = delete;
 
 	/**
 	 * @brief Default constructor.
@@ -99,8 +96,6 @@ private:
 	void shutdown();
 	/// Pointer to the GLFW window.
 	void *glfwWindow = nullptr;
-	/// Pointer to the Graphic Context.
-	uniq<renderer::GraphContext> context;
 
 	/**
 	 * @brief Window's data.
