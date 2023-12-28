@@ -67,6 +67,7 @@ void droneLayer::onAttach() {
 void droneLayer::onDetach() {
 	OWL_PROFILE_FUNCTION()
 
+	IO::CameraSystem::get().invalidate();
 	rc.reset();
 	settings.reset();
 	gauges.reset();

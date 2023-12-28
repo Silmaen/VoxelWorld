@@ -35,22 +35,6 @@ public:
 	}
 
 	/**
-	 * @brief object for camera list.
-	 */
-	struct CameraInfo {
-		/// The camera port.
-		std::string port{};
-		/// Camera Id.
-		int32_t id = -1;
-		/// Device Name.
-		std::string name{};
-		/// Bus information.
-		std::string busInfo{};
-	};
-
-	using CameraList = std::vector<CameraInfo>;
-
-	/**
 	 * @brief Frame update of the camera
 	 */
 	void onUpdate(const owl::core::Timestep &ts);
@@ -60,13 +44,6 @@ public:
 	 * @return The camera frame.
 	 */
 	[[nodiscard]] const owl::shared<owl::renderer::Texture> &getFrame() const { return frame; }
-
-	/**
-	 * @brief Get the number of camera.
-	 * @param recompute Recompute the number of camera.
-	 * @return Get the number of camera.
-	 */
-	[[nodiscard]] size_t getNbCamera(bool recompute = false);
 
 	/**
 	 * @brief Set the camera by its ID.
@@ -80,7 +57,12 @@ public:
 	 * @brief Get the current Camera Id.
 	 * @return The current camera ID.
 	 */
-	[[nodiscard]] CameraInfo getCurrentCamera() const;
+	[[nodiscard]] int32_t getCurrentCameraId() const;
+	/**
+	 * @brief Get the current Camera Id.
+	 * @return The current camera ID.
+	 */
+	[[nodiscard]] std::string getCurrentCameraName() const;
 
 	/**
 	 * @brief Actualize the list of available cameras.
@@ -91,7 +73,12 @@ public:
 	 * @brief Gat the list of camera.
 	 * @return Lit of Camera.
 	 */
-	[[nodiscard]] const CameraList &getListOfCamera() const { return cameraList; }
+	[[nodiscard]] std::vector<std::string> getListOfCameraNames() const;
+
+	/**
+	 * @brief Destroy internal objects.
+	 */
+	void invalidate();
 
 private:
 	/**
@@ -99,7 +86,7 @@ private:
 	 */
 	CameraSystem();
 
-	void resize(const owl::math::FrameSize& size);
+	void resize(const owl::math::FrameSize &size);
 
 	owl::math::FrameSize size;
 
@@ -108,7 +95,6 @@ private:
 	int32_t frameCount = 0;
 
 	owl::shared<owl::renderer::Texture> frame;
-	CameraList cameraList;
 };
 
 }// namespace drone::IO

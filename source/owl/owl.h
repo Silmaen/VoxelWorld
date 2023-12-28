@@ -23,6 +23,7 @@
 #include "input/CameraOrthoController.h"
 #include "input/Input.h"
 #include "input/Window.h"
+#include "input/video/Manager.h"
 
 // ------- scene -----------
 #include "scene/Entity.h"

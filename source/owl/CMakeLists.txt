@@ -129,3 +129,7 @@ if (${PRJPREFIX}_BUILD_SHARED AND WIN32)
             COMMAND_EXPAND_LISTS
     )
 endif ()
+
+if (WIN32)
+    target_link_libraries(${ENGINE_NAME} PUBLIC Mf Mfplat Mfreadwrite)
+endif ()

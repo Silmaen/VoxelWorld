@@ -174,13 +174,13 @@ def main():
                        help="The targeted architecture")
     arg_p.add_argument("--remote-url", "-r",
                        type=str,
-                       default="Remote url to use")
+                       help="Remote url to use")
     arg_p.add_argument("--remote-login", "-l",
                        type=str,
-                       default="Remote login to use")
+                       help="Remote login to use")
     arg_p.add_argument("--remote-passwd", "-p",
                        type=str,
-                       default="Remote password to use")
+                       help="Remote password to use")
     args = arg_p.parse_args()
     has_depmanager()
     remote = {

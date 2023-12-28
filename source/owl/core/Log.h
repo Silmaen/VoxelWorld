@@ -39,13 +39,13 @@ public:
 	 * @brief Access to the logger for the core system.
 	 * @return The Core logger.
 	 */
-	static std::shared_ptr<spdlog::logger> getCoreLogger() { return coreLogger; }
+	static shared<spdlog::logger> getCoreLogger() { return coreLogger; }
 
 	/**
 	 * @brief Access to the logger for the application system.
 	 * @return The application logger.
 	 */
-	static std::shared_ptr<spdlog::logger> getClientLogger() { return clientLogger; }
+	static shared<spdlog::logger> getClientLogger() { return clientLogger; }
 
 	/**
 	 * @brief Defines the Verbosity level
@@ -66,9 +66,9 @@ public:
 
 private:
 	/// The core logger.
-	static std::shared_ptr<spdlog::logger> coreLogger;
+	static shared<spdlog::logger> coreLogger;
 	/// The application logger.
-	static std::shared_ptr<spdlog::logger> clientLogger;
+	static shared<spdlog::logger> clientLogger;
 	/// The level of verbosity
 	static spdlog::level::level_enum verbosity;
 };
