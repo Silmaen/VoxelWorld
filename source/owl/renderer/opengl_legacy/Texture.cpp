@@ -15,7 +15,7 @@
 
 namespace owl::renderer::opengl_legacy {
 
-Texture2D::Texture2D(uint32_t width_, uint32_t height_, bool withAlpha) : width{width_}, height{height_}, hasAlpha{withAlpha} {
+Texture2D::Texture2D(const math::FrameSize &size_, bool withAlpha) : size{size_}, hasAlpha{withAlpha} {
 	OWL_PROFILE_FUNCTION()
 
 	// functions safe for openGL 2.1
@@ -29,6 +29,9 @@ Texture2D::Texture2D(uint32_t width_, uint32_t height_, bool withAlpha) : width{
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+Texture2D::Texture2D(uint32_t width_, uint32_t height_, bool withAlpha) : Texture2D({width_, height_}, withAlpha) {
 }
 
 Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {
@@ -53,8 +56,7 @@ Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {
 		OWL_CORE_ERROR("Impossible to load {}, invalid number of channels {}: must be 3 or 4.")
 		return;
 	}
-	width = static_cast<uint32_t>(width_);
-	height = static_cast<uint32_t>(height_);
+	size = {static_cast<uint32_t>(width_), static_cast<uint32_t>(height_)};
 
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
@@ -66,8 +68,8 @@ Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? GL_RGBA : GL_RGB,
-				 static_cast<GLsizei>(width),
-				 static_cast<GLsizei>(height),
+				 static_cast<GLsizei>(size.width()),
+				 static_cast<GLsizei>(size.height()),
 				 0,
 				 hasAlpha ? GL_RGBA : GL_RGB,
 				 GL_UNSIGNED_BYTE,
@@ -91,15 +93,15 @@ void Texture2D::bind(uint32_t slot) const {
 	glBindTexture(GL_TEXTURE_2D, textureId);
 }
 
-void Texture2D::setData(void *data, [[maybe_unused]] uint32_t size) {
+void Texture2D::setData(void *data, [[maybe_unused]] uint32_t size_) {
 	OWL_PROFILE_FUNCTION()
 
-	OWL_CORE_ASSERT(size == width * height * (hasAlpha ? 4 : 3), "Data size missmatch texture size!")
+	OWL_CORE_ASSERT(size_ == size.surface() * (hasAlpha ? 4 : 3), "Data size missmatch texture size!")
 
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? GL_RGBA : GL_RGB,
-				 static_cast<GLsizei>(width),
-				 static_cast<GLsizei>(height),
+				 static_cast<GLsizei>(size.width()),
+				 static_cast<GLsizei>(size.height()),
 				 0,
 				 hasAlpha ? GL_RGBA : GL_RGB,
 				 GL_UNSIGNED_BYTE,

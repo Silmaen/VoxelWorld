@@ -33,6 +33,12 @@ public:
 	 * @param withAlpha If the texture has alpha channel.
 	 */
 	Texture2D(uint32_t width, uint32_t height, bool withAlpha = true);
+	/**
+	 * @brief Constructor by size.
+	 * @param size Texture's width.
+	 * @param withAlpha If the texture has alpha channel.
+	 */
+	explicit Texture2D(const math::FrameSize &size, bool withAlpha = true);
 
 	/**
 	 * @brief Destructor.
@@ -52,19 +58,25 @@ public:
 	 * @brief Access to texture's width.
 	 * @return Texture's width.
 	 */
-	[[nodiscard]] uint32_t getWidth() const override { return width; }
+	[[nodiscard]] uint32_t getWidth() const override { return size.getWidth(); }
 
 	/**
 	 * @brief Access to texture's height.
 	 * @return Texture's height.
 	 */
-	[[nodiscard]] uint32_t getHeight() const override { return height; }
+	[[nodiscard]] uint32_t getHeight() const override { return size.getHeight(); }
+
+	/**
+	 * @brief Access to texture's size.
+	 * @return Texture's size.
+	 */
+	[[nodiscard]] math::FrameSize getSize() const override { return size; }
 
 	/**
 	 * @brief Tells if the data effectively loaded.
 	 * @return True if texture contains data.
 	 */
-	[[nodiscard]] bool isLoaded() const override { return width * height > 0; }
+	[[nodiscard]] bool isLoaded() const override { return size.surface() > 0; }
 
 	/**
 	 * @brief Get renderer id.
@@ -96,10 +108,8 @@ public:
 private:
 	/// Path to the texture file.
 	std::filesystem::path path;
-	/// Texture's width.
-	uint32_t width = 0;
-	/// Texture's height
-	uint32_t height = 0;
+	/// Texture's size.
+	math::FrameSize size = {0, 0};
 	/// OpenGL binding.
 	uint32_t textureId = 0;
 	/// If the image has Alpha channel.

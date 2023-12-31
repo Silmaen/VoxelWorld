@@ -19,6 +19,7 @@ public:
 	[[nodiscard]] bool operator==(const owl::renderer::Texture &other) const override { return p == other.getPath(); }
 	[[nodiscard]] uint32_t getWidth() const override { return 0; }
 	[[nodiscard]] uint32_t getHeight() const override { return 0; }
+	[[nodiscard]] owl::math::FrameSize getSize() const override { return {0,0}; }
 	[[nodiscard]] bool isLoaded() const override { return true; }
 	[[nodiscard]] uint32_t getRendererID() const override { return 0; }
 	void bind(uint32_t) const override {}

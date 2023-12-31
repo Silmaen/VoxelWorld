@@ -8,6 +8,7 @@
 
 #pragma once
 #include "core/Core.h"
+#include "math/sizingTypes.h"
 #include <filesystem>
 
 namespace owl::renderer {
@@ -46,6 +47,12 @@ public:
 	 * @return Texture's height.
 	 */
 	[[nodiscard]] virtual uint32_t getHeight() const = 0;
+
+	/**
+	 * @brief Access to texture's size.
+	 * @return Texture's size.
+	 */
+	[[nodiscard]] virtual math::FrameSize getSize() const = 0;
 
 	/**
 	 * @brief Tells if the data effectively loaded.
@@ -114,6 +121,13 @@ public:
 	 * @return Pointer to the texture.
 	 */
 	static shared<Texture2D> create(const std::string &textureName);
+	/**
+	 * @brief Creates the texture with the given size.
+	 * @param size The texture's size.
+	 * @param withAlpha If the texture has alpha channel.
+	 * @return Resulting texture.
+	 */
+	static shared<Texture2D> create(const math::FrameSize &size, bool withAlpha = true);
 	/**
 	 * @brief Creates the texture with the given size.
 	 * @param width The texture's width.
