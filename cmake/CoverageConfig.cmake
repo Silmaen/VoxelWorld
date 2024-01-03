@@ -13,8 +13,8 @@ string(REPLACE " " ";" GCOVR_VERSION ${GCOVR_VERSION})
 list(SUBLIST GCOVR_VERSION 1 1 GCOVR_VERSION)
 
 message(STATUS "Found gcovr version ${GCOVR_VERSION}.")
-if (${GCOVR_VERSION} VERSION_LESS 6.0)
-    message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 6.0")
+if (${GCOVR_VERSION} VERSION_LESS 5.0)
+    message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 5.0")
 endif ()
 
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_COVERAGE)

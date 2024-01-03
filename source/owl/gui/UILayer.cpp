@@ -56,9 +56,9 @@ void UILayer::onAttach() {// Setup Dear ImGui context
 	// Better fonts
 	ImFontConfig fontConfig;
 	fontConfig.FontDataOwnedByAtlas = false;
-	ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF(toRawData(g_RobotoRegular), sizeof(g_RobotoRegular), 20.0f, &fontConfig);
-	io.Fonts->AddFontFromMemoryTTF(toRawData(g_RobotoBold), sizeof(g_RobotoBold), 20.0f, &fontConfig);
-	io.Fonts->AddFontFromMemoryTTF(toRawData(g_RobotoItalic), sizeof(g_RobotoItalic), 20.0f, &fontConfig);
+	ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoRegular)), sizeof(g_RobotoRegular), 20.0f, &fontConfig);
+	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoBold)), sizeof(g_RobotoBold), 20.0f, &fontConfig);
+	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoItalic)), sizeof(g_RobotoItalic), 20.0f, &fontConfig);
 	io.FontDefault = robotoFont;
 
 	// Setup Dear ImGui style

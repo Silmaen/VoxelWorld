@@ -87,7 +87,6 @@ public:
 	 */
 	void actualiseList();
 
-
 	/**
 	 * @brief Gat the list of camera.
 	 * @return Lit of Camera.
@@ -100,10 +99,9 @@ private:
 	 */
 	CameraSystem();
 
-	void resize(uint32_t nw, uint32_t nh);
+	void resize(const owl::math::FrameSize& size);
 
-	uint32_t width = 0;
-	uint32_t height = 0;
+	owl::math::FrameSize size;
 
 	int32_t frameSkip = 0;
 	int32_t frameCheck = 50;

@@ -13,7 +13,9 @@
 
 namespace owl::renderer::null {
 
-Texture2D::Texture2D(uint32_t width_, uint32_t height_) : width{width_}, height{height_} {}
+Texture2D::Texture2D(const math::FrameSize &size_) : size{size_} {}
+
+Texture2D::Texture2D(uint32_t width_, uint32_t height_) : size{width_, height_} {}
 
 Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {}
 
