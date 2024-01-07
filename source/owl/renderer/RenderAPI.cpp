@@ -11,6 +11,7 @@
 #include "null/RenderAPI.h"
 #include "opengl/RenderAPI.h"
 #include "opengl_legacy/RenderAPI.h"
+#include "vulkan/RenderAPI.h"
 
 namespace owl::renderer {
 
@@ -21,15 +22,14 @@ uniq<RenderAPI> RenderAPI::create(const RenderAPI::Type &creationType) {
 	state = RenderAPI::State::Created;
 	type = creationType;
 	switch (type) {
-		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
-			return nullptr;
 		case RenderAPI::Type::Null:
 			return mk_uniq<null::RenderAPI>();
 		case RenderAPI::Type::OpenGL:
 			return mk_uniq<opengl::RenderAPI>();
 		case RenderAPI::Type::OpenglLegacy:
 			return mk_uniq<opengl_legacy::RenderAPI>();
+		case RenderAPI::Type::Vulkan:
+			return mk_uniq<vulkan::RenderAPI>();
 	}
 
 	OWL_CORE_ERROR("Unknown RendererAPI!")

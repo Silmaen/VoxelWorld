@@ -13,6 +13,7 @@
 #include "null/Shader.h"
 #include "opengl/Shader.h"
 #include "opengl_legacy/Shader.h"
+#include "vulkan/Shader.h"
 #include <magic_enum.hpp>
 
 namespace owl::renderer {
@@ -20,15 +21,14 @@ namespace owl::renderer {
 shared<Shader> Shader::create(const std::string &shaderName, const std::string &vertexSrc, const std::string &fragmentSrc) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
-			return nullptr;
 		case RenderAPI::Type::Null:
 			return mk_shared<null::Shader>(shaderName, vertexSrc, fragmentSrc);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::Shader>(shaderName, vertexSrc, fragmentSrc);
 		case RenderAPI::Type::OpenglLegacy:
 			return mk_shared<opengl_legacy::Shader>(shaderName, vertexSrc, fragmentSrc);
+		case RenderAPI::Type::Vulkan:
+			return mk_shared<vulkan::Shader>(shaderName, vertexSrc, fragmentSrc);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;
@@ -37,9 +37,6 @@ shared<Shader> Shader::create(const std::string &shaderName, const std::string &
 shared<Shader> Shader::create(const std::string &shaderName) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
-			return nullptr;
 		case RenderAPI::Type::Null: {
 			std::vector<std::filesystem::path> sources;
 			return mk_shared<null::Shader>(shaderName, sources);
@@ -70,6 +67,19 @@ shared<Shader> Shader::create(const std::string &shaderName) {
 			}
 			return mk_shared<opengl_legacy::Shader>(shaderName, sources);
 		}
+		case RenderAPI::Type::Vulkan: {
+			std::vector<std::filesystem::path> sources;
+			auto shaderDir = core::Application::get().getAssetDirectory() / "shaders";
+			for (const auto &file: std::filesystem::directory_iterator(shaderDir)) {
+				if (file.path().stem().string() == shaderName)
+					sources.push_back(file);
+			}
+			if (sources.empty()) {
+				OWL_CORE_WARN("Not able to find Shader {} in directory {}", shaderName, shaderDir.string())
+				return nullptr;
+			}
+			return mk_shared<vulkan::Shader>(shaderName, sources);
+		}
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;
@@ -78,9 +88,6 @@ shared<Shader> Shader::create(const std::string &shaderName) {
 shared<Shader> Shader::create(const std::filesystem::path &file) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
-			return nullptr;
 		case RenderAPI::Type::Null: {
 			std::string shaderName = file.stem().string();
 			return mk_shared<null::Shader>(shaderName, std::vector<std::filesystem::path>{file});
@@ -104,6 +111,22 @@ shared<Shader> Shader::create(const std::filesystem::path &file) {
 		case RenderAPI::Type::OpenglLegacy: {
 			std::string shaderName = file.stem().string();
 			return mk_shared<opengl_legacy::Shader>(shaderName, std::vector<std::filesystem::path>{file});
+		}
+		case RenderAPI::Type::Vulkan: {
+			std::string shaderName = file.stem().string();
+			if (is_directory(file)) {
+				std::vector<std::filesystem::path> sources;
+				for (const auto &f: file)
+					sources.push_back(f);
+				if (sources.empty()) {
+					OWL_CORE_WARN("Not able to find Shader in {}", file.string())
+					return nullptr;
+				}
+
+				return mk_shared<vulkan::Shader>(shaderName, sources);
+			} else {
+				return mk_shared<vulkan::Shader>(shaderName, std::vector<std::filesystem::path>{file});
+			}
 		}
 	}
 	OWL_CORE_ERROR("Unknown API Type!")

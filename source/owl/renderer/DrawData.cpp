@@ -12,6 +12,7 @@
 #include "null/DrawData.h"
 #include "opengl/DrawData.h"
 #include "opengl_legacy/DrawData.h"
+#include "vulkan/DrawData.h"
 #include <magic_enum.hpp>
 
 namespace owl::renderer {
@@ -21,15 +22,14 @@ DrawData::~DrawData() = default;
 shared<DrawData> DrawData::create() {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
-			return nullptr;
 		case RenderAPI::Type::Null:
 			return mk_shared<null::DrawData>();
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::DrawData>();
 		case RenderAPI::Type::OpenglLegacy:
 			return mk_shared<opengl_legacy::DrawData>();
+		case RenderAPI::Type::Vulkan:
+			return mk_shared<vulkan::DrawData>();
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;
