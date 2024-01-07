@@ -1,5 +1,5 @@
 /**
- * @file CameraSystem.h
+ * @file DroneSettings.h
  * @author Silmaen
  * @date 11/10/2023
  * Copyright (c) 2023 All rights reserved.

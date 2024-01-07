@@ -19,18 +19,26 @@ def runtest(build_path: str):
     is_ok = True
     for test in list_tests:
         try:
-            out = run([f"{test}", f"--gtest_output=xml:test/{test.stem}_UTest_Report.xml"], cwd=build_path)
+            out = run(
+                [f"{test}", f"--gtest_output=xml:test/{test.stem}_UTest_Report.xml"],
+                cwd=build_path,
+                shell=True,
+            )
             if out.returncode != 0:
                 is_ok = False
         except Exception as err:
-            print(f"ERROR: exception '{err}' while running test {test.stem}", file=stderr)
+            print(
+                f"ERROR: exception '{err}' while running test {test.stem}", file=stderr
+            )
             is_ok = False
     return is_ok
 
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument("build", type=str, help="The path to the build relative to source")
+    parser.add_argument(
+        "build", type=str, help="The path to the build relative to source"
+    )
     args = parser.parse_args()
 
     if not runtest(args.build):
