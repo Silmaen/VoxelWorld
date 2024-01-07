@@ -91,33 +91,29 @@ std::string unFourCC(const uint32_t pixelFormat) {
 }
 
 Device::PixelFormat getDevicePixelFormat(const uint32_t pixelFormat) {
-	switch (pixelFormat) {
-		case V4L2_PIX_FMT_RGB24:
-			return Device::PixelFormat::RGB24;
-		case V4L2_PIX_FMT_NV12:
-			return Device::PixelFormat::NV12;
-		case V4L2_PIX_FMT_YUYV:
-			return Device::PixelFormat::YUYV;
-		case V4L2_PIX_FMT_MJPEG:
-			return Device::PixelFormat::MJPEG;
-		default:
-			return Device::PixelFormat::Unknwon;
-	}
+	if (pixelFormat == V4L2_PIX_FMT_RGB24)
+		return Device::PixelFormat::RGB24;
+	else if (pixelFormat == V4L2_PIX_FMT_NV12)
+		return Device::PixelFormat::NV12;
+	else if (pixelFormat == V4L2_PIX_FMT_YUYV)
+		return Device::PixelFormat::YUYV;
+	else if (pixelFormat == V4L2_PIX_FMT_MJPEG)
+		return Device::PixelFormat::MJPEG;
+	else
+		return Device::PixelFormat::Unknwon;
 }
 
 uint32_t getV4L2PixelFormat(const Device::PixelFormat &pixelFormat) {
-	switch (pixelFormat) {
-		case Device::PixelFormat::RGB24:
-			return V4L2_PIX_FMT_RGB24;
-		case Device::PixelFormat::NV12:
-			return V4L2_PIX_FMT_NV12;
-		case Device::PixelFormat::YUYV:
-			return V4L2_PIX_FMT_YUYV;
-		case Device::PixelFormat::MJPEG:
-			return V4L2_PIX_FMT_MJPEG;
-		default:
-			return 0;
-	}
+	if (pixelFormat == Device::PixelFormat::RGB24)
+		return V4L2_PIX_FMT_RGB24;
+	else if (pixelFormat == Device::PixelFormat::NV12)
+		return V4L2_PIX_FMT_NV12;
+	else if (pixelFormat == Device::PixelFormat::YUYV)
+		return V4L2_PIX_FMT_YUYV;
+	else if (pixelFormat == Device::PixelFormat::MJPEG)
+		return V4L2_PIX_FMT_MJPEG;
+	else
+		return 0;
 }
 
 }// namespace
@@ -191,7 +187,7 @@ void Device::open() {
 		v4l2_format fmt{};
 		fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		if (ioctl(fileHandler, VIDIOC_G_FMT, &fmt) < 0) {
-			OWL_CORE_WARN("({}) Unable to get format of device.", file);
+			OWL_CORE_WARN("({}) Unable to get format of device.", file)
 			close();
 			return;
 		}
@@ -303,13 +299,13 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 		return;
 	}
 
-	std::vector<uint8_t> convertedBuffer = getRGBBuffer(static_cast<const uint8_t *>(buffer), bufferInfo.bytesused);
+	std::vector<uint8_t> convertedBuffer = getRGBBuffer(static_cast<const uint8_t *>(buffer), static_cast<int32_t>(bufferInfo.bytesused));
 	// frames are written after dequeing the buffer
 	if (!convertedBuffer.empty()) {
 		if (size.surface() * 3 != convertedBuffer.size()) {
 			OWL_CORE_WARN("Device ({}) buffer size missmatch: {}, expecting {}.", file, bufferInfo.bytesused, size.surface() * 3)
 		} else {
-			frame->setData(convertedBuffer.data(), convertedBuffer.size());
+			frame->setData(convertedBuffer.data(), static_cast<uint32_t>(convertedBuffer.size()));
 		}
 	}
 	// queue the buffer

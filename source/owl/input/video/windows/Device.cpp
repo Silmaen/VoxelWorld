@@ -163,6 +163,10 @@ Device::PixelFormat getDevicePixelFormat(const GUID &videoFormat) {
 		return Device::PixelFormat::RGB24;
 	else if (videoFormat == MFVideoFormat_NV12)
 		return Device::PixelFormat::NV12;
+	else if (videoFormat == MFVideoFormat_MJPG)
+		return Device::PixelFormat::MJPEG;
+	else if (videoFormat == MFVideoFormat_YUY2)
+		return Device::PixelFormat::YUYV;
 
 	// Format inconnu
 	return Device::PixelFormat::Unknwon;
@@ -351,7 +355,7 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 	byte *byteBuffer;
 	u_long bCurLen = 0;
 	buffer->Lock(&byteBuffer, nullptr, &bCurLen);
-	std::vector<byte> convertedBuffer = getRGBBuffer(byteBuffer, bCurLen);
+	std::vector<byte> convertedBuffer = getRGBBuffer(byteBuffer, static_cast<int32_t>(bCurLen));
 	if (size.surface() * 3 != convertedBuffer.size()) {
 		OWL_CORE_WARN("Frame size missmatch {} buffer: {}.", size.surface() * 3, convertedBuffer.size())
 		buffer->Unlock();

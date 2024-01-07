@@ -1,5 +1,5 @@
 /**
- * @file ${FILE}
+ * @file Device.h
  * @author Silmaen
  * @date 03/01/2024
  * Copyright © 2024 All rights reserved.

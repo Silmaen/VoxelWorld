@@ -30,7 +30,7 @@ void ConvertNV12ToRGB24(const uint8_t *nv12Buffer, const math::FrameSize &frameS
 			const uint32_t yIndex = i * frameSize.getWidth() + j;
 			const uint32_t uvIndex = (i / 2) * frameSize.getWidth() + (j & ~1ull);
 			// Indices dans le tampon RGB24
-			const uint32_t rgbIndex = (i * frameSize.getWidth() + j) * 3;
+			const uint32_t rgbIndex = ((i + 1) * frameSize.getWidth() - j - 1) * 3;
 			// Conversion YUV vers RGB
 			const int32_t c = yComponent[yIndex] - 16;
 			const int32_t d = uvComponent[uvIndex] - 128;
@@ -133,9 +133,9 @@ bool Device::isPixelFormatSupported(const PixelFormat &pixFormat) {
 		case PixelFormat::MJPEG:
 			return true;
 		case PixelFormat::Unknwon:
-		default:
 			return false;
 	}
+	return false;
 }
 
 }// namespace owl::input::video
