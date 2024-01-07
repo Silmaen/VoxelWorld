@@ -15,15 +15,13 @@
 #include "null/Texture.h"
 #include "opengl/Texture.h"
 #include "opengl_legacy/Texture.h"
+#include "vulkan/Texture.h"
 
 namespace owl::renderer {
 
 shared<Texture2D> Texture2D::create(const std::filesystem::path &file) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
-			return nullptr;
 		case RenderAPI::Type::Null: {
 			auto texture = mk_shared<null::Texture2D>(file);
 			if (texture->isLoaded())// No data
@@ -42,6 +40,12 @@ shared<Texture2D> Texture2D::create(const std::filesystem::path &file) {
 				return texture;
 			return nullptr;
 		}
+		case RenderAPI::Type::Vulkan: {
+			auto texture = mk_shared<vulkan::Texture2D>(file);
+			if (texture->isLoaded())// No data
+				return texture;
+			return nullptr;
+		}
 	}
 
 	OWL_CORE_ERROR("Unknown RendererAPI!")
@@ -55,15 +59,14 @@ shared<Texture2D> Texture2D::create(const std::string &textureName) {
 shared<Texture2D> Texture2D::create(uint32_t width, uint32_t height, bool withAlpha) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
-			return nullptr;
 		case RenderAPI::Type::Null:
 			return mk_shared<null::Texture2D>(width, height);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::Texture2D>(width, height, withAlpha);
 		case RenderAPI::Type::OpenglLegacy:
 			return mk_shared<opengl_legacy::Texture2D>(width, height, withAlpha);
+		case RenderAPI::Type::Vulkan:
+			return mk_shared<vulkan::Texture2D>(width, height, withAlpha);
 	}
 
 	OWL_CORE_ERROR("Unknown RendererAPI!")
@@ -72,15 +75,14 @@ shared<Texture2D> Texture2D::create(uint32_t width, uint32_t height, bool withAl
 shared<Texture2D> Texture2D::create(const math::FrameSize &size, bool withAlpha) {
 	auto type = Renderer::getAPI();
 	switch (type) {
-		case RenderAPI::Type::Vulkan:
-			OWL_CORE_ERROR("Render API {} is not yet supported", magic_enum::enum_name(type))
-			return nullptr;
 		case RenderAPI::Type::Null:
 			return mk_shared<null::Texture2D>(size);
 		case RenderAPI::Type::OpenGL:
 			return mk_shared<opengl::Texture2D>(size, withAlpha);
 		case RenderAPI::Type::OpenglLegacy:
 			return mk_shared<opengl_legacy::Texture2D>(size, withAlpha);
+		case RenderAPI::Type::Vulkan:
+			return mk_shared<vulkan::Texture2D>(size, withAlpha);
 	}
 
 	OWL_CORE_ERROR("Unknown RendererAPI!")
