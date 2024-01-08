@@ -29,7 +29,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	~GraphContext() override = default;//---UNCOVER---
+	~GraphContext() override;
 
 	/**
 	 * @brief Initialize the context.
@@ -44,7 +44,7 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	[[nodiscard]] [[nodiscard]] Version getVersion() const override { return {0, 0}; }
+	[[nodiscard]] Version getVersion() const override { return {1, 3}; }
 };
 
 }// namespace owl::renderer::vulkan

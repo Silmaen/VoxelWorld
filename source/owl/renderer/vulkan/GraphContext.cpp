@@ -11,10 +11,12 @@
 
 namespace owl::renderer::vulkan {
 
-GraphContext::GraphContext(GLFWwindow *) {}
+GraphContext::GraphContext(GLFWwindow *){};
 
-void GraphContext::init() {}
+GraphContext::~GraphContext() = default;
 
 void GraphContext::swapBuffers() {}
+
+void GraphContext::init() {}
 
 }// namespace owl::renderer::vulkan

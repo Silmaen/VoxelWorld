@@ -26,48 +26,60 @@ Application::Application(const AppParams &appParams) : initParams{appParams} {
 	OWL_CORE_ASSERT(!instance, "Application already exists!")
 	instance = this;
 
-	// Set up a working directory
-	// Assuming present of a folder 'res' containing the data
-	workingDirectory = absolute(std::filesystem::current_path());
-	OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
+	// Look for things on the storages
+	{
+		// Set up a working directory
+		// Assuming present of a folder 'res' containing the data
+		workingDirectory = absolute(std::filesystem::current_path());
+		OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
 
-	// load config file if any
-	auto configPath = workingDirectory / "config.yml";
-	if (exists(configPath))
-		initParams.loadFromFile(configPath);
-	// save config
-	initParams.saveToFile(configPath);
+		// load config file if any
+		auto configPath = workingDirectory / "config.yml";
+		if (exists(configPath))
+			initParams.loadFromFile(configPath);
+		// save config
+		initParams.saveToFile(configPath);
 
-	[[maybe_unused]] bool assetFound = searchAssets(initParams.assetsPattern);
-	OWL_CORE_ASSERT(assetFound, "Unable to find assets")
+		[[maybe_unused]] bool assetFound = searchAssets(initParams.assetsPattern);
+		OWL_CORE_ASSERT(assetFound, "Unable to find assets")
+	}
 
-	// startup the renderer
-	renderer::RenderCommand::create(initParams.renderer);
-	// check renderer creation
-	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Created) {
-		OWL_CORE_ERROR("ERROR while Creating Renderer")
-		state = State::Error;
-		return;
+	// Create the renderer
+	{
+		renderer::RenderCommand::create(initParams.renderer);
+		// check renderer creation
+		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Created) {
+			OWL_CORE_ERROR("ERROR while Creating Renderer")
+			state = State::Error;
+			return;
+		}
 	}
 
 	// create main window
-	appWindow = input::Window::create({
-			.title = initParams.name,
-			.iconPath = initParams.icon.empty() ? "" : (assetDirectory / initParams.icon).string(),
-			.width = initParams.width,
-			.height = initParams.height,
-	});
-	input::Input::init();
-	OWL_CORE_INFO("Window Created.")
-	// initialize the renderer
-	renderer::Renderer::init();
-	// check renderer initialization
-	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
-		OWL_CORE_ERROR("ERROR while Initializing Renderer")
-		state = State::Error;
-		return;
+	{
+		appWindow = input::Window::create({
+				.title = initParams.name,
+				.iconPath = initParams.icon.empty() ? "" : (assetDirectory / initParams.icon).string(),
+				.width = initParams.width,
+				.height = initParams.height,
+		});
+		input::Input::init();
+		OWL_CORE_INFO("Window Created.")
 	}
-	OWL_CORE_INFO("Renderer initiated.")
+
+	// initialize the renderer
+	{
+		renderer::Renderer::init();
+		// check renderer initialization
+		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
+			OWL_CORE_ERROR("ERROR while Initializing Renderer")
+			state = State::Error;
+			return;
+		}
+		OWL_CORE_INFO("Renderer initiated.")
+	}
+
+	// set up the callbacks
 	appWindow->setEventCallback(
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 

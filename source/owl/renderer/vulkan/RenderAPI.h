@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../RenderAPI.h"
+#include <vulkan/vulkan.h>
 
 /**
  * @brief Namespace for vulkan specific rendering objects.
@@ -29,7 +30,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	~RenderAPI() override = default;
+	~RenderAPI() override;
 
 	/**
 	 * @brief Initialize the renderer.
@@ -74,6 +75,12 @@ public:
 	 * @return Number of texture slots.
 	 */
 	[[nodiscard]] uint32_t getMaxTextureSlots() const override { return 16; }
+
+private:
+	/// Instance of Vulkan.
+	VkInstance instance{};
+	/// Rendering surface.
+	VkSurfaceKHR surface{};
 };
 
 }// namespace owl::renderer::vulkan

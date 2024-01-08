@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <vulkan/vulkan.h>
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
