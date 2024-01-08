@@ -44,7 +44,7 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	Version getVersion() const override { return {0, 0}; }
+	[[nodiscard]] [[nodiscard]] Version getVersion() const override { return {0, 0}; }
 };
 
 }// namespace owl::renderer::vulkan

@@ -44,7 +44,7 @@ struct OWL_API AppParams {
 
 	/**
 	 * @brief Access to the given command line argument.
-	 * @param index Id of the argument.
+	 * @param index Index of the argument.
 	 * @return The argument.
 	 */
 	const char *operator[](int index) const {
@@ -63,7 +63,7 @@ struct OWL_API AppParams {
 	void saveToFile(const std::filesystem::path &file) const;
 };
 /**
- * @brief Class Application
+ * @brief Root class defining the application to run.
  */
 class OWL_API Application {
 public:

@@ -71,7 +71,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the event's name'.
+	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
 	[[nodiscard]] std::string getName() const override {
@@ -91,7 +91,7 @@ public:
 	[[nodiscard]] type getType() const override { return getStaticType(); }
 
 private:
-	/// Counter of repet.
+	/// Counter of repeat.
 	uint16_t repeatCount;
 };
 
@@ -115,7 +115,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the event's name'.
+	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
 	[[nodiscard]] std::string getName() const override {
@@ -155,7 +155,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the event's name'.
+	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
 	[[nodiscard]] std::string getName() const override {

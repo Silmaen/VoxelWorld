@@ -1,36 +1,56 @@
 # Owl
 
+![GitHub License](https://img.shields.io/github/license/Silmaen/Owl)
+![GitHub tag checks state](https://img.shields.io/github/checks-status/Silmaen/Owl/main)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Silmaen/Owl)
+[![GitHub Stars](https://img.shields.io/github/stars/silmaen/Owl)]()
+
 ![](assets/logo/logo_owl.png)
 
 Owl aims to be a simple game engine. The main goal of this engine is learning game engine
 development.
 
+## Documentation
+
+The full documentation is available on the dedicated website [owl](https:://owl.argawaen.net).
+
 ## Platform
 
-We try to be multiplatform :
+We try to be multiplatform and using different compilers:
 
-* Windows x64 mingw (g++ or clang++)
-* Linux x64 (g++ or clang++)
-* Linux Arm64
+* Windows x64
+    * mingw g++ 13.2
+    * mingw clang++ 17.0
+* Linux x64 & arm64
+    * Ubuntu 22.04 (glibc 2.35) gcc 12 (and above)
+    * Ubuntu 22.04 (glibc 2.35) clang 15 (and above)
 
-These platform requires a graphic card that support OpenGL 4.5.
+These platform requires a graphic card that supports one of the following renderer:
+
+* `Null` - for no graphic rendering (Server for example)
+* `OpenGL` - Use OpenGL 4.5 (you must have Graphics device that supports it)
+* `OpenGL_Legacy` - Use of OpenGL 2.1, but with some extensions (
+  GL_ARB_framebuffer_object,GL_ARB_framebuffer_sRGB,GL_ARB_texture_multisample,GL_ARB_texture_storage,GL_ARB_texture_storage_multisample)
+    * Some features will not be available with this renderer
+* `Vulkan` - Use Vulkan 1.3 (you must have Graphics device that supports it)
 
 ## Dependencies
 
+### Dependencies manager
+
 Dependencies are managed by my dependency tool [DepManger](https://github.com/Silmaen/DepManager).
 
+Dependencies are hosted by my dependency server [DepMangerServer](https://github.com/Silmaen/DepManagerServer).
+
+### Dependencies sources
+
 All the dependencies and their recipes for DepManager are available in a separate
-repository [here](https://github.com/Silmaen/OwlDependencies).
-Most of then are configured as git submodules.
+repository [OwlDependencies](https://github.com/Silmaen/OwlDependencies).
 
-## RoadMap
+Most are configured as git submodules.
 
-* Misc
-    * [ ] Refactor unclean code
-    * [ ] Refactor documentation
-    * [ ] Add unit testing
-* Renderder
-    * [ ] Add a legacy OpenGL renderer (version < 4.5 )
-        * [ ] Make it work on Old GraphicCard on x64
-        * [ ] Make it Work on Raspberry Pi 3
+## Build
 
+To build the engine Cmake (>2.24) is required.
+
+Most user will use one of the cmake's preset defined.

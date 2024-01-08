@@ -6,7 +6,7 @@
  * All modification must get authorization from the author.
  *
  * This file should be included only once in the client side.
- * This allow the memory TRacker to track memory allocation from both engine &
+ * This allows the memory TRacker to track memory allocation from both engine &
  * client in the case of shared library build.
  */
 #pragma once

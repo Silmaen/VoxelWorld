@@ -26,7 +26,7 @@ Application::Application(const AppParams &appParams) : initParams{appParams} {
 	OWL_CORE_ASSERT(!instance, "Application already exists!")
 	instance = this;
 
-	// Setup a working directory
+	// Set up a working directory
 	// Assuming present of a folder 'res' containing the data
 	workingDirectory = absolute(std::filesystem::current_path());
 	OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
@@ -240,9 +240,9 @@ void AppParams::loadFromFile(const std::filesystem::path &file) {
 		if (appConfig["width"]) width = appConfig["width"].as<uint32_t>();
 		if (appConfig["height"]) height = appConfig["height"].as<uint32_t>();
 		if (appConfig["renderer"]) {
-			auto d_renderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(appConfig["renderer"].as<std::string>());
-			if (d_renderer.has_value())
-				renderer = d_renderer.value();
+			auto dRenderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(appConfig["renderer"].as<std::string>());
+			if (dRenderer.has_value())
+				renderer = dRenderer.value();
 		}
 	}
 }

@@ -69,7 +69,7 @@ public:
 
 	/**
 	 * @brief Defines the theme for the UI.
-	 * @param theme The them to apply.
+	 * @param theme The theme to apply.
 	 */
 	void setTheme(const Theme &theme = Theme());
 

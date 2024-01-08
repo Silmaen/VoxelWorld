@@ -16,7 +16,7 @@
 namespace owl::input::null {
 
 /**
- * @brief Class GLFW Window.
+ * @brief GLFW implementation of window.
  */
 class OWL_API Window : public ::owl::input::Window {
 public:

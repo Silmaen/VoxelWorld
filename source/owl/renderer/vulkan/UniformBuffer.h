@@ -19,8 +19,6 @@ public:
 	UniformBuffer() = delete;
 	UniformBuffer(const UniformBuffer &) = default;
 	UniformBuffer(UniformBuffer &&) = default;
-	UniformBuffer &operator=(const UniformBuffer &) = default;
-	UniformBuffer &operator=(UniformBuffer &&) = default;
 
 	/**
 	 * @brief Constructor.
@@ -45,7 +43,7 @@ public:
 	 * @param size The data size.
 	 * @param offset The offset to start.
 	 */
-	void setData(const void *data, uint32_t size, uint32_t offset = 0) override;
+	void setData(const void *data, uint32_t size, uint32_t offset) override;
 
 private:
 };

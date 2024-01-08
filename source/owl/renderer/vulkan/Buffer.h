@@ -25,7 +25,7 @@ public:
 	 * @brief Constructor.
 	 * @param size The buffer size.
 	 */
-	VertexBuffer(uint32_t size);
+	explicit VertexBuffer(uint32_t size);
 
 	/**
 	 * @brief Default constructor.

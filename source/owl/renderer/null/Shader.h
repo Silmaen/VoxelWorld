@@ -19,8 +19,6 @@ class OWL_API Shader : public owl::renderer::Shader {
 public:
 	Shader(const Shader &) = delete;
 	Shader(Shader &&) = delete;
-	Shader &operator=(const Shader &) = delete;
-	Shader &operator=(Shader &&) = delete;
 
 	/**
 	 * @brief Constructor.

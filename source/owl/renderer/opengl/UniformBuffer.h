@@ -19,8 +19,6 @@ public:
 	UniformBuffer() = delete;
 	UniformBuffer(const UniformBuffer &) = default;
 	UniformBuffer(UniformBuffer &&) = default;
-	UniformBuffer &operator=(const UniformBuffer &) = default;
-	UniformBuffer &operator=(UniformBuffer &&) = default;
 
 	/**
 	 * @brief Constructor.

@@ -68,7 +68,7 @@ public:
 
 	/**
 	 * @brief Get the starting of the layer list.
-	 * @return Iterator at the begin of the layer list.
+	 * @return Iterator at the beginning of the layer list.
 	 */
 	[[nodiscard]] iterator begin() { return layers.begin(); }
 
@@ -80,7 +80,7 @@ public:
 
 	/**
 	 * @brief Get the starting of the reversed layer list.
-	 * @return Reverse iterator at the begin of the layer list.
+	 * @return Reverse iterator at the beginning of the layer list.
 	 */
 	[[nodiscard]] reverse_iterator rbegin() { return layers.rbegin(); }
 
@@ -92,7 +92,7 @@ public:
 
 	/**
 	 * @brief Get the starting of the layer list.
-	 * @return Const iterator at the begin of the layer list.
+	 * @return Const iterator at the beginning of the layer list.
 	 */
 	[[nodiscard]] const_iterator begin() const { return layers.begin(); }
 
@@ -104,7 +104,7 @@ public:
 
 	/**
 	 * @brief Get the starting of the reversed layer list.
-	 * @return Const reverse iterator at the begin of the layer list.
+	 * @return Const reverse iterator at the beginning of the layer list.
 	 */
 	[[nodiscard]] const_reverse_iterator rbegin() const {
 		return layers.rbegin();

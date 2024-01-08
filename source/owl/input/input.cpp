@@ -1,10 +1,10 @@
 /**
-* @file Input.cpp
-* @author Silmaen
-* @date 02/08/2023
-* Copyright © 2023 All rights reserved.
-* All modification must get authorization from the author.
-*/
+ * @file Input.cpp
+ * @author Silmaen
+ * @date 02/08/2023
+ * Copyright © 2023 All rights reserved.
+ * All modification must get authorization from the author.
+ */
 
 #include "owlpch.h"
 

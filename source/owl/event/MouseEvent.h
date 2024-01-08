@@ -51,7 +51,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the event's name'.
+	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
 	[[nodiscard]] std::string getName() const override {
@@ -119,7 +119,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the event's name'.
+	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
 	[[nodiscard]] std::string getName() const override {
@@ -204,7 +204,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the event's name'.
+	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
 	[[nodiscard]] std::string getName() const override {
@@ -245,7 +245,7 @@ public:
 	}
 
 	/**
-	 * @brief Get the event's name'.
+	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
 	[[nodiscard]] std::string getName() const override {

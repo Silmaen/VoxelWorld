@@ -13,7 +13,7 @@
 namespace owl::renderer {
 
 /**
- * @brief Class GraphicContext.
+ * @brief General class for the GraphicContext.
  */
 class OWL_API GraphContext {
 public:

@@ -16,7 +16,7 @@
 namespace owl::core {
 
 /**
- * @brief Class managing the Time Steps.
+ * @brief Time Steps.
  */
 class OWL_API Timestep {
 public:

@@ -155,33 +155,33 @@ void Renderer2D::init() {
 	// quads
 	data->drawQuad = DrawData::create();
 	data->drawQuad->init({
-								{"a_Position", ShaderDataType::Float3},
-								{"a_Color", ShaderDataType::Float4},
-								{"a_TexCoord", ShaderDataType::Float2},
-								{"a_TexIndex", ShaderDataType::Float},
-								{"a_TilingFactor", ShaderDataType::Float},
-								{"a_EntityID", ShaderDataType::Int},
-						},
-						quadIndices, "renderer2D_quad");
+								 {"a_Position", ShaderDataType::Float3},
+								 {"a_Color", ShaderDataType::Float4},
+								 {"a_TexCoord", ShaderDataType::Float2},
+								 {"a_TexIndex", ShaderDataType::Float},
+								 {"a_TilingFactor", ShaderDataType::Float},
+								 {"a_EntityID", ShaderDataType::Int},
+						 },
+						 quadIndices, "renderer2D_quad");
 	// circles
 	data->drawCircle = DrawData::create();
 	data->drawCircle->init({
-								  {"a_WorldPosition", ShaderDataType::Float3},
-								  {"a_LocalPosition", ShaderDataType::Float3},
-								  {"a_Color", ShaderDataType::Float4},
-								  {"a_Thickness", ShaderDataType::Float},
-								  {"a_Fade", ShaderDataType::Float},
-								  {"a_EntityID", ShaderDataType::Int},
-						  },
-						  quadIndices, "renderer2D_circle");
+								   {"a_WorldPosition", ShaderDataType::Float3},
+								   {"a_LocalPosition", ShaderDataType::Float3},
+								   {"a_Color", ShaderDataType::Float4},
+								   {"a_Thickness", ShaderDataType::Float},
+								   {"a_Fade", ShaderDataType::Float},
+								   {"a_EntityID", ShaderDataType::Int},
+						   },
+						   quadIndices, "renderer2D_circle");
 	// Lines
 	data->drawLine = DrawData::create();
 	data->drawLine->init({
-								{"a_Position", ShaderDataType::Float3},
-								{"a_Color", ShaderDataType::Float4},
-								{"a_EntityID", ShaderDataType::Int},
-						},
-						quadIndices, "renderer2D_line");
+								 {"a_Position", ShaderDataType::Float3},
+								 {"a_Color", ShaderDataType::Float4},
+								 {"a_EntityID", ShaderDataType::Int},
+						 },
+						 quadIndices, "renderer2D_line");
 
 	data->whiteTexture = Texture2D::create(1, 1);
 	uint32_t whiteTextureData = 0xffffffff;
@@ -221,7 +221,7 @@ void Renderer2D::beginScene(const CameraOrtho &camera) {
 	OWL_PROFILE_FUNCTION()
 
 	data->cameraBuffer.viewProjection = camera.getViewProjectionMatrix();
-	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData));
+	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData), 0);
 	startBatch();
 }
 
@@ -229,7 +229,7 @@ void Renderer2D::beginScene(const CameraEditor &camera) {
 	OWL_PROFILE_FUNCTION()
 
 	data->cameraBuffer.viewProjection = camera.getViewProjection();
-	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData));
+	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData), 0);
 	startBatch();
 }
 
@@ -237,7 +237,7 @@ void Renderer2D::beginScene(const Camera &camera, const glm::mat4 &transform) {
 	OWL_PROFILE_FUNCTION()
 
 	data->cameraBuffer.viewProjection = camera.getProjection() * glm::inverse(transform);
-	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData));
+	data->cameraUniformBuffer->setData(&data->cameraBuffer, sizeof(utils::internalData::CameraData), 0);
 	startBatch();
 }
 
@@ -250,7 +250,7 @@ void Renderer2D::endScene() {
 void Renderer2D::flush() {
 	if (data->quad.indexCount > 0) {
 		data->drawQuad->setVertexData(data->quad.vertexBuf.data(),
-									 static_cast<uint32_t>(data->quad.vertexBuf.size() * sizeof(utils::QuadVertex)));
+									  static_cast<uint32_t>(data->quad.vertexBuf.size() * sizeof(utils::QuadVertex)));
 		// bind textures
 		for (uint32_t i = 0; i < data->textureSlotIndex; i++)
 			data->textureSlots[i]->bind(i);
@@ -260,14 +260,14 @@ void Renderer2D::flush() {
 	}
 	if (data->circle.indexCount > 0) {
 		data->drawCircle->setVertexData(data->circle.vertexBuf.data(),
-									   static_cast<uint32_t>(data->circle.vertexBuf.size() * sizeof(utils::CircleVertex)));
+										static_cast<uint32_t>(data->circle.vertexBuf.size() * sizeof(utils::CircleVertex)));
 		// draw call
 		RenderCommand::drawData(data->drawCircle, data->circle.indexCount);
 		data->stats.drawCalls++;
 	}
 	if (data->line.indexCount > 0) {
 		data->drawLine->setVertexData(data->line.vertexBuf.data(),
-									 static_cast<uint32_t>(data->line.vertexBuf.size() * sizeof(utils::LineVertex)));
+									  static_cast<uint32_t>(data->line.vertexBuf.size() * sizeof(utils::LineVertex)));
 		// draw call
 		RenderCommand::drawData(data->drawLine, data->line.indexCount);
 		data->stats.drawCalls++;
