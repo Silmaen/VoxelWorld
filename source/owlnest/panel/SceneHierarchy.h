@@ -53,7 +53,7 @@ public:
 	 * @brief Constructor
 	 * @param scene The base scene
 	 */
-	explicit SceneHierarchy(const shared<scene::Scene> &scene);
+	[[maybe_unused]] explicit SceneHierarchy(const shared<scene::Scene> &scene);
 	/**
 	 * @brief Define the Scene context
 	 * @param scene The Scene

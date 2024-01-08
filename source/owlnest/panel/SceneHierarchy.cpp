@@ -24,7 +24,7 @@
 
 namespace owl::panel {
 
-SceneHierarchy::SceneHierarchy(const shared<scene::Scene> &context_) {
+[[maybe_unused]] SceneHierarchy::SceneHierarchy(const shared<scene::Scene> &context_) {
 	setContext(context_);
 }
 

@@ -13,7 +13,7 @@
 namespace owl::renderer::opengl {
 
 /**
- * @brief Class VertexBuffer.
+ * @brief OpenGL implementation of vertex buffer.
  */
 class VertexBuffer : public ::owl::renderer::VertexBuffer {
 public:
@@ -60,7 +60,7 @@ private:
 };
 
 /**
- * @brief Class IndexBuffer.
+ * @brief OpenGL implementation of index buffer.
  */
 class IndexBuffer : public ::owl::renderer::IndexBuffer {
 public:

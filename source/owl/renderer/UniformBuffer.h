@@ -32,7 +32,7 @@ public:
 	 * @param size The data size.
 	 * @param offset The offset to start.
 	 */
-	virtual void setData(const void *data, uint32_t size, uint32_t offset = 0) = 0;
+	virtual void setData(const void *data, uint32_t size, uint32_t offset) = 0;
 
 	/**
 	 * @brief bind this uniform buffer.

@@ -182,7 +182,7 @@ public:
 	 * @brief Constructor.
 	 * @param name_ Scope's name.
 	 */
-	explicit ProfileTimer(const char *name_) : name(name_), startTimepoint{std::chrono::steady_clock::now()},
+	explicit ProfileTimer(const char *name_) : name(name_), startTimePoint{std::chrono::steady_clock::now()},
 											   stopped(false) {
 	}
 
@@ -198,14 +198,14 @@ public:
 	 * @brief Stop the timer.
 	 */
 	void stop() {
-		auto endTimepoint = std::chrono::steady_clock::now();
+		auto endTimePoint = std::chrono::steady_clock::now();
 		auto highResStart =
-				FloatingPointMicroseconds{startTimepoint.time_since_epoch()};
+				FloatingPointMicroseconds{startTimePoint.time_since_epoch()};
 		auto elapsedTime =
-				std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint)
+				std::chrono::time_point_cast<std::chrono::microseconds>(endTimePoint)
 						.time_since_epoch() -
 				std::chrono::time_point_cast<std::chrono::microseconds>(
-						startTimepoint)
+						startTimePoint)
 						.time_since_epoch();
 
 		Profiler::get().writeProfile(
@@ -218,7 +218,7 @@ private:
 	/// Scope's name.
 	const char *name;
 	/// Timer starting point.
-	std::chrono::time_point<std::chrono::steady_clock> startTimepoint;
+	std::chrono::time_point<std::chrono::steady_clock> startTimePoint;
 	/// Timer state, true if not running.
 	bool stopped;
 };

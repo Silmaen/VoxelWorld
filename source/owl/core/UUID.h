@@ -14,7 +14,7 @@
 namespace owl::core {
 
 /**
- * @brief Class UUID.
+ * @brief Uuid object.
  */
 class OWL_API UUID {
 public:
@@ -30,7 +30,7 @@ public:
 
 	/**
 	 * @brief Default constructor.
-	 * @param Uuid The Id to initialize.
+	 * @param Uuid The uuid to initialize.
 	 */
 	UUID(uint64_t Uuid) : uuid{Uuid} {}
 

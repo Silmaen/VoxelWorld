@@ -26,7 +26,7 @@
 namespace owl::core {
 
 /**
- * @brief Class for the logging system.
+ * @brief Logging system.
  */
 class OWL_API Log {
 public:

@@ -1,10 +1,10 @@
 /**
-* @file UniformBindingLibrary.cpp
-* @author Silmaen
-* @date 01/09/2023
-* Copyright © 2023 All rights reserved.
-* All modification must get authorization from the author.
-*/
+ * @file UniformBindingLibrary.cpp
+ * @author Silmaen
+ * @date 01/09/2023
+ * Copyright © 2023 All rights reserved.
+ * All modification must get authorization from the author.
+ */
 
 #include "UniformBindingLibrary.h"
 

@@ -29,7 +29,7 @@ public:
 	/**
 	 * @brief Run destroy script.
 	 */
-	void (*destroyScript)(NativeScript *);
+	[[maybe_unused]] void (*destroyScript)(NativeScript *);
 
 	/**
 	 * @brief Bind the script.

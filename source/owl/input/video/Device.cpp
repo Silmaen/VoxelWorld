@@ -14,7 +14,7 @@ namespace owl::input::video {
 
 namespace {
 
-void ConvertNV12ToRGB24(const uint8_t *nv12Buffer, const math::FrameSize &frameSize, uint8_t *rgb24Buffer) {
+void convertNV12ToRGB24(const uint8_t *nv12Buffer, const math::FrameSize &frameSize, uint8_t *rgb24Buffer) {
 	// Chaque composant Y occupe width * height octets
 	const uint32_t ySize = frameSize.surface();
 
@@ -43,33 +43,33 @@ void ConvertNV12ToRGB24(const uint8_t *nv12Buffer, const math::FrameSize &frameS
 	}
 }
 
-void ConvertYUYVToRGB24(const uint8_t *yuyvBuffer, const math::FrameSize &frameSize, uint8_t *rgb24Buffer) {
+void convertYUYVToRGB24(const uint8_t *yuyvBuffer, const math::FrameSize &frameSize, uint8_t *rgb24Buffer) {
 	// Chaque composant YUV prend deux octets dans le format YUYV
 	const uint32_t yuyvSize = frameSize.surface() * 2;
 
 	// Parcourir chaque paire de pixels YUYV
 	for (uint32_t i = 0; i < yuyvSize; i += 4) {
 		// Conversion YUV vers RGB pour le premier pixel
-		const int32_t C0 = yuyvBuffer[i] - 16;
-		const int32_t D0 = yuyvBuffer[i + 1] - 128;
-		const int32_t E0 = yuyvBuffer[i + 3] - 128;
+		const int32_t c0 = yuyvBuffer[i] - 16;
+		const int32_t d0 = yuyvBuffer[i + 1] - 128;
+		const int32_t e0 = yuyvBuffer[i + 3] - 128;
 		// Conversion YUV vers RGB pour le deuxième pixel
-		const int32_t C1 = yuyvBuffer[i + 2] - 16;
+		const int32_t c1 = yuyvBuffer[i + 2] - 16;
 		// Indices dans le tampon RGB24
 		const uint32_t rgbIndex = i * 3 / 2;
 
 		// Stocker les composantes RGB dans le tampon RGB24 pour les deux pixels
-		rgb24Buffer[rgbIndex] = static_cast<uint8_t>(math::clamp((298 * C0 + 409 * E0 + 128) >> 8, 0, 255));
-		rgb24Buffer[rgbIndex + 1] = static_cast<uint8_t>(math::clamp((298 * C0 - 100 * D0 - 208 * E0 + 128) >> 8, 0, 255));
-		rgb24Buffer[rgbIndex + 2] = static_cast<uint8_t>(math::clamp((298 * C0 + 516 * D0 + 128) >> 8, 0, 255));
+		rgb24Buffer[rgbIndex] = static_cast<uint8_t>(math::clamp((298 * c0 + 409 * e0 + 128) >> 8, 0, 255));
+		rgb24Buffer[rgbIndex + 1] = static_cast<uint8_t>(math::clamp((298 * c0 - 100 * d0 - 208 * e0 + 128) >> 8, 0, 255));
+		rgb24Buffer[rgbIndex + 2] = static_cast<uint8_t>(math::clamp((298 * c0 + 516 * d0 + 128) >> 8, 0, 255));
 
-		rgb24Buffer[rgbIndex + 3] = static_cast<uint8_t>(math::clamp((298 * C1 + 409 * E0 + 128) >> 8, 0, 255));
-		rgb24Buffer[rgbIndex + 4] = static_cast<uint8_t>(math::clamp((298 * C1 - 100 * D0 - 208 * E0 + 128) >> 8, 0, 255));
-		rgb24Buffer[rgbIndex + 5] = static_cast<uint8_t>(math::clamp((298 * C1 + 516 * D0 + 128) >> 8, 0, 255));
+		rgb24Buffer[rgbIndex + 3] = static_cast<uint8_t>(math::clamp((298 * c1 + 409 * e0 + 128) >> 8, 0, 255));
+		rgb24Buffer[rgbIndex + 4] = static_cast<uint8_t>(math::clamp((298 * c1 - 100 * d0 - 208 * e0 + 128) >> 8, 0, 255));
+		rgb24Buffer[rgbIndex + 5] = static_cast<uint8_t>(math::clamp((298 * c1 + 516 * d0 + 128) >> 8, 0, 255));
 	}
 }
 
-void ConvertMJPEGToRGB24(const uint8_t *jpegBuffer, const int32_t jpegSize, const math::FrameSize &frameSize, uint8_t *rgb24Buffer) {
+void convertMJPEGToRGB24(const uint8_t *jpegBuffer, const int32_t jpegSize, const math::FrameSize &frameSize, uint8_t *rgb24Buffer) {
 	int comp, width, height;
 	stbi_set_flip_vertically_on_load(0);
 	uint8_t *buffer = stbi_load_from_memory(jpegBuffer, jpegSize, &width, &height, &comp, 3);
@@ -109,16 +109,16 @@ std::vector<uint8_t> Device::getRGBBuffer(const uint8_t *inputBuffer, const int3
 	std::vector<uint8_t> output;
 	if (pixFormat == PixelFormat::NV12) {
 		output.resize(3 * size.surface());
-		ConvertNV12ToRGB24(inputBuffer, size, output.data());
+		convertNV12ToRGB24(inputBuffer, size, output.data());
 	} else if (pixFormat == PixelFormat::RGB24) {
 		output.resize(3 * size.surface());
 		memcpy(output.data(), inputBuffer, output.size());
 	} else if (pixFormat == PixelFormat::YUYV) {
 		output.resize(3 * size.surface());
-		ConvertYUYVToRGB24(inputBuffer, size, output.data());
+		convertYUYVToRGB24(inputBuffer, size, output.data());
 	} else if (pixFormat == PixelFormat::MJPEG) {
 		output.resize(3 * size.surface());
-		ConvertMJPEGToRGB24(inputBuffer, bufferSize, size, output.data());
+		convertMJPEGToRGB24(inputBuffer, bufferSize, size, output.data());
 	} else {
 		OWL_CORE_WARN("Unkown or unsupported pixel format, empty output buffer.")
 	}

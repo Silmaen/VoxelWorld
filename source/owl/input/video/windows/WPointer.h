@@ -27,7 +27,7 @@ public:
 	 * @param other Raw pointer to affect.
 	 * @param own If the WPoint should take the ownership of the memory.
 	 */
-	WPointer(PTR *other, bool own = false) : owner{own}, object{other} {}
+	explicit WPointer(PTR *other, bool own = false) : owner{own}, object{other} {}
 
 	/**
 	 * @brief Destructor.

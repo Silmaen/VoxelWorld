@@ -19,8 +19,6 @@ class Framebuffer : public ::owl::renderer::Framebuffer {
 public:
 	Framebuffer(const Framebuffer &) = default;
 	Framebuffer(Framebuffer &&) = default;
-	Framebuffer &operator=(const Framebuffer &) = default;
-	Framebuffer &operator=(Framebuffer &&) = default;
 
 	/**
 	 * @brief Default constructor.
@@ -64,7 +62,7 @@ public:
 	 * @param index The color index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getColorAttachmentRendererID([[maybe_unused]] uint32_t index = 0) const override {
+	[[nodiscard]] uint32_t getColorAttachmentRendererID([[maybe_unused]] uint32_t index) const override {
 		return 0;
 	}
 
