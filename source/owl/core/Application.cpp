@@ -10,6 +10,8 @@
 
 #include "Application.h"
 
+#include <utility>
+
 #include "core/external/yaml.h"
 #include "debug/Tracker.h"
 #include "input/Input.h"
@@ -20,7 +22,7 @@ namespace owl::core {
 
 Application *Application::instance = nullptr;
 
-Application::Application(const AppParams &appParams) : initParams{appParams} {
+Application::Application(AppParams appParams) : initParams{std::move(appParams)} {
 	OWL_PROFILE_FUNCTION()
 
 	OWL_CORE_ASSERT(!instance, "Application already exists!")

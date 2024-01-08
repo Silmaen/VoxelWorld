@@ -80,7 +80,7 @@ private:
 	/// Instance of Vulkan.
 	VkInstance instance{};
 	/// Rendering surface.
-	VkSurfaceKHR surface{};
+	//VkSurface surface{};
 };
 
 }// namespace owl::renderer::vulkan

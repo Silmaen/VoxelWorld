@@ -212,10 +212,13 @@ void Window::onUpdate() {
 void Window::setVSync(bool enabled) {
 	OWL_PROFILE_FUNCTION()
 
-	if (enabled)
-		glfwSwapInterval(1);
-	else
-		glfwSwapInterval(0);
+	auto api = renderer::RenderAPI::getAPI();
+	if (api == renderer::RenderAPI::Type::OpenGL || api == renderer::RenderAPI::Type::OpenglLegacy) {
+		if (enabled)
+			glfwSwapInterval(1);
+		else
+			glfwSwapInterval(0);
+	}
 
 	windowData.VSync = enabled;
 }

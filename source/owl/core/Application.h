@@ -76,7 +76,7 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	explicit Application(const AppParams &appParams);
+	explicit Application(AppParams appParams);
 
 	/**
 	 * @brief Access to Application instance.

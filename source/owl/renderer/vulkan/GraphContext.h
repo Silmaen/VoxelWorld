@@ -44,7 +44,17 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	[[nodiscard]] Version getVersion() const override { return {1, 3}; }
+	[[nodiscard]] Version getVersion() const override;
+
+private:
+	/// Loaded version.
+	int version = 0;
+	/// The window.
+	GLFWwindow *wnd;
+	/// Vulkan instance.
+	VkInstance instance = nullptr;
+	/// Vulkan Surface.
+	VkSurfaceKHR surface = nullptr;
 };
 
 }// namespace owl::renderer::vulkan
