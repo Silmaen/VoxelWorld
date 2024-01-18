@@ -3,7 +3,7 @@ file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_D
 
 add_custom_target(All_Tests)
 # googletest
-find_package(GTest 1.13 REQUIRED)
+find_package(GTest REQUIRED)
 
 foreach (child ${children})
     if (${child} MATCHES "test_helper")

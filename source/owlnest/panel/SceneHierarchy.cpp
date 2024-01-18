@@ -37,10 +37,13 @@ void SceneHierarchy::onImGuiRender() {
 	ImGui::Begin("Scene Hierarchy");
 
 	if (context) {
-		context->registry.each([&](auto entityID) {
+		for (auto &&[e, entity]: context->registry.storage<scene::Entity>().each()) {
+			drawEntityNode(entity);
+		}
+		/*context->registry.each([&](auto entityID) {
 			scene::Entity entity{entityID, context.get()};
 			drawEntityNode(entity);
-		});
+		});*/
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			selection = {};

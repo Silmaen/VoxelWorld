@@ -19,7 +19,7 @@ public:
 	[[nodiscard]] bool operator==(const owl::renderer::Texture &other) const override { return p == other.getPath(); }
 	[[nodiscard]] uint32_t getWidth() const override { return 0; }
 	[[nodiscard]] uint32_t getHeight() const override { return 0; }
-	[[nodiscard]] owl::math::FrameSize getSize() const override { return {0,0}; }
+	[[nodiscard]] owl::math::FrameSize getSize() const override { return {0, 0}; }
 	[[nodiscard]] bool isLoaded() const override { return true; }
 	[[nodiscard]] uint32_t getRendererID() const override { return 0; }
 	void bind(uint32_t) const override {}
@@ -43,7 +43,7 @@ TEST(SceneSerializer, SaveLoad) {
 	SceneSerializer loader(sc2);
 	loader.deserialize(fs);
 
-	EXPECT_EQ(sc2->registry.size(), sc->registry.size());
+	EXPECT_EQ(sc2->registry.storage<owl::scene::Entity>().size(), sc->registry.storage<owl::scene::Entity>().size());
 	remove(fs);
 	EXPECT_FALSE(exists(fs));
 	owl::core::Log::invalidate();
@@ -69,7 +69,7 @@ TEST(SceneSerializer, SaveLoadFULL) {
 	SceneSerializer loader(sc2);
 	loader.deserialize(fs);
 
-	EXPECT_EQ(sc2->registry.size(), sc->registry.size());
+	EXPECT_EQ(sc2->registry.storage<owl::scene::Entity>().size(), sc->registry.storage<owl::scene::Entity>().size());
 	remove(fs);
 	EXPECT_FALSE(exists(fs));
 	owl::core::Log::invalidate();

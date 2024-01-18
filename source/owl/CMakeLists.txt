@@ -64,9 +64,9 @@ find_package(glm 0.9.9 REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC glm::glm)
 
 # ImGui
-if (NOT ${PRJPREFIX}_BUILD_SHARED)
-    find_package(Vulkan REQUIRED)
-endif ()
+message(STATUS "CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}")
+find_package(VulkanHeaders REQUIRED)
+find_package(VulkanLoader REQUIRED)
 find_package(imgui REQUIRED)
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui::imgui)
 find_package(imguizmo REQUIRED)
@@ -78,7 +78,7 @@ target_link_libraries(${ENGINE_NAME} PRIVATE magic_enum::magic_enum)
 
 # yaml
 find_package(yaml-cpp REQUIRED)
-target_link_libraries(${ENGINE_NAME} PRIVATE yaml-cpp)
+target_link_libraries(${ENGINE_NAME} PUBLIC yaml-cpp::yaml-cpp)
 
 # spdlog
 find_package(spdlog REQUIRED)

@@ -21,14 +21,6 @@ target_compile_definitions(${CMAKE_PROJECT_NAME}drone PRIVATE OWL_ASSETS_LOCATIO
 
 # ----==== third party ====----
 
-# OpenCV
-#find_package(OpenCV 4.5.0 REQUIRED)
-#target_link_libraries(${CMAKE_PROJECT_NAME}drone PUBLIC opencv_videoio)
-
-# yaml
-find_package(yaml-cpp REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME}drone PRIVATE yaml-cpp)
-
 if (OWL_PLATFORM_WINDOWS)
     # for web cam identification
     target_link_libraries(${CMAKE_PROJECT_NAME}drone PRIVATE strmiids)
