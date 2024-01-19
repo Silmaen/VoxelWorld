@@ -36,60 +36,74 @@ endif ()
 # ----==== third party ====----
 
 # cpptrace
-find_package(cpptrace 0.1 REQUIRED)
+find_package(cpptrace REQUIRED)
+message(STATUS "Found cpptrace version ${cpptrace_VERSION} @ ${cpptrace_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC cpptrace::cpptrace)
 
 # debugbreak
-find_package(debugbreak 1.0 REQUIRED)
+find_package(debugbreak REQUIRED)
+message(STATUS "Found debugbreak version ${debugbreak_VERSION} @ ${debugbreak_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC debugbreak::debugbreak)
 
 # Entt
-find_package(EnTT 3.11 REQUIRED)
+find_package(EnTT REQUIRED)
+message(STATUS "Found EnTT version ${EnTT_VERSION} @ ${EnTT_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC EnTT::EnTT)
 
 # fmt
-find_package(fmt 10.1 REQUIRED)
+find_package(fmt REQUIRED)
+message(STATUS "Found fmt version ${fmt_VERSION} @ ${fmt_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
 
 # glad
 find_package(glad 2.0 REQUIRED)
+message(STATUS "Found glad version ${glad_VERSION} @ ${glad_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE glad::glad)
 
 # GLFW
-find_package(glfw3 3.3.8 REQUIRED)
+find_package(glfw3 REQUIRED)
+message(STATUS "Found glfw3 version ${glfw3_VERSION} @ ${glfw3_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE glfw)
 
 # glm
-find_package(glm 0.9.9 REQUIRED)
+find_package(glm REQUIRED)
+message(STATUS "Found glm version ${glm_VERSION} @ ${glm_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC glm::glm)
 
 # ImGui
-message(STATUS "CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}")
 find_package(VulkanHeaders REQUIRED)
 find_package(VulkanLoader REQUIRED)
+message(STATUS "Found Vulkan version ${VulkanLoader_VERSION} @ ${VulkanLoader_DIR}")
 find_package(imgui REQUIRED)
+message(STATUS "Found imgui version ${imgui_VERSION} @ ${imgui_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui::imgui)
 find_package(imguizmo REQUIRED)
+message(STATUS "Found imguizmo version ${imguizmo_VERSION} @ ${imguizmo_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC imguizmo::imguizmo)
 
 # magic_enum
 find_package(magic_enum REQUIRED)
+message(STATUS "Found magic_enum version ${magic_enum_VERSION} @ ${magic_enum_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE magic_enum::magic_enum)
 
 # yaml
 find_package(yaml-cpp REQUIRED)
+message(STATUS "Found yaml-cpp version ${yaml-cpp_VERSION} @ ${yaml-cpp_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC yaml-cpp::yaml-cpp)
 
 # spdlog
 find_package(spdlog REQUIRED)
+message(STATUS "Found Spdlog version ${spdlog_VERSION} @ ${spdlog_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog)
 
 # stb_image
 find_package(stb_image REQUIRED)
+message(STATUS "Found stb_image version ${stb_image_VERSION} @ ${stb_image_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE stb_image::stb_image)
 
 # NativeFile Dialog
 find_package(nfd REQUIRED)
+message(STATUS "Found nfd version ${nfd_VERSION} @ ${nfd_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE nfd::nfd)
 
 # Spir-V cross
