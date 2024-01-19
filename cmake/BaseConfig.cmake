@@ -2,7 +2,9 @@
 #
 #
 include(OwlUtils)
-include(Depmanager)
+if (NOT ${PRJPREFIX}_SKIP_DEPMANAGER)
+    include(Depmanager)
+endif ()
 #
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -13,6 +15,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_library(${CMAKE_PROJECT_NAME}_Base INTERFACE)
+add_library(${CMAKE_PROJECT_NAME}_BaseTest INTERFACE)
+add_dependencies(${CMAKE_PROJECT_NAME}_BaseTest ${CMAKE_PROJECT_NAME}_Base)
 #
 # ---=== Supported OS ===---
 #
@@ -74,17 +78,14 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-c++98-compat-pedantic
             -Wno-c++20-compat
             -Wno-padded
-            -Wno-used-but-marked-unused
             -Wno-exit-time-destructors
-            -Wno-global-constructors
-            -Wno-reserved-macro-identifier
-            -Wno-unused-macros
-            -Wno-ctad-maybe-unsupported
-            -Wno-format-security)
+    )
+    target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
+            -Wno-global-constructors # Ony in gtest -> only for tests
+    )
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 16)
         target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
                 -Wno-unsafe-buffer-usage
-                -Wno-cast-function-type-strict
         )
     endif ()
 else ()
