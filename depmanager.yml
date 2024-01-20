@@ -13,6 +13,7 @@ packages:
   imguizmo:
   mavsdk:
   shaderc:
+    kind: "static"
   spdlog:
   spirv-cross:
   yaml-cpp:

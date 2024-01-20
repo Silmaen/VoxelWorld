@@ -126,33 +126,28 @@ find_package(SPIRV-Tools REQUIRED)
 find_package(SPIRV-Tools-opt REQUIRED)
 find_package(glslang REQUIRED)
 find_package(shaderc REQUIRED)
-if (${PRJPREFIX}_BUILD_SHARED)
-    target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
-else ()
-    target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc)
-endif ()
+target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
 
 # additional windows libs
 if (OWL_PLATFORM_WINDOWS)
     target_link_libraries(${ENGINE_NAME} PUBLIC Mf Mfplat Mfreadwrite)
-endif ()
 
-if (${PRJPREFIX}_BUILD_SHARED)
-    if (OWL_PLATFORM_WINDOWS)
-        add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/libshaderc_shared$<$<CONFIG:Debug>:d>.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-                COMMAND_EXPAND_LISTS
-        )
+    if (${PRJPREFIX}_BUILD_SHARED)
         add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_RUNTIME_DLLS:${ENGINE_NAME}>" "$<TARGET_FILE_DIR:${ENGINE_NAME}>"
                 COMMAND_EXPAND_LISTS
+                COMMENT "Copy the shared dll"
         )
     else ()
-        #dump_cmake_variables("")
-        #add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-        #        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_RUNTIME_DLLS:${ENGINE_NAME}>" "$<TARGET_FILE_DIR:${ENGINE_NAME}>"
-        #        COMMAND_EXPAND_LISTS
-        #)
-        print_target_properties(${ENGINE_NAME})
+        set(shader_libs
+                libshaderc_shared
+        )
+        foreach (l_lib ${shader_libs})
+            add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/${l_lib}$<$<CONFIG:Debug>:d>.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                    COMMAND_EXPAND_LISTS
+                    COMMENT "Copy the shader-shared dll"
+            )
+        endforeach ()
     endif ()
 endif ()
