@@ -2,7 +2,9 @@
 #
 #
 include(OwlUtils)
-include(Depmanager)
+if (NOT ${PRJPREFIX}_SKIP_DEPMANAGER)
+    include(Depmanager)
+endif ()
 #
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -13,6 +15,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_library(${CMAKE_PROJECT_NAME}_Base INTERFACE)
+add_library(${CMAKE_PROJECT_NAME}_BaseTest INTERFACE)
+add_dependencies(${CMAKE_PROJECT_NAME}_BaseTest ${CMAKE_PROJECT_NAME}_Base)
 #
 # ---=== Supported OS ===---
 #
@@ -33,6 +37,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
     set(OWL_PLATFORM_LINUX ON)
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_LINUX)
+    #target_link_options(${CMAKE_PROJECT_NAME}_Base INTERFACE "-Wl,-rpath='$ORIGIN'")
 else ()
     message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")
 endif ()
@@ -74,17 +79,14 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-c++98-compat-pedantic
             -Wno-c++20-compat
             -Wno-padded
-            -Wno-used-but-marked-unused
             -Wno-exit-time-destructors
-            -Wno-global-constructors
-            -Wno-reserved-macro-identifier
-            -Wno-unused-macros
-            -Wno-ctad-maybe-unsupported
-            -Wno-format-security)
+    )
+    target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
+            -Wno-global-constructors # Ony in gtest -> only for tests
+    )
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 16)
         target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
                 -Wno-unsafe-buffer-usage
-                -Wno-cast-function-type-strict
         )
     endif ()
 else ()
@@ -109,6 +111,9 @@ if (OWL_PLATFORM_WINDOWS)
             endif ()
         endforeach ()
     endif ()
+elseif (OWL_PLATFORM_LINUX)
+    set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
+    add_link_options("-Wl,--disable-new-dtags")
 endif ()
 add_dependencies(${CMAKE_PROJECT_NAME}_Base ${CMAKE_PROJECT_NAME}_SuperBase)
 

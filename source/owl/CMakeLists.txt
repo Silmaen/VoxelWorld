@@ -36,65 +36,81 @@ endif ()
 # ----==== third party ====----
 
 # cpptrace
-find_package(cpptrace 0.1 REQUIRED)
+find_package(cpptrace REQUIRED)
+message(STATUS "Found cpptrace version ${cpptrace_VERSION} @ ${cpptrace_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC cpptrace::cpptrace)
 
 # debugbreak
-find_package(debugbreak 1.0 REQUIRED)
+find_package(debugbreak REQUIRED)
+message(STATUS "Found debugbreak version ${debugbreak_VERSION} @ ${debugbreak_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC debugbreak::debugbreak)
 
 # Entt
-find_package(EnTT 3.11 REQUIRED)
+find_package(EnTT REQUIRED)
+message(STATUS "Found EnTT version ${EnTT_VERSION} @ ${EnTT_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC EnTT::EnTT)
 
 # fmt
-find_package(fmt 10.1 REQUIRED)
+find_package(fmt REQUIRED)
+message(STATUS "Found fmt version ${fmt_VERSION} @ ${fmt_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
 
 # glad
 find_package(glad 2.0 REQUIRED)
+message(STATUS "Found glad version ${glad_VERSION} @ ${glad_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE glad::glad)
 
 # GLFW
-find_package(glfw3 3.3.8 REQUIRED)
+find_package(glfw3 REQUIRED)
+message(STATUS "Found glfw3 version ${glfw3_VERSION} @ ${glfw3_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE glfw)
 
 # glm
-find_package(glm 0.9.9 REQUIRED)
+find_package(glm REQUIRED)
+message(STATUS "Found glm version ${glm_VERSION} @ ${glm_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC glm::glm)
 
 # ImGui
-if (NOT ${PRJPREFIX}_BUILD_SHARED)
-    find_package(Vulkan REQUIRED)
-endif ()
+find_package(VulkanHeaders REQUIRED)
+find_package(VulkanLoader REQUIRED)
+message(STATUS "Found Vulkan version ${VulkanLoader_VERSION} @ ${VulkanLoader_DIR}")
+target_link_libraries(${ENGINE_NAME} PUBLIC Vulkan::Loader)
 find_package(imgui REQUIRED)
+message(STATUS "Found imgui version ${imgui_VERSION} @ ${imgui_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui::imgui)
 find_package(imguizmo REQUIRED)
+message(STATUS "Found imguizmo version ${imguizmo_VERSION} @ ${imguizmo_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC imguizmo::imguizmo)
 
 # magic_enum
 find_package(magic_enum REQUIRED)
+message(STATUS "Found magic_enum version ${magic_enum_VERSION} @ ${magic_enum_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE magic_enum::magic_enum)
 
 # yaml
 find_package(yaml-cpp REQUIRED)
-target_link_libraries(${ENGINE_NAME} PRIVATE yaml-cpp)
+message(STATUS "Found yaml-cpp version ${yaml-cpp_VERSION} @ ${yaml-cpp_DIR}")
+target_link_libraries(${ENGINE_NAME} PUBLIC yaml-cpp::yaml-cpp)
 
 # spdlog
 find_package(spdlog REQUIRED)
+message(STATUS "Found Spdlog version ${spdlog_VERSION} @ ${spdlog_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC spdlog::spdlog)
 
 # stb_image
 find_package(stb_image REQUIRED)
+message(STATUS "Found stb_image version ${stb_image_VERSION} @ ${stb_image_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE stb_image::stb_image)
 
 # NativeFile Dialog
 find_package(nfd REQUIRED)
+message(STATUS "Found nfd version ${nfd_VERSION} @ ${nfd_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE nfd::nfd)
 
 # Spir-V cross
 if (${PRJPREFIX}_BUILD_SHARED AND WIN32)
     find_package(spirv_cross_c_shared REQUIRED)
+    message(STATUS "Found spirv_cross_c_shared version ${spirv_cross_c_shared_VERSION} @ ${spirv_cross_c_shared_DIR}")
     target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-c-shared)
 else ()
     find_package(spirv_cross_core REQUIRED)
@@ -104,32 +120,38 @@ else ()
     find_package(spirv_cross_cpp REQUIRED)
     find_package(spirv_cross_reflect REQUIRED)
     find_package(spirv_cross_c REQUIRED)
+    message(STATUS "Found spirv_cross_c version ${spirv_cross_c_VERSION} @ ${spirv_cross_c_DIR}")
     target_link_libraries(${ENGINE_NAME} PRIVATE spirv-cross-cpp)
 endif ()
+
 # shaderc
 find_package(SPIRV-Tools REQUIRED)
 find_package(SPIRV-Tools-opt REQUIRED)
 find_package(glslang REQUIRED)
 find_package(shaderc REQUIRED)
-if (${PRJPREFIX}_BUILD_SHARED OR WIN32)
-    target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
-    if (WIN32)
-        add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/libshaderc_shared$<$<CONFIG:Debug>:d>.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-                COMMAND_EXPAND_LISTS
-        )
-    endif ()
-else ()
-    target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc)
-endif ()
+message(STATUS "Found shaderc version ${shaderc_VERSION} @ ${shaderc_DIR}")
+target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
 
-if (${PRJPREFIX}_BUILD_SHARED AND WIN32)
-    add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_RUNTIME_DLLS:${ENGINE_NAME}>" "$<TARGET_FILE_DIR:${ENGINE_NAME}>"
-            COMMAND_EXPAND_LISTS
-    )
-endif ()
-
-if (WIN32)
+# additional windows libs
+if (OWL_PLATFORM_WINDOWS)
     target_link_libraries(${ENGINE_NAME} PUBLIC Mf Mfplat Mfreadwrite)
+
+    if (${PRJPREFIX}_BUILD_SHARED)
+        add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_RUNTIME_DLLS:${ENGINE_NAME}>" "$<TARGET_FILE_DIR:${ENGINE_NAME}>"
+                COMMAND_EXPAND_LISTS
+                COMMENT "Copy the shared dll"
+        )
+    else ()
+        set(shader_libs
+                libshaderc_shared
+        )
+        foreach (l_lib ${shader_libs})
+            add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/${l_lib}$<$<CONFIG:Debug>:d>.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                    COMMAND_EXPAND_LISTS
+                    COMMENT "Copy the shader-shared dll"
+            )
+        endforeach ()
+    endif ()
 endif ()

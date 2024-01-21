@@ -1,0 +1,22 @@
+packages:
+  googletest:
+  cpptrace:
+  debugbreak:
+  entt:
+  magic_enum:
+  stb_image:
+  fmt:
+  glad:
+  glfw:
+  glm:
+  imgui:
+  imguizmo:
+  mavsdk:
+  shaderc:
+    kind: "static"
+  spdlog:
+  spirv-cross:
+  yaml-cpp:
+  nfd:
+  vulkan:
+

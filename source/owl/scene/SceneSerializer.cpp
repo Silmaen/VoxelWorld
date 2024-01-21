@@ -84,7 +84,7 @@ namespace owl::scene {
 SceneSerializer::SceneSerializer(const shared<Scene> &scene_) : scene(scene_) {
 }
 
-static void serializeEntity(YAML::Emitter &out, Entity entity) {
+[[maybe_unused]] static void serializeEntity(YAML::Emitter &out, Entity entity) {
 	out << YAML::BeginMap;// Entity
 	out << YAML::Key << "Entity" << YAML::Value << entity.getUUID();
 
@@ -155,12 +155,11 @@ void SceneSerializer::serialize(const std::filesystem::path &filepath) {
 	out << YAML::BeginMap;
 	out << YAML::Key << "Scene" << YAML::Value << "untitled";
 	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-	scene->registry.each([&](auto entityID) {
-		Entity entity = {entityID, scene.get()};
-		if (!entity)
-			return;
+	for (auto &&[e]: scene->registry.storage<entt::entity>().each()) {
+		Entity entity{e, scene.get()};
+		if (!entity) continue;
 		serializeEntity(out, entity);
-	});
+	}
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 	std::ofstream fileOut(filepath);

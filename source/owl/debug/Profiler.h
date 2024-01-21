@@ -57,7 +57,7 @@ public:
 	 */
 	void beginSession(const std::string &name_,
 					  const std::string &filepath = "results.json") {
-		std::lock_guard lock(profilerMutex);
+		std::lock_guard<std::mutex> lock(profilerMutex);
 		if (currentSession) {
 			// If there is already a current session, then close it before beginning
 			// new one. Subsequent profiling output meant for the original session
@@ -92,7 +92,7 @@ public:
 	 * @brief Terminate profile session.
 	 */
 	void endSession() {
-		std::lock_guard lock(profilerMutex);
+		std::lock_guard<std::mutex> lock(profilerMutex);
 		internalEndSession();
 	}
 
@@ -114,7 +114,7 @@ public:
 		json << "\"ts\":" << result.start.count();
 		json << "}";
 
-		std::lock_guard lock(profilerMutex);
+		std::lock_guard<std::mutex> lock(profilerMutex);
 		if (currentSession) {
 			outputStream << json.str();
 			outputStream.flush();

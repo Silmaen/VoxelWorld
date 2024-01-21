@@ -10,7 +10,6 @@
 #include "Transform.h"
 #include "math/trigonometry.h"
 
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
 namespace owl::math {
