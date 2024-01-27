@@ -145,12 +145,13 @@ if (OWL_PLATFORM_WINDOWS)
     else ()
         set(shader_libs
                 libshaderc_shared
+                SPIRV
         )
         foreach (l_lib ${shader_libs})
             add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../../bin/${l_lib}$<$<CONFIG:Debug>:d>.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${shaderc_DIR}/../../bin/${l_lib}.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
                     COMMAND_EXPAND_LISTS
-                    COMMENT "Copy the shader-shared dll"
+                    COMMENT "Copy the vulkan shared dll"
             )
         endforeach ()
     endif ()

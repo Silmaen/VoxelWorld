@@ -15,13 +15,11 @@ dependencies = [
     {"name": "imgui", "version": "*", "header": False},
     {"name": "imguizmo", "version": "*", "header": False},
     {"name": "mavsdk", "version": "*", "header": False},
-    {"name": "shaderc", "version": "*", "header": False},
     {"name": "spdlog", "version": "*", "header": False},
-    {"name": "spirv-cross", "version": "*", "header": False},
     {"name": "yaml-cpp", "version": "*", "header": False},
     {"name": "nfd", "version": "*", "header": False},
     {"name": "googletest", "version": "*", "header": False},
-    {"name": "vulkan", "version": "*", "header": False},
+    {"name": "vulkan_sdk", "version": "*", "header": False, "kind": "shared"},
 ]
 
 
@@ -103,6 +101,7 @@ def check_dependencies(target: dict):
     if def_name in ["", None]:
         print(f"Warning: No remote defined.", file=stderr)
 
+    first_run = True
     for kind in kinds:
         for dep in dependencies:
             query = {
@@ -112,6 +111,10 @@ def check_dependencies(target: dict):
                 "arch": target["arch"],
                 "kind": "header",
             }
+            if dep["header"] and not first_run:
+                continue
+            if "kind" in dep and dep["kind"] != kind:
+                continue
             if not dep["header"]:
                 query["kind"] = kind
             # search local
@@ -160,7 +163,7 @@ def check_dependencies(target: dict):
                     file=stderr,
                 )
                 continue
-
+        first_run = False
 
 def check_remote(remote: dict):
     if "url" not in remote:
