@@ -8,6 +8,7 @@
   "include": [
     "cmake/CMakePresetsMinGW.json",
     "cmake/CMakePresetsWSL.json",
+    "cmake/CMakePresetsDocker.json",
     "cmake/CMakePresetsRaspberryPi.json",
     "cmake/CMakePresetsLinux.json",
     "cmake/CMakePresetsVisualStudio.json",

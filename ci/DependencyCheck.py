@@ -165,6 +165,7 @@ def check_dependencies(target: dict):
                 continue
         first_run = False
 
+
 def check_remote(remote: dict):
     if "url" not in remote:
         return

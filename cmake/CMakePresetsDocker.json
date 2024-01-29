@@ -10,55 +10,58 @@
   ],
   "configurePresets": [
     {
-      "name": "linux-gcc-release-static",
+      "name": "docker-gcc-release-static",
       "inherits": [
+        "toolset-docker-gcc",
         "gcc-release-static"
-      ],
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
+      ]
     },
     {
-      "name": "linux-gcc-debug-static",
+      "name": "docker-gcc-debug-static",
       "inherits": [
+        "toolset-docker-gcc",
         "gcc-debug-static"
       ]
     },
     {
-      "name": "linux-clang-release-static",
+      "name": "docker-clang-release-static",
       "inherits": [
+        "toolset-docker-clang",
         "clang-release-static"
       ]
     },
     {
-      "name": "linux-clang-debug-static",
+      "name": "docker-clang-debug-static",
       "inherits": [
+        "toolset-docker-clang",
         "clang-debug-static"
       ]
     },
     {
-      "name": "linux-gcc-release-shared",
+      "name": "docker-gcc-release-shared",
       "inherits": [
+        "toolset-docker-gcc",
         "gcc-release-shared"
       ]
     },
     {
-      "name": "linux-gcc-debug-shared",
+      "name": "docker-gcc-debug-shared",
       "inherits": [
+        "toolset-docker-gcc",
         "gcc-debug-shared"
       ]
     },
     {
-      "name": "linux-clang-release-shared",
+      "name": "docker-clang-release-shared",
       "inherits": [
+        "toolset-docker-clang",
         "clang-release-shared"
       ]
     },
     {
-      "name": "linux-clang-debug-shared",
+      "name": "docker-clang-debug-shared",
       "inherits": [
+        "toolset-docker-clang",
         "clang-debug-shared"
       ]
     }
