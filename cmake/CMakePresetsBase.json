@@ -134,6 +134,24 @@
           "toolchain": "VisualStudio"
         }
       }
+    },
+    {
+      "name": "toolset-docker-gcc",
+      "hidden": true,
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "DockerGcc"
+        }
+      }
+    },
+    {
+      "name": "toolset-docker-clang",
+      "hidden": true,
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "DockerClang"
+        }
+      }
     }
   ]
 }

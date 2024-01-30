@@ -12,11 +12,8 @@ packages:
   imgui:
   imguizmo:
   mavsdk:
-  shaderc:
-    kind: "static"
   spdlog:
-  spirv-cross:
   yaml-cpp:
   nfd:
-  vulkan:
-
+  vulkan_sdk:
+    kind: "shared"
