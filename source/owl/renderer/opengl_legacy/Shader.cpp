@@ -12,14 +12,10 @@
 #include "core/external/opengl21.h"
 #include "core/utils/FileUtils.h"
 #include "renderer/RenderCommand.h"
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wdocumentation")
 #include <glm/gtc/type_ptr.hpp>
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP
 
 namespace owl::renderer::opengl_legacy {
 

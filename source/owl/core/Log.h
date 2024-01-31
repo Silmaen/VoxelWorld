@@ -12,14 +12,10 @@
 #include "external/spdlog.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wformat-nonliteral")
 #include "glm/gtx/string_cast.hpp"
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP
 /**
  * @brief Namespace for the core objects.
  */

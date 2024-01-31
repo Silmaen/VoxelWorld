@@ -8,16 +8,13 @@
 #include "owlpch.h"
 
 #include "CameraOrtho.h"
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
-#pragma clang diagnostic ignored "-Wdocumentation-deprecated-sync"
-#pragma clang diagnostic ignored "-Wdocumentation"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wdocumentation-unknown-command")
+OWL_DIAG_DISABLE_CLANG("-Wdocumentation-deprecated-sync")
+OWL_DIAG_DISABLE_CLANG("-Wdocumentation")
+
 #include <glm/gtc/matrix_transform.hpp>
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP
 
 namespace owl::renderer {
 

@@ -6,16 +6,9 @@
  * All modification must get authorization from the author.
  */
 #pragma once
+#include "core/Macros.h"
 
-#ifdef OLD_GLAD
-#include "glad21/glad.h"
-#else
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wreserved-identifier")
 #include "glad21/gl.h"
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif
-#endif
+OWL_DIAG_POP

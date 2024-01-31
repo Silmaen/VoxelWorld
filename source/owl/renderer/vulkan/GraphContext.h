@@ -47,14 +47,8 @@ public:
 	[[nodiscard]] Version getVersion() const override;
 
 private:
-	/// Loaded version.
-	int version = 0;
 	/// The window.
-	GLFWwindow *wnd;
-	/// Vulkan instance.
-	VkInstance instance = nullptr;
-	/// Vulkan Surface.
-	VkSurfaceKHR surface = nullptr;
+	[[maybe_unused]] GLFWwindow *wnd;
 };
 
 }// namespace owl::renderer::vulkan

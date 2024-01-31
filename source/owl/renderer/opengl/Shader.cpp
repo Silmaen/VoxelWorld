@@ -14,28 +14,20 @@
 #include "core/utils/FileUtils.h"
 #include "debug/Tracker.h"
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wdocumentation")
 #include <glm/gtc/type_ptr.hpp>
 #include <magic_enum.hpp>
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
-#pragma clang diagnostic ignored "-Wdouble-promotion"
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wswitch-enum")
+OWL_DIAG_DISABLE_CLANG("-Wdouble-promotion")
+OWL_DIAG_DISABLE_CLANG("-Wsign-conversion")
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross.hpp>
 #include <spirv_glsl.hpp>
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP
 
 namespace owl::renderer::opengl {
 

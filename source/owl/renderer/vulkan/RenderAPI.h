@@ -75,12 +75,6 @@ public:
 	 * @return Number of texture slots.
 	 */
 	[[nodiscard]] uint32_t getMaxTextureSlots() const override { return 16; }
-
-private:
-	/// Instance of Vulkan.
-	VkInstance instance{};
-	/// Rendering surface.
-	//VkSurface surface{};
 };
 
 }// namespace owl::renderer::vulkan

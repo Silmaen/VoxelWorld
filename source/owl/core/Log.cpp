@@ -9,16 +9,12 @@
 #include "owlpch.h"
 
 #include "Log.h"
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#pragma clang diagnostic ignored "-Wundefined-func-template"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
+OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP
 #include "debug/Tracker.h"
 
 namespace owl::core {

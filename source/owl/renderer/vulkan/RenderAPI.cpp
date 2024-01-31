@@ -9,6 +9,8 @@
 
 #include "GraphContext.h"
 #include "RenderAPI.h"
+
+#include "VulkanHandler.h"
 #include "core/Application.h"
 #include "core/external/glfw3.h"
 
@@ -16,19 +18,24 @@
 namespace owl::renderer::vulkan {
 
 RenderAPI::~RenderAPI() {
-	vkDestroyInstance(instance, nullptr);
 }
 
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
-	if (getState() != State::Created)
-		return;
-	auto gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
+	if (getState() != State::Created) return;
+
+	auto &vkh = VulkanHandler::get();
+	vkh.initVulkan();
+#ifdef OWL_DEBUG
+	vkh.activateValidation();
+#endif
+
+	const auto gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
 	auto vers = gc->getVersion();
 	{
-		if (vers < GraphContext::Version{1, 3}) {
-			OWL_CORE_ERROR("Insufficient version found {}.{} need at least 1.3", vers.major, vers.minor)
+		if (vers < GraphContext::Version{1, 0}) {
+			OWL_CORE_ERROR("Insufficient version found {}.{} need at least 1.0", vers.major, vers.minor)
 			return;
 		}
 	}

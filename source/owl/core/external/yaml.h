@@ -7,12 +7,8 @@
  */
 #pragma once
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-#pragma clang diagnostic ignored "-Wshadow"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wreserved-identifier")
+OWL_DIAG_DISABLE_CLANG("-Wshadow")
 #include <yaml-cpp/yaml.h>
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP
