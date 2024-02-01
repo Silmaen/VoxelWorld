@@ -7,17 +7,18 @@
  */
 #include "owlpch.h"
 
-#include "GraphContext.h"
 #include "RenderAPI.h"
 
-#include "VulkanHandler.h"
 #include "core/Application.h"
 #include "core/external/glfw3.h"
+#include "internal/VulkanHandler.h"
 
 
 namespace owl::renderer::vulkan {
 
 RenderAPI::~RenderAPI() {
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.release();
 }
 
 void RenderAPI::init() {
@@ -25,20 +26,16 @@ void RenderAPI::init() {
 
 	if (getState() != State::Created) return;
 
-	auto &vkh = VulkanHandler::get();
-	vkh.initVulkan();
+	auto &vkh = internal::VulkanHandler::get();
 #ifdef OWL_DEBUG
 	vkh.activateValidation();
 #endif
-
-	const auto gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
-	auto vers = gc->getVersion();
-	{
-		if (vers < GraphContext::Version{1, 0}) {
-			OWL_CORE_ERROR("Insufficient version found {}.{} need at least 1.0", vers.major, vers.minor)
-			return;
-		}
+	vkh.initVulkan();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		setState(State::Error);
+		return;
 	}
+
 
 	// renderer is now ready
 	setState(State::Ready);

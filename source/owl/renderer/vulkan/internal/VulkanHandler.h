@@ -7,9 +7,11 @@
  */
 
 #pragma once
-#include <vulkan/vulkan.h>
+#include "SwapChain.h"
 
-namespace owl::renderer::vulkan {
+#include <backends/imgui_impl_vulkan.h>
+
+namespace owl::renderer::vulkan::internal {
 
 /**
  * @brief Class VulkanHandler.
@@ -61,6 +63,8 @@ public:
 		ErrorNoGpuFound,
 		ErrorCreatingLogicalDevice,
 		ErrorCreatingCommandPool,
+		ErrorCreatingWindowSurface,
+		ErrorCreatingSwapChain,
 	};
 
 	/**
@@ -82,6 +86,8 @@ public:
 		if (state == State::Uninitialized) validation = true;
 	}
 
+	[[nodiscard]] ImGui_ImplVulkan_InitInfo toImGuiInfo() const;
+
 private:
 	/**
 	 * @brief Default Constructor.
@@ -91,50 +97,38 @@ private:
 	/**
 	 * @brief Create the instance.
 	 */
-	void createInstance(bool enableValidation = false);
-
+	void createInstance();
+	void createSurface();
+	void createPhysicalDevice();
 	void createLogicalDevice();
+	void createSwapChain();
 
 	void setupDebugging();
-	void getEnabledFeatures();
-	void getEnabledExtensions();
+
+	/// The current state of the handler.
+	State state = State::Uninitialized;
+	/// Loaded version.
+	int version = 0;
+	/// Enable Validation layers.
+	bool validation = false;
+	/// Validation layers available?.
+	bool validationPresent = false;
 
 	/// Vulkan Instance
 	VkInstance instance = nullptr;
-	/// Vulkan physical device.
-	VkPhysicalDevice physicalDevice = nullptr;
-	/// Physical device properties (for e.g. checking device limits).
-	[[maybe_unused]] VkPhysicalDeviceProperties deviceProperties{};
-	/// Features available on the selected physical device (for e.g. checking if a feature is available).
-	[[maybe_unused]] VkPhysicalDeviceFeatures deviceFeatures{};
-	/// Available memory (type) properties for the physical device
-	[[maybe_unused]] VkPhysicalDeviceMemoryProperties deviceMemoryProperties{};
-	/// Debug messenger.
-	VkDebugUtilsMessengerEXT debugUtilsMessenger{};
-	/// Enable Validation layers.
-	bool validation = false;
-	/// The current state of the handler.
-	State state = State::Uninitialized;
 	/// The list of supported extensions.
 	std::vector<std::string> supportedInstanceExtensions;
-	std::vector<std::string> supportedPhysicalDeviceExtensions;
-	/// Loaded version.
-	int version = 0;
-	VkDevice logicalDevice = nullptr;
-	VkPhysicalDeviceFeatures enabledFeatures{};
-	std::vector<const char *> enabledDeviceExtensions;
-	[[maybe_unused]] VkQueue queue = nullptr;
-	std::vector<VkQueueFamilyProperties> queueFamilyProperties;
-	VkCommandPool commandPool = nullptr;
-	struct
-	{
-		uint32_t graphics = 0;
-		uint32_t compute = 0;
-		uint32_t transfer = 0;
-	} queueFamilyIndices;
 
-	[[nodiscard]] uint32_t getQueueFamilyIndex(VkQueueFlags queueFlags) const;
-	void createCommandPool(uint32_t queueFamilyIndex);
+	/// Debug messenger.
+	VkDebugUtilsMessengerEXT debugUtilsMessenger{};
+
+	/// The physical device.
+	PhysicalDevice physicalDevice;
+
+	/// The logical device.
+	VkDevice logicalDevice = nullptr;
+	/// The swapchain.s
+	SwapChain swapChain;
 };
 
-}// namespace owl::renderer::vulkan
+}// namespace owl::renderer::vulkan::internal

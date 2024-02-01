@@ -46,9 +46,30 @@ public:
 	 */
 	[[nodiscard]] Version getVersion() const override;
 
+	/**
+	 * @brief Create the Window surface.
+	 * @param instance The Vulkan instance
+	 * @return The operation result.
+	 */
+	VkResult createSurface(VkInstance instance);
+
+	/**
+	 * @brief Destroy the Window surface.
+	 * @param instance The Vulkan instance
+	 */
+	void destroySurface(VkInstance instance);
+
+	/**
+	 * \brief Access to the vulkn surface.
+	 * \return The vulkan surface.
+	 */
+	[[nodiscard]] VkSurfaceKHR getSurface() const { return surface; }
+
 private:
 	/// The window.
-	[[maybe_unused]] GLFWwindow *wnd;
+	GLFWwindow *wnd;
+	/// the presenttin surface.
+	VkSurfaceKHR surface;
 };
 
 }// namespace owl::renderer::vulkan

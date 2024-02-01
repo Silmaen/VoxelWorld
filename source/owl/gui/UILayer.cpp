@@ -12,6 +12,7 @@
 #include "core/Application.h"
 #include "core/external/glfw3.h"
 #include "core/external/imgui.h"
+#include "renderer/vulkan/internal/VulkanHandler.h"
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
@@ -72,11 +73,22 @@ void UILayer::onAttach() {// Setup Dear ImGui context
 
 	auto *window = static_cast<GLFWwindow *>(
 			core::Application::get().getWindow().getNativeWindow());
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
+
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL) {
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+	}
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy) {
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL2_Init();
+	}
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan) {
+		ImGui_ImplGlfw_InitForVulkan(window, true);
+		auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
+		ImGui_ImplVulkan_InitInfo info = vkh.toImGuiInfo();
+		VkRenderPass render_pass{};
+		ImGui_ImplVulkan_Init(&info, render_pass);
+	}
 }
 
 void UILayer::onDetach() {
@@ -86,6 +98,8 @@ void UILayer::onDetach() {
 		ImGui_ImplOpenGL3_Shutdown();
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
 		ImGui_ImplOpenGL2_Shutdown();
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan)
+		ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
@@ -101,8 +115,12 @@ void UILayer::onEvent([[maybe_unused]] event::Event &event) {
 void UILayer::begin() {
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
 		ImGui_ImplOpenGL3_NewFrame();
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+	else if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
 		ImGui_ImplOpenGL2_NewFrame();
+	else if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan)
+		ImGui_ImplVulkan_NewFrame();
+	else
+		return;
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
@@ -113,6 +131,12 @@ void UILayer::begin() {
 
 void UILayer::end() {
 	OWL_PROFILE_FUNCTION()
+	if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL)
+		return;
+	if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy)
+		return;
+	if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::Vulkan)
+		return;
 	if (dockingEnable) {
 		ImGui::End();
 	}
@@ -131,7 +155,8 @@ void UILayer::end() {
 		GLFWwindow *backup_current_context = glfwGetCurrentContext();
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backup_current_context);
+		if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL || renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy)
+			glfwMakeContextCurrent(backup_current_context);
 	}
 }
 
