@@ -95,13 +95,26 @@ void VulkanHandler::release() {
 	state = State::Uninitialized;
 }
 
+static void func(VkResult) {}
+
 ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 	return {
 			.Instance = instance,
 			.PhysicalDevice = physicalDevice.device,
 			.Device = logicalDevice,
 			.QueueFamily = physicalDevice.queues.graphicsIndex,
-			.Queue = physicalDevice.queues.graphics};
+			.Queue = physicalDevice.queues.graphics,
+			.PipelineCache = {},
+			.DescriptorPool = {},
+			.Subpass = 0,
+			.MinImageCount = 2,
+			.ImageCount = 2,
+			.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+			.UseDynamicRendering = false,
+			.ColorAttachmentFormat = {},
+			.Allocator = nullptr,
+			.CheckVkResultFn = func,
+			.MinAllocationSize = 1024 * 1024};
 }
 
 void VulkanHandler::createInstance() {
@@ -201,7 +214,7 @@ void VulkanHandler::createInstance() {
 
 void VulkanHandler::setupDebugging() {
 	OWL_DIAG_PUSH
-	OWL_DIAG_DISABLE_CLANG("-Wcast-function-type-strict")
+	OWL_DIAG_DISABLE_CLANG17("-Wcast-function-type-strict")
 	vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
 	vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
 	OWL_DIAG_POP
