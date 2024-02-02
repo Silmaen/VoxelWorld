@@ -65,6 +65,8 @@ public:
 		ErrorCreatingCommandPool,
 		ErrorCreatingWindowSurface,
 		ErrorCreatingSwapChain,
+		ErrorCreatingImagesView,
+		ErrorCreatingRenderPass,
 	};
 
 	/**
@@ -88,6 +90,10 @@ public:
 
 	[[nodiscard]] ImGui_ImplVulkan_InitInfo toImGuiInfo() const;
 
+	[[nodiscard]] VkRenderPass getRenderPath() const { return renderPass; }
+
+	[[nodiscard]] VkDevice getDevice() const { return logicalDevice; }
+
 private:
 	/**
 	 * @brief Default Constructor.
@@ -102,6 +108,10 @@ private:
 	void createPhysicalDevice();
 	void createLogicalDevice();
 	void createSwapChain();
+	void createImageViews();
+	void createRenderPass();
+	void createGraphicsPipeLine();
+	void createDescriptorPool();
 
 	void setupDebugging();
 
@@ -127,8 +137,14 @@ private:
 
 	/// The logical device.
 	VkDevice logicalDevice = nullptr;
-	/// The swapchain.s
+	/// The swapchain.
 	SwapChain swapChain;
+	/// The images views.
+	std::vector<VkImageView> swapChainImageViews;
+	/// The render pass.
+	VkRenderPass renderPass = nullptr;
+	/// Descriptor pool.
+	VkDescriptorPool descriptorPool = nullptr;
 };
 
 }// namespace owl::renderer::vulkan::internal

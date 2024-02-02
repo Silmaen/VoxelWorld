@@ -86,8 +86,7 @@ void UILayer::onAttach() {// Setup Dear ImGui context
 		ImGui_ImplGlfw_InitForVulkan(window, true);
 		auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
 		ImGui_ImplVulkan_InitInfo info = vkh.toImGuiInfo();
-		VkRenderPass render_pass{};
-		ImGui_ImplVulkan_Init(&info, render_pass);
+		ImGui_ImplVulkan_Init(&info, vkh.getRenderPath());
 	}
 }
 
@@ -131,11 +130,7 @@ void UILayer::begin() {
 
 void UILayer::end() {
 	OWL_PROFILE_FUNCTION()
-	if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL)
-		return;
-	if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy)
-		return;
-	if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::Vulkan)
+	if ((renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL) && (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy) && (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::Vulkan))
 		return;
 	if (dockingEnable) {
 		ImGui::End();

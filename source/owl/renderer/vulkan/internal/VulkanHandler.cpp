@@ -71,11 +71,35 @@ void VulkanHandler::initVulkan() {
 	if (state != State::Uninitialized)
 		return;
 	OWL_CORE_TRACE("Vulkan: Swap Chain created.")
+	createImageViews();
+	if (state != State::Uninitialized)
+		return;
+	OWL_CORE_TRACE("Vulkan: Image views created.")
+	createRenderPass();
+	if (state != State::Uninitialized)
+		return;
+	OWL_CORE_TRACE("Vulkan: Render pass created.")
+	createGraphicsPipeLine();
+	if (state != State::Uninitialized)
+		return;
+	OWL_CORE_TRACE("Vulkan: Graphics pipeline created.")
+	createDescriptorPool();
+	if (state != State::Uninitialized)
+		return;
+	OWL_CORE_TRACE("Vulkan: Descriptor pool created.")
 	state = State::Running;
 }
 
 void VulkanHandler::release() {
 	if (instance == nullptr) return;// nothing can exists without instance.
+
+	if (renderPass != nullptr) {
+		vkDestroyRenderPass(logicalDevice, renderPass, nullptr);
+		renderPass = nullptr;
+	}
+	for (auto imageView: swapChainImageViews) {
+		vkDestroyImageView(logicalDevice, imageView, nullptr);
+	}
 	swapChain.release();
 
 	if (logicalDevice != nullptr) {
@@ -105,13 +129,13 @@ ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 			.QueueFamily = physicalDevice.queues.graphicsIndex,
 			.Queue = physicalDevice.queues.graphics,
 			.PipelineCache = {},
-			.DescriptorPool = {},
+			.DescriptorPool = descriptorPool,
 			.Subpass = 0,
 			.MinImageCount = 2,
 			.ImageCount = 2,
 			.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
 			.UseDynamicRendering = false,
-			.ColorAttachmentFormat = {},
+			.ColorAttachmentFormat = swapChain.swapChainImageFormat,
 			.Allocator = nullptr,
 			.CheckVkResultFn = func,
 			.MinAllocationSize = 1024 * 1024};
@@ -311,6 +335,84 @@ void VulkanHandler::createLogicalDevice() {
 void VulkanHandler::createSwapChain() {
 	if (!swapChain.create(logicalDevice, physicalDevice))
 		state = State::ErrorCreatingSwapChain;
+}
+
+void VulkanHandler::createImageViews() {
+	swapChainImageViews.resize(swapChain.swapChainImages.size());
+
+	for (size_t i = 0; i < swapChain.swapChainImages.size(); i++) {
+		VkImageViewCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		createInfo.image = swapChain.swapChainImages[i];
+		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		createInfo.format = swapChain.swapChainImageFormat;
+		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		createInfo.subresourceRange.baseMipLevel = 0;
+		createInfo.subresourceRange.levelCount = 1;
+		createInfo.subresourceRange.baseArrayLayer = 0;
+		createInfo.subresourceRange.layerCount = 1;
+
+		if (vkCreateImageView(logicalDevice, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) {
+			state = State::ErrorCreatingImagesView;
+			break;
+		}
+	}
+}
+
+void VulkanHandler::createRenderPass() {
+	VkAttachmentDescription colorAttachment{};
+	colorAttachment.format = swapChain.swapChainImageFormat;
+	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	VkAttachmentReference colorAttachmentRef{};
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription subpass{};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	VkRenderPassCreateInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+
+	if (vkCreateRenderPass(logicalDevice, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create render pass!")
+		state = State::ErrorCreatingRenderPass;
+	}
+}
+
+void VulkanHandler::createGraphicsPipeLine() {
+}
+
+void VulkanHandler::createDescriptorPool() {
+	VkDescriptorPoolSize poolSize{};
+	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSize.descriptorCount = static_cast<uint32_t>(2);
+
+	VkDescriptorPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = 1;
+	poolInfo.pPoolSizes = &poolSize;
+	poolInfo.maxSets = static_cast<uint32_t>(2);
+
+	if (vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor pool!");
+	}
 }
 
 }// namespace owl::renderer::vulkan::internal
