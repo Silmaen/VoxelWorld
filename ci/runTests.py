@@ -21,12 +21,14 @@ def runtest(build_path: str):
         try:
             report_file = build_dir / "test" / f"{test.stem}_UTest_Report.xml"
             report_file.unlink(missing_ok=True)
+            print(f">>>: {test} --gtest_output=xml:{report_file}")
             out = run(
                 f"{test} --gtest_output=xml:{report_file}",
                 cwd=build_dir,
                 shell=True,
             )
             if out.returncode != 0:
+                print(f"ERROR ({test}): Running code: {out.returncode}", file=stderr)
                 is_ok = False
             elif not report_file.exists():
                 print(f"ERROR: report file {report_file} not found", file=stderr)

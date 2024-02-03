@@ -10,6 +10,7 @@
 
 #include "Application.h"
 
+#include <cstdlib>
 #include <utility>
 
 #include "core/external/yaml.h"
@@ -34,6 +35,11 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 		// Assuming present of a folder 'res' containing the data
 		workingDirectory = absolute(std::filesystem::current_path());
 		OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
+#ifdef WIN32
+		_putenv_s("VK_LAYER_PATH", workingDirectory.string().c_str());
+#else
+		setenv("VK_LAYER_PATH", workingDirectory.string().c_str(), 1);
+#endif
 
 		// load config file if any
 		auto configPath = workingDirectory / "config.yml";
@@ -86,18 +92,23 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 
 	// create the GUI layer
-	imGuiLayer = mk_shared<gui::UILayer>();
-	pushOverlay(imGuiLayer);
+	if (renderer::RenderCommand::getAPI() == renderer::RenderAPI::Type::OpenGL || renderer::RenderCommand::getAPI() == renderer::RenderAPI::Type::OpenglLegacy) {
+		imGuiLayer = mk_shared<gui::UILayer>();
+		pushOverlay(imGuiLayer);
+		OWL_CORE_TRACE("GUI Layer created.")
+	}
 
 	OWL_CORE_TRACE("Application creation done.")
 }
 
 void Application::enableDocking() {
-	imGuiLayer->enableDocking();
+	if (imGuiLayer)
+		imGuiLayer->enableDocking();
 }
 
 void Application::disableDocking() {
-	imGuiLayer->disableDocking();
+	if (imGuiLayer)
+		imGuiLayer->disableDocking();
 }
 
 Application::~Application() {
@@ -143,7 +154,7 @@ void Application::run() {
 					for (auto &layer: layerStack)
 						layer->onUpdate(stepper);
 				}
-				{
+				if (imGuiLayer) {
 					imGuiLayer->begin();
 					{
 						OWL_PROFILE_SCOPE("LayerStack onImUpdate")

@@ -46,7 +46,7 @@ void base2D::onUpdate(const core::Timestep &ts) {
 	static float rotation = 0.f;
 	rotation += ts.getSeconds() * 50.f;
 	// First part of the scene
-	if (renderer::RenderCommand::getAPI() != renderer::RenderAPI::Type::Vulkan) {
+	{
 		OWL_PROFILE_SCOPE("Render Draws 1")
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
 		renderer::Renderer2D::drawQuad({
@@ -78,7 +78,7 @@ void base2D::onUpdate(const core::Timestep &ts) {
 		renderer::Renderer2D::endScene();
 	}
 	// second part of the scene
-	if (renderer::RenderCommand::getAPI() != renderer::RenderAPI::Type::Vulkan) {
+	{
 		OWL_PROFILE_SCOPE("Render Draws 2")
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
 		int32_t id = 0;

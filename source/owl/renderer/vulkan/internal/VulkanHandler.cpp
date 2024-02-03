@@ -182,7 +182,7 @@ void VulkanHandler::createInstance() {
 		instanceExtensions.assign(uniqueExtensions.begin(), uniqueExtensions.end());
 	}
 	if (validation && std::find(supportedInstanceExtensions.begin(), supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == supportedInstanceExtensions.end()) {
-		OWL_CORE_WARN("Vulkan: request validation layer but is not supported, deactivating.")
+		OWL_CORE_WARN("Vulkan: request extension Debug Utils but is not supported, deactivating.")
 		validation = false;
 	}
 
