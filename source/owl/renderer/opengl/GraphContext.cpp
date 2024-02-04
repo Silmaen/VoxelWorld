@@ -26,9 +26,9 @@ void GraphContext::init() {
 #else
 	version = gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress));
 #endif
-	OWL_CORE_ASSERT(version, "Failed to initialize GLAD")
+	OWL_CORE_ASSERT(version, "Failed to initialize GLAD for OpenGL")
 
-	OWL_CORE_INFO("OpenGL Renderer Initiated.")
+	OWL_CORE_INFO("OpenGL GraphContext Initiated.")
 	OWL_CORE_INFO("Device Info:")
 	OWL_CORE_INFO("  Vendor: {}", reinterpret_cast<const char *>(glGetString(GL_VENDOR)))
 	OWL_CORE_INFO("  Renderer: {}", reinterpret_cast<const char *>(glGetString(GL_RENDERER)))

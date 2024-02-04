@@ -9,12 +9,33 @@
 
 #include "GraphContext.h"
 
+#include "internal/VulkanHandler.h"
+
 namespace owl::renderer::vulkan {
 
-GraphContext::GraphContext(GLFWwindow *) {}
+GraphContext::GraphContext(GLFWwindow *window)
+	: wnd(window){};
 
-void GraphContext::init() {}
+GraphContext::~GraphContext() = default;
 
 void GraphContext::swapBuffers() {}
+
+void GraphContext::init() {
+}
+
+GraphContext::Version GraphContext::getVersion() const {
+	int version = internal::VulkanHandler::get().getVersion();
+	return {static_cast<int32_t>(VK_API_VERSION_MAJOR(version)), static_cast<int32_t>(VK_API_VERSION_MAJOR(version))};
+}
+
+VkResult GraphContext::createSurface(const VkInstance instance) {
+	return glfwCreateWindowSurface(instance, wnd, nullptr, &surface);
+}
+
+
+void GraphContext::destroySurface(const VkInstance instance) {
+	vkDestroySurfaceKHR(instance, surface, nullptr);
+	surface = nullptr;
+}
 
 }// namespace owl::renderer::vulkan

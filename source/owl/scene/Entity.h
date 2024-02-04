@@ -38,10 +38,8 @@ public:
 	Entity(entt::entity handle, Scene *scene);
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundefined-func-template"
-#endif
+	OWL_DIAG_PUSH
+	OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 	/**
 	 * @brief Add component to this entity.
 	 * @tparam T Type of the component.
@@ -70,9 +68,7 @@ public:
 		scene->onComponentAdded<T>(*this, component);
 		return component;
 	}
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+	OWL_DIAG_POP
 
 	/**
 	 * @brief Access to the component of the given type.

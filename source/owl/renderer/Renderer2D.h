@@ -140,11 +140,6 @@ struct OWL_API PolyLineData {
 	int entityID = -1;
 };
 
-#ifdef __clang__
-#pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
-
 /**
  * @brief Class Renderer2D.
  */
@@ -283,8 +278,5 @@ private:
 	 */
 	static void startBatch();
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

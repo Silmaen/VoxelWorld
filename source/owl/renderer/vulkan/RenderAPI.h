@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../RenderAPI.h"
+#include <vulkan/vulkan.h>
 
 /**
  * @brief Namespace for vulkan specific rendering objects.
@@ -29,7 +30,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	~RenderAPI() override = default;
+	~RenderAPI() override;
 
 	/**
 	 * @brief Initialize the renderer.

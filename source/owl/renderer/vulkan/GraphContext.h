@@ -29,7 +29,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	~GraphContext() override = default;//---UNCOVER---
+	~GraphContext() override;
 
 	/**
 	 * @brief Initialize the context.
@@ -44,7 +44,32 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	[[nodiscard]] [[nodiscard]] Version getVersion() const override { return {0, 0}; }
+	[[nodiscard]] Version getVersion() const override;
+
+	/**
+	 * @brief Create the Window surface.
+	 * @param instance The Vulkan instance
+	 * @return The operation result.
+	 */
+	VkResult createSurface(VkInstance instance);
+
+	/**
+	 * @brief Destroy the Window surface.
+	 * @param instance The Vulkan instance
+	 */
+	void destroySurface(VkInstance instance);
+
+	/**
+	 * \brief Access to the vulkn surface.
+	 * \return The vulkan surface.
+	 */
+	[[nodiscard]] VkSurfaceKHR getSurface() const { return surface; }
+
+private:
+	/// The window.
+	GLFWwindow *wnd;
+	/// the presenttin surface.
+	VkSurfaceKHR surface;
 };
 
 }// namespace owl::renderer::vulkan

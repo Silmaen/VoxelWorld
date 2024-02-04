@@ -7,6 +7,7 @@
  */
 
 #pragma once
+#include "Macros.h"
 #include <memory>
 
 #if defined(OWL_PLATFORM_WINDOWS)

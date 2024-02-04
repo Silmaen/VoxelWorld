@@ -45,7 +45,7 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	Version getVersion() const override;
+	[[nodiscard]] Version getVersion() const override;
 
 private:
 	/// Link to the parent window.

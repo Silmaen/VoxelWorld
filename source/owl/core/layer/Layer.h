@@ -18,11 +18,6 @@
  */
 namespace owl::core::layer {
 
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class Layer.
  */
@@ -41,7 +36,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Layer() = default;
+	virtual ~Layer();
 
 	/**
 	 * @brief Action on Attach.
@@ -81,9 +76,5 @@ protected:
 	/// Debug name for this layer.
 	std::string debugName;
 };
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::core::layer

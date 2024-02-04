@@ -76,7 +76,7 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	explicit Application(const AppParams &appParams);
+	explicit Application(AppParams appParams);
 
 	/**
 	 * @brief Access to Application instance.
@@ -207,7 +207,7 @@ private:
 	/// Pointer to the window.
 	uniq<input::Window> appWindow;
 	/// Pointer to the GUI Layer.
-	shared<gui::UILayer> imGuiLayer;
+	shared<gui::UILayer> imGuiLayer = nullptr;
 	/// Running state.
 	State state = State::Running;
 	/// If Window minimized.

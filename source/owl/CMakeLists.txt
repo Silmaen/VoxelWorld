@@ -70,11 +70,20 @@ find_package(glm REQUIRED)
 message(STATUS "Found glm version ${glm_VERSION} @ ${glm_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC glm::glm)
 
-# ImGui
+# Vulkan
 find_package(VulkanHeaders REQUIRED)
 find_package(VulkanLoader REQUIRED)
-message(STATUS "Found Vulkan version ${VulkanLoader_VERSION} @ ${VulkanLoader_DIR}")
+get_filename_component(VULKAN_DIR ${VulkanLoader_DIR} DIRECTORY)
+get_filename_component(VULKAN_DIR ${VULKAN_DIR} DIRECTORY)
+message(STATUS "Found Vulkan version ${VulkanLoader_VERSION} @ ${VULKAN_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC Vulkan::Loader)
+
+find_package(VulkanUtilityLibraries REQUIRED)
+message(STATUS "Found VulkanUtilityLibrary version ${VulkanLoader_VERSION} @ ${VULKAN_DIR}")
+target_link_libraries(${ENGINE_NAME} PUBLIC Vulkan::LayerSettings)
+target_link_libraries(${ENGINE_NAME} PUBLIC Vulkan::UtilityHeaders)
+
+# ImGui
 find_package(imgui REQUIRED)
 message(STATUS "Found imgui version ${imgui_VERSION} @ ${imgui_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC imgui::imgui)
@@ -129,7 +138,6 @@ find_package(SPIRV-Tools REQUIRED)
 find_package(SPIRV-Tools-opt REQUIRED)
 find_package(glslang REQUIRED)
 find_package(shaderc REQUIRED)
-message(STATUS "Found shaderc version ${shaderc_VERSION} @ ${shaderc_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
 
 # additional windows libs
@@ -146,6 +154,7 @@ if (OWL_PLATFORM_WINDOWS)
         set(shader_libs
                 libshaderc_shared
                 SPIRV
+                vulkan-1
         )
         foreach (l_lib ${shader_libs})
             add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
@@ -155,4 +164,25 @@ if (OWL_PLATFORM_WINDOWS)
             )
         endforeach ()
     endif ()
+
+endif ()
+
+# copy the Vulkan layers & configs
+if (${PRJPREFIX}_COPY_VULKAN_LAYERS)
+    set(VULKAN_BIN_DIR ${VULKAN_DIR}/bin)
+
+    message(STATUS "Vulkan dir:  ${VULKAN_DIR}")
+    file(GLOB VK_LAYER_BIN_FILES LIST_DIRECTORIES false ${VULKAN_DIR}/bin/*VkLayer*)
+    file(GLOB VK_LAYER_LIB_FILES LIST_DIRECTORIES false ${VULKAN_DIR}/lib/*VkLayer*)
+    set(VK_LAYER_FILES ${VK_LAYER_BIN_FILES} ${VK_LAYER_LIB_FILES})
+
+    foreach (file ${VK_LAYER_FILES})
+        get_filename_component(filename ${file} NAME)
+        set(destination "$<TARGET_FILE_DIR:${ENGINE_NAME}>/${filename}")
+
+        add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
+                COMMAND "${CMAKE_COMMAND}" -E "$<IF:$<CONFIG:Debug>,echo,true>" "Copying VkLayer file ${file} for debug configuration..."
+                COMMAND "${CMAKE_COMMAND}" -E "$<IF:$<CONFIG:Debug>,copy_if_different,true>" "${file}" "${destination}"
+        )
+    endforeach ()
 endif ()

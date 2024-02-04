@@ -9,14 +9,33 @@
 
 #include "RenderAPI.h"
 
+#include "core/Application.h"
+#include "core/external/glfw3.h"
+#include "internal/VulkanHandler.h"
+
 
 namespace owl::renderer::vulkan {
+
+RenderAPI::~RenderAPI() {
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.release();
+}
 
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
-	if (getState() != State::Created)
+	if (getState() != State::Created) return;
+
+	auto &vkh = internal::VulkanHandler::get();
+#ifdef OWL_DEBUG
+	vkh.activateValidation();
+#endif
+	vkh.initVulkan();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		setState(State::Error);
 		return;
+	}
+
 
 	// renderer is now ready
 	setState(State::Ready);
@@ -31,5 +50,6 @@ void RenderAPI::clear() {}
 void RenderAPI::drawData(const shared<DrawData> &, uint32_t) {}
 
 void RenderAPI::setLineWidth(float) {}
+
 
 }// namespace owl::renderer::vulkan

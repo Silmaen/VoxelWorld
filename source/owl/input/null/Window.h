@@ -51,6 +51,11 @@ public:
 	 */
 	[[nodiscard]] uint32_t getHeight() const override { return windowData.height; }
 
+	/**
+	 * @brief Access to texture's size.
+	 * @return Texture's size.
+	 */
+	[[nodiscard]] math::FrameSize getSize() const override { return {windowData.width, windowData.height}; }
 
 	/**
 	 * @brief Get the type of window manager.

@@ -61,7 +61,7 @@ public:
 	 * @param data Draw data to render.
 	 * @param indexCount Number of vertex to draw (=0 all).
 	 */
-	void drawData(const shared<DrawData> &data, uint32_t indexCount = 0) override;
+	void drawData(const shared<DrawData> &data, uint32_t indexCount) override;
 
 	/**
 	 * @brief Define the line width.

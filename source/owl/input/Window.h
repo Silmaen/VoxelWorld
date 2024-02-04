@@ -9,6 +9,7 @@
 #pragma once
 #include "core/Core.h"
 #include "event/Event.h"
+#include "math/sizingTypes.h"
 #include "renderer/GraphContext.h"
 #include <functional>
 
@@ -73,6 +74,12 @@ public:
 	 * @return The window's height.
 	 */
 	[[nodiscard]] virtual uint32_t getHeight() const = 0;
+
+	/**
+	 * @brief Access to texture's size.
+	 * @return Texture's size.
+	 */
+	[[nodiscard]] virtual math::FrameSize getSize() const = 0;
 
 	/**
 	 * @brief Get the type of window manager.

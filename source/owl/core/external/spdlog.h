@@ -8,15 +8,12 @@
 
 #pragma once
 
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
-#pragma clang diagnostic ignored "-Wswitch-enum"
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#pragma clang diagnostic ignored "-Wundefined-func-template"
-#pragma clang diagnostic ignored "-Wfloat-equal"
-#endif
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wdocumentation-unknown-command")
+OWL_DIAG_DISABLE_CLANG("-Wswitch-enum")
+OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
+OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
+OWL_DIAG_DISABLE_CLANG("-Wfloat-equal")
+
 #include <spdlog/spdlog.h>
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP

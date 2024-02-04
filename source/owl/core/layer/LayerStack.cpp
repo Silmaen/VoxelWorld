@@ -12,6 +12,8 @@
 
 namespace owl::core::layer {
 
+Layer::~Layer() = default;
+
 LayerStack::~LayerStack() {
 	for (auto &layer: layers) {
 		layer->onDetach();

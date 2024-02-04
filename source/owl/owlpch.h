@@ -7,11 +7,9 @@
  */
 
 #pragma once
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundefined-func-template"
-#endif
+#include "core/Macros.h"
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 
 #include <algorithm>
 #include <array>
@@ -21,6 +19,7 @@
 #include <list>
 #include <memory>
 #include <random>
+#include <set>
 #include <streambuf>
 #include <string>
 #include <string_view>
@@ -35,6 +34,4 @@
 // third party
 #include <magic_enum.hpp>
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+OWL_DIAG_POP

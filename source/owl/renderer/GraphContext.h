@@ -50,14 +50,36 @@ public:
 	struct Version {
 		int major;///< major version number.
 		int minor;///< minor version number.
+		/**
+		 * @brief Check version order
+		 * @param other Version to compare
+		 * @return True if this is equal.
+		 */
+		[[nodiscard]] bool operator==(const Version &other) const {
+			return major == other.major && minor == other.minor;
+		}
+		/**
+		 * @brief Check version order
+		 * @param other Version to compare
+		 * @return True if this is lower.
+		 */
+		[[nodiscard]] bool operator<(const Version &other) const {
+			return major < other.major || (major == other.major && minor < other.minor);
+		}
+		/**
+		 * @brief Check version order
+		 * @param other Version to compare
+		 * @return True if this is lower.
+		 */
+		[[nodiscard]] bool operator<=(const Version &other) const {
+			return major <= other.major || (major == other.major && minor <= other.minor);
+		}
 	};
 	/**
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	virtual Version getVersion() const = 0;
-
-private:
+	[[nodiscard]] virtual Version getVersion() const = 0;
 };
 
 }// namespace owl::renderer

@@ -113,7 +113,7 @@ def check_dependencies(target: dict):
             }
             if dep["header"] and not first_run:
                 continue
-            if "kind" in dep and dep["kind"] != kind:
+            if "kind" in dep and dep["kind"] != kind and dep["kind"] in kinds:
                 continue
             if not dep["header"]:
                 query["kind"] = kind
