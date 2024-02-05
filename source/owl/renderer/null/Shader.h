@@ -23,24 +23,27 @@ public:
 	/**
 	 * @brief Constructor.
 	 * @param shaderName Shader's name.
+	 * @param renderer Name of the shader's related renderer.
 	 * @param vertexSrc Source of the vertex shader.
 	 * @param fragmentSrc Source of fragment shader.
 	 */
-	Shader(const std::string &shaderName, const std::string &vertexSrc, const std::string &fragmentSrc);
+	Shader(const std::string &shaderName, const std::string &renderer, const std::string &vertexSrc, const std::string &fragmentSrc);
 
 	/**
 	 * @brief Constructor.
 	 * @param shaderName Shader's name.
+	 * @param renderer Name of the shader's related renderer.
 	 * @param sources The shader's sources with type.
 	 */
-	Shader(const std::string &shaderName, const std::unordered_map<ShaderType, std::string> &sources);
+	Shader(const std::string &shaderName, const std::string &renderer, const std::unordered_map<ShaderType, std::string> &sources);
 
 	/**
 	 * @brief Constructor.
 	 * @param shaderName Shader's name.
+	 * @param renderer Name of the shader's related renderer.
 	 * @param sources The shader source's path with type.
 	 */
-	Shader(const std::string &shaderName, const std::vector<std::filesystem::path> &sources);
+	Shader(const std::string &shaderName, const std::string &renderer, const std::vector<std::filesystem::path> &sources);
 
 	/**
 	 * @brief Destructor.

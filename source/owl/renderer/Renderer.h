@@ -31,7 +31,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Renderer();
+	~Renderer() = default;
 
 	/**
 	 * @brief Initialize the renderer.

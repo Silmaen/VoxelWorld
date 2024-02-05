@@ -16,11 +16,11 @@ namespace owl::renderer::opengl_legacy {
 
 DrawData::~DrawData() = default;
 
-void DrawData::init(const BufferLayout &layout, std::vector<uint32_t> &indices, const std::string &shaderName) {
+void DrawData::init(const BufferLayout &layout, [[maybe_unused]] const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) {
 	OWL_PROFILE_FUNCTION()
 
 	// Load the shader !
-	setShader(shaderName);
+	setShader(shaderName, renderer);
 	if (!shader) return;
 	// Create the buffers
 	vertexBuffer = mk_shared<opengl_legacy::VertexBuffer>(layout.getStride() * indices.size());
@@ -63,13 +63,13 @@ uint32_t DrawData::getIndexCount() const {
 	return indexBuffer->getCount();
 }
 
-void DrawData::setShader(const std::string &shaderName) {
+void DrawData::setShader(const std::string &shaderName, const std::string &renderer) {
 	OWL_PROFILE_FUNCTION()
 
 	auto &shLib = Renderer::getShaderLibrary();
-	if (!shLib.exists(shaderName))
-		shLib.addFromStandardPath(shaderName);
-	shader = static_pointer_cast<Shader>(shLib.get(shaderName));
+	if (!shLib.exists(shaderName, renderer))
+		shLib.addFromStandardPath(shaderName, renderer);
+	shader = static_pointer_cast<Shader>(shLib.get(shaderName, renderer));
 }
 
 void DrawData::applyLayout() const {

@@ -12,6 +12,9 @@
 
 namespace owl::renderer::vulkan::internal {
 
+/**
+ * @brief Vulkan swapchain.
+ */
 struct SwapChain {
 	VkSwapchainKHR swapChain = nullptr;
 	std::vector<VkImage> swapChainImages{};

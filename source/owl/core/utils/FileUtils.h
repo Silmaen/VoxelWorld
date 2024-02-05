@@ -16,6 +16,6 @@ namespace owl::core::utils {
  * @param file The file to read.
  * @return The content of the file.
  */
-std::string fileToString(const std::filesystem::path &file);
+std::string OWL_API fileToString(const std::filesystem::path &file);
 
 }// namespace owl::core::utils

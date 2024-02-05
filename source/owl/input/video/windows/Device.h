@@ -15,7 +15,9 @@
 #include <mfidl.h>
 #include <mfreadwrite.h>
 
-
+/**
+ * @brief Windows video devices.
+ */
 namespace owl::input::video::windows {
 
 /**

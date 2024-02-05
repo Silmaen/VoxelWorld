@@ -92,7 +92,7 @@ public:
 	 * @brief Get the actual API type.
 	 * @return API Type.
 	 */
-	inline static Type getAPI() { return type; }
+	static Type getAPI() { return type; }
 
 	/**
 	 * @brief Static method to create a Render API.
@@ -104,7 +104,15 @@ public:
 	 * @brief Get the actual API state.
 	 * @return API State.
 	 */
-	inline static State getState() { return state; }
+	static State getState() { return state; }
+
+	/**
+	 * @brief Check if the API type require initializations.
+	 * @return tRue if initialization required.
+	 */
+	static bool requireInit() {
+		return type == Type::OpenGL || type == Type::OpenglLegacy || type == Type::Vulkan;
+	}
 
 protected:
 	/**

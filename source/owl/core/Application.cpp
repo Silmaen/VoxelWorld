@@ -36,9 +36,9 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 		workingDirectory = absolute(std::filesystem::current_path());
 		OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
 #ifdef WIN32
-		_putenv_s("VK_LAYER_PATH", workingDirectory.string().c_str());
+		_putenv_s("VK_ADD_LAYER_PATH", workingDirectory.string().c_str());
 #else
-		setenv("VK_LAYER_PATH", workingDirectory.string().c_str(), 1);
+		setenv("VK_ADD_LAYER_PATH", workingDirectory.string().c_str(), 1);
 #endif
 
 		// load config file if any

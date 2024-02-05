@@ -29,10 +29,11 @@ public:
 	/**
 	 * @brief Initialize the draw data.
 	 * @param layout_ Layout of the vertex attributes.
+	 * @param renderer Name of the shader's related renderer.
 	 * @param indices List of vertex indices.
 	 * @param shaderName The shader name.
 	 */
-	virtual void init(const BufferLayout &layout_, std::vector<uint32_t> &indices, const std::string &shaderName) = 0;
+	virtual void init(const BufferLayout &layout_, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) = 0;
 
 	/**
 	 * @brief Bind this draw data.
@@ -66,8 +67,9 @@ public:
 	/**
 	 * @brief Define the shader for this object.
 	 * @param shaderName The shader name.
+	 * @param renderer Name of the shader's related renderer.
 	 */
-	virtual void setShader(const std::string &shaderName) = 0;
+	virtual void setShader(const std::string &shaderName, const std::string &renderer) = 0;
 };
 
 }// namespace owl::renderer

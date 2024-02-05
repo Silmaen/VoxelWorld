@@ -1,6 +1,8 @@
 
 #include "testHelper.h"
 #include <core/Application.h>
+#include <core/utils/FileUtils.h>
+#include <fstream>
 
 using namespace owl::core;
 
@@ -44,4 +46,22 @@ TEST(Core, AppParams_serialize) {
 	EXPECT_EQ(paramsIni.height, paramsLoad.height);
 	EXPECT_EQ(paramsIni.renderer, paramsLoad.renderer);
 	remove(tmpFile);
+}
+
+TEST(Core, fileToString) {
+	Log::setVerbosityLevel(spdlog::level::off);
+	Log::init();
+	const std::string superStr = "yoho\nI'm fine!\n";
+	const auto tmpFile = std::filesystem::temp_directory_path() / "testFile.b";
+	{
+		std::ofstream out(tmpFile, std::ios::out);
+		out << superStr;
+		out.close();
+	}
+	std::string read = owl::core::utils::fileToString(tmpFile);
+	EXPECT_STREQ(superStr.c_str(), read.c_str());
+	read = owl::core::utils::fileToString("");
+	EXPECT_STREQ("", read.c_str());
+	remove(tmpFile);
+	Log::invalidate();
 }

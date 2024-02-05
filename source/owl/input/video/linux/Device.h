@@ -12,6 +12,9 @@
 #ifdef OWL_PLATFORM_LINUX
 #include <linux/videodev2.h>
 
+/**
+ * @brief Linux video devices.
+ */
 namespace owl::input::video::linux64 {
 
 /**

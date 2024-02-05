@@ -11,11 +11,11 @@
 
 namespace owl::renderer::null {
 
-Shader::Shader(const std::string &shaderName, const std::string &, const std::string &) : ::owl::renderer::Shader{shaderName} {}
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::string &, const std::string &) : ::owl::renderer::Shader{shaderName, renderer} {}
 
-Shader::Shader(const std::string &shaderName, const std::unordered_map<ShaderType, std::string> &) : ::owl::renderer::Shader{shaderName} {}
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::unordered_map<ShaderType, std::string> &) : ::owl::renderer::Shader{shaderName, renderer} {}
 
-Shader::Shader(const std::string &shaderName, const std::vector<std::filesystem::path> &) : ::owl::renderer::Shader{shaderName} {}
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::vector<std::filesystem::path> &) : ::owl::renderer::Shader{shaderName, renderer} {}
 
 Shader::~Shader() = default;
 
