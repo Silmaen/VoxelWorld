@@ -31,10 +31,11 @@ public:
 	/**
 	 * @brief Initialize the draw data.
 	 * @param layout_ Layout of the vertex attributes.
+	 * @param renderer Name of the shader's related renderer.
 	 * @param indices List of vertex indices.
 	 * @param shaderName The shader name.
 	 */
-	void init([[maybe_unused]] const BufferLayout &layout_, [[maybe_unused]] std::vector<uint32_t> &indices, [[maybe_unused]] const std::string &shaderName) override;
+	void init([[maybe_unused]] const BufferLayout &layout_, const std::string &renderer, [[maybe_unused]] std::vector<uint32_t> &indices, [[maybe_unused]] const std::string &shaderName) override;
 
 	/**
 	 * @brief Bind this draw data.
@@ -62,8 +63,9 @@ public:
 	/**
 	 * @brief Define the shader for this object.
 	 * @param shaderName The shader name.
+	 * @param renderer Name of the shader's related renderer.
 	 */
-	void setShader(const std::string &shaderName) override;
+	void setShader(const std::string &shaderName, [[maybe_unused]] const std::string &renderer) override;
 
 private:
 	void applyLayout() const;

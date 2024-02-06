@@ -162,7 +162,7 @@ void Renderer2D::init() {
 								 {"a_TilingFactor", ShaderDataType::Float},
 								 {"a_EntityID", ShaderDataType::Int},
 						 },
-						 quadIndices, "renderer2D_quad");
+						 "renderer2D", quadIndices, "quad");
 	// circles
 	data->drawCircle = DrawData::create();
 	data->drawCircle->init({
@@ -173,7 +173,7 @@ void Renderer2D::init() {
 								   {"a_Fade", ShaderDataType::Float},
 								   {"a_EntityID", ShaderDataType::Int},
 						   },
-						   quadIndices, "renderer2D_circle");
+						   "renderer2D", quadIndices, "circle");
 	// Lines
 	data->drawLine = DrawData::create();
 	data->drawLine->init({
@@ -181,7 +181,7 @@ void Renderer2D::init() {
 								 {"a_Color", ShaderDataType::Float4},
 								 {"a_EntityID", ShaderDataType::Int},
 						 },
-						 quadIndices, "renderer2D_line");
+						 "renderer2D", quadIndices, "line");
 
 	data->whiteTexture = Texture2D::create(1, 1);
 	uint32_t whiteTextureData = 0xffffffff;

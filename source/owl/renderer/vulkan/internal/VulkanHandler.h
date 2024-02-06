@@ -10,7 +10,11 @@
 #include "SwapChain.h"
 
 #include <backends/imgui_impl_vulkan.h>
+#include <map>
 
+/**
+ * @brief Internal functions of the vulkan renderer.
+ */
 namespace owl::renderer::vulkan::internal {
 
 /**
@@ -94,6 +98,10 @@ public:
 
 	[[nodiscard]] VkDevice getDevice() const { return logicalDevice; }
 
+	[[nodiscard]] VkPipeline getPipeline(int32_t id) const;
+	int32_t pushPpeline(VkPipeline pipeline);
+	void popPipeline(int32_t id);
+
 private:
 	/**
 	 * @brief Default Constructor.
@@ -145,6 +153,8 @@ private:
 	VkRenderPass renderPass = nullptr;
 	/// Descriptor pool.
 	VkDescriptorPool descriptorPool = nullptr;
+	/// List of piplines.
+	std::map<int32_t, VkPipeline> pipeLines;
 };
 
 }// namespace owl::renderer::vulkan::internal

@@ -10,6 +10,7 @@
 #include "core/Core.h"
 #include <glm/glm.hpp>
 #include <unordered_map>
+#include <utility>
 
 namespace owl::renderer {
 
@@ -34,7 +35,7 @@ public:
 	/**
 	 * @brief Constructor.
 	 */
-	Shader(const std::string &name_) : name{name_} {}
+	Shader(std::string name_, std::string renderer_) : name{std::move(name_)}, renderer{std::move(renderer_)} {}
 
 	/**
 	 * @brief Destructor.
@@ -52,27 +53,21 @@ public:
 	virtual void unbind() const = 0;
 
 	/**
-	 * @brief Create a new shader.
-	 * @param shaderName Name of the files in the standard path.
-	 * @param vertexSrc Source of the vertex shader.
-	 * @param fragmentSrc Source of fragment shader.
+	* @brief Create a new shader.
+	 * @param shaderName Shader's name.
+	 * @param renderer Name of the shader's related renderer.
 	 * @return Pointer to the shader.
 	 */
-	static shared<Shader> create(const std::string &shaderName, const std::string &vertexSrc, const std::string &fragmentSrc);
+	static shared<Shader> create(const std::string &shaderName, const std::string &renderer);
 
 	/**
-	 * @brief Create a new shader.
-	 * @param shaderName Name of the files in the standard path.
-	 * @return Pointer to the shader.
-	 */
-	static shared<Shader> create(const std::string &shaderName);
-
-	/**
-	 * @brief Create a new shader.
+	* @brief Create a new shader.
+	 * @param shaderName Shader's name.
+	 * @param renderer Name of the shader's related renderer.
 	 * @param file Source of the shader.
 	 * @return Pointer to the shader.
 	 */
-	static shared<Shader> create(const std::filesystem::path &file);
+	static shared<Shader> create(const std::string &shaderName, const std::string &renderer, const std::filesystem::path &file);
 
 	/**
 	 * @brief Set shader's internal int variable.
@@ -129,10 +124,24 @@ public:
 	 * @return Shader's name.
 	 */
 	[[nodiscard]] virtual const std::string &getName() const { return name; }
+	/**
+	 * @brief get the shader's renderer's name.
+	 * @return Shader's renderer's name.
+	 */
+	[[nodiscard]] virtual const std::string &getRenderer() const { return renderer; }
+
+	/**
+	 * @brief get the shader's full name.
+	 * @return Shader's full name.
+	 */
+	[[nodiscard]] virtual std::string getFullName() const { return fmt::format("{}_{}", renderer, name); }
+
 
 private:
 	/// Shader's name.
 	std::string name;
+	/// Shader's name.
+	std::string renderer;
 	/// Library is a friend to be able to modify name.
 	friend class ShaderLibrary;
 };

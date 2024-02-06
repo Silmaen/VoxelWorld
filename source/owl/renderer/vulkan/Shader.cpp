@@ -8,16 +8,50 @@
 #include "owlpch.h"
 
 #include "Shader.h"
+#include "core/utils/FileUtils.h"
+#include "internal/VulkanHandler.h"
+
+#include <vulkan/vulkan_core.h>
 
 namespace owl::renderer::vulkan {
 
-Shader::Shader(const std::string &shaderName, const std::string &, const std::string &) : ::owl::renderer::Shader{shaderName} {}
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::string &vertexSrc, const std::string &fragmentSrc) : ::owl::renderer::Shader{shaderName, renderer} {
+	OWL_PROFILE_FUNCTION()
 
-Shader::Shader(const std::string &shaderName, const std::unordered_map<ShaderType, std::string> &) : ::owl::renderer::Shader{shaderName} {}
+	createShader({{ShaderType::Vertex, vertexSrc}, {ShaderType::Fragment, fragmentSrc}});
+}
 
-Shader::Shader(const std::string &shaderName, const std::vector<std::filesystem::path> &) : ::owl::renderer::Shader{shaderName} {}
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::unordered_map<ShaderType, std::string> &sources) : ::owl::renderer::Shader{shaderName, renderer} {
+	OWL_PROFILE_FUNCTION()
 
-Shader::~Shader() = default;
+	createShader(sources);
+}
+
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::vector<std::filesystem::path> &sources) : ::owl::renderer::Shader{shaderName, renderer} {
+	OWL_PROFILE_FUNCTION()
+	std::unordered_map<ShaderType, std::string> strSources;
+
+	for (const auto &src: sources) {
+		ShaderType type = ShaderType::None;
+		if (src.extension() == ".frag")
+			type = ShaderType::Fragment;
+		if (src.extension() == ".vert")
+			type = ShaderType::Vertex;
+		if (type == ShaderType::None) {
+			OWL_CORE_ASSERT(false, "Unknown Shader Type")
+			continue;
+		}
+		strSources.emplace(type, core::utils::fileToString(src));
+	}
+	createShader(strSources);
+}
+
+Shader::~Shader() {
+	if (pipelineId > 0) {
+		auto &vkh = internal::VulkanHandler::get();
+		vkh.popPipeline(pipelineId);
+	}
+}
 
 void Shader::bind() const {}
 
@@ -37,5 +71,7 @@ void Shader::setFloat4(const std::string &, const glm::vec4 &) {}
 
 void Shader::setMat4(const std::string &, const glm::mat4 &) {}
 
+void Shader::createShader(const std::unordered_map<ShaderType, std::string> &) {
+}
 
 }// namespace owl::renderer::vulkan

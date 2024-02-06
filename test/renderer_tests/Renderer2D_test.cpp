@@ -10,10 +10,10 @@ TEST(Renderer2D, fakeEmptyScene) {
 	owl::core::Log::init(spdlog::level::off);
 	RenderCommand::create(RenderAPI::Type::Null);
 	Renderer::init();
-	CameraOrtho cam(0, 0, 800, 600);
+	const CameraOrtho cam(0, 0, 800, 600);
 	Renderer2D::beginScene(cam);
 	Renderer2D::endScene();
-	auto st = Renderer2D::getStats();
+	const auto st = Renderer2D::getStats();
 	EXPECT_EQ(st.drawCalls, 0);
 	EXPECT_EQ(st.quadCount, 0);
 	EXPECT_EQ(st.getTotalIndexCount(), 0);
@@ -50,6 +50,8 @@ TEST(Renderer2D, fakeLineScene) {
 	EXPECT_EQ(st.getTotalIndexCount(), 0);
 	EXPECT_EQ(st.getTotalVertexCount(), 0);
 
+	Renderer2D::shutdown();
+	Renderer2D::shutdown();
 	RenderCommand::invalidate();
 	owl::core::Log::invalidate();
 }
@@ -58,14 +60,14 @@ TEST(Renderer2D, fakeCircleRectScene) {
 	owl::core::Log::init(spdlog::level::off);
 	RenderCommand::create(RenderAPI::Type::Null);
 	Renderer::init();
-	CameraEditor cam;
+	const CameraEditor cam;
 	Renderer2D::resetStats();
 	Renderer2D::beginScene(cam, glm::identity<glm::mat4>());
 	Renderer2D::drawRect({.transform = utils::Transform2D{glm::identity<glm::mat4>()}});
 	Renderer2D::nextBatch();
 	Renderer2D::drawCircle({.transform = utils::Transform2D{glm::identity<glm::mat4>()}});
 	Renderer2D::endScene();
-	auto st = Renderer2D::getStats();
+	const auto st = Renderer2D::getStats();
 	EXPECT_EQ(st.drawCalls, 6);
 	EXPECT_EQ(st.quadCount, 1);
 	EXPECT_EQ(st.getTotalIndexCount(), 6);

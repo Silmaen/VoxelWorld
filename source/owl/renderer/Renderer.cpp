@@ -18,10 +18,6 @@ shared<Renderer::SceneData> Renderer::sceneData = nullptr;
 shared<ShaderLibrary> Renderer::shaderLibrary = nullptr;
 shared<TextureLibrary> Renderer::textureLibrary = nullptr;
 
-Renderer::~Renderer() {
-	reset();
-};
-
 void Renderer::init() {
 	OWL_PROFILE_FUNCTION()
 

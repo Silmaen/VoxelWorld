@@ -33,15 +33,14 @@ TEST(RenderAPI, RenderComamand) {
 TEST(RenderAPI, badCreation) {
 	// bad Type value
 	owl::core::Log::init(spdlog::level::off);
-	owl::uniq<RenderAPI> api = RenderAPI::create(RenderAPI::Type{-1});
-	auto gf = GraphContext::create(nullptr);
-	auto fb = Framebuffer::create({});
-	auto ub = UniformBuffer::create(0, 0);
-	auto tex = Texture2D::create(std::filesystem::path());
-	auto tex2 = Texture2D::create(1, 1);
-	auto shader = Shader::create(std::filesystem::path());
-	auto shader2 = Shader::create(std::string("bob"));
-	auto shader3 = Shader::create("bob2", "", "");
+	const owl::uniq<RenderAPI> api = RenderAPI::create(RenderAPI::Type{-1});
+	const auto gf = GraphContext::create(nullptr);
+	const auto fb = Framebuffer::create({});
+	const auto ub = UniformBuffer::create(0, 0);
+	const auto tex = Texture2D::create(std::filesystem::path());
+	const auto tex2 = Texture2D::create(1, 1);
+	const auto shader = Shader::create("bob2", "", std::filesystem::path());
+	const auto shader2 = Shader::create("bob2", "");
 	EXPECT_TRUE(api == nullptr);
 	EXPECT_TRUE(gf == nullptr);
 	EXPECT_TRUE(fb == nullptr);
@@ -50,7 +49,6 @@ TEST(RenderAPI, badCreation) {
 	EXPECT_TRUE(tex2 == nullptr);
 	EXPECT_TRUE(shader == nullptr);
 	EXPECT_TRUE(shader2 == nullptr);
-	EXPECT_TRUE(shader3 == nullptr);
 	owl::core::Log::invalidate();
 }
 

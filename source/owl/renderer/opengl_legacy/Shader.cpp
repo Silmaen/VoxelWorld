@@ -54,19 +54,19 @@ static const std::vector<std::string> texUniforms = {
 		"u_Texture31",
 };
 
-Shader::Shader(const std::string &shaderName, const std::string &vertexSrc, const std::string &fragmentSrc) : ::owl::renderer::Shader{shaderName} {
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::string &vertexSrc, const std::string &fragmentSrc) : ::owl::renderer::Shader{shaderName, renderer} {
 	OWL_PROFILE_FUNCTION()
 
 	createShader({{ShaderType::Vertex, vertexSrc}, {ShaderType::Fragment, fragmentSrc}});
 }
 
-Shader::Shader(const std::string &shaderName, const std::unordered_map<ShaderType, std::string> &sources) : ::owl::renderer::Shader{shaderName} {
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::unordered_map<ShaderType, std::string> &sources) : ::owl::renderer::Shader{shaderName, renderer} {
 	OWL_PROFILE_FUNCTION()
 
 	createShader(sources);
 }
 
-Shader::Shader(const std::string &shaderName, const std::vector<std::filesystem::path> &sources) : ::owl::renderer::Shader{shaderName} {
+Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::vector<std::filesystem::path> &sources) : ::owl::renderer::Shader{shaderName, renderer} {
 	OWL_PROFILE_FUNCTION()
 	std::unordered_map<ShaderType, std::string> strSources;
 
