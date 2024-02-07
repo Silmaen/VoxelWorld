@@ -88,6 +88,11 @@ public:
 	 */
 	[[nodiscard]] void *getNativeWindow() const override { return glfwWindow; }
 
+	/**
+	 * @brief Terminate the window.
+	 */
+	void shutdown() override;
+
 private:
 	/**
 	 * @brief Initialize the window.
@@ -95,10 +100,6 @@ private:
 	 */
 	void init(const Properties &props);
 
-	/**
-	 * @brief Terminate the window.
-	 */
-	void shutdown();
 	/// Pointer to the GLFW window.
 	void *glfwWindow = nullptr;
 

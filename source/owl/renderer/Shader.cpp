@@ -38,15 +38,19 @@ shared<Shader> Shader::create(const std::string &shaderName, const std::string &
 shared<Shader> Shader::create(const std::string &shaderName, const std::string &renderer, const std::filesystem::path &file) {
 	std::vector<std::filesystem::path> sources;
 	if (is_directory(file)) {
-		for (const auto &f: file)
+		for (const auto &f: std::filesystem::directory_iterator(file)) {
+			if (f.path().stem() != shaderName)
+				continue;
 			sources.push_back(f);
+		}
 		if (sources.empty()) {
-			OWL_CORE_WARN("Not able to find Shader in {}", file.string())
+			OWL_CORE_WARN("Not able to find Shader {} in {}", shaderName, file.string())
 			return nullptr;
 		}
 	} else {
 		sources = {file};
 	}
+	OWL_CORE_TRACE("Try to create shader {} for renderer {} / API {}.", shaderName, renderer, magic_enum::enum_name(Renderer::getAPI()))
 	switch (Renderer::getAPI()) {
 		case RenderAPI::Type::Null:
 			return mk_shared<null::Shader>(shaderName, renderer, sources);

@@ -75,6 +75,16 @@ public:
 	 * @return Number of texture slots.
 	 */
 	[[nodiscard]] uint32_t getMaxTextureSlots() const override { return 16; }
+
+	/**
+	 * @brief Reset value for the frame to render.
+	 */
+	void beginFrame() override;
+
+	/**
+	 * @brief Ends draw call for the current frame.
+	 */
+	void endFrame() override;
 };
 
 }// namespace owl::renderer::vulkan

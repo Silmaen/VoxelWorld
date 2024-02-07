@@ -9,8 +9,11 @@
 
 #include "VulkanHandler.h"
 
+#include "../DrawData.h"
 #include "../GraphContext.h"
 #include "core/Application.h"
+#include "renderer/utils/shaderFileUtils.h"
+#include "utils.h"
 
 namespace owl::renderer::vulkan::internal {
 
@@ -18,108 +21,6 @@ namespace {
 
 PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
 PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
-
-std::string resultString(VkResult result) {
-	switch (result) {
-		case VK_SUCCESS:
-			return "VK_SUCCESS";
-		case VK_NOT_READY:
-			return "VK_NOT_READY";
-		case VK_TIMEOUT:
-			return "VK_TIMEOUT";
-		case VK_EVENT_SET:
-			return "VK_EVENT_SET";
-		case VK_EVENT_RESET:
-			return "VK_EVENT_RESET";
-		case VK_INCOMPLETE:
-			return "VK_INCOMPLETE";
-		case VK_ERROR_OUT_OF_HOST_MEMORY:
-			return "VK_ERROR_OUT_OF_HOST_MEMORY";
-		case VK_ERROR_OUT_OF_DEVICE_MEMORY:
-			return "VK_ERROR_OUT_OF_DEVICE_MEMORY";
-		case VK_ERROR_INITIALIZATION_FAILED:
-			return "VK_ERROR_INITIALIZATION_FAILED";
-		case VK_ERROR_DEVICE_LOST:
-			return "VK_ERROR_DEVICE_LOST";
-		case VK_ERROR_MEMORY_MAP_FAILED:
-			return "VK_ERROR_MEMORY_MAP_FAILED";
-		case VK_ERROR_LAYER_NOT_PRESENT:
-			return "VK_ERROR_LAYER_NOT_PRESENT";
-		case VK_ERROR_EXTENSION_NOT_PRESENT:
-			return "VK_ERROR_EXTENSION_NOT_PRESENT";
-		case VK_ERROR_FEATURE_NOT_PRESENT:
-			return "VK_ERROR_FEATURE_NOT_PRESENT";
-		case VK_ERROR_INCOMPATIBLE_DRIVER:
-			return "VK_ERROR_INCOMPATIBLE_DRIVER";
-		case VK_ERROR_TOO_MANY_OBJECTS:
-			return "VK_ERROR_TOO_MANY_OBJECTS";
-		case VK_ERROR_FORMAT_NOT_SUPPORTED:
-			return "VK_ERROR_FORMAT_NOT_SUPPORTED";
-		case VK_ERROR_FRAGMENTED_POOL:
-			return "VK_ERROR_FRAGMENTED_POOL";
-		case VK_ERROR_UNKNOWN:
-			return "VK_ERROR_UNKNOWN";
-		case VK_ERROR_OUT_OF_POOL_MEMORY:
-			return "VK_ERROR_OUT_OF_POOL_MEMORY";
-		case VK_ERROR_INVALID_EXTERNAL_HANDLE:
-			return "VK_ERROR_INVALID_EXTERNAL_HANDLE";
-		case VK_ERROR_FRAGMENTATION:
-			return "VK_ERROR_FRAGMENTATION";
-		case VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS:
-			return "VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS";
-		case VK_PIPELINE_COMPILE_REQUIRED:
-			return "VK_PIPELINE_COMPILE_REQUIRED";
-		case VK_ERROR_SURFACE_LOST_KHR:
-			return "VK_ERROR_SURFACE_LOST_KHR";
-		case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
-			return "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR";
-		case VK_SUBOPTIMAL_KHR:
-			return "VK_SUBOPTIMAL_KHR";
-		case VK_ERROR_OUT_OF_DATE_KHR:
-			return "VK_ERROR_OUT_OF_DATE_KHR";
-		case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR:
-			return "VK_ERROR_INCOMPATIBLE_DISPLAY_KHR";
-		case VK_ERROR_VALIDATION_FAILED_EXT:
-			return "VK_ERROR_VALIDATION_FAILED_EXT";
-		case VK_ERROR_INVALID_SHADER_NV:
-			return "VK_ERROR_INVALID_SHADER_NV";
-		case VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR:
-			return "VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR";
-		case VK_ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR:
-			return "VK_ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR";
-		case VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR:
-			return "VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR";
-		case VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR:
-			return "VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR";
-		case VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR:
-			return "VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR";
-		case VK_ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR:
-			return "VK_ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR";
-		case VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT:
-			return "VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT";
-		case VK_ERROR_NOT_PERMITTED_KHR:
-			return "VK_ERROR_NOT_PERMITTED_KHR";
-		case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT:
-			return "VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT";
-		case VK_THREAD_IDLE_KHR:
-			return "VK_THREAD_IDLE_KHR";
-		case VK_THREAD_DONE_KHR:
-			return "VK_THREAD_DONE_KHR";
-		case VK_OPERATION_DEFERRED_KHR:
-			return "VK_OPERATION_DEFERRED_KHR";
-		case VK_OPERATION_NOT_DEFERRED_KHR:
-			return "VK_OPERATION_NOT_DEFERRED_KHR";
-		case VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR:
-			return "VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR";
-		case VK_ERROR_COMPRESSION_EXHAUSTED_EXT:
-			return "VK_ERROR_COMPRESSION_EXHAUSTED_EXT";
-		case VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT:
-			return "VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT";
-		case VK_RESULT_MAX_ENUM:
-			return "VK_RESULT_MAX_ENUM";
-	}
-	return "VK_RESULT_unknown";
-}
 
 VkBool32 debugUtilsMessageCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 								   VkDebugUtilsMessageTypeFlagsEXT,
@@ -141,6 +42,9 @@ VkBool32 debugUtilsMessageCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messag
 	return false;
 }
 
+// for debug
+DrawData data;
+
 }// namespace
 
 VulkanHandler::VulkanHandler() = default;
@@ -157,67 +61,101 @@ void VulkanHandler::initVulkan() {
 		if (state == State::ErrorSetupDebugging) return;
 		OWL_CORE_TRACE("Vulkan: Debug support initiated.")
 	}
-	createSurface();
-	if (state != State::Uninitialized)
-		return;
-	OWL_CORE_TRACE("Vulkan: Surface created.")
-	createPhysicalDevice();
-	if (state != State::Uninitialized)
-		return;
-	OWL_CORE_TRACE("Vulkan: Physical Device created.")
-	createLogicalDevice();
-	if (state != State::Uninitialized)
-		return;
-	OWL_CORE_TRACE("Vulkan: Logical Device created.")
-	createSwapChain();
-	if (state != State::Uninitialized)
-		return;
-	OWL_CORE_TRACE("Vulkan: Swap Chain created.")
-	createImageViews();
-	if (state != State::Uninitialized)
-		return;
-	OWL_CORE_TRACE("Vulkan: Image views created.")
-	createRenderPass();
-	if (state != State::Uninitialized)
-		return;
-	OWL_CORE_TRACE("Vulkan: Render pass created.")
-	createGraphicsPipeLine();
-	if (state != State::Uninitialized)
-		return;
-	OWL_CORE_TRACE("Vulkan: Graphics pipeline created.")
-	createDescriptorPool();
-	if (state != State::Uninitialized)
-		return;
-	OWL_CORE_TRACE("Vulkan: Descriptor pool created.")
+	{
+		createSurface();
+		if (state != State::Uninitialized)
+			return;
+		OWL_CORE_TRACE("Vulkan: Surface created.")
+	}
+	{
+		createPhysicalDevice();
+		if (state != State::Uninitialized)
+			return;
+		OWL_CORE_TRACE("Vulkan: Physical Device created.")
+	}
+	{
+		createLogicalDevice();
+		if (state != State::Uninitialized)
+			return;
+		OWL_CORE_TRACE("Vulkan: Logical Device created.")
+	}
+	{
+		createSwapChain();
+		if (state != State::Uninitialized)
+			return;
+		OWL_CORE_TRACE("Vulkan: Swap Chain created.")
+	}
+	{
+		createDescriptorPool();
+		if (state != State::Uninitialized)
+			return;
+		OWL_CORE_TRACE("Vulkan: Descriptor pool created.")
+	}
+	{
+		createCommandPool();
+		if (state != State::Uninitialized)
+			return;
+		OWL_CORE_TRACE("Vulkan: Command Pool Created.")
+	}
+	{
+		createCommandBuffer();
+		if (state != State::Uninitialized)
+			return;
+		OWL_CORE_TRACE("Vulkan: Command Buffer Created.")
+	}
+	{
+		createSyncObjects();
+		if (state != State::Uninitialized)
+			return;
+		OWL_CORE_TRACE("Vulkan: Sync objects Created.")
+	}
+	{
+		OWL_CORE_TRACE("Vulkan: Just for debugging, create a triangle pipeline.")
+		std::vector<uint32_t> bob{};
+		data.init({}, "renderer2D", bob, "triangle");
+	}
 	state = State::Running;
 }
 
 void VulkanHandler::release() {
 	if (instance == nullptr) return;// nothing can exists without instance.
 
-	if (renderPass != nullptr) {
-		vkDestroyRenderPass(logicalDevice, renderPass, nullptr);
-		renderPass = nullptr;
+	if (renderFinishedSemaphore != nullptr) {
+		vkDestroySemaphore(logicalDevice, renderFinishedSemaphore, nullptr);
+		OWL_CORE_TRACE("Vulkan: renderFinishedSemaphore destroyed.")
 	}
-	for (auto imageView: swapChainImageViews) {
-		vkDestroyImageView(logicalDevice, imageView, nullptr);
+	if (imageAvailableSemaphore != nullptr) {
+		vkDestroySemaphore(logicalDevice, imageAvailableSemaphore, nullptr);
+		OWL_CORE_TRACE("Vulkan: imageAvailableSemaphore destroyed.")
+	}
+	if (inFlightFence != nullptr) {
+		vkDestroyFence(logicalDevice, inFlightFence, nullptr);
+		OWL_CORE_TRACE("Vulkan: inFlightFence destroyed.")
+	}
+	if (commandPool != nullptr) {
+		vkDestroyCommandPool(logicalDevice, commandPool, nullptr);
+		OWL_CORE_TRACE("Vulkan: commandPool destroyed.")
 	}
 	swapChain.release();
-
+	OWL_CORE_TRACE("Vulkan: swap destroyed.")
 	if (logicalDevice != nullptr) {
 		vkDestroyDevice(logicalDevice, nullptr);
 		logicalDevice = nullptr;
+		OWL_CORE_TRACE("Vulkan: logicalDevice destroyed.")
 	}
 	{
 		const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
 		gc->destroySurface(instance);
+		OWL_CORE_TRACE("Vulkan: Surface destroyed.")
 	}
 	if (debugUtilsMessenger != nullptr) {
 		vkDestroyDebugUtilsMessengerEXT(instance, debugUtilsMessenger, nullptr);
 		debugUtilsMessenger = nullptr;
+		OWL_CORE_TRACE("Vulkan: debugUtilsMessenger destroyed.")
 	}
 	vkDestroyInstance(instance, nullptr);
 	instance = nullptr;
+	OWL_CORE_TRACE("Vulkan: instance destroyed.")
 	state = State::Uninitialized;
 }
 
@@ -264,11 +202,14 @@ void VulkanHandler::createInstance() {
 		vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
 		if (extCount > 0) {
 			std::vector<VkExtensionProperties> extensions(extCount);
-			if (vkEnumerateInstanceExtensionProperties(nullptr, &extCount, &extensions.front()) == VK_SUCCESS) {
+			const VkResult result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, &extensions.front());
+			if (result == VK_SUCCESS) {
 				for (VkExtensionProperties &extension: extensions) {
 					supportedInstanceExtensions.emplace_back(extension.extensionName);
 					OWL_CORE_TRACE("Vulkan: Supported instance extension: {}", extension.extensionName)
 				}
+			} else {
+				OWL_CORE_WARN("Vulkan: unable to enumerate extensions ({}).", resultString(result))
 			}
 		}
 	}
@@ -361,14 +302,18 @@ void VulkanHandler::setupDebugging() {
 	debugUtilsMessagerCI.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 	debugUtilsMessagerCI.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
 	debugUtilsMessagerCI.pfnUserCallback = debugUtilsMessageCallback;
-	if (vkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessagerCI, nullptr, &debugUtilsMessenger) != VK_SUCCESS)
+	const VkResult result = vkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessagerCI, nullptr, &debugUtilsMessenger);
+	if (result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: Error while setup debugging ({})", resultString(result))
 		state = State::ErrorSetupDebugging;
+	}
 }
 
 void VulkanHandler::createSurface() {
 	auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
-	if (gc->createSurface(instance) != VK_SUCCESS) {
-		OWL_CORE_ERROR("Vulkan: failed to create window surface!")
+	const VkResult result = gc->createSurface(instance);
+	if (result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create window surface ({})", resultString(result))
 		state = State::ErrorCreatingWindowSurface;
 	}
 }
@@ -437,9 +382,10 @@ void VulkanHandler::createLogicalDevice() {
 	} else {
 		deviceCI.enabledLayerCount = 0;
 	}
-
-	if (vkCreateDevice(physicalDevice.device, &deviceCI, nullptr, &logicalDevice) != VK_SUCCESS) {
+	const VkResult result = vkCreateDevice(physicalDevice.device, &deviceCI, nullptr, &logicalDevice);
+	if (result != VK_SUCCESS) {
 		state = State::ErrorCreatingLogicalDevice;
+		OWL_CORE_ERROR("Vulkan: Error while creating the logical device ({})", resultString(result))
 		return;
 	}
 
@@ -447,70 +393,9 @@ void VulkanHandler::createLogicalDevice() {
 }
 
 void VulkanHandler::createSwapChain() {
-	if (!swapChain.create(logicalDevice, physicalDevice))
+	swapChain.create(logicalDevice, physicalDevice);
+	if (swapChain.state != SwapChain::State::Initialized)
 		state = State::ErrorCreatingSwapChain;
-}
-
-void VulkanHandler::createImageViews() {
-	swapChainImageViews.resize(swapChain.swapChainImages.size());
-
-	for (size_t i = 0; i < swapChain.swapChainImages.size(); i++) {
-		VkImageViewCreateInfo createInfo{};
-		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image = swapChain.swapChainImages[i];
-		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		createInfo.format = swapChain.swapChainImageFormat;
-		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		createInfo.subresourceRange.baseMipLevel = 0;
-		createInfo.subresourceRange.levelCount = 1;
-		createInfo.subresourceRange.baseArrayLayer = 0;
-		createInfo.subresourceRange.layerCount = 1;
-
-		if (vkCreateImageView(logicalDevice, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) {
-			state = State::ErrorCreatingImagesView;
-			break;
-		}
-	}
-}
-
-void VulkanHandler::createRenderPass() {
-	VkAttachmentDescription colorAttachment{};
-	colorAttachment.format = swapChain.swapChainImageFormat;
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-	VkAttachmentReference colorAttachmentRef{};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	VkSubpassDescription subpass{};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-
-	VkRenderPassCreateInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = 1;
-	renderPassInfo.pAttachments = &colorAttachment;
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpass;
-
-	if (vkCreateRenderPass(logicalDevice, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
-		OWL_CORE_ERROR("Vulkan: failed to create render pass!")
-		state = State::ErrorCreatingRenderPass;
-	}
-}
-
-void VulkanHandler::createGraphicsPipeLine() {
 }
 
 void VulkanHandler::createDescriptorPool() {
@@ -523,31 +408,338 @@ void VulkanHandler::createDescriptorPool() {
 	poolInfo.poolSizeCount = 1;
 	poolInfo.pPoolSizes = &poolSize;
 	poolInfo.maxSets = static_cast<uint32_t>(2);
-
-	if (vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create descriptor pool!");
+	const VkResult result = vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &descriptorPool);
+	if (result != VK_SUCCESS) {
+		OWL_CORE_ERROR("failed to create descriptor pool ({})", resultString(result))
+		state = State::ErrorCreatingDescriptorPool;
 	}
 }
 
-
-VkPipeline VulkanHandler::getPipeline(int32_t id) const {
-	if (!pipeLines.contains(id))
-		return nullptr;
+VulkanHandler::PipeLineData VulkanHandler::getPipeline(int32_t id) const {
+	if (state == State::Running || !pipeLines.contains(id))
+		return {};
 	return pipeLines.at(id);
 }
 
-int32_t VulkanHandler::pushPpeline(VkPipeline pipeline) {
-	const auto id = static_cast<int32_t>(pipeLines.rbegin()->first) + 1;
-	pipeLines.emplace(id, pipeline);
+int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &shaderStages) {
+	if (state == State::Running)
+		return -1;
+	PipeLineData pData;
+
+	// PipeLine Layout
+	{
+		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+		{
+			pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+			pipelineLayoutInfo.setLayoutCount = 0;
+			pipelineLayoutInfo.pushConstantRangeCount = 0;
+			pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+			pipelineLayoutInfo.setLayoutCount = 0;
+			pipelineLayoutInfo.pushConstantRangeCount = 0;
+		}
+		const VkResult result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pData.layout);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: Shader: failed to create pipeline layout {} ({})", pipeLineName, resultString(result))
+			state = State::ErrorCreatingPipelineLayout;
+			return -1;
+		}
+	}
+
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+	VkPipelineViewportStateCreateInfo viewportState{};
+	VkPipelineRasterizationStateCreateInfo rasterizer{};
+	VkPipelineMultisampleStateCreateInfo multisampling{};
+	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+	VkPipelineColorBlendStateCreateInfo colorBlending{};
+	VkPipelineDynamicStateCreateInfo dynamicState{};
+	{
+		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertexInputInfo.vertexBindingDescriptionCount = 0;
+		vertexInputInfo.vertexAttributeDescriptionCount = 0;
+
+		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+		inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		viewportState.viewportCount = 1;
+		viewportState.scissorCount = 1;
+
+		rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+		rasterizer.depthClampEnable = VK_FALSE;
+		rasterizer.rasterizerDiscardEnable = VK_FALSE;
+		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+		rasterizer.lineWidth = 1.0f;
+		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+		rasterizer.depthBiasEnable = VK_FALSE;
+
+		multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+		multisampling.sampleShadingEnable = VK_FALSE;
+		multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+		colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		colorBlendAttachment.blendEnable = VK_FALSE;
+
+		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+		colorBlending.logicOpEnable = VK_FALSE;
+		colorBlending.logicOp = VK_LOGIC_OP_COPY;
+		colorBlending.attachmentCount = 1;
+		colorBlending.pAttachments = &colorBlendAttachment;
+		colorBlending.blendConstants[0] = 0.0f;
+		colorBlending.blendConstants[1] = 0.0f;
+		colorBlending.blendConstants[2] = 0.0f;
+		colorBlending.blendConstants[3] = 0.0f;
+
+		VkDynamicState dynamicStates[] = {
+				VK_DYNAMIC_STATE_VIEWPORT,
+				VK_DYNAMIC_STATE_SCISSOR};
+
+		dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		dynamicState.dynamicStateCount = 2;
+		dynamicState.pDynamicStates = dynamicStates;
+	}
+
+	VkGraphicsPipelineCreateInfo pipelineInfo{};
+	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	pipelineInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
+	pipelineInfo.pStages = shaderStages.data();
+	pipelineInfo.pVertexInputState = &vertexInputInfo;
+	pipelineInfo.pInputAssemblyState = &inputAssembly;
+	pipelineInfo.pViewportState = &viewportState;
+	pipelineInfo.pRasterizationState = &rasterizer;
+	pipelineInfo.pMultisampleState = &multisampling;
+	pipelineInfo.pColorBlendState = &colorBlending;
+	pipelineInfo.pDynamicState = &dynamicState;
+	pipelineInfo.layout = pData.layout;
+	pipelineInfo.renderPass = swapChain.renderPass;
+	pipelineInfo.subpass = 0;
+	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+
+	OWL_CORE_TRACE("Vulkan pipeline: vkCreateGraphicsPipelines")
+	const VkResult result2 = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pData.pipeLine);
+	if (result2 != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create graphics pipeline for {} ({})", pipeLineName, resultString(result2))
+		state = State::ErrorCreatingPipeline;
+		return -1;
+	}
+
+	const auto id = pipeLines.empty() ? 0 : static_cast<int32_t>(pipeLines.rbegin()->first) + 1;
+	pipeLines.emplace(id, pData);
+	OWL_CORE_TRACE("Vulkan pipeline: {} Loaded.", pipeLineName)
 	return id;
 }
 
 void VulkanHandler::popPipeline(int32_t id) {
 	if (!pipeLines.contains(id))
 		return;
-	if (pipeLines[id] != nullptr)
-		vkDestroyPipeline(logicalDevice, pipeLines[id], nullptr);
+	if (pipeLines[id].pipeLine != nullptr)
+		vkDestroyPipeline(logicalDevice, pipeLines[id].pipeLine, nullptr);
+	if (pipeLines[id].layout != nullptr)
+		vkDestroyPipelineLayout(logicalDevice, pipeLines[id].layout, nullptr);
 	pipeLines.erase(id);
+}
+
+void VulkanHandler::createCommandPool() {
+	VkCommandPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	poolInfo.queueFamilyIndex = physicalDevice.queues.graphicsIndex;
+
+	const VkResult result = vkCreateCommandPool(logicalDevice, &poolInfo, nullptr, &commandPool);
+	if (result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create command pool ({}).", resultString(result))
+		state = State::ErrorCreatingCommandPool;
+	}
+}
+
+void VulkanHandler::createCommandBuffer() {
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = commandPool;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = 1;
+
+	const VkResult result = vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
+	if (result != VK_SUCCESS) {
+		OWL_CORE_ERROR("failed to allocate command buffers ({}).", resultString(result))
+		state = State::ErrorCreatingCommandBuffer;
+	}
+}
+
+void VulkanHandler::createSyncObjects() {
+	VkSemaphoreCreateInfo semaphoreInfo{};
+	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	VkFenceCreateInfo fenceInfo{};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+	{
+		const VkResult result = vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &imageAvailableSemaphore);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: failed to create image available semaphore ({}).", resultString(result))
+			state = State::ErrorCreatingSyncObjects;
+			return;
+		}
+	}
+	{
+		const VkResult result = vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &renderFinishedSemaphore);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: failed to create render finish semaphore ({}).", resultString(result))
+			state = State::ErrorCreatingSyncObjects;
+			return;
+		}
+	}
+	{
+		const VkResult result = vkCreateFence(logicalDevice, &fenceInfo, nullptr, &inFlightFence);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: failed to create synchronization in flight fence ({}).", resultString(result))
+			state = State::ErrorCreatingSyncObjects;
+		}
+	}
+}
+
+void VulkanHandler::drawFrame() {
+	if (state != State::Running)
+		return;
+	// todo: Will be replaced by layers draw...
+	if (!pipeLines.empty()) {
+		data.bind();
+
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(swapChain.swapChainExtent.width);
+		viewport.height = static_cast<float>(swapChain.swapChainExtent.height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+		VkRect2D scissor{};
+		scissor.offset = {0, 0};
+		scissor.extent = swapChain.swapChainExtent;
+		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+		vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+	}
+}
+
+void VulkanHandler::beginFrame() {
+	if (state != State::Running)
+		return;
+	vkWaitForFences(logicalDevice, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
+	vkResetFences(logicalDevice, 1, &inFlightFence);
+
+	{
+		const VkResult result = vkAcquireNextImageKHR(logicalDevice, swapChain.swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: failed to aquire next image ({}).", resultString(result))
+			state = State::ErrorAcquiringNextImage;
+			return;
+		}
+	}
+
+	{
+		const VkResult result = vkResetCommandBuffer(commandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: failed to reset recording command buffer ({}).", resultString(result))
+			state = State::ErrorResetCommandBuffer;
+			return;
+		}
+	}
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	{
+		const VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: failed to begin recording command buffer ({}).", resultString(result))
+			state = State::ErrorBeginCommandBuffer;
+			return;
+		}
+	}
+
+	VkRenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass = swapChain.renderPass;
+	renderPassInfo.framebuffer = swapChain.swapChainFramebuffers[imageIndex];
+	renderPassInfo.renderArea.offset = {0, 0};
+	renderPassInfo.renderArea.extent = swapChain.swapChainExtent;
+
+	VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &clearColor;
+
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	// todo: should disapear!!!
+	drawFrame();
+}
+
+void VulkanHandler::endFrame() {
+	if (state != State::Running)
+		return;
+	vkCmdEndRenderPass(commandBuffer);
+
+	const VkResult result = vkEndCommandBuffer(commandBuffer);
+	if (result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to end command buffer ({}).", resultString(result))
+		state = State::ErrorEndCommandBuffer;
+	}
+}
+
+void VulkanHandler::swapFrame() {
+	if (state != State::Running)
+		return;
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+	const VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
+	constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
+
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	const VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = signalSemaphores;
+
+	{
+		const VkResult result = vkQueueSubmit(physicalDevice.queues.graphics, 1, &submitInfo, inFlightFence);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: failed to submit draw command buffer ({}).", resultString(result))
+			state = State::ErrorSubmitingDrawCommand;
+			return;
+		}
+	}
+
+	VkPresentInfoKHR presentInfo{};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = signalSemaphores;
+
+	const VkSwapchainKHR swapChains[] = {swapChain.swapChain};
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapChains;
+
+	presentInfo.pImageIndices = &imageIndex;
+
+	{
+		const VkResult result = vkQueuePresentKHR(physicalDevice.queues.present, &presentInfo);
+		if (result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: failed to present queue ({}).", resultString(result))
+			state = State::ErrorPresentingQueue;
+		}
+	}
+}
+
+void VulkanHandler::bindPipeline(int32_t id) {
+	if (state != State::Running)
+		return;
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeLines[id].pipeLine);
 }
 
 }// namespace owl::renderer::vulkan::internal

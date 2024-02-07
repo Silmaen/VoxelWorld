@@ -20,10 +20,31 @@ struct SwapChain {
 	std::vector<VkImage> swapChainImages{};
 	VkFormat swapChainImageFormat{VK_FORMAT_UNDEFINED};
 	VkExtent2D swapChainExtent{};
-	VkDevice device{nullptr};
+	std::vector<VkImageView> swapChainImageViews{};
+	std::vector<VkFramebuffer> swapChainFramebuffers{};
+	/// The render pass.
+	VkRenderPass renderPass = nullptr;
 
-	bool create(VkDevice logicDevice, const PhysicalDevice &phy);
+	void create(const VkDevice &logicDevice, const PhysicalDevice &physicalDevice);
 	void release();
+
+	enum struct State {
+		Created,
+		Initialized,
+		ErrorCreatingSwapChain,
+		ErrorCreatingImagesView,
+		ErrorCreatingRenderPass,
+		ErrorCreatingFramebuffer,
+	};
+	State state = State::Created;
+
+private:
+	void createSwapChain();
+	void createImageViews();
+	void createRenderPass();
+	void createSwapChainFrameBuffers();
+	VkDevice device{nullptr};
+	const PhysicalDevice *phy{nullptr};
 };
 
 }// namespace owl::renderer::vulkan::internal

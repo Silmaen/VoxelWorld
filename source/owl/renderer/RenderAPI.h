@@ -60,7 +60,7 @@ public:
 	 * @param data Draw data to render.
 	 * @param indexCount Number of vertex to draw (=0 all).
 	 */
-	virtual void drawData(const shared<DrawData> &data, uint32_t indexCount = 0) = 0;
+	virtual void drawData(const shared<DrawData> &data, uint32_t indexCount) = 0;
 
 	/**
 	 * @brief Define the line width.
@@ -114,12 +114,22 @@ public:
 		return type == Type::OpenGL || type == Type::OpenglLegacy || type == Type::Vulkan;
 	}
 
+	/**
+	 * @brief Reset value for the frame to render.
+	 */
+	virtual void beginFrame() {}
+
+	/**
+	 * @brief Ends draw call for the current frame.
+	 */
+	virtual void endFrame() {}
+
 protected:
 	/**
 	 * @brief Define the API State.
 	 * @param st The new API State.
 	 */
-	inline static void setState(const State &st) { state = st; }
+	static void setState(const State &st) { state = st; }
 
 private:
 	/// The current state of the API.

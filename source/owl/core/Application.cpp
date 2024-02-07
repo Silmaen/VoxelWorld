@@ -38,7 +38,7 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 #ifdef WIN32
 		_putenv_s("VK_ADD_LAYER_PATH", workingDirectory.string().c_str());
 #else
-		setenv("VK_ADD_LAYER_PATH", workingDirectory.string().c_str(), 1);
+		setenv("VK_ADD_LAYER_PATH", (workingDirectory.parent_path() / "lib").string().c_str(), 1);
 #endif
 
 		// load config file if any
@@ -120,6 +120,7 @@ Application::~Application() {
 			layerStack.popOverlay(layer);
 		}
 		input::Input::invalidate();
+		appWindow->shutdown();
 		renderer::Renderer::shutdown();
 		renderer::RenderCommand::invalidate();
 		appWindow.reset();
@@ -142,29 +143,29 @@ void Application::run() {
 	uint64_t frameCount = 0;
 #endif
 	while (state == State::Running) {
+		OWL_PROFILE_SCOPE("RunLoop")
+
+		stepper.update();
 		if (!minimized) {
-			OWL_PROFILE_SCOPE("RunLoop")
-
-			stepper.update();
-
-			if (!minimized) {
-				{
-					OWL_PROFILE_SCOPE("LayerStack onUpdate")
-
-					for (auto &layer: layerStack)
-						layer->onUpdate(stepper);
-				}
-				if (imGuiLayer) {
-					imGuiLayer->begin();
-					{
-						OWL_PROFILE_SCOPE("LayerStack onImUpdate")
-
-						for (auto &layer: layerStack)
-							layer->onImGuiRender(stepper);
-					}
-					imGuiLayer->end();
-				}
+			renderer::RenderCommand::beginFrame();
+			if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
+				state = State::Error;
+				continue;
 			}
+			{
+				OWL_PROFILE_SCOPE("LayerStack onUpdate")
+
+				for (auto &layer: layerStack)
+					layer->onUpdate(stepper);
+			}
+			if (imGuiLayer) {
+				OWL_PROFILE_SCOPE("LayerStack onImUpdate")
+				imGuiLayer->begin();
+				for (auto &layer: layerStack)
+					layer->onImGuiRender(stepper);
+				imGuiLayer->end();
+			}
+			renderer::RenderCommand::endFrame();
 		}
 		appWindow->onUpdate();
 

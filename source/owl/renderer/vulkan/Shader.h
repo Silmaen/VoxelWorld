@@ -114,8 +114,11 @@ public:
 
 private:
 	void createShader(const std::unordered_map<ShaderType, std::string> &sources);
-
+	void compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string> &sources);
+	void createPipeline();
 	int32_t pipelineId = -1;
+
+	std::unordered_map<ShaderType, std::vector<uint32_t>> vulkanSPIRV;
 };
 
 }// namespace owl::renderer::vulkan

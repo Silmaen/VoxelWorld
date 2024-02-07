@@ -193,8 +193,12 @@ void Window::init(const Properties &props) {
 void Window::shutdown() {
 	OWL_PROFILE_FUNCTION()
 
+	if (glfwWindow == nullptr)
+		return;
+	context->waitIdle();
 	glfwDestroyWindow(glfwWindow);
 	--s_GLFWWindowCount;
+	glfwWindow = nullptr;
 
 	if (s_GLFWWindowCount == 0) {
 		glfwTerminate();

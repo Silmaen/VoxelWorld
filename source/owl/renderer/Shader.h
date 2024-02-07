@@ -19,7 +19,9 @@ class ShaderLibrary;
 enum class ShaderType {
 	None,
 	Vertex,
-	Fragment
+	Fragment,
+	Geometry,
+	Compute,
 };
 
 /**

@@ -33,10 +33,14 @@ public:
 	 */
 	virtual void init() = 0;
 	/**
-	 * @brief Doo the buffer swap.
+	 * @brief Do the buffer swap.
 	 */
 	virtual void swapBuffers() = 0;
 
+	/**
+	 * @brief Wait for device ready.
+	 */
+	virtual void waitIdle() {}
 	/**
 	 * @brief Create a Graphics context.
 	 * @param window The window into render context.

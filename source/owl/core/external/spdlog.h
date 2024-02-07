@@ -7,6 +7,7 @@
  */
 
 #pragma once
+#include "core/Macros.h"
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wdocumentation-unknown-command")

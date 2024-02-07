@@ -32,7 +32,7 @@ public:
 	/**
 	 * @brief Initialize the renderer.
 	 */
-	inline static void init() {
+	static void init() {
 		if (renderAPI)
 			renderAPI->init();
 	}
@@ -40,7 +40,7 @@ public:
 	/**
 	 * @brief Reset RenderAPI.
 	 */
-	inline static void invalidate() {
+	static void invalidate() {
 		renderAPI.reset();
 	}
 
@@ -57,7 +57,7 @@ public:
 	 * @param width Viewport's width.
 	 * @param height Viewport Height.
 	 */
-	inline static void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+	static void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
 		renderAPI->setViewport(x, y, width, height);
 	}
 
@@ -65,14 +65,14 @@ public:
 	 * @brief Binding to the definition of background color.
 	 * @param color The new background color.
 	 */
-	inline static void setClearColor(const glm::vec4 &color) {
+	static void setClearColor(const glm::vec4 &color) {
 		renderAPI->setClearColor(color);
 	}
 
 	/**
 	 * @brief Binding to clear screen.
 	 */
-	inline static void clear() {
+	static void clear() {
 		renderAPI->clear();
 	}
 
@@ -81,7 +81,7 @@ public:
 	 * @param data Draw data to render.
 	 * @param indexCount Number of vertex to draw (=0 all).
 	 */
-	inline static void drawData(const shared<DrawData> &data, uint32_t indexCount = 0) {
+	static void drawData(const shared<DrawData> &data, uint32_t indexCount = 0) {
 		renderAPI->drawData(data, indexCount);
 	}
 
@@ -89,7 +89,7 @@ public:
 	 * @brief Define the line width.
 	 * @param width New line width.
 	 */
-	inline static void setLineWidth(float width) {
+	static void setLineWidth(float width) {
 		renderAPI->setLineWidth(width);
 	}
 
@@ -103,13 +103,23 @@ public:
 	 * @brief Get the actual API type.
 	 * @return API Type.
 	 */
-	inline static RenderAPI::Type getAPI() { return renderAPI->getAPI(); }
+	static RenderAPI::Type getAPI() { return renderAPI->getAPI(); }
 
 	/**
 	 * @brief Get the maximum number of texture slots.
 	 * @return Number of texture slots.
 	 */
-	inline static uint32_t getMaxTextureSlots() { return renderAPI->getMaxTextureSlots(); }
+	static uint32_t getMaxTextureSlots() { return renderAPI->getMaxTextureSlots(); }
+
+	/**
+	 * @brief Reset value for the frame to render.
+	 */
+	static void beginFrame() { renderAPI->beginFrame(); }
+
+	/**
+	 * @brief Ends draw call for the current frame.
+	 */
+	static void endFrame() { renderAPI->endFrame(); }
 
 private:
 	/// Pointer to the render API

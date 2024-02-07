@@ -18,7 +18,10 @@ GraphContext::GraphContext(GLFWwindow *window)
 
 GraphContext::~GraphContext() = default;
 
-void GraphContext::swapBuffers() {}
+void GraphContext::swapBuffers() {
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.swapFrame();
+}
 
 void GraphContext::init() {
 }
@@ -36,6 +39,12 @@ VkResult GraphContext::createSurface(const VkInstance instance) {
 void GraphContext::destroySurface(const VkInstance instance) {
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	surface = nullptr;
+}
+
+void GraphContext::waitIdle() {
+	OWL_CORE_TRACE("GraphContext Wait for Idle.")
+	auto &vkh = internal::VulkanHandler::get();
+	vkDeviceWaitIdle(vkh.getDevice());
 }
 
 }// namespace owl::renderer::vulkan
