@@ -77,6 +77,8 @@ Shader::~Shader() {
 }
 
 void Shader::bind() const {
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.bindPipeline(pipelineId);
 }
 
 void Shader::unbind() const {}
@@ -201,7 +203,7 @@ void Shader::createPipeline() {
 
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages = {vertShaderStageInfo, fragShaderStageInfo};
 
-	vkh.pushPipeline(getName(), shaderStages);
+	pipelineId = vkh.pushPipeline(getName(), shaderStages);
 
 	for (const auto &stage: shaderStages) {
 		vkDestroyShaderModule(vkh.getDevice(), stage.module, nullptr);

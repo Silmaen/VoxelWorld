@@ -38,7 +38,7 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 #ifdef WIN32
 		_putenv_s("VK_ADD_LAYER_PATH", workingDirectory.string().c_str());
 #else
-		setenv("VK_ADD_LAYER_PATH", workingDirectory.string().c_str(), 1);
+		setenv("VK_ADD_LAYER_PATH", (workingDirectory.parent_path() / "lib").string().c_str(), 1);
 #endif
 
 		// load config file if any

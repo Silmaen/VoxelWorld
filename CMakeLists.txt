@@ -17,7 +17,7 @@ option(${PRJPREFIX}_BUILD_NEST "If wanted to generate Owl Nest" ON)
 option(${PRJPREFIX}_BUILD_SANDBOX "If wanted to generate Sandbox" ON)
 option(${PRJPREFIX}_BUILD_DRONE "If wanted to generate OWl Drone" ON)
 option(${PRJPREFIX}_SKIP_DEPMANAGER "Don't use depmanager" OFF)
-option(${PRJPREFIX}_COPY_VULKAN_LAYERS "Copy vulkan layers in the binary directory" ON)
+option(${PRJPREFIX}_COPY_VULKAN_LAYERS "Copy vulkan layers in the binary directory" OFF)
 
 #
 # ---=== Base Configs ===---
