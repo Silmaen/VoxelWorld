@@ -66,11 +66,22 @@ public:
 		/// No compatible GPU found.
 		ErrorNoGpuFound,
 		ErrorCreatingLogicalDevice,
-		ErrorCreatingCommandPool,
 		ErrorCreatingWindowSurface,
 		ErrorCreatingSwapChain,
 		ErrorCreatingImagesView,
 		ErrorCreatingRenderPass,
+		ErrorCreatingPipelineLayout,
+		ErrorCreatingPipeline,
+		ErrorCreatingDescriptorPool,
+		ErrorCreatingCommandPool,
+		ErrorCreatingCommandBuffer,
+		ErrorSubmitingDrawCommand,
+		ErrorPresentingQueue,
+		ErrorAcquiringNextImage,
+		ErrorResetCommandBuffer,
+		ErrorBeginCommandBuffer,
+		ErrorEndCommandBuffer,
+		ErrorCreatingSyncObjects,
 	};
 
 	/**
@@ -94,13 +105,25 @@ public:
 
 	[[nodiscard]] ImGui_ImplVulkan_InitInfo toImGuiInfo() const;
 
-	[[nodiscard]] VkRenderPass getRenderPath() const { return renderPass; }
+	[[nodiscard]] VkRenderPass getRenderPath() const { return swapChain.renderPass; }
 
 	[[nodiscard]] VkDevice getDevice() const { return logicalDevice; }
 
-	[[nodiscard]] VkPipeline getPipeline(int32_t id) const;
-	int32_t pushPpeline(VkPipeline pipeline);
+	struct PipeLineData {
+		VkPipeline pipeLine = nullptr;
+		VkPipelineLayout layout = nullptr;
+	};
+	[[nodiscard]] PipeLineData getPipeline(int32_t id) const;
+	int32_t pushPipeline(const std::string &pipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &spvSrc);
 	void popPipeline(int32_t id);
+	void bindPipeline(int32_t id);
+
+
+	void drawFrame();
+
+	void beginFrame();
+	void endFrame();
+	void swapFrame();
 
 private:
 	/**
@@ -116,12 +139,16 @@ private:
 	void createPhysicalDevice();
 	void createLogicalDevice();
 	void createSwapChain();
-	void createImageViews();
-	void createRenderPass();
-	void createGraphicsPipeLine();
 	void createDescriptorPool();
+	void createCommandPool();
+	void createCommandBuffer();
+	void createSyncObjects();
 
 	void setupDebugging();
+
+	//DEBUG
+	VkShaderModule createShaderModule(const std::vector<char> &code);
+
 
 	/// The current state of the handler.
 	State state = State::Uninitialized;
@@ -147,14 +174,19 @@ private:
 	VkDevice logicalDevice = nullptr;
 	/// The swapchain.
 	SwapChain swapChain;
-	/// The images views.
-	std::vector<VkImageView> swapChainImageViews;
-	/// The render pass.
-	VkRenderPass renderPass = nullptr;
 	/// Descriptor pool.
 	VkDescriptorPool descriptorPool = nullptr;
+
+
 	/// List of piplines.
-	std::map<int32_t, VkPipeline> pipeLines;
+	std::map<int32_t, PipeLineData> pipeLines;
+	VkCommandPool commandPool{nullptr};
+	VkCommandBuffer commandBuffer{nullptr};
+	VkSemaphore imageAvailableSemaphore{nullptr};
+	VkSemaphore renderFinishedSemaphore{nullptr};
+	VkFence inFlightFence{nullptr};
+
+	uint32_t imageIndex = 0;
 };
 
 }// namespace owl::renderer::vulkan::internal

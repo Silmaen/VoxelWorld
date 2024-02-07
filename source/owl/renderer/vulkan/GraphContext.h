@@ -37,7 +37,7 @@ public:
 	void init() override;
 
 	/**
-	 * @brief Doo the buffer swap.
+	 * @brief Do the buffer swap.
 	 */
 	void swapBuffers() override;
 	/**
@@ -64,6 +64,10 @@ public:
 	 * \return The vulkan surface.
 	 */
 	[[nodiscard]] VkSurfaceKHR getSurface() const { return surface; }
+	/**
+	 * @brief Wait for device ready.
+	 */
+	void waitIdle() override;
 
 private:
 	/// The window.

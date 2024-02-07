@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
 		OWL_PROFILE_END_SESSION()
 		// Shutdown
 		OWL_PROFILE_BEGIN_SESSION("Shutdown", "OwlProfile-shutdown.json")
+		OWL_CORE_TRACE("Terminate application.")
 		app.reset();
 #if OWL_TRACKER_VERBOSITY >= 1
 		{

@@ -37,5 +37,5 @@ cmake-*
 output*
 
 # Cache
-*.cached_*
+*.spv
 /CMakeUserPresets.json

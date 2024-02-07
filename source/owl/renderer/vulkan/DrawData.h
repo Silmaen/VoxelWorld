@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../DrawData.h"
+#include "Shader.h"
 
 namespace owl::renderer::vulkan {
 
@@ -33,12 +34,12 @@ public:
 	 * @param indices List of vertex indices.
 	 * @param shaderName The shader name.
 	 */
-	void init([[maybe_unused]] const BufferLayout &layout_, [[maybe_unused]] const std::string &renderer, [[maybe_unused]] std::vector<uint32_t> &indices, [[maybe_unused]] const std::string &shaderName) override {}
+	void init(const BufferLayout &layout_, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) override;
 
 	/**
 	 * @brief Bind this draw data.
 	 */
-	void bind() const override {}
+	void bind() const override;
 
 	/**
 	 * @brief Unbind the draw data.
@@ -63,7 +64,12 @@ public:
 	 * @param shaderName The shader name.
 	 * @param renderer Name of the shader's related renderer.
 	 */
-	void setShader([[maybe_unused]] const std::string &shaderName, [[maybe_unused]] const std::string &renderer) override {}
+	void setShader(const std::string &shaderName, const std::string &renderer) override;
+
+
+private:
+	/// Pointer to the shader/pipeline.
+	shared<Shader> shader;
 };
 
 }// namespace owl::renderer::vulkan

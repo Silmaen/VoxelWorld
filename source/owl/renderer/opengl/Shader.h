@@ -179,7 +179,6 @@ private:
 	 */
 	void compile(const std::unordered_map<ShaderType, std::string> &sources);
 
-	void reflect(ShaderType stage, const std::vector<uint32_t> &shaderData);
 	void compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string> &sources);
 	void compileOrGetOpenGLBinaries();
 	void createProgram();

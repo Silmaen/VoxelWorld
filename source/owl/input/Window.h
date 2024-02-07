@@ -126,6 +126,11 @@ public:
 		return context.get();
 	}
 
+	/**
+	 * @brief Terminate the window.
+	 */
+	virtual void shutdown() = 0;
+
 protected:
 	/// Pointer to the Graphic Context.
 	uniq<renderer::GraphContext> context;

@@ -36,7 +36,6 @@ void RenderAPI::init() {
 		return;
 	}
 
-
 	// renderer is now ready
 	setState(State::Ready);
 }
@@ -51,5 +50,24 @@ void RenderAPI::drawData(const shared<DrawData> &, uint32_t) {}
 
 void RenderAPI::setLineWidth(float) {}
 
+void RenderAPI::beginFrame() {
+	auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_ERROR("Vulkan is in error state ({}).", magic_enum::enum_name(vkh.getState()))
+		setState(State::Error);
+		return;
+	}
+	vkh.beginFrame();
+}
+
+void RenderAPI::endFrame() {
+	auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_ERROR("Vulkan is in error state: ({}).", magic_enum::enum_name(vkh.getState()))
+		setState(State::Error);
+		return;
+	}
+	vkh.endFrame();
+}
 
 }// namespace owl::renderer::vulkan
