@@ -91,6 +91,12 @@ public:
 	[[nodiscard]] const State &getState() const { return state; }
 
 	/**
+	 * @brief Define a new state for the vulkan handler
+	 * @param st The new state.
+	 */
+	void setState(const State &st) { state = st; }
+
+	/**
 	 * @brief The vulkan version.
 	 * @return The actual Vulkan version
 	 */

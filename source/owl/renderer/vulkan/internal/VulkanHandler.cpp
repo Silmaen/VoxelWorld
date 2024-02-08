@@ -120,6 +120,15 @@ void VulkanHandler::initVulkan() {
 void VulkanHandler::release() {
 	if (instance == nullptr) return;// nothing can exists without instance.
 
+
+	for (auto &&[id, pipeLine]: pipeLines) {
+		if (pipeLine.pipeLine != nullptr)
+			vkDestroyPipeline(logicalDevice, pipeLine.pipeLine, nullptr);
+		if (pipeLine.layout != nullptr)
+			vkDestroyPipelineLayout(logicalDevice, pipeLine.layout, nullptr);
+	}
+	pipeLines.clear();
+
 	if (renderFinishedSemaphore != nullptr) {
 		vkDestroySemaphore(logicalDevice, renderFinishedSemaphore, nullptr);
 		OWL_CORE_TRACE("Vulkan: renderFinishedSemaphore destroyed.")
@@ -422,27 +431,21 @@ VulkanHandler::PipeLineData VulkanHandler::getPipeline(int32_t id) const {
 }
 
 int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &shaderStages) {
-	if (state == State::Running)
-		return -1;
 	PipeLineData pData;
-
 	// PipeLine Layout
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	{
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-		{
-			pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-			pipelineLayoutInfo.setLayoutCount = 0;
-			pipelineLayoutInfo.pushConstantRangeCount = 0;
-			pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-			pipelineLayoutInfo.setLayoutCount = 0;
-			pipelineLayoutInfo.pushConstantRangeCount = 0;
-		}
-		const VkResult result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pData.layout);
-		if (result != VK_SUCCESS) {
-			OWL_CORE_ERROR("Vulkan: Shader: failed to create pipeline layout {} ({})", pipeLineName, resultString(result))
-			state = State::ErrorCreatingPipelineLayout;
-			return -1;
-		}
+		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipelineLayoutInfo.setLayoutCount = 0;
+		pipelineLayoutInfo.pushConstantRangeCount = 0;
+		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipelineLayoutInfo.setLayoutCount = 0;
+		pipelineLayoutInfo.pushConstantRangeCount = 0;
+	}
+	if (const VkResult result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pData.layout); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: Shader: failed to create pipeline layout {} ({})", pipeLineName, resultString(result))
+		state = State::ErrorCreatingPipelineLayout;
+		return -1;
 	}
 
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -518,9 +521,8 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
 	OWL_CORE_TRACE("Vulkan pipeline: vkCreateGraphicsPipelines")
-	const VkResult result2 = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pData.pipeLine);
-	if (result2 != VK_SUCCESS) {
-		OWL_CORE_ERROR("Vulkan: failed to create graphics pipeline for {} ({})", pipeLineName, resultString(result2))
+	if (const VkResult result = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pData.pipeLine); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create graphics pipeline for {} ({})", pipeLineName, resultString(result))
 		state = State::ErrorCreatingPipeline;
 		return -1;
 	}
@@ -531,7 +533,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 	return id;
 }
 
-void VulkanHandler::popPipeline(int32_t id) {
+void VulkanHandler::popPipeline(const int32_t id) {
 	if (!pipeLines.contains(id))
 		return;
 	if (pipeLines[id].pipeLine != nullptr)
@@ -547,8 +549,7 @@ void VulkanHandler::createCommandPool() {
 	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	poolInfo.queueFamilyIndex = physicalDevice.queues.graphicsIndex;
 
-	const VkResult result = vkCreateCommandPool(logicalDevice, &poolInfo, nullptr, &commandPool);
-	if (result != VK_SUCCESS) {
+	if (const VkResult result = vkCreateCommandPool(logicalDevice, &poolInfo, nullptr, &commandPool); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create command pool ({}).", resultString(result))
 		state = State::ErrorCreatingCommandPool;
 	}
@@ -561,8 +562,7 @@ void VulkanHandler::createCommandBuffer() {
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = 1;
 
-	const VkResult result = vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
-	if (result != VK_SUCCESS) {
+	if (const VkResult result = vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("failed to allocate command buffers ({}).", resultString(result))
 		state = State::ErrorCreatingCommandBuffer;
 	}
@@ -575,28 +575,19 @@ void VulkanHandler::createSyncObjects() {
 	VkFenceCreateInfo fenceInfo{};
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-	{
-		const VkResult result = vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &imageAvailableSemaphore);
-		if (result != VK_SUCCESS) {
-			OWL_CORE_ERROR("Vulkan: failed to create image available semaphore ({}).", resultString(result))
-			state = State::ErrorCreatingSyncObjects;
-			return;
-		}
+	if (const VkResult result = vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &imageAvailableSemaphore); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create image available semaphore ({}).", resultString(result))
+		state = State::ErrorCreatingSyncObjects;
+		return;
 	}
-	{
-		const VkResult result = vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &renderFinishedSemaphore);
-		if (result != VK_SUCCESS) {
-			OWL_CORE_ERROR("Vulkan: failed to create render finish semaphore ({}).", resultString(result))
-			state = State::ErrorCreatingSyncObjects;
-			return;
-		}
+	if (const VkResult result = vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &renderFinishedSemaphore); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create render finish semaphore ({}).", resultString(result))
+		state = State::ErrorCreatingSyncObjects;
+		return;
 	}
-	{
-		const VkResult result = vkCreateFence(logicalDevice, &fenceInfo, nullptr, &inFlightFence);
-		if (result != VK_SUCCESS) {
-			OWL_CORE_ERROR("Vulkan: failed to create synchronization in flight fence ({}).", resultString(result))
-			state = State::ErrorCreatingSyncObjects;
-		}
+	if (const VkResult result = vkCreateFence(logicalDevice, &fenceInfo, nullptr, &inFlightFence); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create synchronization in flight fence ({}).", resultString(result))
+		state = State::ErrorCreatingSyncObjects;
 	}
 }
 
@@ -680,8 +671,7 @@ void VulkanHandler::endFrame() {
 		return;
 	vkCmdEndRenderPass(commandBuffer);
 
-	const VkResult result = vkEndCommandBuffer(commandBuffer);
-	if (result != VK_SUCCESS) {
+	if (const VkResult result = vkEndCommandBuffer(commandBuffer); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to end command buffer ({}).", resultString(result))
 		state = State::ErrorEndCommandBuffer;
 	}
@@ -706,13 +696,10 @@ void VulkanHandler::swapFrame() {
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	{
-		const VkResult result = vkQueueSubmit(physicalDevice.queues.graphics, 1, &submitInfo, inFlightFence);
-		if (result != VK_SUCCESS) {
-			OWL_CORE_ERROR("Vulkan: failed to submit draw command buffer ({}).", resultString(result))
-			state = State::ErrorSubmitingDrawCommand;
-			return;
-		}
+	if (const VkResult result = vkQueueSubmit(physicalDevice.queues.graphics, 1, &submitInfo, inFlightFence); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to submit draw command buffer ({}).", resultString(result))
+		state = State::ErrorSubmitingDrawCommand;
+		return;
 	}
 
 	VkPresentInfoKHR presentInfo{};
@@ -727,16 +714,13 @@ void VulkanHandler::swapFrame() {
 
 	presentInfo.pImageIndices = &imageIndex;
 
-	{
-		const VkResult result = vkQueuePresentKHR(physicalDevice.queues.present, &presentInfo);
-		if (result != VK_SUCCESS) {
-			OWL_CORE_ERROR("Vulkan: failed to present queue ({}).", resultString(result))
-			state = State::ErrorPresentingQueue;
-		}
+	if (const VkResult result = vkQueuePresentKHR(physicalDevice.queues.present, &presentInfo); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to present queue ({}).", resultString(result))
+		state = State::ErrorPresentingQueue;
 	}
 }
 
-void VulkanHandler::bindPipeline(int32_t id) {
+void VulkanHandler::bindPipeline(const int32_t id) {
 	if (state != State::Running)
 		return;
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeLines[id].pipeLine);

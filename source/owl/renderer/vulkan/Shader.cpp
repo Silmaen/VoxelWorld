@@ -36,6 +36,23 @@ namespace utils {
 	return static_cast<VkShaderStageFlagBits>(0);
 }
 
+
+static VkShaderModule createShaderModule(VkDevice logicalDevice, const std::vector<uint32_t> &code) {
+	VkShaderModuleCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	createInfo.codeSize = code.size() * sizeof(uint32_t);
+	createInfo.pCode = code.data();
+
+	VkShaderModule shaderModule;
+	const VkResult result = vkCreateShaderModule(logicalDevice, &createInfo, nullptr, &shaderModule);
+	if (result != VK_SUCCESS) {
+		OWL_CORE_ERROR("failed to create shader module ({}).", internal::resultString(result))
+		return nullptr;
+	}
+
+	return shaderModule;
+}
+
 }// namespace utils
 
 Shader::Shader(const std::string &shaderName, const std::string &renderer, const std::string &vertexSrc, const std::string &fragmentSrc) : ::owl::renderer::Shader{shaderName, renderer} {
@@ -70,13 +87,15 @@ Shader::Shader(const std::string &shaderName, const std::string &renderer, const
 }
 
 Shader::~Shader() {
-	if (pipelineId > 0) {
-		auto &vkh = internal::VulkanHandler::get();
-		vkh.popPipeline(pipelineId);
-	}
+	if (pipelineId < 0)
+		return;
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.popPipeline(pipelineId);
 }
 
 void Shader::bind() const {
+	if (pipelineId < 0)
+		return;
 	auto &vkh = internal::VulkanHandler::get();
 	vkh.bindPipeline(pipelineId);
 }
@@ -99,6 +118,7 @@ void Shader::setMat4(const std::string &, const glm::mat4 &) {}
 
 void Shader::createShader(const std::unordered_map<ShaderType, std::string> &sources) {
 	OWL_SCOPE_UNTRACK
+
 	OWL_PROFILE_FUNCTION()
 	const auto start = std::chrono::steady_clock::now();
 
@@ -153,60 +173,29 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 		renderer::utils::shaderReflect(getName(), getRenderer(), "vulkan", stage, data);
 }
 
-static VkShaderModule createShaderModule(VkDevice logicalDevice, const std::vector<char> &code) {
-	VkShaderModuleCreateInfo createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	createInfo.codeSize = code.size();
-	createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
-
-	VkShaderModule shaderModule;
-	if (vkCreateShaderModule(logicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create shader module!");
-	}
-
-	return shaderModule;
-}
-static std::vector<char> readFile(const std::string &filename) {
-	std::ifstream file(filename, std::ios::ate | std::ios::binary);
-	if (!file.is_open()) {
-		throw std::runtime_error("failed to open file!");
-	}
-	const size_t fileSize = static_cast<size_t>(file.tellg());
-	std::vector<char> buffer(fileSize);
-	file.seekg(0);
-	file.read(buffer.data(), fileSize);
-	file.close();
-	return buffer;
-}
-
-
 void Shader::createPipeline() {
 	auto &vkh = internal::VulkanHandler::get();
-
-	const auto path = renderer::utils::getCacheDirectory("renderer2D", "vulkan");
-	const auto vertShaderCode = readFile((path / "vert.spv").string());
-	const auto fragShaderCode = readFile((path / "frag.spv").string());
-
-	const VkShaderModule vertShaderModule = createShaderModule(vkh.getDevice(), vertShaderCode);
-	const VkShaderModule fragShaderModule = createShaderModule(vkh.getDevice(), fragShaderCode);
-	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vertShaderStageInfo.module = vertShaderModule;
-	vertShaderStageInfo.pName = "main";
-
-	VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	fragShaderStageInfo.module = fragShaderModule;
-	fragShaderStageInfo.pName = "main";
-
-	std::vector<VkPipelineShaderStageCreateInfo> shaderStages = {vertShaderStageInfo, fragShaderStageInfo};
-
+	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+	for (auto &&[stage, code]: vulkanSPIRV) {
+		shaderStages.emplace_back();
+		shaderStages.back().sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		shaderStages.back().stage = utils::shaderStageToVkStageBit(stage);
+		shaderStages.back().module = utils::createShaderModule(vkh.getDevice(), code);
+		if (shaderStages.back().module == nullptr) {
+			OWL_CORE_ERROR("Vulkan: Failed create shader module {} {}", getName(), magic_enum::enum_name(stage))
+			vkh.setState(internal::VulkanHandler::State::ErrorCreatingPipeline);
+			return;
+		}
+		shaderStages.back().pName = "main";
+	}
+	if (pipelineId >= 0)
+		vkh.popPipeline(pipelineId);
 	pipelineId = vkh.pushPipeline(getName(), shaderStages);
-
 	for (const auto &stage: shaderStages) {
 		vkDestroyShaderModule(vkh.getDevice(), stage.module, nullptr);
+	}
+	if (pipelineId < 0) {
+		OWL_CORE_WARN("Vulkan shader: Failed to register shader {}.", getName())
 	}
 }
 
