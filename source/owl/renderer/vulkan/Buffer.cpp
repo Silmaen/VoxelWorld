@@ -9,26 +9,195 @@
 
 #include "Buffer.h"
 
+#include "internal/VulkanHandler.h"
+#include "internal/utils.h"
 
 namespace owl::renderer::vulkan {
 
-VertexBuffer::VertexBuffer(uint32_t) {}
+namespace {
 
-VertexBuffer::VertexBuffer(float *, uint32_t) {}
+VkFormat shaderDataTypeToVulkanFormat(const ShaderDataType &type) {
+	switch (type) {
+		case ShaderDataType::None:
+			return VK_FORMAT_UNDEFINED;
+		case ShaderDataType::Float:
+			return VK_FORMAT_R32_SFLOAT;
+		case ShaderDataType::Float2:
+			return VK_FORMAT_R32G32_SFLOAT;
+		case ShaderDataType::Float3:
+			return VK_FORMAT_R32G32B32_SFLOAT;
+		case ShaderDataType::Float4:
+			return VK_FORMAT_R32G32B32A32_SFLOAT;
+		case ShaderDataType::Mat3:
+		case ShaderDataType::Mat4:
+			return VK_FORMAT_R32_SFLOAT;
+		case ShaderDataType::Int:
+			return VK_FORMAT_R32_SINT;
+		case ShaderDataType::Int2:
+			return VK_FORMAT_R32G32_SINT;
+		case ShaderDataType::Int3:
+			return VK_FORMAT_R32G32B32_SINT;
+		case ShaderDataType::Int4:
+			return VK_FORMAT_R32G32B32A32_SINT;
+		case ShaderDataType::Bool:
+			return VK_FORMAT_R8_UINT;
+	}
+	return VK_FORMAT_UNDEFINED;
+}
 
-VertexBuffer::~VertexBuffer() {}
+}// namespace
 
-void VertexBuffer::bind() const {}
+VertexBuffer::VertexBuffer(const uint32_t size) {
+	createBuffer(nullptr, size);
+}
+
+VertexBuffer::VertexBuffer(const float *vertices, const uint32_t size) {
+	createBuffer(vertices, size);
+}
+
+VertexBuffer::~VertexBuffer() {
+	release();
+}
+
+void VertexBuffer::release() {
+	const auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_WARN("Vulkan vertex buffer: Trying to delete vertex buffer after VulkanHander release...")
+		return;
+	}
+	if (vertexBuffer != nullptr)
+		vkDestroyBuffer(vkh.getDevice(), vertexBuffer, nullptr);
+	vertexBuffer = nullptr;
+	if (vertexBufferMemory != nullptr)
+		vkFreeMemory(vkh.getDevice(), vertexBufferMemory, nullptr);
+	vertexBufferMemory = nullptr;
+}
+
+void VertexBuffer::bind() const {
+	const auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_WARN("Vulkan vertex buffer: Trying to bind vertex buffer after VulkanHander release...")
+		return;
+	}
+	const VkBuffer vertexBuffers[] = {vertexBuffer};
+	constexpr VkDeviceSize offsets[] = {0};
+	vkCmdBindVertexBuffers(vkh.getCurrentCommandBuffer(), 0, 1, vertexBuffers, offsets);
+}
 
 void VertexBuffer::unbind() const {}
 
-void VertexBuffer::setData(const void *, uint32_t) {}
+void VertexBuffer::setData(const void *data, const uint32_t size) {
+	const auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_WARN("Vulkan vertex buffer: Trying to set vertex buffer data after VulkanHander release...")
+		return;
+	}
 
-IndexBuffer::IndexBuffer(uint32_t *, uint32_t size) : count(size) {}
+	if (data != nullptr) {
+		VkBuffer stagingBuffer;
+		VkDeviceMemory stagingBufferMemory;
+		vkh.createBuffer(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-IndexBuffer::~IndexBuffer() {}
+		void *data_internal;
+		vkMapMemory(vkh.getDevice(), stagingBufferMemory, 0, size, 0, &data_internal);
+		memcpy(data_internal, data, size);
+		vkUnmapMemory(vkh.getDevice(), stagingBufferMemory);
 
-void IndexBuffer::bind() const {}
+		vkh.copyBuffer(stagingBuffer, vertexBuffer, size);
+
+		vkDestroyBuffer(vkh.getDevice(), stagingBuffer, nullptr);
+		vkFreeMemory(vkh.getDevice(), stagingBufferMemory, nullptr);
+	}
+}
+
+VkVertexInputBindingDescription VertexBuffer::getBindingDescription() const {
+	VkVertexInputBindingDescription bindingDescription{};
+	bindingDescription.binding = 0;
+	bindingDescription.stride = getLayout().getStride();
+	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	return bindingDescription;
+}
+
+std::vector<VkVertexInputAttributeDescription> VertexBuffer::getAttributeDescriptions() const {
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+
+	auto layout = getLayout();
+	uint32_t id = 0;
+	for (const auto &element: layout) {
+		attributeDescriptions.emplace_back(VkVertexInputAttributeDescription{
+				.location = id,
+				.binding = 0,
+				.format = shaderDataTypeToVulkanFormat(element.type),
+				.offset = element.offset,
+		});
+		++id;
+	}
+	return attributeDescriptions;
+}
+
+void VertexBuffer::createBuffer(const float *data, const uint32_t size) {
+	const auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_WARN("Vulkan vertex buffer: Trying to set vertex buffer data after VulkanHander release...")
+		return;
+	}
+	release();
+	vkh.createBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+	setData(data, size);
+}
+
+
+IndexBuffer::IndexBuffer(uint32_t *data, uint32_t size) : count(size) {
+	const auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_WARN("Vulkan index buffer: Trying to create index buffer data after VulkanHander release...")
+		return;
+	}
+	const VkDeviceSize bufferSize = sizeof(uint32_t) * size;
+	vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+
+	if (data != nullptr) {
+		VkBuffer stagingBuffer;
+		VkDeviceMemory stagingBufferMemory;
+		vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+		void *data_internal;
+		vkMapMemory(vkh.getDevice(), stagingBufferMemory, 0, bufferSize, 0, &data_internal);
+		memcpy(data_internal, data, bufferSize);
+		vkUnmapMemory(vkh.getDevice(), stagingBufferMemory);
+		vkh.copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+		vkDestroyBuffer(vkh.getDevice(), stagingBuffer, nullptr);
+		vkFreeMemory(vkh.getDevice(), stagingBufferMemory, nullptr);
+	}
+}
+
+IndexBuffer::~IndexBuffer() {
+	release();
+}
+
+void IndexBuffer::release() {
+	const auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_WARN("Vulkan vertex buffer: Trying to delete vertex buffer after VulkanHander release...")
+		return;
+	}
+	if (indexBuffer != nullptr)
+		vkDestroyBuffer(vkh.getDevice(), indexBuffer, nullptr);
+	indexBuffer = nullptr;
+	if (indexBufferMemory != nullptr)
+		vkFreeMemory(vkh.getDevice(), indexBufferMemory, nullptr);
+	indexBufferMemory = nullptr;
+	count = 0;
+}
+
+void IndexBuffer::bind() const {
+	const auto &vkh = internal::VulkanHandler::get();
+	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+		OWL_CORE_WARN("Vulkan vertex buffer: Trying to bind vertex buffer after VulkanHander release...")
+		return;
+	}
+	vkCmdBindIndexBuffer(vkh.getCurrentCommandBuffer(), indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+}
 
 void IndexBuffer::unbind() const {}
 

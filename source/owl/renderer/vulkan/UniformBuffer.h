@@ -9,6 +9,8 @@
 
 #include "../UniformBuffer.h"
 
+#include <vulkan/vulkan.h>
+
 namespace owl::renderer::vulkan {
 
 /**
@@ -24,8 +26,9 @@ public:
 	 * @brief Constructor.
 	 * @param size Buffer's size.
 	 * @param binding Buffer's binding.
+	 * @param renderer Name of the shader's related renderer.
 	 */
-	UniformBuffer(uint32_t size, uint32_t binding);
+	UniformBuffer(uint32_t size, uint32_t binding, const std::string &renderer);
 
 	/**
 	 * @brief Destructor.
@@ -46,6 +49,8 @@ public:
 	void setData(const void *data, uint32_t size, uint32_t offset) override;
 
 private:
+	/// The renderer name.
+	std::string renderer;
 };
 
 }// namespace owl::renderer::vulkan

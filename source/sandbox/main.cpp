@@ -12,9 +12,9 @@
 
 #include "base2D.h"
 
-class Sandbox : public owl::core::Application {
+class Sandbox final : public owl::core::Application {
 public:
-	Sandbox(owl::core::AppParams param) : Application(param) { pushLayer(owl::mk_shared<owl::base2D>()); }
+	explicit Sandbox(const owl::core::AppParams &param) : Application(param) { pushLayer(owl::mk_shared<owl::base2D>()); }
 };
 
 owl::shared<owl::core::Application> owl::core::createApplication(int argc, char **argv) {

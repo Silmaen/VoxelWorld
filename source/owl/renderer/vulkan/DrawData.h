@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../DrawData.h"
+#include "Buffer.h"
 #include "Shader.h"
 
 namespace owl::renderer::vulkan {
@@ -29,12 +30,12 @@ public:
 
 	/**
 	 * @brief Initialize the draw data.
-	 * @param layout_ Layout of the vertex attributes.
+	 * @param layout Layout of the vertex attributes.
 	 * @param renderer Name of the shader's related renderer.
 	 * @param indices List of vertex indices.
 	 * @param shaderName The shader name.
 	 */
-	void init(const BufferLayout &layout_, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) override;
+	void init(const BufferLayout &layout, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) override;
 
 	/**
 	 * @brief Bind this draw data.
@@ -44,20 +45,20 @@ public:
 	/**
 	 * @brief Unbind the draw data.
 	 */
-	void unbind() const override {}
+	void unbind() const override;
 
 	/**
 	 * @brief Push Vertices data  to the draw buffer.
 	 * @param data The raw vertices data
 	 * @param size The size of the raw data.
 	 */
-	void setVertexData([[maybe_unused]] const void *data, [[maybe_unused]] uint32_t size) override {}
+	void setVertexData(const void *data, uint32_t size) override;
 
 	/**
 	 * @brief Get the number of vertex to draw.
 	 * @return Number of vertex to draw
 	 */
-	[[nodiscard]] uint32_t getIndexCount() const override { return 0; }
+	[[nodiscard]] uint32_t getIndexCount() const override;
 
 	/**
 	 * @brief Define the shader for this object.
@@ -66,10 +67,15 @@ public:
 	 */
 	void setShader(const std::string &shaderName, const std::string &renderer) override;
 
-
 private:
+	/// index of the pipeline.
+	int32_t pipelineId = -1;
 	/// Pointer to the shader/pipeline.
 	shared<Shader> shader;
+	/// Pointer to the vertex buffer.
+	shared<VertexBuffer> vertexBuffer;
+	/// Pointer to the index buffer.
+	shared<IndexBuffer> indexBuffer;
 };
 
 }// namespace owl::renderer::vulkan

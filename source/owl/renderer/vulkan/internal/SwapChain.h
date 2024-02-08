@@ -27,6 +27,7 @@ struct SwapChain {
 
 	void create(const VkDevice &logicDevice, const PhysicalDevice &physicalDevice);
 	void release();
+	void recreate(VkExtent2D extent);
 
 	enum struct State {
 		Created,
@@ -39,7 +40,8 @@ struct SwapChain {
 	State state = State::Created;
 
 private:
-	void createSwapChain();
+	void cleanup();
+	void createSwapChain(const VkExtent2D &extent);
 	void createImageViews();
 	void createRenderPass();
 	void createSwapChainFrameBuffers();

@@ -27,7 +27,7 @@ struct Queues {
 	/// The graphics queue.
 	VkQueue present = nullptr;
 
-	void defineQueues(VkDevice device);
+	void defineQueues(const VkDevice &device);
 	[[nodiscard]] std::vector<uint32_t> getIndices() const;
 	[[nodiscard]] std::set<uint32_t> getUniqueIndices() const;
 };
@@ -69,9 +69,11 @@ struct PhysicalDevice {
 	void create(VkPhysicalDevice dev);
 
 	[[nodiscard]] bool checkExtensionSupport() const;
+	void updateSurfaceInformations();
 
 	[[nodiscard]] std::string getName() const;
 	[[nodiscard]] std::string getVersonStr() const;
+	[[nodiscard]] uint32_t findMemoryTypeIndex(uint32_t typeFilter, VkMemoryPropertyFlags memProperties) const;
 };
 
 }// namespace owl::renderer::vulkan::internal

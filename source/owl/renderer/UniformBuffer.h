@@ -43,9 +43,10 @@ public:
 	 * @brief Create a new instance of UniformBuffer.
 	 * @param size The buffer size.
 	 * @param binding The binding.
+	 * @param renderer Name of the shader's related renderer.
 	 * @return New instance of UniformBuffer.
 	 */
-	static shared<UniformBuffer> create(uint32_t size, uint32_t binding);
+	static shared<UniformBuffer> create(uint32_t size, uint32_t binding, const std::string &renderer);
 };
 
 }// namespace owl::renderer

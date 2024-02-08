@@ -86,19 +86,9 @@ Shader::Shader(const std::string &shaderName, const std::string &renderer, const
 	createShader(strSources);
 }
 
-Shader::~Shader() {
-	if (pipelineId < 0)
-		return;
-	auto &vkh = internal::VulkanHandler::get();
-	vkh.popPipeline(pipelineId);
-}
+Shader::~Shader() {}
 
-void Shader::bind() const {
-	if (pipelineId < 0)
-		return;
-	auto &vkh = internal::VulkanHandler::get();
-	vkh.bindPipeline(pipelineId);
-}
+void Shader::bind() const {}
 
 void Shader::unbind() const {}
 
@@ -124,7 +114,6 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &sou
 
 	renderer::utils::createCacheDirectoryIfNeeded(getRenderer(), "vulkan");
 	compileOrGetVulkanBinaries(sources);
-	createPipeline();
 
 	const auto timer = std::chrono::steady_clock::now() - start;
 	double duration = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) / 1000.0;
@@ -173,7 +162,7 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 		renderer::utils::shaderReflect(getName(), getRenderer(), "vulkan", stage, data);
 }
 
-void Shader::createPipeline() {
+std::vector<VkPipelineShaderStageCreateInfo> Shader::getStagesInfo() {
 	auto &vkh = internal::VulkanHandler::get();
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
 	for (auto &&[stage, code]: vulkanSPIRV) {
@@ -184,19 +173,11 @@ void Shader::createPipeline() {
 		if (shaderStages.back().module == nullptr) {
 			OWL_CORE_ERROR("Vulkan: Failed create shader module {} {}", getName(), magic_enum::enum_name(stage))
 			vkh.setState(internal::VulkanHandler::State::ErrorCreatingPipeline);
-			return;
+			return {};
 		}
 		shaderStages.back().pName = "main";
 	}
-	if (pipelineId >= 0)
-		vkh.popPipeline(pipelineId);
-	pipelineId = vkh.pushPipeline(getName(), shaderStages);
-	for (const auto &stage: shaderStages) {
-		vkDestroyShaderModule(vkh.getDevice(), stage.module, nullptr);
-	}
-	if (pipelineId < 0) {
-		OWL_CORE_WARN("Vulkan shader: Failed to register shader {}.", getName())
-	}
+	return shaderStages;
 }
 
 }// namespace owl::renderer::vulkan

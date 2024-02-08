@@ -192,7 +192,7 @@ void Renderer2D::init() {
 	utils::maxTextureSlots = RenderCommand::getMaxTextureSlots();
 	data->textureSlots.resize(utils::maxTextureSlots);
 	data->textureSlots[0] = data->whiteTexture;
-	data->cameraUniformBuffer = UniformBuffer::create(sizeof(utils::internalData::CameraData), 0);
+	data->cameraUniformBuffer = UniformBuffer::create(sizeof(utils::internalData::CameraData), 0, "Renderer2D");
 	data->cameraUniformBuffer->bind();
 }
 

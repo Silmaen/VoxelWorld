@@ -37,6 +37,8 @@ struct OWL_API AppParams {
 	uint32_t height = 960;
 	/// Renderer's type.
 	renderer::RenderAPI::Type renderer = renderer::RenderAPI::Type::OpenGL;
+	/// If the application should use ImGui overlay.
+	bool hasGui = true;
 	/// Number of command line arguments.
 	int argCount = 0;
 	/// List of command line argument.
