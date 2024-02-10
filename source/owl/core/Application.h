@@ -43,6 +43,8 @@ struct OWL_API AppParams {
 	int argCount = 0;
 	/// List of command line argument.
 	char **args = nullptr;
+	/// If extra debugging symbols should be loaded.
+	bool useDebugging = false;
 
 	/**
 	 * @brief Access to the given command line argument.

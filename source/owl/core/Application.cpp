@@ -77,7 +77,7 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 
 	// initialize the renderer
 	{
-		renderer::Renderer::init();
+		renderer::Renderer::init(initParams.useDebugging);
 		// check renderer initialization
 		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
 			OWL_CORE_ERROR("ERROR while Initializing Renderer")
@@ -269,6 +269,7 @@ void AppParams::loadFromFile(const std::filesystem::path &file) {
 				renderer = dRenderer.value();
 		}
 		if (appConfig["hasGui"]) hasGui = appConfig["hasGui"].as<bool>();
+		if (appConfig["useDebugging"]) useDebugging = appConfig["useDebugging"].as<bool>();
 	}
 }
 
@@ -281,6 +282,7 @@ void AppParams::saveToFile(const std::filesystem::path &file) const {
 	out << YAML::Key << "height" << YAML::Value << height;
 	out << YAML::Key << "renderer" << YAML::Value << std::string(magic_enum::enum_name(renderer));
 	out << YAML::Key << "hasGui" << YAML::Value << hasGui;
+	out << YAML::Key << "useDebugging" << YAML::Value << useDebugging;
 
 	out << YAML::EndMap;
 	out << YAML::EndMap;

@@ -198,7 +198,7 @@ ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 			.MinImageCount = 2,
 			.ImageCount = 2,
 			.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
-			.UseDynamicRendering = false,
+			.UseDynamicRendering = true,
 			.ColorAttachmentFormat = swapChain.swapChainImageFormat,
 			.Allocator = nullptr,
 			.CheckVkResultFn = func,
@@ -327,8 +327,8 @@ void VulkanHandler::setupDebugging() {
 			.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 			.pNext = nullptr,
 			.flags = {},
-			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-			.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
+			.messageSeverity = 0x1111,// VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+			.messageType = 0x1111,    // VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
 			.pfnUserCallback = debugUtilsMessageCallback,
 			.pUserData = nullptr};
 	if (const VkResult result = vkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessagerCI, nullptr, &debugUtilsMessenger); result != VK_SUCCESS) {

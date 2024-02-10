@@ -21,15 +21,15 @@ RenderAPI::~RenderAPI() {
 	vkh.release();
 }
 
-void RenderAPI::init() {
+void RenderAPI::init(bool extraDebugging) {
 	OWL_PROFILE_FUNCTION()
 
 	if (getState() != State::Created) return;
 
 	auto &vkh = internal::VulkanHandler::get();
-#ifdef OWL_DEBUG
-	vkh.activateValidation();
-#endif
+	if (extraDebugging) {
+		vkh.activateValidation();
+	}
 	vkh.initVulkan();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		setState(State::Error);

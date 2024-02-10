@@ -14,7 +14,7 @@
 
 namespace owl::renderer::opengl_legacy {
 
-void RenderAPI::init() {
+void RenderAPI::init(bool) {
 	OWL_PROFILE_FUNCTION()
 
 	auto vers = core::Application::get().getWindow().getGraphContext()->getVersion();
