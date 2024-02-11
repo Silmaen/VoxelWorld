@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "PhysicalDevice.h"
+#include <vulkan/vulkan.h>
 
 namespace owl::renderer::vulkan::internal {
 
@@ -25,7 +25,7 @@ struct SwapChain {
 	/// The render pass.
 	VkRenderPass renderPass = nullptr;
 
-	void create(const VkDevice &logicDevice, const PhysicalDevice &physicalDevice);
+	void create(const VkDevice &logicDevice, const VkPhysicalDevice &physicalDevice);
 	void release();
 	void recreate(VkExtent2D extent);
 
@@ -46,7 +46,7 @@ private:
 	void createRenderPass();
 	void createSwapChainFrameBuffers();
 	VkDevice device{nullptr};
-	const PhysicalDevice *phy{nullptr};
+	VkPhysicalDevice phy{nullptr};
 };
 
 }// namespace owl::renderer::vulkan::internal

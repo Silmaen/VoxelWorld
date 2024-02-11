@@ -21,39 +21,6 @@ namespace {
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
-PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
-
-VkBool32 debugUtilsMessageCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-								   VkDebugUtilsMessageTypeFlagsEXT,
-								   const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
-								   void *) {
-
-	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
-		OWL_CORE_TRACE("Vulkan: [{}][{}]: {}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage)
-	} else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-		OWL_CORE_INFO("Vulkan: [{}][{}]: {}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage)
-	} else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-		OWL_CORE_WARN("Vulkan: [{}][{}]: {}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage)
-	} else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-		OWL_CORE_ERROR("Vulkan: [{}][{}]: {}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage)
-	}
-	// The return value of this callback controls whether the Vulkan call that caused the validation message will be aborted or not
-	// We return VK_FALSE as we DON'T want Vulkan calls that cause a validation message to abort
-	// If you instead want to have calls abort, pass in VK_TRUE and the function will return VK_ERROR_VALIDATION_FAILED_EXT
-	return false;
-}
-
-constexpr VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessagerCI{
-		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-		.pNext = nullptr,
-		.flags = {},
-		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
-		.pfnUserCallback = debugUtilsMessageCallback,
-		.pUserData = nullptr};
-
-
 }// namespace
 
 VulkanHandler::VulkanHandler() = default;
@@ -61,32 +28,11 @@ VulkanHandler::VulkanHandler() = default;
 VulkanHandler::~VulkanHandler() = default;
 
 void VulkanHandler::initVulkan() {
-	createInstance();
-	if (state == State::ErrorCreatingInstance)
-		return;
-	OWL_CORE_TRACE("Vulkan: Instance created.")
-	if (validation) {
-		setupDebugging();
-		if (state == State::ErrorSetupDebugging) return;
-		OWL_CORE_TRACE("Vulkan: Debug support initiated.")
-	}
 	{
-		createSurface();
+		createCore();
 		if (state != State::Uninitialized)
 			return;
-		OWL_CORE_TRACE("Vulkan: Surface created.")
-	}
-	{
-		createPhysicalDevice();
-		if (state != State::Uninitialized)
-			return;
-		OWL_CORE_TRACE("Vulkan: Physical Device created.")
-	}
-	{
-		createLogicalDevice();
-		if (state != State::Uninitialized)
-			return;
-		OWL_CORE_TRACE("Vulkan: Logical Device created.")
+		OWL_CORE_TRACE("Vulkan: Core created.")
 	}
 	{
 		createSwapChain();
@@ -128,77 +74,64 @@ void VulkanHandler::initVulkan() {
 }
 
 void VulkanHandler::release() {
-	if (instance == nullptr) return;// nothing can exists without instance.
+	auto &core = VulkanCore::get();
+	if (core.getInstance() == nullptr) return;// nothing can exists without instance.
+
 	for (auto &&[id, pipeLine]: pipeLines) {
 		if (pipeLine.pipeLine != nullptr)
-			vkDestroyPipeline(logicalDevice, pipeLine.pipeLine, nullptr);
+			vkDestroyPipeline(core.getLogicalDevice(), pipeLine.pipeLine, nullptr);
 		if (pipeLine.layout != nullptr)
-			vkDestroyPipelineLayout(logicalDevice, pipeLine.layout, nullptr);
+			vkDestroyPipelineLayout(core.getLogicalDevice(), pipeLine.layout, nullptr);
 	}
 	pipeLines.clear();
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-		vkDestroyBuffer(logicalDevice, uniformBuffers[i], nullptr);
-		vkFreeMemory(logicalDevice, uniformBuffersMemory[i], nullptr);
+		vkDestroyBuffer(core.getLogicalDevice(), uniformBuffers[i], nullptr);
+		vkFreeMemory(core.getLogicalDevice(), uniformBuffersMemory[i], nullptr);
 	}
 	if (descriptorSetLayout != nullptr) {
-		vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, nullptr);
+		vkDestroyDescriptorSetLayout(core.getLogicalDevice(), descriptorSetLayout, nullptr);
 		OWL_CORE_TRACE("Vulkan: descriptorSetLayout destroyed.")
 	}
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 		if (renderFinishedSemaphores[i] != nullptr) {
-			vkDestroySemaphore(logicalDevice, renderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(core.getLogicalDevice(), renderFinishedSemaphores[i], nullptr);
 			OWL_CORE_TRACE("Vulkan: renderFinishedSemaphore destroyed.")
 		}
 		if (imageAvailableSemaphores[i] != nullptr) {
-			vkDestroySemaphore(logicalDevice, imageAvailableSemaphores[i], nullptr);
+			vkDestroySemaphore(core.getLogicalDevice(), imageAvailableSemaphores[i], nullptr);
 			OWL_CORE_TRACE("Vulkan: imageAvailableSemaphore destroyed.")
 		}
 		if (inFlightFences[i] != nullptr) {
-			vkDestroyFence(logicalDevice, inFlightFences[i], nullptr);
+			vkDestroyFence(core.getLogicalDevice(), inFlightFences[i], nullptr);
 			OWL_CORE_TRACE("Vulkan: inFlightFence destroyed.")
 		}
 	}
 	if (commandPool != nullptr) {
-		vkDestroyCommandPool(logicalDevice, commandPool, nullptr);
+		vkDestroyCommandPool(core.getLogicalDevice(), commandPool, nullptr);
 		OWL_CORE_TRACE("Vulkan: commandPool destroyed.")
 	}
 	if (descriptorPool != nullptr) {
-		vkDestroyDescriptorPool(logicalDevice, descriptorPool, nullptr);
+		vkDestroyDescriptorPool(core.getLogicalDevice(), descriptorPool, nullptr);
 		descriptorPool = nullptr;
 		OWL_CORE_TRACE("Vulkan: descriptorPool destroyed.")
 	}
 	swapChain.release();
 	OWL_CORE_TRACE("Vulkan: swap destroyed.")
-	if (logicalDevice != nullptr) {
-		vkDestroyDevice(logicalDevice, nullptr);
-		logicalDevice = nullptr;
-		OWL_CORE_TRACE("Vulkan: logicalDevice destroyed.")
-	}
-	{
-		const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
-		gc->destroySurface(instance);
-		OWL_CORE_TRACE("Vulkan: Surface destroyed.")
-	}
-	if (debugUtilsMessenger != nullptr) {
-		vkDestroyDebugUtilsMessengerEXT(instance, debugUtilsMessenger, nullptr);
-		debugUtilsMessenger = nullptr;
-		OWL_CORE_TRACE("Vulkan: debugUtilsMessenger destroyed.")
-	}
-	vkDestroyInstance(instance, nullptr);
-	instance = nullptr;
-	OWL_CORE_TRACE("Vulkan: instance destroyed.")
+	core.release();
+	OWL_CORE_TRACE("Vulkan: core destroyed.")
 	state = State::Uninitialized;
 }
 
 static void func(VkResult) {}
 
 ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
+	const auto &core = VulkanCore::get();
 	return {
-			.Instance = instance,
-			.PhysicalDevice = physicalDevice.device,
-			.Device = logicalDevice,
-			.QueueFamily = physicalDevice.queues.graphicsIndex,
-			.Queue = physicalDevice.queues.graphics,
+			.Instance = core.getInstance(),
+			.PhysicalDevice = core.getPhysicalDevice(),
+			.Device = core.getLogicalDevice(),
+			.QueueFamily = core.getGraphQueueFamilyIndex(),
+			.Queue = core.getGraphicQueue(),
 			.PipelineCache = {},
 			.DescriptorPool = descriptorPool,
 			.Subpass = 0,
@@ -212,210 +145,23 @@ ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 			.MinAllocationSize = 1024 * 1024};
 }
 
-void VulkanHandler::createInstance() {
-
-	uint32_t instanceVersion;
-	vkEnumerateInstanceVersion(&instanceVersion);
-	version = static_cast<int>(instanceVersion & 0xFFFFF000);//Remove the patch version.
-	OWL_CORE_INFO("Vulkan: Found API Version: {}.{}.", VK_API_VERSION_MAJOR(version), VK_API_VERSION_MINOR(version))
-
-	// App info
-	constexpr VkApplicationInfo appInfo = {
-			.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-			.pNext = nullptr,
-			.pApplicationName = "Owl",
-			.applicationVersion = {},
-			.pEngineName = "OwlEngine",
-			.engineVersion = {},
-			.apiVersion = VK_API_VERSION_1_3};
-
-	// Supported Instance extensions & Layer
-	{
-		// Get extensions supported by the instance and store for later use
-		uint32_t extCount = 0;
-		vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
-		if (extCount > 0) {
-			std::vector<VkExtensionProperties> extensions(extCount);
-			if (const VkResult result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, &extensions.front()); result == VK_SUCCESS) {
-				for (const VkExtensionProperties &extension: extensions) {
-					supportedInstanceExtensions.emplace_back(extension.extensionName);
-					OWL_CORE_TRACE("Vulkan: Supported instance extension: {}", extension.extensionName)
-				}
-			} else {
-				OWL_CORE_WARN("Vulkan: unable to enumerate extensions ({}).", resultString(result))
-			}
-		}
+void VulkanHandler::createCore() {
+	auto &core = VulkanCore::get();
+	core.init({.activeValidation = validation});
+	if (core.getState() == VulkanCore::State::Error) {
+		state = State::ErrorCreatingCore;
 	}
-
-	// extension for the instance creation.
-	std::vector<const char *> instanceExtensions = {VK_KHR_SURFACE_EXTENSION_NAME};
-	// Include Extension from glfw.
-	{
-		uint32_t glfwExtensionCount = 0;
-		const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-		std::set<const char *> uniqueExtensions(instanceExtensions.begin(), instanceExtensions.end());
-		uniqueExtensions.insert(glfwExtensions, glfwExtensions + glfwExtensionCount);
-		instanceExtensions.assign(uniqueExtensions.begin(), uniqueExtensions.end());
-	}
-	if (validation && std::ranges::find(supportedInstanceExtensions.begin(), supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == supportedInstanceExtensions.end()) {
-		OWL_CORE_WARN("Vulkan: request extension Debug Utils but is not supported, deactivating.")
-		validation = false;
-	}
-
-	// create Info
-	VkInstanceCreateInfo instanceCI{};
-	instanceCI.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	instanceCI.pApplicationInfo = &appInfo;
-	// potentially include Debug Messager
-	if (validation) {
-		instanceCI.pNext = &debugUtilsMessagerCI;
-		instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-	}
-
-	// Give the list of required extention to the Instance Create Info
-	instanceCI.enabledExtensionCount = static_cast<uint32_t>(instanceExtensions.size());
-	instanceCI.ppEnabledExtensionNames = instanceExtensions.data();
-
-	if (validation) {
-		const auto validationLayerName = "VK_LAYER_KHRONOS_validation";
-		// Check if this layer is available at instance level
-		uint32_t instanceLayerCount;
-		vkEnumerateInstanceLayerProperties(&instanceLayerCount, nullptr);
-		std::vector<VkLayerProperties> instanceLayerProperties(instanceLayerCount);
-		vkEnumerateInstanceLayerProperties(&instanceLayerCount, instanceLayerProperties.data());
-		OWL_CORE_TRACE("Vulkan: Found {} instance layer.", instanceLayerCount)
-		validationPresent = false;
-		for (const VkLayerProperties &layer: instanceLayerProperties) {
-			OWL_CORE_TRACE("Vulkan: Instance layer: {}", layer.layerName)
-			if (strcmp(layer.layerName, validationLayerName) == 0) {
-				validationPresent = true;
-				break;
-			}
-		}
-		if (validationPresent) {
-			instanceCI.ppEnabledLayerNames = &validationLayerName;
-			instanceCI.enabledLayerCount = 1;
-		} else {
-			OWL_CORE_WARN("Vulkan: Validation layer VK_LAYER_KHRONOS_validation not present, validation is disabled")
-		}
-	}
-
-	VkResult result = vkCreateInstance(&instanceCI, nullptr, &instance);
-	bool second = false;
-	if (result == VK_ERROR_LAYER_NOT_PRESENT) {
-		OWL_CORE_ERROR("Vulkan: Unable to create instance because a layer can't be loaded, Retry without layers.")
-		second = true;
-		instanceCI.ppEnabledLayerNames = nullptr;
-		instanceCI.enabledLayerCount = 0;
-		result = vkCreateInstance(&instanceCI, nullptr, &instance);
-	}
-	if (result != VK_SUCCESS) {
-		if (second)
-			OWL_CORE_ERROR("Vulkan: Definitively unable to create instance ({}).", resultString(result))
-		else
-			OWL_CORE_ERROR("Vulkan: Unable to create instance ({}).", resultString(result))
-		state = State::ErrorCreatingInstance;
-	}
-}
-
-void VulkanHandler::setupDebugging() {
-	OWL_DIAG_PUSH
-	OWL_DIAG_DISABLE_CLANG17("-Wcast-function-type-strict")
-	vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
-	vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
-	OWL_DIAG_POP
-
-	if (const VkResult result = vkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessagerCI, nullptr, &debugUtilsMessenger); result != VK_SUCCESS) {
-		OWL_CORE_ERROR("Vulkan: Error while setup debugging ({})", resultString(result))
-		state = State::ErrorSetupDebugging;
-	}
-}
-
-void VulkanHandler::createSurface() {
-	const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
-	if (const VkResult result = gc->createSurface(instance); result != VK_SUCCESS) {
-		OWL_CORE_ERROR("Vulkan: failed to create window surface ({})", resultString(result))
-		state = State::ErrorCreatingWindowSurface;
-	}
-}
-
-void VulkanHandler::createPhysicalDevice() {
-	uint32_t deviceCount = 0;
-	{
-		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-		if (deviceCount == 0) {
-			OWL_CORE_ERROR("Vulkan: Cannot find any GPUs with vulkan support.")
-			state = State::ErrorNoGpuFound;
-			return;
-		}
-	}
-	bool found = false;
-	{
-		physicalDevice.score = 0;
-		std::vector<VkPhysicalDevice> devices(deviceCount);
-		vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
-		for (const auto &device: devices) {
-			PhysicalDevice dev;
-			dev.create(device);
-			OWL_CORE_TRACE("Vulkan: found device: {} @ api {}", dev.getName(), dev.getVersonStr())
-			for (const auto &layer: dev.layers) {
-				OWL_CORE_TRACE("        layer       : {} {}", layer.layerName, layer.description)
-			}
-			if (dev.score > physicalDevice.score) {
-				physicalDevice = std::move(dev);
-				found = true;
-			}
-		}
-	}
-	if (!found) {
-		OWL_CORE_ERROR("Vulkan: Found no graphics card with enough capabilities.")
-		state = State::ErrorNoGpuFound;
-		return;
-	}
-	OWL_CORE_INFO("Vulkan: Using GPU: {}.", physicalDevice.getName())
-}
-
-void VulkanHandler::createLogicalDevice() {
-	std::vector<VkDeviceQueueCreateInfo> deviceQueuesCI;
-	float queuePriority = 1.0f;
-	for (const uint32_t queue: physicalDevice.queues.getUniqueIndices()) {
-		VkDeviceQueueCreateInfo deviceQueueCI{
-				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = {},
-				.queueFamilyIndex = queue,
-				.queueCount = 1,
-				.pQueuePriorities = &queuePriority};
-		deviceQueuesCI.push_back(deviceQueueCI);
-	}
-	const auto validationLayerName = "VK_LAYER_KHRONOS_validation";
-	const VkDeviceCreateInfo deviceCI{
-			.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.queueCreateInfoCount = static_cast<uint32_t>(deviceQueuesCI.size()),
-			.pQueueCreateInfos = deviceQueuesCI.data(),
-			.enabledLayerCount = validationPresent ? 1u : 0u,
-			.ppEnabledLayerNames = &validationLayerName,
-			.enabledExtensionCount = static_cast<uint32_t>(internal::deviceExtensions.size()),
-			.ppEnabledExtensionNames = internal::deviceExtensions.data(),
-			.pEnabledFeatures = &physicalDevice.enabledFeatures};
-	if (const VkResult result = vkCreateDevice(physicalDevice.device, &deviceCI, nullptr, &logicalDevice); result != VK_SUCCESS) {
-		state = State::ErrorCreatingLogicalDevice;
-		OWL_CORE_ERROR("Vulkan: Error while creating the logical device ({})", resultString(result))
-		return;
-	}
-
-	physicalDevice.queues.defineQueues(logicalDevice);
 }
 
 void VulkanHandler::createSwapChain() {
-	swapChain.create(logicalDevice, physicalDevice);
+	const auto &core = VulkanCore::get();
+	swapChain.create(core.getLogicalDevice(), core.getPhysicalDevice());
 	if (swapChain.state != SwapChain::State::Initialized)
 		state = State::ErrorCreatingSwapChain;
 }
 
 void VulkanHandler::createDescriptorPool() {
+	const auto &core = VulkanCore::get();
 	VkDescriptorPoolSize poolSize{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = static_cast<uint32_t>(2)};
@@ -426,13 +172,14 @@ void VulkanHandler::createDescriptorPool() {
 			.maxSets = static_cast<uint32_t>(2),
 			.poolSizeCount = 1,
 			.pPoolSizes = &poolSize};
-	if (const VkResult result = vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &descriptorPool); result != VK_SUCCESS) {
+	if (const VkResult result = vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr, &descriptorPool); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("failed to create descriptor pool ({})", resultString(result))
 		state = State::ErrorCreatingDescriptorPool;
 	}
 }
 
 void VulkanHandler::createDescriptorSets(const size_t size) {
+	const auto &core = VulkanCore::get();
 	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
 	const VkDescriptorSetAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
@@ -441,7 +188,7 @@ void VulkanHandler::createDescriptorSets(const size_t size) {
 			.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT),
 			.pSetLayouts = layouts.data()};
 	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-	if (const auto result = vkAllocateDescriptorSets(logicalDevice, &allocInfo, descriptorSets.data()); result != VK_SUCCESS) {
+	if (const auto result = vkAllocateDescriptorSets(core.getLogicalDevice(), &allocInfo, descriptorSets.data()); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to allocate descriptor sets ({})", resultString(result))
 		state = State::ErrorCreatingDescriptorSet;
 		return;
@@ -463,7 +210,7 @@ void VulkanHandler::createDescriptorSets(const size_t size) {
 				.pImageInfo = nullptr,
 				.pBufferInfo = &bufferInfo,
 				.pTexelBufferView = nullptr};
-		vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, nullptr);
+		vkUpdateDescriptorSets(core.getLogicalDevice(), 1, &descriptorWrite, 0, nullptr);
 	}
 }
 
@@ -478,6 +225,7 @@ VkCommandBuffer VulkanHandler::getCurrentCommandBuffer() const {
 }
 
 int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &shaderStages, VkPipelineVertexInputStateCreateInfo vertexInputInfo) {
+	const auto &core = VulkanCore::get();
 	PipeLineData pData;
 	// PipeLine Layout
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{
@@ -488,7 +236,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.pSetLayouts = &descriptorSetLayout,
 			.pushConstantRangeCount = 0,
 			.pPushConstantRanges = nullptr};
-	if (const VkResult result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pData.layout); result != VK_SUCCESS) {
+	if (const VkResult result = vkCreatePipelineLayout(core.getLogicalDevice(), &pipelineLayoutInfo, nullptr, &pData.layout); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: Shader: failed to create pipeline layout {} ({})", pipeLineName, resultString(result))
 		state = State::ErrorCreatingPipelineLayout;
 		return -1;
@@ -581,7 +329,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.basePipelineIndex = 0};
 
 	OWL_CORE_TRACE("Vulkan pipeline: vkCreateGraphicsPipelines")
-	if (const VkResult result = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pData.pipeLine); result != VK_SUCCESS) {
+	if (const VkResult result = vkCreateGraphicsPipelines(core.getLogicalDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pData.pipeLine); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create graphics pipeline for {} ({})", pipeLineName, resultString(result))
 		state = State::ErrorCreatingPipeline;
 		return -1;
@@ -594,28 +342,32 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 }
 
 void VulkanHandler::popPipeline(const int32_t id) {
+	const auto &core = VulkanCore::get();
 	if (!pipeLines.contains(id))
 		return;
 	if (pipeLines[id].pipeLine != nullptr)
-		vkDestroyPipeline(logicalDevice, pipeLines[id].pipeLine, nullptr);
+		vkDestroyPipeline(core.getLogicalDevice(), pipeLines[id].pipeLine, nullptr);
 	if (pipeLines[id].layout != nullptr)
-		vkDestroyPipelineLayout(logicalDevice, pipeLines[id].layout, nullptr);
+		vkDestroyPipelineLayout(core.getLogicalDevice(), pipeLines[id].layout, nullptr);
 	pipeLines.erase(id);
 }
 
 void VulkanHandler::createCommandPool() {
+	const auto &core = VulkanCore::get();
 	const VkCommandPoolCreateInfo poolInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-			.queueFamilyIndex = physicalDevice.queues.graphicsIndex};
-	if (const VkResult result = vkCreateCommandPool(logicalDevice, &poolInfo, nullptr, &commandPool); result != VK_SUCCESS) {
+			.queueFamilyIndex = core.getGraphQueueFamilyIndex()};
+
+	if (const VkResult result = vkCreateCommandPool(core.getLogicalDevice(), &poolInfo, nullptr, &commandPool); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create command pool ({}).", resultString(result))
 		state = State::ErrorCreatingCommandPool;
 	}
 }
 
 void VulkanHandler::createCommandBuffers() {
+	const auto &core = VulkanCore::get();
 	commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 	const VkCommandBufferAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -623,7 +375,7 @@ void VulkanHandler::createCommandBuffers() {
 			.commandPool = commandPool,
 			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 			.commandBufferCount = static_cast<uint32_t>(commandBuffers.size())};
-	if (const VkResult result = vkAllocateCommandBuffers(logicalDevice, &allocInfo, commandBuffers.data()); result != VK_SUCCESS) {
+	if (const VkResult result = vkAllocateCommandBuffers(core.getLogicalDevice(), &allocInfo, commandBuffers.data()); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("failed to allocate command buffers ({}).", resultString(result))
 		state = State::ErrorCreatingCommandBuffer;
 	}
@@ -643,18 +395,19 @@ void VulkanHandler::createSyncObjects() {
 			.pNext = nullptr,
 			.flags = VK_FENCE_CREATE_SIGNALED_BIT};
 
+	const auto &core = VulkanCore::get();
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-		if (const VkResult result = vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]); result != VK_SUCCESS) {
+		if (const VkResult result = vkCreateSemaphore(core.getLogicalDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]); result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan: failed to create image available semaphore {} ({}).", i, resultString(result))
 			state = State::ErrorCreatingSyncObjects;
 			return;
 		}
-		if (const VkResult result = vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]); result != VK_SUCCESS) {
+		if (const VkResult result = vkCreateSemaphore(core.getLogicalDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]); result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan: failed to create render finish semaphore {} ({}).", i, resultString(result))
 			state = State::ErrorCreatingSyncObjects;
 			return;
 		}
-		if (const VkResult result = vkCreateFence(logicalDevice, &fenceInfo, nullptr, &inFlightFences[i]); result != VK_SUCCESS) {
+		if (const VkResult result = vkCreateFence(core.getLogicalDevice(), &fenceInfo, nullptr, &inFlightFences[i]); result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan: failed to create synchronization in flight fence {} ({}).", i, resultString(result))
 			state = State::ErrorCreatingSyncObjects;
 			return;
@@ -687,10 +440,11 @@ void VulkanHandler::drawData(uint32_t vertexCount, bool indexed) const {
 void VulkanHandler::beginFrame() {
 	if (state != State::Running)
 		return;
-	vkWaitForFences(logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-	if (const VkResult result = vkAcquireNextImageKHR(logicalDevice, swapChain.swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS) {
+	const auto &core = VulkanCore::get();
+	vkWaitForFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+	if (const VkResult result = vkAcquireNextImageKHR(core.getLogicalDevice(), swapChain.swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS) {
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-			swapChain.recreate(physicalDevice.capabilities.currentExtent);
+			swapChain.recreate(core.getCurrentExtent());
 			return;
 		}
 		if (result != VK_SUBOPTIMAL_KHR) {
@@ -698,7 +452,7 @@ void VulkanHandler::beginFrame() {
 			state = State::ErrorAcquiringNextImage;
 			return;
 		}
-		vkResetFences(logicalDevice, 1, &inFlightFences[currentFrame]);
+		vkResetFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
 	}
 
 	if (const VkResult result = vkResetCommandBuffer(getCurrentCommandBuffer(), /*VkCommandBufferResetFlagBits*/ 0); result != VK_SUCCESS) {
@@ -763,8 +517,9 @@ void VulkanHandler::swapFrame() {
 			.signalSemaphoreCount = 1,
 			.pSignalSemaphores = signalSemaphores};
 
-	vkResetFences(logicalDevice, 1, &inFlightFences[currentFrame]);
-	if (const VkResult result = vkQueueSubmit(physicalDevice.queues.graphics, 1, &submitInfo, inFlightFences[currentFrame]); result != VK_SUCCESS) {
+	const auto &core = VulkanCore::get();
+	vkResetFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
+	if (const VkResult result = vkQueueSubmit(core.getGraphicQueue(), 1, &submitInfo, inFlightFences[currentFrame]); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to submit draw command buffer ({}).", resultString(result))
 		state = State::ErrorSubmitingDrawCommand;
 		return;
@@ -782,10 +537,10 @@ void VulkanHandler::swapFrame() {
 			.pImageIndices = &imageIndex,
 			.pResults = nullptr};
 
-	if (const VkResult result = vkQueuePresentKHR(physicalDevice.queues.present, &presentInfo); result != VK_SUCCESS) {
+	if (const VkResult result = vkQueuePresentKHR(core.getPresentQueue(), &presentInfo); result != VK_SUCCESS) {
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || resize) {
 			resize = false;
-			swapChain.recreate(physicalDevice.capabilities.currentExtent);
+			swapChain.recreate(core.getCurrentExtent());
 		} else {
 			OWL_CORE_ERROR("Vulkan: failed to present queue ({}).", resultString(result))
 			state = State::ErrorPresentingQueue;
@@ -809,13 +564,15 @@ void VulkanHandler::bindPipeline(const int32_t id) {
 }
 
 void VulkanHandler::setResize() {
-	physicalDevice.updateSurfaceInformations();
+	auto &core = VulkanCore::get();
+	core.updateSurfaceInformations();
 	resize = true;
 }
 
 void VulkanHandler::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const {
 
 	OWL_CORE_FRAME_TRACE("Frame Trace: Begin copy buffer size {}", size)
+	const auto &core = VulkanCore::get();
 	const VkCommandBufferAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.pNext = nullptr,
@@ -824,7 +581,7 @@ void VulkanHandler::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceS
 			.commandBufferCount = 1};
 
 	VkCommandBuffer commandBuffer;
-	if (const VkResult result = vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer); result != VK_SUCCESS) {
+	if (const VkResult result = vkAllocateCommandBuffers(core.getLogicalDevice(), &allocInfo, &commandBuffer); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create command buffer for buffer copy.")
 		return;
 	}
@@ -859,20 +616,21 @@ void VulkanHandler::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceS
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr};
 
-	if (const VkResult result = vkQueueSubmit(physicalDevice.queues.graphics, 1, &submitInfo, VK_NULL_HANDLE); result != VK_SUCCESS) {
+	if (const VkResult result = vkQueueSubmit(core.getGraphicQueue(), 1, &submitInfo, VK_NULL_HANDLE); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to submit to queue for buffer copy.")
 		return;
 	}
-	if (const VkResult result = vkQueueWaitIdle(physicalDevice.queues.graphics); result != VK_SUCCESS) {
+	if (const VkResult result = vkQueueWaitIdle(core.getGraphicQueue()); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to wait for idle queue for buffer copy.")
 		return;
 	}
 
-	vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
+	vkFreeCommandBuffers(core.getLogicalDevice(), commandPool, 1, &commandBuffer);
 	OWL_CORE_FRAME_TRACE("Frame Trace: End copy buffer!")
 }
 
 void VulkanHandler::createDescriptorSetLayout() {
+	const auto &core = VulkanCore::get();
 	VkDescriptorSetLayoutBinding uboLayoutBinding{
 			.binding = 0,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -885,7 +643,7 @@ void VulkanHandler::createDescriptorSetLayout() {
 			.flags = {},
 			.bindingCount = 1,
 			.pBindings = &uboLayoutBinding};
-	if (const auto result = vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &descriptorSetLayout); result != VK_SUCCESS) {
+	if (const auto result = vkCreateDescriptorSetLayout(core.getLogicalDevice(), &layoutInfo, nullptr, &descriptorSetLayout); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create descriptor set layout ({}).", resultString(result))
 		state = State::ErrorCreatingDescriptorSetLayout;
 	}
@@ -895,10 +653,10 @@ void VulkanHandler::createUniformBuffers(const size_t size) {
 	uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 	uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 	uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
-
+	const auto &core = VulkanCore::get();
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		createBuffer(size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
-		if (const auto result = vkMapMemory(logicalDevice, uniformBuffersMemory[i], 0, size, 0, &uniformBuffersMapped[i]); result != VK_SUCCESS) {
+		if (const auto result = vkMapMemory(core.getLogicalDevice(), uniformBuffersMemory[i], 0, size, 0, &uniformBuffersMapped[i]); result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan: Failed to create uniform buffer {}.", i)
 		}
 	}
@@ -906,6 +664,7 @@ void VulkanHandler::createUniformBuffers(const size_t size) {
 }
 
 void VulkanHandler::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory) const {
+	const auto &core = VulkanCore::get();
 	const VkBufferCreateInfo bufferInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 			.pNext = nullptr,
@@ -916,26 +675,26 @@ void VulkanHandler::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, Vk
 			.queueFamilyIndexCount = 0,
 			.pQueueFamilyIndices = nullptr};
 
-	if (const VkResult result = vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &buffer); result != VK_SUCCESS) {
+	if (const VkResult result = vkCreateBuffer(core.getLogicalDevice(), &bufferInfo, nullptr, &buffer); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan buffer: failed to create vertex buffer ({}).", resultString(result))
 		return;
 	}
 
 	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
+	vkGetBufferMemoryRequirements(core.getLogicalDevice(), buffer, &memRequirements);
 
 	const VkMemoryAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.allocationSize = memRequirements.size,
-			.memoryTypeIndex = physicalDevice.findMemoryTypeIndex(memRequirements.memoryTypeBits, properties)};
+			.memoryTypeIndex = core.findMemoryTypeIndex(memRequirements.memoryTypeBits, properties)};
 
-	if (const VkResult result = vkAllocateMemory(logicalDevice, &allocInfo, nullptr, &bufferMemory); result != VK_SUCCESS) {
+	if (const VkResult result = vkAllocateMemory(core.getLogicalDevice(), &allocInfo, nullptr, &bufferMemory); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan vertex buffer: failed to allocate memory buffer ({}).", resultString(result))
 		return;
 	}
 
-	if (const VkResult result = vkBindBufferMemory(logicalDevice, buffer, bufferMemory, 0); result != VK_SUCCESS) {
+	if (const VkResult result = vkBindBufferMemory(core.getLogicalDevice(), buffer, bufferMemory, 0); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan vertex buffer: failed to bind memory buffer ({}).", resultString(result))
 	}
 }

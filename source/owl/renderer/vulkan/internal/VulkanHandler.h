@@ -8,6 +8,7 @@
 
 #pragma once
 #include "SwapChain.h"
+#include "VulkanCore.h"
 
 #include <backends/imgui_impl_vulkan.h>
 #include <map>
@@ -20,7 +21,7 @@ namespace owl::renderer::vulkan::internal {
 /**
  * @brief Class VulkanHandler.
  */
-class VulkanHandler {
+class VulkanHandler final {
 public:
 	VulkanHandler(const VulkanHandler &) = delete;
 	VulkanHandler(VulkanHandler &&) = delete;
@@ -30,7 +31,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~VulkanHandler();
+	~VulkanHandler();
 
 	/**
 	 * @brief Handler for vulkan objects
@@ -57,16 +58,8 @@ public:
 		Uninitialized,
 		/// Initialized and ready.
 		Running,
-		/// Encounter an error while creating the instance.
-		ErrorCreatingInstance,
-		/// Encounter an error while setuping the debug.
-		ErrorSetupDebugging,
-		/// Encounter an error while enumerating the physical devices.
-		ErrorEnumeratingPhysicalDevices,
-		/// No compatible GPU found.
-		ErrorNoGpuFound,
-		ErrorCreatingLogicalDevice,
-		ErrorCreatingWindowSurface,
+		/// Encounter an error while creating the core of vulkan.
+		ErrorCreatingCore,
 		ErrorCreatingSwapChain,
 		ErrorCreatingImagesView,
 		ErrorCreatingRenderPass,
@@ -115,8 +108,8 @@ public:
 
 	[[nodiscard]] VkRenderPass getRenderPath() const { return swapChain.renderPass; }
 
-	[[nodiscard]] VkDevice getDevice() const { return logicalDevice; }
-	[[nodiscard]] const PhysicalDevice &getPhysicalDevice() const { return physicalDevice; }
+	[[nodiscard]] static VkDevice getDevice() { return VulkanCore::get().getLogicalDevice(); }
+	[[nodiscard]] static VkPhysicalDevice getPhysicalDevice() { return VulkanCore::get().getPhysicalDevice(); }
 	[[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const;
 
 
@@ -152,10 +145,7 @@ private:
 	/**
 	 * @brief Create the instance.
 	 */
-	void createInstance();
-	void createSurface();
-	void createPhysicalDevice();
-	void createLogicalDevice();
+	void createCore();
 	void createSwapChain();
 	void createDescriptorPool();
 	void createCommandPool();
@@ -163,9 +153,6 @@ private:
 	void createSyncObjects();
 	void createDescriptorSetLayout();
 
-	void setupDebugging();
-
-	//void drawFrame();
 
 	/// The current state of the handler.
 	State state = State::Uninitialized;
@@ -173,23 +160,8 @@ private:
 	int version = 0;
 	/// Enable Validation layers.
 	bool validation = false;
-	/// Validation layers available?.
-	bool validationPresent = false;
 	bool resize = false;
 
-	/// Vulkan Instance
-	VkInstance instance = nullptr;
-	/// The list of supported extensions.
-	std::vector<std::string> supportedInstanceExtensions;
-
-	/// Debug messenger.
-	VkDebugUtilsMessengerEXT debugUtilsMessenger{};
-
-	/// The physical device.
-	PhysicalDevice physicalDevice;
-
-	/// The logical device.
-	VkDevice logicalDevice = nullptr;
 	/// The swapchain.
 	SwapChain swapChain;
 
