@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../Shader.h"
+#include <vulkan/vulkan.h>
 
 namespace owl::renderer::vulkan {
 
@@ -112,11 +113,15 @@ public:
 	 */
 	void setMat4(const std::string &name, const glm::mat4 &value) override;
 
+	/**
+	 * @brief Compute the stages informations.
+	 * @return Stage informations.
+	 */
+	std::vector<VkPipelineShaderStageCreateInfo> getStagesInfo();
+
 private:
 	void createShader(const std::unordered_map<ShaderType, std::string> &sources);
 	void compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string> &sources);
-	void createPipeline();
-	int32_t pipelineId = -1;
 
 	std::unordered_map<ShaderType, std::vector<uint32_t>> vulkanSPIRV;
 };

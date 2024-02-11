@@ -21,15 +21,15 @@ RenderAPI::~RenderAPI() {
 	vkh.release();
 }
 
-void RenderAPI::init() {
+void RenderAPI::init(bool extraDebugging) {
 	OWL_PROFILE_FUNCTION()
 
 	if (getState() != State::Created) return;
 
 	auto &vkh = internal::VulkanHandler::get();
-#ifdef OWL_DEBUG
-	vkh.activateValidation();
-#endif
+	if (extraDebugging) {
+		vkh.activateValidation();
+	}
 	vkh.initVulkan();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		setState(State::Error);
@@ -40,13 +40,29 @@ void RenderAPI::init() {
 	setState(State::Ready);
 }
 
-void RenderAPI::setViewport(uint32_t, uint32_t, uint32_t, uint32_t) {}
+void RenderAPI::setViewport(uint32_t, uint32_t, uint32_t, uint32_t) {
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.setResize();
+}
 
-void RenderAPI::setClearColor(const glm::vec4 &) {}
+void RenderAPI::setClearColor(const glm::vec4 &col) {
+	auto &vkh = internal::VulkanHandler::get();
+	VkClearValue val;
+	val.color.float32[0] = col.r;
+	val.color.float32[1] = col.g;
+	val.color.float32[2] = col.b;
+	val.color.float32[3] = col.a;
+	vkh.setClearColor(val);
+}
 
 void RenderAPI::clear() {}
 
-void RenderAPI::drawData(const shared<DrawData> &, uint32_t) {}
+void RenderAPI::drawData(const shared<DrawData> &data, uint32_t index) {
+	const auto &vkh = internal::VulkanHandler::get();
+	data->bind();
+	const uint32_t count = index ? index : data->getIndexCount();
+	vkh.drawData(count);
+}
 
 void RenderAPI::setLineWidth(float) {}
 

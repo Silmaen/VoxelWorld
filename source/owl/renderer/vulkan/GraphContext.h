@@ -71,9 +71,9 @@ public:
 
 private:
 	/// The window.
-	GLFWwindow *wnd;
+	GLFWwindow *wnd = nullptr;
 	/// the presenttin surface.
-	VkSurfaceKHR surface;
+	VkSurfaceKHR surface = nullptr;
 };
 
 }// namespace owl::renderer::vulkan

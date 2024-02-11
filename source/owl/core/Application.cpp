@@ -42,13 +42,13 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 #endif
 
 		// load config file if any
-		auto configPath = workingDirectory / "config.yml";
+		const auto configPath = workingDirectory / "config.yml";
 		if (exists(configPath))
 			initParams.loadFromFile(configPath);
 		// save config
 		initParams.saveToFile(configPath);
 
-		[[maybe_unused]] bool assetFound = searchAssets(initParams.assetsPattern);
+		[[maybe_unused]] const bool assetFound = searchAssets(initParams.assetsPattern);
 		OWL_CORE_ASSERT(assetFound, "Unable to find assets")
 	}
 
@@ -77,7 +77,7 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 
 	// initialize the renderer
 	{
-		renderer::Renderer::init();
+		renderer::Renderer::init(initParams.useDebugging);
 		// check renderer initialization
 		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
 			OWL_CORE_ERROR("ERROR while Initializing Renderer")
@@ -92,7 +92,7 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 
 	// create the GUI layer
-	if (renderer::RenderCommand::getAPI() == renderer::RenderAPI::Type::OpenGL || renderer::RenderCommand::getAPI() == renderer::RenderAPI::Type::OpenglLegacy) {
+	if (initParams.hasGui) {
 		imGuiLayer = mk_shared<gui::UILayer>();
 		pushOverlay(imGuiLayer);
 		OWL_CORE_TRACE("GUI Layer created.")
@@ -155,13 +155,13 @@ void Application::run() {
 			{
 				OWL_PROFILE_SCOPE("LayerStack onUpdate")
 
-				for (auto &layer: layerStack)
+				for (const auto &layer: layerStack)
 					layer->onUpdate(stepper);
 			}
 			if (imGuiLayer) {
 				OWL_PROFILE_SCOPE("LayerStack onImUpdate")
 				imGuiLayer->begin();
-				for (auto &layer: layerStack)
+				for (const auto &layer: layerStack)
 					layer->onImGuiRender(stepper);
 				imGuiLayer->end();
 			}
@@ -261,15 +261,15 @@ bool Application::searchAssets(const std::string &pattern) {
 
 void AppParams::loadFromFile(const std::filesystem::path &file) {
 	YAML::Node data = YAML::LoadFile(file.string());
-	auto appConfig = data["AppConfig"];
-	if (appConfig) {
+	if (auto appConfig = data["AppConfig"]; appConfig) {
 		if (appConfig["width"]) width = appConfig["width"].as<uint32_t>();
 		if (appConfig["height"]) height = appConfig["height"].as<uint32_t>();
 		if (appConfig["renderer"]) {
-			auto dRenderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(appConfig["renderer"].as<std::string>());
-			if (dRenderer.has_value())
+			if (const auto dRenderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(appConfig["renderer"].as<std::string>()); dRenderer.has_value())
 				renderer = dRenderer.value();
 		}
+		if (appConfig["hasGui"]) hasGui = appConfig["hasGui"].as<bool>();
+		if (appConfig["useDebugging"]) useDebugging = appConfig["useDebugging"].as<bool>();
 	}
 }
 
@@ -281,6 +281,8 @@ void AppParams::saveToFile(const std::filesystem::path &file) const {
 	out << YAML::Key << "width" << YAML::Value << width;
 	out << YAML::Key << "height" << YAML::Value << height;
 	out << YAML::Key << "renderer" << YAML::Value << std::string(magic_enum::enum_name(renderer));
+	out << YAML::Key << "hasGui" << YAML::Value << hasGui;
+	out << YAML::Key << "useDebugging" << YAML::Value << useDebugging;
 
 	out << YAML::EndMap;
 	out << YAML::EndMap;

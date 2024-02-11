@@ -18,7 +18,7 @@
 
 namespace owl::renderer {
 
-shared<UniformBuffer> UniformBuffer::create(uint32_t size, uint32_t binding) {
+shared<UniformBuffer> UniformBuffer::create(uint32_t size, uint32_t binding, const std::string &renderer) {
 	auto type = Renderer::getAPI();
 	switch (type) {
 		case RenderAPI::Type::Null:
@@ -28,7 +28,7 @@ shared<UniformBuffer> UniformBuffer::create(uint32_t size, uint32_t binding) {
 		case RenderAPI::Type::OpenglLegacy:
 			return mk_shared<opengl_legacy::UniformBuffer>(size, binding);
 		case RenderAPI::Type::Vulkan:
-			return mk_shared<vulkan::UniformBuffer>(size, binding);
+			return mk_shared<vulkan::UniformBuffer>(size, binding, renderer);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;

@@ -32,7 +32,7 @@ namespace owl::renderer::opengl {
 	OWL_CORE_ASSERT(false, "Unknown severity level!")
 }
 
-void RenderAPI::init() {
+void RenderAPI::init(bool) {
 	OWL_PROFILE_FUNCTION()
 
 	auto vers = core::Application::get().getWindow().getGraphContext()->getVersion();

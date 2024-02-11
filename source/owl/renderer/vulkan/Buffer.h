@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../Buffer.h"
+#include <vulkan/vulkan.h>
 
 namespace owl::renderer::vulkan {
 
@@ -30,12 +31,17 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	VertexBuffer(float *vertices, uint32_t size);
+	VertexBuffer(const float *vertices, const uint32_t size);
 
 	/**
 	 * @brief Destructor.
 	 */
-	~VertexBuffer() override;//---UNCOVER---
+	~VertexBuffer() override;
+
+	/**
+	 * @brief Release the memory buffer
+	 */
+	void release();
 
 	/**
 	 * @brief Activate the buffer in the GPU.
@@ -52,9 +58,27 @@ public:
 	 * @param data The raw data.
 	 * @param size Number of data.
 	 */
-	void setData(const void *data, uint32_t size) override;
+	void setData(const void *data, const uint32_t size) override;
+
+	/**
+	 * @brief Get the binding description.
+	 * @return The bining description.
+	 */
+	[[nodiscard]] VkVertexInputBindingDescription getBindingDescription() const;
+
+	/**
+	 * @brief Get The attribute desciption.
+	 * @return The attribute description.
+	 */
+	[[nodiscard]] std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions() const;
 
 private:
+	/// The vulkan vertex buffer.
+	VkBuffer vertexBuffer{nullptr};
+	/// The vulkan vertex buffer memory.
+	VkDeviceMemory vertexBufferMemory{nullptr};
+
+	void createBuffer(const float *data, const uint32_t size);
 };
 
 /**
@@ -69,14 +93,19 @@ public:
 	/**
 	 * @brief Default constructor.
 	 * @param indices Array of indices.
-	 * @param count Number of indices in the array.
+	 * @param size Number of indices in the array.
 	 */
-	IndexBuffer(uint32_t *indices, uint32_t count);
+	IndexBuffer(uint32_t *indices, uint32_t size);
 
 	/**
 	 * @brief Destructor.
 	 */
-	~IndexBuffer() override;//---UNCOVER---
+	~IndexBuffer() override;
+
+	/**
+	 * @brief Release the memory buffer
+	 */
+	void release();
 
 	/**
 	 * @brief Activate the buffer in the GPU.
@@ -97,6 +126,10 @@ public:
 private:
 	/// Number of elements.
 	uint32_t count = 0;
+	/// Vulkan index buffer.
+	VkBuffer indexBuffer{nullptr};
+	/// Vulkan memory buffer.
+	VkDeviceMemory indexBufferMemory{nullptr};
 };
 
 }// namespace owl::renderer::vulkan

@@ -36,7 +36,7 @@ TEST(RenderAPI, badCreation) {
 	const owl::uniq<RenderAPI> api = RenderAPI::create(RenderAPI::Type{-1});
 	const auto gf = GraphContext::create(nullptr);
 	const auto fb = Framebuffer::create({});
-	const auto ub = UniformBuffer::create(0, 0);
+	const auto ub = UniformBuffer::create(0, 0, "Renderer2D");
 	const auto tex = Texture2D::create(std::filesystem::path());
 	const auto tex2 = Texture2D::create(1, 1);
 	const auto shader = Shader::create("bob2", "", std::filesystem::path());

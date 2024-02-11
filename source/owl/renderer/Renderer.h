@@ -35,8 +35,9 @@ public:
 
 	/**
 	 * @brief Initialize the renderer.
+	 * @param extraDebugging If extra debug tools should be loaded.
 	 */
-	static void init();
+	static void init(bool extraDebugging = false);
 
 	/**
 	 * @brief Stops the renderer.

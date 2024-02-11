@@ -82,6 +82,8 @@ public:
 		ErrorBeginCommandBuffer,
 		ErrorEndCommandBuffer,
 		ErrorCreatingSyncObjects,
+		ErrorCreatingDescriptorSet,
+		ErrorCreatingDescriptorSetLayout,
 	};
 
 	/**
@@ -114,22 +116,32 @@ public:
 	[[nodiscard]] VkRenderPass getRenderPath() const { return swapChain.renderPass; }
 
 	[[nodiscard]] VkDevice getDevice() const { return logicalDevice; }
+	[[nodiscard]] const PhysicalDevice &getPhysicalDevice() const { return physicalDevice; }
+	[[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const;
+
 
 	struct PipeLineData {
 		VkPipeline pipeLine = nullptr;
 		VkPipelineLayout layout = nullptr;
 	};
 	[[nodiscard]] PipeLineData getPipeline(int32_t id) const;
-	int32_t pushPipeline(const std::string &pipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &spvSrc);
+	int32_t pushPipeline(const std::string &pipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &shaderStages, VkPipelineVertexInputStateCreateInfo vertexInputInfo);
 	void popPipeline(int32_t id);
 	void bindPipeline(int32_t id);
-
-
-	void drawFrame();
 
 	void beginFrame();
 	void endFrame();
 	void swapFrame();
+
+	void drawData(uint32_t vertexCount) const;
+
+	void setClearColor(const VkClearValue &color) { clearColor = color; }
+	void setResize();
+	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
+	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory) const;
+
+	void createUniformBuffers(size_t size);
+	void setUniformData(const void *data, size_t size) const;
 
 private:
 	/**
@@ -147,14 +159,13 @@ private:
 	void createSwapChain();
 	void createDescriptorPool();
 	void createCommandPool();
-	void createCommandBuffer();
+	void createCommandBuffers();
 	void createSyncObjects();
+	void createDescriptorSetLayout();
 
 	void setupDebugging();
 
-	//DEBUG
-	VkShaderModule createShaderModule(const std::vector<char> &code);
-
+	//void drawFrame();
 
 	/// The current state of the handler.
 	State state = State::Uninitialized;
@@ -164,6 +175,7 @@ private:
 	bool validation = false;
 	/// Validation layers available?.
 	bool validationPresent = false;
+	bool resize = false;
 
 	/// Vulkan Instance
 	VkInstance instance = nullptr;
@@ -180,19 +192,29 @@ private:
 	VkDevice logicalDevice = nullptr;
 	/// The swapchain.
 	SwapChain swapChain;
-	/// Descriptor pool.
-	VkDescriptorPool descriptorPool = nullptr;
 
 
 	/// List of piplines.
 	std::map<int32_t, PipeLineData> pipeLines;
 	VkCommandPool commandPool{nullptr};
-	VkCommandBuffer commandBuffer{nullptr};
-	VkSemaphore imageAvailableSemaphore{nullptr};
-	VkSemaphore renderFinishedSemaphore{nullptr};
-	VkFence inFlightFence{nullptr};
+
+	std::vector<VkCommandBuffer> commandBuffers{nullptr};
+	std::vector<VkSemaphore> imageAvailableSemaphores{nullptr};
+	std::vector<VkSemaphore> renderFinishedSemaphores{nullptr};
+	std::vector<VkFence> inFlightFences{nullptr};
+	int currentFrame = 0;
 
 	uint32_t imageIndex = 0;
+	VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+
+	VkDescriptorSetLayout descriptorSetLayout{nullptr};
+	VkDescriptorPool descriptorPool{nullptr};
+	void createDescriptorSets(size_t size);
+
+	std::vector<VkDescriptorSet> descriptorSets;
+	std::vector<VkBuffer> uniformBuffers;
+	std::vector<VkDeviceMemory> uniformBuffersMemory;
+	std::vector<void *> uniformBuffersMapped;
 };
 
 }// namespace owl::renderer::vulkan::internal

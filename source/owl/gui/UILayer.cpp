@@ -145,6 +145,10 @@ void UILayer::end() {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan) {
+		auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
+		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), vkh.getCurrentCommandBuffer());
+	}
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 		GLFWwindow *backup_current_context = glfwGetCurrentContext();

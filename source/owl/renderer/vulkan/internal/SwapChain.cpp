@@ -17,7 +17,17 @@ namespace owl::renderer::vulkan::internal {
 void SwapChain::create(const VkDevice &logicDevice, const PhysicalDevice &physicalDevice) {
 	device = logicDevice;
 	phy = &physicalDevice;
-	createSwapChain();
+
+	VkExtent2D extent;
+	if (phy->capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+		extent = phy->capabilities.currentExtent;
+	} else {
+		auto sizes = core::Application::get().getWindow().getSize();
+		extent.width = std::clamp(sizes.width(), phy->capabilities.minImageExtent.width, phy->capabilities.maxImageExtent.width);
+		extent.height = std::clamp(sizes.height(), phy->capabilities.minImageExtent.height, phy->capabilities.maxImageExtent.height);
+	}
+
+	createSwapChain(extent);
 	if (state != State::Created)
 		return;
 	OWL_CORE_TRACE("  Internal swapchain created.")
@@ -37,16 +47,12 @@ void SwapChain::create(const VkDevice &logicDevice, const PhysicalDevice &physic
 	state = State::Initialized;
 }
 
-void SwapChain::release() {
+void SwapChain::cleanup() {
 	for (const auto &framebuffer: swapChainFramebuffers) {
 		if (framebuffer != nullptr)
 			vkDestroyFramebuffer(device, framebuffer, nullptr);
 	}
 	swapChainFramebuffers.clear();
-	if (renderPass != nullptr) {
-		vkDestroyRenderPass(device, renderPass, nullptr);
-		renderPass = nullptr;
-	}
 	for (const auto &imageView: swapChainImageViews) {
 		if (imageView != nullptr)
 			vkDestroyImageView(device, imageView, nullptr);
@@ -57,10 +63,18 @@ void SwapChain::release() {
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
 		swapChain = nullptr;
 	}
+}
+
+void SwapChain::release() {
+	cleanup();
+	if (renderPass != nullptr) {
+		vkDestroyRenderPass(device, renderPass, nullptr);
+		renderPass = nullptr;
+	}
 	state = State::Created;
 }
 
-void SwapChain::createSwapChain() {
+void SwapChain::createSwapChain(const VkExtent2D &extent) {
 	auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
 
 	VkSurfaceFormatKHR surfaceFormat = phy->formats.front();
@@ -75,14 +89,6 @@ void SwapChain::createSwapChain() {
 		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
 			presentMode = availablePresentMode;
 		}
-	}
-	VkExtent2D extent;
-	if (phy->capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-		extent = phy->capabilities.currentExtent;
-	} else {
-		auto sizes = core::Application::get().getWindow().getSize();
-		extent.width = std::clamp(sizes.width(), phy->capabilities.minImageExtent.width, phy->capabilities.maxImageExtent.width);
-		extent.height = std::clamp(sizes.height(), phy->capabilities.minImageExtent.height, phy->capabilities.maxImageExtent.height);
 	}
 
 	uint32_t imageCount = phy->capabilities.minImageCount + 1;
@@ -116,6 +122,7 @@ void SwapChain::createSwapChain() {
 	createInfo.clipped = VK_TRUE;
 
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
+
 	const VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain);
 	if (result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create swap chain ({}).", resultString(result))
@@ -222,6 +229,20 @@ void SwapChain::createSwapChainFrameBuffers() {
 			state = State::ErrorCreatingFramebuffer;
 		}
 	}
+}
+
+void SwapChain::recreate(VkExtent2D extent) {
+
+	if (extent.width == swapChainExtent.width && extent.height == swapChainExtent.height)
+		return;
+
+	vkDeviceWaitIdle(device);
+
+	cleanup();
+
+	createSwapChain(extent);
+	createImageViews();
+	createSwapChainFrameBuffers();
 }
 
 }// namespace owl::renderer::vulkan::internal
