@@ -6,13 +6,14 @@
  * All modification must get authorization from the author.
  */
 
-#include "event/AppEvent.h"
 #include "testHelper.h"
+
+#include <event/AppEvent.h>
 
 using namespace owl::event;
 
 TEST(AppEvent, Tick) {
-	AppTickEvent event;
+	const AppTickEvent event;
 	EXPECT_STREQ(event.getName().c_str(), "AppTickEvent");
 	EXPECT_EQ(event.getType(), type::AppTick);
 	EXPECT_EQ(event.getStaticType(), type::AppTick);
@@ -27,7 +28,7 @@ TEST(AppEvent, Tick) {
 }
 
 TEST(AppEvent, Update) {
-	AppUpdateEvent event;
+	const AppUpdateEvent event;
 	EXPECT_STREQ(event.getName().c_str(), "AppUpdateEvent");
 	EXPECT_EQ(event.getType(), type::AppUpdate);
 	EXPECT_EQ(event.getStaticType(), type::AppUpdate);
@@ -42,7 +43,7 @@ TEST(AppEvent, Update) {
 }
 
 TEST(AppEvent, Render) {
-	AppRenderEvent event;
+	const AppRenderEvent event;
 	EXPECT_STREQ(event.getName().c_str(), "AppRenderEvent");
 	EXPECT_EQ(event.getType(), type::AppRender);
 	EXPECT_EQ(event.getStaticType(), type::AppRender);
@@ -57,7 +58,7 @@ TEST(AppEvent, Render) {
 }
 
 TEST(WindowEvent, Close) {
-	WindowCloseEvent event;
+	const WindowCloseEvent event;
 	EXPECT_STREQ(event.getName().c_str(), "WindowCloseEvent");
 	EXPECT_EQ(event.getType(), type::WindowClose);
 	EXPECT_EQ(event.getStaticType(), type::WindowClose);
@@ -72,7 +73,7 @@ TEST(WindowEvent, Close) {
 }
 
 TEST(WindowEvent, Resize) {
-	WindowResizeEvent event(1422, 166);
+	const WindowResizeEvent event(1422, 166);
 	EXPECT_STREQ(event.getName().c_str(), "WindowResizeEvent");
 	EXPECT_EQ(event.getType(), type::WindowResize);
 	EXPECT_EQ(event.getStaticType(), type::WindowResize);

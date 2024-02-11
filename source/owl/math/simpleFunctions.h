@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <algorithm>
-
 /**
  * @brief Namespace for mathematical functions.
  */

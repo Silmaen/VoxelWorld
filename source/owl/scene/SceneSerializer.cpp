@@ -18,9 +18,6 @@
 
 #include "core/external/yaml.h"
 
-#include <magic_enum.hpp>
-
-
 namespace YAML {
 
 template<>
@@ -91,7 +88,7 @@ SceneSerializer::SceneSerializer(const shared<Scene> &scene_) : scene(scene_) {
 	if (entity.hasComponent<component::Tag>()) {
 		out << YAML::Key << "Tag";
 		out << YAML::BeginMap;// Tag
-		auto &tag = entity.getComponent<component::Tag>().tag;
+		const auto &tag = entity.getComponent<component::Tag>().tag;
 		out << YAML::Key << "tag" << YAML::Value << tag;
 		out << YAML::EndMap;// Tag
 	}
@@ -109,8 +106,8 @@ SceneSerializer::SceneSerializer(const shared<Scene> &scene_) : scene(scene_) {
 	if (entity.hasComponent<component::Camera>()) {
 		out << YAML::Key << "Camera";
 		out << YAML::BeginMap;// CameraComponent
-		auto &cameraComponent = entity.getComponent<component::Camera>();
-		auto &camera = cameraComponent.camera;
+		const auto &cameraComponent = entity.getComponent<component::Camera>();
+		const auto &camera = cameraComponent.camera;
 		out << YAML::Key << "camera" << YAML::Value;
 		out << YAML::BeginMap;// Camera
 		out << YAML::Key << "projectionType" << YAML::Value << std::string(magic_enum::enum_name(camera.getProjectionType()));
@@ -156,7 +153,7 @@ void SceneSerializer::serialize(const std::filesystem::path &filepath) {
 	out << YAML::Key << "Scene" << YAML::Value << "untitled";
 	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 	for (auto &&[e]: scene->registry.storage<entt::entity>().each()) {
-		Entity entity{e, scene.get()};
+		const Entity entity{e, scene.get()};
 		if (!entity) continue;
 		serializeEntity(out, entity);
 	}

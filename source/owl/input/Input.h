@@ -12,7 +12,6 @@
 #include "MouseCode.h"
 #include "Window.h"
 #include "core/Core.h"
-#include <glm/glm.hpp>
 
 namespace owl::input {
 

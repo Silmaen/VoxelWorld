@@ -14,7 +14,7 @@ namespace owl::renderer::opengl_legacy {
 /**
  * @brief Class UniformBuffer.
  */
-class UniformBuffer : public ::owl::renderer::UniformBuffer {
+class UniformBuffer final : public ::owl::renderer::UniformBuffer {
 public:
 	UniformBuffer() = delete;
 	UniformBuffer(const UniformBuffer &) = default;

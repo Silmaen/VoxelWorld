@@ -10,7 +10,6 @@
 
 #include "Tracker.h"
 
-
 #define OWL_DEALLOC_EXCEPT noexcept
 
 static bool doTrack = true;
@@ -106,7 +105,7 @@ void Tracker::AllocationState::pushMemory(void *memPtr, size_t size) {
 
 void Tracker::AllocationState::freeMemory(void *memPtr, size_t size) {
 	doTrack = false;
-	auto chunk = std::find_if(allocs.begin(), allocs.end(), [&memPtr](const AllocationInfo &cc) { return cc.location == memPtr; });
+	auto chunk = std::ranges::find_if(allocs.begin(), allocs.end(), [&memPtr](const AllocationInfo &cc) { return cc.location == memPtr; });
 	if (chunk != allocs.end()) {
 		if (size == 0) {
 			size = chunk->size;

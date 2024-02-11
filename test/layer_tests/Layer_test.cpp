@@ -6,9 +6,10 @@
  * All modification must get authorization from the author.
  */
 
-#include "core/layer/Layer.h"
-#include "event/AppEvent.h"
 #include "testHelper.h"
+
+#include <core/layer/Layer.h>
+#include <event/AppEvent.h>
 
 using namespace owl::core;
 using namespace owl::event;

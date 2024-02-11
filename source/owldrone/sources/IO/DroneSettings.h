@@ -14,12 +14,12 @@ namespace drone::IO {
 /**
  * @brief Class DroneSettings.
  */
-class DroneSettings {
+class DroneSettings final {
 public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~DroneSettings();
+	~DroneSettings();
 
 	DroneSettings(const DroneSettings &) = delete;
 	DroneSettings(DroneSettings &&) = delete;

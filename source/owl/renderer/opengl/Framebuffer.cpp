@@ -32,7 +32,7 @@ static void bindTexture(bool multisampled, uint32_t id) {
 }
 
 static void attachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, uint32_t width, uint32_t height, int index) {
-	bool multisampled = samples > 1;
+	const bool multisampled = samples > 1;
 	if (multisampled) {
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat, width, height, GL_FALSE);
 	} else {
@@ -47,7 +47,7 @@ static void attachColorTexture(uint32_t id, int samples, GLenum internalFormat, 
 }
 
 static void attachDepthTexture(uint32_t id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height) {
-	bool multisampled = samples > 1;
+	const bool multisampled = samples > 1;
 	if (multisampled) {
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
 	} else {
@@ -118,7 +118,7 @@ void Framebuffer::invalidate() {
 	glCreateFramebuffers(1, &rendererID);
 	glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 
-	bool multisample = specs.samples > 1;
+	const bool multisample = specs.samples > 1;
 
 	// Attachments
 	if (!colorAttachmentSpecifications.empty()) {
@@ -157,14 +157,14 @@ void Framebuffer::invalidate() {
 
 	if (colorAttachments.size() > 1) {
 		OWL_CORE_ASSERT(colorAttachments.size() <= 4, "Bad color attachment size")
-		GLenum buffers[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+		constexpr GLenum buffers[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
 		glDrawBuffers(colorAttachments.size(), buffers);
 	} else if (colorAttachments.empty()) {
 		// Only depth-pass
 		glDrawBuffer(GL_NONE);
 	}
 
-	bool completeFramebuffer = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+	const bool completeFramebuffer = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	OWL_CORE_ASSERT(completeFramebuffer, "Framebuffer is incomplete!")
 	if (!completeFramebuffer) {
 		OWL_CORE_WARN("Incomplete Framebuffer")

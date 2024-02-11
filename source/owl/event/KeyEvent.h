@@ -9,12 +9,6 @@
 #pragma once
 #include "Event.h"
 #include "input/KeyCodes.h"
-#include <fmt/format.h>
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 
 namespace owl::event {
 
@@ -46,7 +40,7 @@ protected:
 /**
  * @brief Event of key presse
  */
-class OWL_API KeyPressedEvent : public KeyEvent {
+class OWL_API KeyPressedEvent final : public KeyEvent {
 public:
 	/**
 	 * @brief Constructor.
@@ -98,7 +92,7 @@ private:
 /**
  * @brief Event of key released
  */
-class OWL_API KeyReleasedEvent : public KeyEvent {
+class OWL_API KeyReleasedEvent final : public KeyEvent {
 public:
 	/**
 	 * @brief Constructor.
@@ -138,7 +132,7 @@ public:
 /**
  * @brief Event of key typed
  */
-class KeyTypedEvent : public KeyEvent {
+class KeyTypedEvent final : public KeyEvent {
 public:
 	/**
 	 * @brief Constructor.
@@ -176,7 +170,3 @@ public:
 };
 
 }// namespace owl::event
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif

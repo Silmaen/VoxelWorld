@@ -15,7 +15,7 @@ namespace owl::renderer::opengl {
 /**
  * @brief OpenGL implementation of vertex buffer.
  */
-class VertexBuffer : public ::owl::renderer::VertexBuffer {
+class VertexBuffer final: public ::owl::renderer::VertexBuffer {
 public:
 	VertexBuffer(const VertexBuffer &) = delete;
 	VertexBuffer(VertexBuffer &&) = delete;

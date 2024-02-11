@@ -7,6 +7,7 @@
  */
 
 #pragma once
+
 #include "core/external/shaderc.h"
 #include "renderer/Shader.h"
 

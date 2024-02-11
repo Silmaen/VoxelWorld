@@ -5,6 +5,7 @@
  * Copyright © 2023 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "owlpch.h"
 
 #include "UniformBindingLibrary.h"
 
@@ -12,7 +13,7 @@ namespace owl::renderer::opengl_legacy {
 
 
 const UniformBuffer *UniformBindingLibrary::getUniformBuffer(uint32_t binding) {
-	auto result = std::find_if(uniforms.begin(), uniforms.end(), [&binding](auto &item) { return item->getBinding() == binding; });
+	const auto result = std::ranges::find_if(uniforms.begin(), uniforms.end(), [&binding](auto &item) { return item->getBinding() == binding; });
 	if (result == uniforms.end())
 		return nullptr;
 	return *result;

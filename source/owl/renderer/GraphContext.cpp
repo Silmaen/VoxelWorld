@@ -14,8 +14,6 @@
 #include "opengl_legacy/GraphContext.h"
 #include "vulkan/GraphContext.h"
 
-#include <magic_enum.hpp>
-
 namespace owl::renderer {
 
 uniq<GraphContext> GraphContext::create(void *window) {

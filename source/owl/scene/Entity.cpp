@@ -10,6 +10,7 @@
 
 namespace owl::scene {
 
+Entity::~Entity() = default;
 
 Entity::Entity(entt::entity handle, Scene *scene_) : entityHandle{handle}, scene{scene_} {
 }

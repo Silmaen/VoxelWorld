@@ -7,20 +7,10 @@
  */
 
 #include "EditorLayer.h"
-#include "core/Application.h"
-#include "core/utils/FileDialog.h"
-#include "event/KeyEvent.h"
-#include "math/Transform.h"
-#include "scene/SceneSerializer.h"
-#include "scene/ScriptableEntity.h"
-#include "scene/component/Camera.h"
-#include "scene/component/Tag.h"
-#include "scene/component/Transform.h"
 
 #include <glm/gtc/type_ptr.hpp>
-#include <imgui.h>
-// must be included AFTER imgui
 
+// must be included AFTER imgui
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
 #include <ImGuizmo.h>

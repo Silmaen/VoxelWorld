@@ -15,7 +15,7 @@ namespace owl::renderer::opengl_legacy {
 /**
  * @brief Class VertexBuffer.
  */
-class VertexBuffer : public ::owl::renderer::VertexBuffer {
+class VertexBuffer final : public ::owl::renderer::VertexBuffer {
 public:
 	VertexBuffer(const VertexBuffer &) = delete;
 	VertexBuffer(VertexBuffer &&) = delete;
@@ -62,7 +62,7 @@ private:
 /**
  * @brief Class IndexBuffer.
  */
-class IndexBuffer : public ::owl::renderer::IndexBuffer {
+class IndexBuffer final : public ::owl::renderer::IndexBuffer {
 public:
 	IndexBuffer(const IndexBuffer &) = delete;
 	IndexBuffer(IndexBuffer &&) = delete;

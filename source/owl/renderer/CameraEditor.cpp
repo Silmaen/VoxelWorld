@@ -11,8 +11,6 @@
 
 #include "input/Input.h"
 
-#include <glm/gtx/quaternion.hpp>
-
 namespace owl::renderer {
 
 Camera::~Camera() = default;
@@ -27,7 +25,7 @@ CameraEditor::~CameraEditor() = default;
 void CameraEditor::onUpdate([[maybe_unused]] core::Timestep ts) {
 	if (input::Input::isKeyPressed(input::key::LeftAlt)) {
 		const glm::vec2 &mouse{input::Input::getMouseX(), input::Input::getMouseY()};
-		glm::vec2 delta = (mouse - initialMousePosition) * 0.003f;
+		const glm::vec2 delta = (mouse - initialMousePosition) * 0.003f;
 		initialMousePosition = mouse;
 		if (input::Input::isMouseButtonPressed(input::mouse::ButtonMiddle))
 			mousePan(delta);
@@ -70,13 +68,13 @@ void CameraEditor::updateView() {
 	// yaw = pitch = 0.0f; // Lock the camera's rotation
 	position = calculatePosition();
 
-	glm::quat orientation = getOrientation();
+	const glm::quat orientation = getOrientation();
 	viewMatrix = glm::translate(glm::mat4(1.0f), position) * glm::toMat4(orientation);
 	viewMatrix = glm::inverse(viewMatrix);
 }
 
 bool CameraEditor::onMouseScroll(event::MouseScrolledEvent &e) {
-	float delta = e.getYOff() * 0.1f;
+	const float delta = e.getYOff() * 0.1f;
 	mouseZoom(delta);
 	updateView();
 	return false;
@@ -89,7 +87,7 @@ void CameraEditor::mousePan(const glm::vec2 &delta) {
 }
 
 void CameraEditor::mouseRotate(const glm::vec2 &delta) {
-	float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
+	const float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
 	yaw += yawSign * delta.x * rotationSpeed();
 	pitch += delta.y * rotationSpeed();
 }
@@ -107,10 +105,10 @@ glm::vec3 CameraEditor::calculatePosition() const {
 }
 
 std::pair<float, float> CameraEditor::panSpeed() const {
-	float x = std::min(viewportWidth / 1000.0f, 2.4f);// max = 2.4f
+	const float x = std::min(viewportWidth / 1000.0f, 2.4f);// max = 2.4f
 	float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 
-	float y = std::min(viewportHeight / 1000.0f, 2.4f);// max = 2.4f
+	const float y = std::min(viewportHeight / 1000.0f, 2.4f);// max = 2.4f
 	float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
 
 	return {xFactor, yFactor};

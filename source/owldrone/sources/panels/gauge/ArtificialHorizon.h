@@ -13,7 +13,7 @@ namespace drone::panels::gauge {
 /**
  * @brief Class ArtificialHorizon
  */
-class ArtificialHorizon : public BaseGauge {
+class ArtificialHorizon final: public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.

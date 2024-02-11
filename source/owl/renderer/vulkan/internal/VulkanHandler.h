@@ -7,11 +7,11 @@
  */
 
 #pragma once
+
 #include "SwapChain.h"
 #include "VulkanCore.h"
 
 #include <backends/imgui_impl_vulkan.h>
-#include <map>
 
 /**
  * @brief Internal functions of the vulkan renderer.

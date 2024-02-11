@@ -10,8 +10,6 @@
 
 #include "Framebuffer.h"
 
-#include <utility>
-
 namespace owl::renderer::opengl_legacy {
 
 Framebuffer::Framebuffer(FramebufferSpecification spec) : specs{std::move(spec)} {

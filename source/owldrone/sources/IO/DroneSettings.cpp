@@ -17,8 +17,8 @@ DroneSettings::~DroneSettings() = default;
 
 void DroneSettings::readFromFile(const std::filesystem::path &file) {
 	YAML::Node data = YAML::LoadFile(file.string());
-	auto appConfig = data["DroneConfig"];
-	if (appConfig) {
+
+	if (auto appConfig = data["DroneConfig"]; appConfig) {
 		if (appConfig["useCamera"]) useCamera = appConfig["useCamera"].as<bool>();
 		if (appConfig["cameraId"]) cameraId = appConfig["cameraId"].as<int>();
 		if (appConfig["useSerialPort"]) useSerialPort = appConfig["useSerialPort"].as<bool>();

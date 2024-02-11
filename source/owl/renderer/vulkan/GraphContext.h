@@ -16,7 +16,7 @@ namespace owl::renderer::vulkan {
 /**
  * @brief Class GraphContext.
  */
-class OWL_API GraphContext : public ::owl::renderer::GraphContext {
+class OWL_API GraphContext final : public ::owl::renderer::GraphContext {
 public:
 	GraphContext(const GraphContext &) = delete;
 	GraphContext(GraphContext &&) = delete;

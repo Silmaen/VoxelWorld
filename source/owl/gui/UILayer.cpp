@@ -22,8 +22,8 @@ OWL_DIAG_POP
 namespace owl::gui {
 
 namespace {
-inline ImVec4 glm2im(const glm::vec4 &vec) {
-	return ImVec4(vec.x, vec.y, vec.z, vec.w);
+ImVec4 glm2im(const glm::vec4 &vec) {
+	return {vec.x, vec.y, vec.z, vec.w};
 }
 }// namespace
 
@@ -84,7 +84,7 @@ void UILayer::onAttach() {// Setup Dear ImGui context
 	}
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan) {
 		ImGui_ImplGlfw_InitForVulkan(window, true);
-		auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
+		const auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
 		ImGui_ImplVulkan_InitInfo info = vkh.toImGuiInfo();
 		ImGui_ImplVulkan_Init(&info, vkh.getRenderPath());
 	}
@@ -105,7 +105,7 @@ void UILayer::onDetach() {
 
 void UILayer::onEvent([[maybe_unused]] event::Event &event) {
 	if (blockEvent) {
-		ImGuiIO &io = ImGui::GetIO();
+		const ImGuiIO &io = ImGui::GetIO();
 		event.handled |= event.isInCategory(event::category::Mouse) & io.WantCaptureMouse;
 		event.handled |= event.isInCategory(event::category::Keyboard) & io.WantCaptureKeyboard;
 	}
@@ -128,7 +128,7 @@ void UILayer::begin() {
 	}
 }
 
-void UILayer::end() {
+void UILayer::end() const {
 	OWL_PROFILE_FUNCTION()
 	if ((renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL) && (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy) && (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::Vulkan))
 		return;
@@ -136,7 +136,7 @@ void UILayer::end() {
 		ImGui::End();
 	}
 	ImGuiIO &io = ImGui::GetIO();
-	core::Application &app = core::Application::get();
+	const core::Application &app = core::Application::get();
 	io.DisplaySize = ImVec2(static_cast<float>(app.getWindow().getWidth()),
 							static_cast<float>(app.getWindow().getHeight()));
 	// Rendering
@@ -146,7 +146,7 @@ void UILayer::end() {
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan) {
-		auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
+		const auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), vkh.getCurrentCommandBuffer());
 	}
 
@@ -246,13 +246,13 @@ void UILayer::setTheme(const Theme &theme) {
 void UILayer::initializeDocking() {
 	static bool dockSpaceOpen = true;
 	static bool optFullScreenPersistant = true;
-	bool optFullScreen = optFullScreenPersistant;
+	const bool optFullScreen = optFullScreenPersistant;
 	static ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_None;
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 	// because it would be confusing to have two docking targets within each others.
 	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 	if (optFullScreen) {
-		ImGuiViewport *viewport = ImGui::GetMainViewport();
+		const ImGuiViewport *viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos(viewport->Pos);
 		ImGui::SetNextWindowSize(viewport->Size);
 		ImGui::SetNextWindowViewport(viewport->ID);
@@ -275,12 +275,12 @@ void UILayer::initializeDocking() {
 	if (optFullScreen)
 		ImGui::PopStyleVar(2);
 	// DockSpace
-	ImGuiIO &io = ImGui::GetIO();
+	const ImGuiIO &io = ImGui::GetIO();
 	ImGuiStyle &style = ImGui::GetStyle();
-	float minWinSizeX = style.WindowMinSize.x;
+	const float minWinSizeX = style.WindowMinSize.x;
 	style.WindowMinSize.x = 370.0f;
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-		ImGuiID dockSpaceId = ImGui::GetID("MyDockSpace");
+		const ImGuiID dockSpaceId = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), dockSpaceFlags);
 	}
 	style.WindowMinSize.x = minWinSizeX;

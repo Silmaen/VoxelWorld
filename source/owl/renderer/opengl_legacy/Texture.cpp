@@ -11,7 +11,6 @@
 
 #include "core/external/opengl21.h"
 #include <stb_image.h>
-#include <utility>
 
 namespace owl::renderer::opengl_legacy {
 

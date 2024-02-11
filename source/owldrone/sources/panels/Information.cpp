@@ -7,8 +7,6 @@
  */
 #include "Information.h"
 
-#include <imgui.h>
-
 namespace drone::panels {
 
 Information::Information() = default;

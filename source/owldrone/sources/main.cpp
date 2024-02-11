@@ -11,7 +11,7 @@
 
 #include "droneLayer.h"
 
-class OwlNest : public owl::core::Application {
+class OwlNest final: public owl::core::Application {
 public:
 	OwlNest() = delete;
 	explicit OwlNest(const owl::core::AppParams &param) : owl::core::Application(param) {

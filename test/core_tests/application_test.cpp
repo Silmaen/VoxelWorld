@@ -1,6 +1,5 @@
 
 #include "testHelper.h"
-#include <filesystem>
 
 #include <core/Application.h>
 #include <core/utils/FileUtils.h>
@@ -60,9 +59,9 @@ TEST(Core, fileToString) {
 		out << superStr;
 		out.close();
 	}
-	std::string read = owl::core::utils::fileToString(tmpFile);
+	std::string read = utils::fileToString(tmpFile);
 	EXPECT_STREQ(superStr.c_str(), read.c_str());
-	read = owl::core::utils::fileToString("");
+	read = utils::fileToString("");
 	EXPECT_STREQ("", read.c_str());
 	remove(tmpFile);
 	Log::invalidate();

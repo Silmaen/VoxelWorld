@@ -12,8 +12,6 @@
 #include "core/UUID.h"
 #include "renderer/CameraEditor.h"
 
-#include <entt/entt.hpp>
-
 /**
  * @brief Namespace for the Scene elements
  */
@@ -25,7 +23,7 @@ class ScriptableEntity;
 /**
  * @brief Class Scene.
  */
-class OWL_API Scene {
+class OWL_API Scene final {
 public:
 	Scene(const Scene &) = delete;
 	Scene(Scene &&) = delete;

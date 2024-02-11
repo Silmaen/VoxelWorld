@@ -11,7 +11,6 @@
 #include "event/Event.h"
 #include "math/sizingTypes.h"
 #include "renderer/GraphContext.h"
-#include <functional>
 
 namespace owl::input {
 

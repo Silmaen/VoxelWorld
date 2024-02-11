@@ -1,5 +1,6 @@
 
 #include "testHelper.h"
+
 #include <scene/Entity.h>
 #include <scene/Scene.h>
 #include <scene/component/Camera.h>
@@ -12,7 +13,7 @@ using namespace owl::scene;
 
 TEST(Scene, creation) {
 	Scene sc;
-	auto cam = sc.getPrimaryCamera();
+	const auto cam = sc.getPrimaryCamera();
 	EXPECT_FALSE(cam);
 	auto ent = sc.createEntity("bob");
 	EXPECT_TRUE(ent);
@@ -36,7 +37,7 @@ TEST(Scene, camera) {
 }
 
 TEST(Scene, Copy) {
-	owl::shared<Scene> sc = owl::mk_shared<Scene>();
+	const owl::shared<Scene> sc = owl::mk_shared<Scene>();
 	auto ent = sc->createEntityWithUUID(0, "Camera");
 	ent.addOrReplaceComponent<component::Camera>();
 	auto ent2 = sc->duplicateEntity(ent);
@@ -56,7 +57,7 @@ TEST(Scene, Copy) {
 }
 
 TEST(Scene, RenderEmpty) {
-	owl::shared<Scene> sc = owl::mk_shared<Scene>();
+	const owl::shared<Scene> sc = owl::mk_shared<Scene>();
 	sc->onViewportResize(800, 600);
 	owl::core::Timestep ts;
 	ts.update();

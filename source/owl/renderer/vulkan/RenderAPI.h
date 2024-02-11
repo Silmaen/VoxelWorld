@@ -9,7 +9,6 @@
 #pragma once
 
 #include "../RenderAPI.h"
-#include <vulkan/vulkan.h>
 
 /**
  * @brief Namespace for vulkan specific rendering objects.
@@ -19,7 +18,7 @@ namespace owl::renderer::vulkan {
 /**
  * @brief Class RenderAPI.
  */
-class RenderAPI : public ::owl::renderer::RenderAPI {
+class RenderAPI final : public ::owl::renderer::RenderAPI {
 public:
 	RenderAPI() = default;
 	RenderAPI(const RenderAPI &) = delete;

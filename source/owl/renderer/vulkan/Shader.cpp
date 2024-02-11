@@ -83,7 +83,7 @@ Shader::Shader(const std::string &shaderName, const std::string &renderer, const
 	createShader(strSources);
 }
 
-Shader::~Shader() {}
+Shader::~Shader() = default;
 
 void Shader::bind() const {}
 

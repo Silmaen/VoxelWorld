@@ -13,7 +13,7 @@ namespace drone::panels::gauge {
 /**
  * @brief Class MotorRate
  */
-class MotorRate : public BaseGauge {
+class MotorRate final: public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.

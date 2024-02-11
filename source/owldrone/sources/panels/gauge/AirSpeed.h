@@ -14,7 +14,7 @@ namespace drone::panels::gauge {
 /**
  * @brief Class AirSpeed
  */
-class AirSpeed : public BaseGauge {
+class AirSpeed final : public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.

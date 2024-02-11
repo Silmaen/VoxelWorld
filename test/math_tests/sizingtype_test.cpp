@@ -1,5 +1,6 @@
 
 #include "testHelper.h"
+
 #include <math/sizingTypes.h>
 
 using namespace owl::math;

@@ -12,7 +12,6 @@
 #include "event/AppEvent.h"
 #include "event/MouseEvent.h"
 #include "renderer/CameraOrtho.h"
-#include <glm/vec3.hpp>
 
 namespace owl::input {
 

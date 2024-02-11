@@ -13,8 +13,6 @@
 #include "event/Event.h"
 #include "event/MouseEvent.h"
 
-#include <glm/glm.hpp>
-
 namespace owl::renderer {
 
 /**

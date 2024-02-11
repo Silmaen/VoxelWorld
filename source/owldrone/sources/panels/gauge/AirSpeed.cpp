@@ -6,7 +6,6 @@
  * All modification must get authorization from the author.
  */
 #include "AirSpeed.h"
-#include "renderer/Renderer.h"
 
 namespace drone::panels::gauge {
 

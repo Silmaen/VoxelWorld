@@ -15,7 +15,7 @@ namespace drone::panels {
 /**
  * @brief Class Gauges
  */
-class Gauges : public BasePanel {
+class Gauges final: public BasePanel {
 public:
 	/**
 	 * @brief Constructor.

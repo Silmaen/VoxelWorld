@@ -10,7 +10,6 @@
 
 #include "../Window.h"
 #include "core/external/glfw3.h"
-#include "renderer/GraphContext.h"
 
 /**
  * @brief Namespace for the glfw  elements.
@@ -20,7 +19,7 @@ namespace owl::input::glfw {
 /**
  * @brief Class GLFW Window.
  */
-class OWL_API Window : public ::owl::input::Window {
+class OWL_API Window final : public ::owl::input::Window {
 public:
 	Window(const Window &) = delete;
 	Window(Window &&) = delete;

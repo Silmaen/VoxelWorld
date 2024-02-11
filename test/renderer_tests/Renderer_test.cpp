@@ -1,6 +1,6 @@
 
 #include "testHelper.h"
-#include <filesystem>
+
 #include <renderer/Renderer.h>
 
 using namespace owl::renderer;
@@ -26,7 +26,7 @@ TEST(Renderer, fakeScene) {
 	owl::core::Log::init(spdlog::level::off);
 	RenderCommand::create(RenderAPI::Type::Null);
 	Renderer::init();
-	CameraOrtho cam(0, 0, 800, 600);
+	const CameraOrtho cam(0, 0, 800, 600);
 	Renderer::beginScene(cam);
 	Renderer::endScene();
 

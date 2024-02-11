@@ -10,8 +10,6 @@
 #include "IO/DeviceManager.h"
 #include "IO/DroneSettings.h"
 
-#include <imgui.h>
-
 namespace drone::panels {
 
 Settings::Settings() = default;
@@ -30,7 +28,7 @@ void Settings::onRender() {
 		bool val = settings.useCamera;
 		auto &camSys = IO::CameraSystem::get();
 		const auto &cameras = camSys.getListOfCameraNames();
-		size_t nbCam = cameras.size();
+		const size_t nbCam = cameras.size();
 		if (ImGui::Checkbox("Use the camera", &val)) {
 			settings.useCamera = val && (nbCam > 0);
 		}
@@ -65,12 +63,12 @@ void Settings::onRender() {
 		bool val = settings.useSerialPort;
 		auto &deviceManager = IO::DeviceManager::get();
 		const auto &devices = deviceManager.getAllDevices();
-		size_t nbCom = devices.size();
+		const size_t nbCom = devices.size();
 		if (ImGui::Checkbox("Use the serial ports", &val)) {
 			settings.useSerialPort = val && (nbCom > 0);
 		}
 		if (val && (nbCom > 0)) {
-			auto device = deviceManager.getCurrentDevice();
+			const auto device = deviceManager.getCurrentDevice();
 			std::string cName = "No device";
 			std::string cPort{};
 			if (device) {

@@ -8,8 +8,6 @@
 
 #include "ContentBrowser.h"
 
-#include <owl.h>
-
 namespace owl::panel {
 
 static std::filesystem::path assetPath;
@@ -18,21 +16,15 @@ ContentBrowser::ContentBrowser() {
 	OWL_SCOPE_UNTRACK
 	assetPath = core::Application::get().getAssetDirectory();
 	currentPath = assetPath;
-	{
-		auto fileIconPath = assetPath / "icons" / "FileIcon.png";
-		if (exists(fileIconPath)) {
-			fileIcon = renderer::Texture2D::create(fileIconPath);
-		} else {
-			OWL_CORE_WARN("Unable to find file icon at {}", fileIconPath.string())
-		}
+	if (const auto fileIconPath = assetPath / "icons" / "FileIcon.png"; exists(fileIconPath)) {
+		fileIcon = renderer::Texture2D::create(fileIconPath);
+	} else {
+		OWL_CORE_WARN("Unable to find file icon at {}", fileIconPath.string())
 	}
-	{
-		auto dirIconPath = assetPath / "icons" / "DirectoryIcon.png";
-		if (exists(dirIconPath)) {
-			dirIcon = renderer::Texture2D::create(dirIconPath);
-		} else {
-			OWL_CORE_WARN("Unable to find directory icon at {}", dirIconPath.string())
-		}
+	if (const auto dirIconPath = assetPath / "icons" / "DirectoryIcon.png"; exists(dirIconPath)) {
+		dirIcon = renderer::Texture2D::create(dirIconPath);
+	} else {
+		OWL_CORE_WARN("Unable to find directory icon at {}", dirIconPath.string())
 	}
 }
 
@@ -47,10 +39,10 @@ void ContentBrowser::onImGuiRender() {
 
 	static float padding = 30.0f;
 	static float thumbnailSize = 100.0f;
-	float cellSize = thumbnailSize + padding;
+	const float cellSize = thumbnailSize + padding;
 
 	// setup array of icons
-	float panelWidth = ImGui::GetContentRegionAvail().x;
+	const float panelWidth = ImGui::GetContentRegionAvail().x;
 	int columnCount = static_cast<int>(panelWidth / cellSize);
 	if (columnCount < 1)
 		columnCount = 1;
@@ -72,7 +64,7 @@ void ContentBrowser::onImGuiRender() {
 
 			ImGui::PopStyleColor();
 
-			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked((ImGuiMouseButton_Left))) {
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 				if (directoryEntry.is_directory())
 					currentPath /= path.filename();
 			}

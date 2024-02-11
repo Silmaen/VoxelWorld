@@ -9,7 +9,6 @@
 
 #include "VulkanHandler.h"
 
-#include "../DrawData.h"
 #include "../GraphContext.h"
 #include "core/Application.h"
 #include "math/ColorSpace.h"

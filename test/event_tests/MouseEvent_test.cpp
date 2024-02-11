@@ -5,13 +5,15 @@
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "event/MouseEvent.h"
+
 #include "testHelper.h"
+
+#include <event/MouseEvent.h>
 
 using namespace owl::event;
 
 TEST(MouseEvent, ButtonPressed) {
-	MouseButtonPressedEvent event(12);
+	const MouseButtonPressedEvent event(12);
 	EXPECT_STREQ(event.getName().c_str(), "MouseButtonPressedEvent");
 	EXPECT_EQ(event.getType(), type::MouseButtonPressed);
 	EXPECT_EQ(event.getStaticType(), type::MouseButtonPressed);
@@ -27,7 +29,7 @@ TEST(MouseEvent, ButtonPressed) {
 }
 
 TEST(MouseEvent, ButtonReleased) {
-	MouseButtonReleasedEvent event(12);
+	const MouseButtonReleasedEvent event(12);
 	EXPECT_STREQ(event.getName().c_str(), "MouseButtonReleasedEvent");
 	EXPECT_EQ(event.getType(), type::MouseButtonReleased);
 	EXPECT_EQ(event.getStaticType(), type::MouseButtonReleased);
@@ -43,7 +45,7 @@ TEST(MouseEvent, ButtonReleased) {
 }
 
 TEST(MouseEvent, Moved) {
-	MouseMovedEvent event(144, 155);
+	const MouseMovedEvent event(144, 155);
 	EXPECT_STREQ(event.getName().c_str(), "MouseMovedEvent");
 	EXPECT_EQ(event.getType(), type::MouseMoved);
 	EXPECT_EQ(event.getStaticType(), type::MouseMoved);
@@ -60,7 +62,7 @@ TEST(MouseEvent, Moved) {
 }
 
 TEST(MouseEvent, Scrolled) {
-	MouseScrolledEvent event(1, 1);
+	const MouseScrolledEvent event(1, 1);
 	EXPECT_STREQ(event.getName().c_str(), "MouseScrolledEvent");
 	EXPECT_EQ(event.getType(), type::MouseScrolled);
 	EXPECT_EQ(event.getStaticType(), type::MouseScrolled);

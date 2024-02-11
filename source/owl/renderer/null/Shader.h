@@ -15,7 +15,7 @@ namespace owl::renderer::null {
 /**
  * @brief Class Shader.
  */
-class OWL_API Shader : public owl::renderer::Shader {
+class OWL_API Shader final : public owl::renderer::Shader {
 public:
 	Shader(const Shader &) = delete;
 	Shader(Shader &&) = delete;

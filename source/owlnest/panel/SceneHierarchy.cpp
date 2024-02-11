@@ -10,7 +10,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui_internal.h>
-#include <magic_enum.hpp>
 
 namespace owl::panel {
 
@@ -28,7 +27,7 @@ void SceneHierarchy::onImGuiRender() {
 
 	if (context) {
 		for (auto &&[e]: context->registry.storage<entt::entity>().each()) {
-			scene::Entity entity = {e, context.get()};
+			const scene::Entity entity = {e, context.get()};
 			drawEntityNode(entity);
 		}
 
@@ -52,11 +51,11 @@ void SceneHierarchy::onImGuiRender() {
 }
 
 void SceneHierarchy::drawEntityNode(scene::Entity entity) {
-	auto &tag = entity.getComponent<scene::component::Tag>().tag;
+	const auto &tag = entity.getComponent<scene::component::Tag>().tag;
 
 	ImGuiTreeNodeFlags flags = ((selection == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-	bool opened = ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, "%s", tag.c_str());
+	const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, "%s", tag.c_str());
 	if (ImGui::IsItemClicked()) {
 		selection = entity;
 	}
@@ -69,9 +68,8 @@ void SceneHierarchy::drawEntityNode(scene::Entity entity) {
 	}
 
 	if (opened) {
-		ImGuiTreeNodeFlags flags_o = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened_o = ImGui::TreeNodeEx(reinterpret_cast<void *>(9817239), flags_o, "%s", tag.c_str());
-		if (opened_o)
+		constexpr ImGuiTreeNodeFlags flags_o = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+		if (ImGui::TreeNodeEx(reinterpret_cast<void *>(9817239), flags_o, "%s", tag.c_str()))
 			ImGui::TreePop();
 		ImGui::TreePop();
 	}
@@ -85,7 +83,7 @@ void SceneHierarchy::drawEntityNode(scene::Entity entity) {
 
 static void drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.0f, float columnWidth = 100.0f) {
 	const ImGuiIO &io = ImGui::GetIO();
-	auto boldFont = io.Fonts->Fonts[0];
+	const auto boldFont = io.Fonts->Fonts[0];
 	ImGui::PushID(label.c_str());
 
 	ImGui::Columns(2);
@@ -96,8 +94,8 @@ static void drawVec3Control(const std::string &label, glm::vec3 &values, float r
 	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
 
-	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-	ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+	const float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	const ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
@@ -149,14 +147,14 @@ static void drawVec3Control(const std::string &label, glm::vec3 &values, float r
 
 template<typename T, typename UIFunction>
 static void drawComponent(const std::string &name, scene::Entity entity, UIFunction uiFunction) {
-	const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+	constexpr ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 	if (entity.hasComponent<T>()) {
 		auto &component = entity.getComponent<T>();
-		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+		const ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		const float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 		ImGui::Separator();
-		bool open = ImGui::TreeNodeEx(reinterpret_cast<void *>(typeid(T).hash_code()), treeNodeFlags, "%s", name.c_str());
+		const bool open = ImGui::TreeNodeEx(reinterpret_cast<void *>(typeid(T).hash_code()), treeNodeFlags, "%s", name.c_str());
 		ImGui::PopStyleVar();
 		ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 		if (ImGui::Button("+", ImVec2{lineHeight, lineHeight})) {
@@ -230,7 +228,7 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 		const char *currentProjectionTypeString = projectionTypeStrings[static_cast<int>(camera.getProjectionType())];
 		if (ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
 			for (int i = 0; i < 2; i++) {
-				bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+				const bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
 				if (ImGui::Selectable(projectionTypeStrings[i], isSelected)) {
 					currentProjectionTypeString = projectionTypeStrings[i];
 					camera.setProjectionType(static_cast<scene::SceneCamera::ProjectionType>(i));
@@ -269,8 +267,8 @@ void SceneHierarchy::drawComponents(scene::Entity entity) {
 		ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-				const char *path = reinterpret_cast<const char *>(payload->Data);
-				std::filesystem::path texturePath = core::Application::get().getAssetDirectory() / path;
+				const auto path = reinterpret_cast<const char *>(payload->Data);
+				const std::filesystem::path texturePath = core::Application::get().getAssetDirectory() / path;
 				component.texture = renderer::Texture2D::create(texturePath);
 			}
 			ImGui::EndDragDropTarget();

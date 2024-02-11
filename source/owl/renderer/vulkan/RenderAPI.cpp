@@ -13,7 +13,6 @@
 #include "core/external/glfw3.h"
 #include "internal/VulkanHandler.h"
 
-
 namespace owl::renderer::vulkan {
 
 RenderAPI::~RenderAPI() {
@@ -23,8 +22,8 @@ RenderAPI::~RenderAPI() {
 
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
-	auto &app = core::Application::get();
-	bool extraDebugging = app.getInitParams().useDebugging;
+	const auto &app = core::Application::get();
+	const bool extraDebugging = app.getInitParams().useDebugging;
 
 	if (getState() != State::Created) return;
 

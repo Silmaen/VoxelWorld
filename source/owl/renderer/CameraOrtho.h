@@ -7,6 +7,7 @@
  */
 
 #pragma once
+
 #include "core/Core.h"
 #include "core/external/glm.h"
 

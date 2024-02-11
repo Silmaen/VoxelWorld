@@ -9,14 +9,12 @@
 
 #include "../UniformBuffer.h"
 
-#include <vulkan/vulkan.h>
-
 namespace owl::renderer::vulkan {
 
 /**
  * @brief Class UniformBuffer.
  */
-class UniformBuffer : public ::owl::renderer::UniformBuffer {
+class UniformBuffer final: public ::owl::renderer::UniformBuffer {
 public:
 	UniformBuffer() = delete;
 	UniformBuffer(const UniformBuffer &) = default;

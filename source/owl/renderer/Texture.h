@@ -7,9 +7,9 @@
  */
 
 #pragma once
+
 #include "core/Core.h"
 #include "math/sizingTypes.h"
-#include <filesystem>
 
 namespace owl::renderer {
 

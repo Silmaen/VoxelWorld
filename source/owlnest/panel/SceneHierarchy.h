@@ -10,15 +10,12 @@
 
 #include <owl.h>
 
-#include <utility>
-
-
 namespace owl::panel {
 
 /**
  * @brief Class SceneHierarchy
  */
-class SceneHierarchy {
+class SceneHierarchy final {
 public:
 	/**
 	 * @brief Default copy constructor
@@ -45,7 +42,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~SceneHierarchy() = default;
+	~SceneHierarchy() = default;
 
 	/**
 	 * @brief Constructor

@@ -8,14 +8,13 @@
 #pragma once
 
 #include "controller/RemoteController.h"
-#include "event/KeyEvent.h"
 #include "panels/BasePanel.h"
-#include <owl.h>
 
+#include <owl.h>
 
 namespace drone {
 
-class droneLayer : public owl::core::layer::Layer {
+class droneLayer final : public owl::core::layer::Layer {
 public:
 	droneLayer(const droneLayer &) = delete;
 	droneLayer(droneLayer &&) = delete;
@@ -45,7 +44,7 @@ private:
 	bool onKeyPressed(owl::event::KeyPressedEvent &e);
 	bool onMouseButtonPressed(owl::event::MouseButtonPressedEvent &e);
 
-	bool isConnected() const;
+	[[nodiscard]] bool isConnected() const;
 	void toggleConnect();
 
 	bool connected = false;

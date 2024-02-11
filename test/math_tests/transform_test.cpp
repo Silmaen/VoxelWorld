@@ -1,12 +1,12 @@
 
 #include "testHelper.h"
-#include <math/Transform.h>
 
 #include <cmath>
+#include <math/Transform.h>
 
 using namespace owl::math;
 
-inline constexpr bool vecNear(const glm::vec3 &a, const glm::vec3 &b, float accuracy = 0.001f) {
+constexpr bool vecNear(const glm::vec3 &a, const glm::vec3 &b, float accuracy = 0.001f) {
 	return (std::abs(a[0] - b[0]) < accuracy) &&
 		   (std::abs(a[1] - b[1]) < accuracy) &&
 		   (std::abs(a[2] - b[2]) < accuracy);

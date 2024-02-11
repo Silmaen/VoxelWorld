@@ -1,16 +1,17 @@
 
 #include "testHelper.h"
+
 #include <scene/Entity.h>
 #include <scene/component/Camera.h>
 
 using namespace owl::scene;
 
 TEST(Entity, creation) {
-	Entity ent;
+	const Entity ent;
 	EXPECT_FALSE(ent);
 	EXPECT_TRUE(static_cast<entt::entity>(ent) == entt::null);
 	EXPECT_EQ(static_cast<uint32_t>(ent), 4294967295);
-	Entity ent2(entt::null, nullptr);
+	const Entity ent2(entt::null, nullptr);
 	EXPECT_EQ(ent, ent2);
 	EXPECT_FALSE(ent != ent2);
 }

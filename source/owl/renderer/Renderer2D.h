@@ -14,7 +14,6 @@
 #include "Texture.h"
 #include "scene/component/SpriteRenderer.h"
 
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace owl::renderer {
 

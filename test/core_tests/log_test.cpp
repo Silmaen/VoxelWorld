@@ -1,5 +1,6 @@
 
 #include "testHelper.h"
+
 #include <core/Log.h>
 
 using namespace owl::core;

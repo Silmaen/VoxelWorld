@@ -1,5 +1,6 @@
 
 #include "testHelper.h"
+
 #include <core/Timestep.h>
 
 using namespace owl::core;

@@ -6,7 +6,6 @@
  * All modification must get authorization from the author.
  */
 #include "ArtificialHorizon.h"
-#include "renderer/Renderer.h"
 #include <cmath>
 
 namespace drone::panels::gauge {

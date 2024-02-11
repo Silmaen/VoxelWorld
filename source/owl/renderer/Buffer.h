@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include <utility>
-
 #include "core/Core.h"
+
 namespace owl::renderer {
 
 /**

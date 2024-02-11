@@ -5,6 +5,7 @@
  * Copyright © 2024 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "owlpch.h"
 
 #include "Device.h"
 #include "math/simpleFunctions.h"
@@ -28,7 +29,7 @@ void convertNV12ToRGB24(const uint8_t *nv12Buffer, const math::FrameSize &frameS
 		for (uint32_t j = 0; j < frameSize.getWidth(); j++) {
 			// Indices dans le tampon NV12
 			const uint32_t yIndex = i * frameSize.getWidth() + j;
-			const uint32_t uvIndex = (i / 2) * frameSize.getWidth() + (j & ~1ull);
+			const uint32_t uvIndex = i / 2 * frameSize.getWidth() + (j & ~1ull);
 			// Indices dans le tampon RGB24
 			const uint32_t rgbIndex = ((i + 1) * frameSize.getWidth() - j - 1) * 3;
 			// Conversion YUV vers RGB
@@ -90,8 +91,8 @@ void convertMJPEGToRGB24(const uint8_t *jpegBuffer, const int32_t jpegSize, cons
 	//int rowSize = width * 3;
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
-			int sourceIndex = (i * width + j) * 3;
-			int destinationIndex = ((i + 1) * width - j - 1) * 3;// Inversion horizontale
+			const int sourceIndex = (i * width + j) * 3;
+			const int destinationIndex = ((i + 1) * width - j - 1) * 3;// Inversion horizontale
 			std::memcpy(rgb24Buffer + destinationIndex, buffer + sourceIndex, 3);
 		}
 	}

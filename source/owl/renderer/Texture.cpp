@@ -6,7 +6,6 @@
  * All modification must get authorization from the author.
  */
 #include "owlpch.h"
-#include <magic_enum.hpp>
 
 #include "Texture.h"
 

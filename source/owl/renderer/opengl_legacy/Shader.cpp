@@ -119,32 +119,32 @@ void Shader::setInt(const std::string &name, int data) {
 }
 
 void Shader::uploadInt(const std::string &name, int32_t data) const {
-	GLint location = glGetUniformLocation(programId, name.c_str());
+	const GLint location = glGetUniformLocation(programId, name.c_str());
 	glUniform1i(location, data);
 }
 
 void Shader::setIntArray(const std::string &name, int *values, uint32_t count) {
-	GLint location = glGetUniformLocation(programId, name.c_str());
+	const GLint location = glGetUniformLocation(programId, name.c_str());
 	glUniform1iv(location, static_cast<GLsizei>(count), values);
 }
 
 void Shader::setFloat(const std::string &name, float value) {
-	GLint location = glGetUniformLocation(programId, name.c_str());
+	const GLint location = glGetUniformLocation(programId, name.c_str());
 	glUniform1f(location, value);
 }
 
 void Shader::setFloat2(const std::string &name, const glm::vec2 &value) {
-	GLint location = glGetUniformLocation(programId, name.c_str());
+	const GLint location = glGetUniformLocation(programId, name.c_str());
 	glUniform2f(location, value.x, value.y);
 }
 
 void Shader::setFloat3(const std::string &name, const glm::vec3 &value) {
-	GLint location = glGetUniformLocation(programId, name.c_str());
+	const GLint location = glGetUniformLocation(programId, name.c_str());
 	glUniform3f(location, value.x, value.y, value.z);
 }
 
 void Shader::setFloat4(const std::string &name, const glm::vec4 &value) {
-	GLint location = glGetUniformLocation(programId, name.c_str());
+	const GLint location = glGetUniformLocation(programId, name.c_str());
 	glUniform4f(location, value.x, value.y, value.z, value.w);
 }
 
@@ -153,23 +153,23 @@ void Shader::setMat4(const std::string &name, const glm::mat4 &matrix) {
 }
 
 void Shader::uploadMat4(const std::string &name, const glm::mat4 &matrix) const {
-	GLint location = glGetUniformLocation(programId, name.c_str());
+	const GLint location = glGetUniformLocation(programId, name.c_str());
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::createShader(const std::unordered_map<ShaderType, std::string> &sources) {
 	OWL_PROFILE_FUNCTION()
 
-	auto start = std::chrono::steady_clock::now();
+	const auto start = std::chrono::steady_clock::now();
 
 	// vertex shader
-	GLuint vtxShader = glCreateShader(GL_VERTEX_SHADER);
+	const GLuint vtxShader = glCreateShader(GL_VERTEX_SHADER);
 	{
 		if (!sources.contains(ShaderType::Vertex)) {
 			OWL_CORE_ERROR("Shader {} does not contains Vertex shader.", getName())
 			return;
 		}
-		auto src = sources.at(ShaderType::Vertex).c_str();
+		const auto src = sources.at(ShaderType::Vertex).c_str();
 		glShaderSource(vtxShader, 1, &src, nullptr);
 		glCompileShader(vtxShader);
 		// Check Compilation
@@ -186,14 +186,14 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &sou
 		}
 	}
 	// fragment shader
-	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	const GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 	{
 		if (!sources.contains(ShaderType::Fragment)) {
 			glDeleteShader(vtxShader);
 			OWL_CORE_ERROR("Shader {} does not contains Fragment shader.", getName())
 			return;
 		}
-		auto src = sources.at(ShaderType::Fragment).c_str();
+		const auto src = sources.at(ShaderType::Fragment).c_str();
 		glShaderSource(fragShader, 1, &src, nullptr);
 		glCompileShader(fragShader);
 		// Check Compilation
@@ -234,7 +234,7 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &sou
 		}
 	}
 	// print timing
-	auto timer = std::chrono::steady_clock::now() - start;
+	const auto timer = std::chrono::steady_clock::now() - start;
 	double duration = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) / 1000.0;
 	OWL_CORE_INFO("Compilation of shader {} in {} ms", getName(), duration)
 }
