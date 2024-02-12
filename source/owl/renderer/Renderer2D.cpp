@@ -96,6 +96,9 @@ struct internalData {
 	VertexData<LineVertex> line;
 	shared<DrawData> drawLine;
 	float lineWidth = 2.0f;
+	/// Debug Triangle
+	shared<DrawData> drawDataTriangle;
+	bool doTriangleDraw = false;
 
 	// Textures Data
 	/// One white texture for coloring
@@ -194,6 +197,11 @@ void Renderer2D::init() {
 	data->textureSlots[0] = data->whiteTexture;
 	data->cameraUniformBuffer = UniformBuffer::create(sizeof(utils::internalData::CameraData), 0, "Renderer2D");
 	data->cameraUniformBuffer->bind();
+
+	// debug
+	data->drawDataTriangle = DrawData::create();
+	data->drawDataTriangle->init({},
+								 "renderer2D", quadIndices, "triangle");
 }
 
 void Renderer2D::shutdown() {
@@ -272,13 +280,16 @@ void Renderer2D::flush() {
 		RenderCommand::drawData(data->drawLine, data->line.indexCount);
 		data->stats.drawCalls++;
 	}
+	if (data->doTriangleDraw) {
+		RenderCommand::drawData(data->drawDataTriangle, 3);
+	}
 }
 
 void Renderer2D::startBatch() {
 	utils::resetDrawData(data->quad);
 	utils::resetDrawData(data->circle);
 	utils::resetDrawData(data->line);
-
+	data->doTriangleDraw = false;
 	data->textureSlotIndex = 1;
 }
 
@@ -294,7 +305,9 @@ float Renderer2D::getLineWidth() {
 void Renderer2D::setLineWidth(float width) {
 	data->lineWidth = width;
 }
-
+void Renderer2D::drawDebugTriangle() {
+	data->doTriangleDraw = true;
+}
 void Renderer2D::drawLine(const LineData &lineData) {
 	data->line.vertexBuf.emplace_back(utils::LineVertex{lineData.point1, lineData.color, lineData.entityID});
 	data->line.vertexBuf.emplace_back(utils::LineVertex{lineData.point2, lineData.color, lineData.entityID});

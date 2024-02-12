@@ -44,8 +44,15 @@ VkBool32 debugUtilsMessageCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messag
 	return false;
 }
 
-// for debug
-//DrawData data;
+constexpr VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessagerCI{
+		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+		.pNext = nullptr,
+		.flags = {},
+		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
+		.pfnUserCallback = debugUtilsMessageCallback,
+		.pUserData = nullptr};
+
 
 }// namespace
 
@@ -122,8 +129,6 @@ void VulkanHandler::initVulkan() {
 
 void VulkanHandler::release() {
 	if (instance == nullptr) return;// nothing can exists without instance.
-
-
 	for (auto &&[id, pipeLine]: pipeLines) {
 		if (pipeLine.pipeLine != nullptr)
 			vkDestroyPipeline(logicalDevice, pipeLine.pipeLine, nullptr);
@@ -131,17 +136,14 @@ void VulkanHandler::release() {
 			vkDestroyPipelineLayout(logicalDevice, pipeLine.layout, nullptr);
 	}
 	pipeLines.clear();
-
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 		vkDestroyBuffer(logicalDevice, uniformBuffers[i], nullptr);
 		vkFreeMemory(logicalDevice, uniformBuffersMemory[i], nullptr);
 	}
-
 	if (descriptorSetLayout != nullptr) {
 		vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, nullptr);
 		OWL_CORE_TRACE("Vulkan: descriptorSetLayout destroyed.")
 	}
-
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 		if (renderFinishedSemaphores[i] != nullptr) {
 			vkDestroySemaphore(logicalDevice, renderFinishedSemaphores[i], nullptr);
@@ -159,6 +161,11 @@ void VulkanHandler::release() {
 	if (commandPool != nullptr) {
 		vkDestroyCommandPool(logicalDevice, commandPool, nullptr);
 		OWL_CORE_TRACE("Vulkan: commandPool destroyed.")
+	}
+	if (descriptorPool != nullptr) {
+		vkDestroyDescriptorPool(logicalDevice, descriptorPool, nullptr);
+		descriptorPool = nullptr;
+		OWL_CORE_TRACE("Vulkan: descriptorPool destroyed.")
 	}
 	swapChain.release();
 	OWL_CORE_TRACE("Vulkan: swap destroyed.")
@@ -198,7 +205,7 @@ ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 			.MinImageCount = 2,
 			.ImageCount = 2,
 			.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
-			.UseDynamicRendering = true,
+			.UseDynamicRendering = false,
 			.ColorAttachmentFormat = swapChain.swapChainImageFormat,
 			.Allocator = nullptr,
 			.CheckVkResultFn = func,
@@ -250,7 +257,7 @@ void VulkanHandler::createInstance() {
 		uniqueExtensions.insert(glfwExtensions, glfwExtensions + glfwExtensionCount);
 		instanceExtensions.assign(uniqueExtensions.begin(), uniqueExtensions.end());
 	}
-	if (validation && std::find(supportedInstanceExtensions.begin(), supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == supportedInstanceExtensions.end()) {
+	if (validation && std::ranges::find(supportedInstanceExtensions.begin(), supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == supportedInstanceExtensions.end()) {
 		OWL_CORE_WARN("Vulkan: request extension Debug Utils but is not supported, deactivating.")
 		validation = false;
 	}
@@ -260,13 +267,7 @@ void VulkanHandler::createInstance() {
 	instanceCI.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCI.pApplicationInfo = &appInfo;
 	// potentially include Debug Messager
-	VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessagerCI{};
 	if (validation) {
-		debugUtilsMessagerCI.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		debugUtilsMessagerCI.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-		debugUtilsMessagerCI.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
-		debugUtilsMessagerCI.pfnUserCallback = debugUtilsMessageCallback;
-		debugUtilsMessagerCI.pNext = instanceCI.pNext;
 		instanceCI.pNext = &debugUtilsMessagerCI;
 		instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
@@ -323,14 +324,7 @@ void VulkanHandler::setupDebugging() {
 	vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
 	vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
 	OWL_DIAG_POP
-	constexpr VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessagerCI{
-			.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-			.pNext = nullptr,
-			.flags = {},
-			.messageSeverity = 0x1111,// VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-			.messageType = 0x1111,    // VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
-			.pfnUserCallback = debugUtilsMessageCallback,
-			.pUserData = nullptr};
+
 	if (const VkResult result = vkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessagerCI, nullptr, &debugUtilsMessenger); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: Error while setup debugging ({})", resultString(result))
 		state = State::ErrorSetupDebugging;
@@ -425,7 +419,7 @@ void VulkanHandler::createDescriptorPool() {
 	VkDescriptorPoolSize poolSize{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = static_cast<uint32_t>(2)};
-	VkDescriptorPoolCreateInfo poolInfo{
+	const VkDescriptorPoolCreateInfo poolInfo{
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
@@ -555,7 +549,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.logicOp = VK_LOGIC_OP_COPY,
 			.attachmentCount = 1,
 			.pAttachments = &colorBlendAttachment,
-			.blendConstants = {0.f, 0.f, 0.f, 1.f}};
+			.blendConstants = {0.f, 0.f, 0.f, 0.f}};
 	VkDynamicState dynamicStates[] = {
 			VK_DYNAMIC_STATE_VIEWPORT,
 			VK_DYNAMIC_STATE_SCISSOR};
@@ -610,12 +604,11 @@ void VulkanHandler::popPipeline(const int32_t id) {
 }
 
 void VulkanHandler::createCommandPool() {
-	VkCommandPoolCreateInfo poolInfo{
+	const VkCommandPoolCreateInfo poolInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
 			.queueFamilyIndex = physicalDevice.queues.graphicsIndex};
-
 	if (const VkResult result = vkCreateCommandPool(logicalDevice, &poolInfo, nullptr, &commandPool); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create command pool ({}).", resultString(result))
 		state = State::ErrorCreatingCommandPool;
@@ -669,7 +662,7 @@ void VulkanHandler::createSyncObjects() {
 	}
 }
 
-void VulkanHandler::drawData(uint32_t vertexCount) const {
+void VulkanHandler::drawData(uint32_t vertexCount, bool indexed) const {
 	if (state != State::Running)
 		return;
 	const VkViewport viewport{
@@ -684,7 +677,11 @@ void VulkanHandler::drawData(uint32_t vertexCount) const {
 			.offset = {0, 0},
 			.extent = swapChain.swapChainExtent};
 	vkCmdSetScissor(getCurrentCommandBuffer(), 0, 1, &scissor);
-	vkCmdDrawIndexed(getCurrentCommandBuffer(), vertexCount, 1, 0, 0, 0);
+	OWL_CORE_FRAME_TRACE("Frame Trace: draw {} vertices {}", vertexCount, indexed)
+	if (indexed)
+		vkCmdDrawIndexed(getCurrentCommandBuffer(), vertexCount, 1, 0, 0, 0);
+	else
+		vkCmdDraw(getCurrentCommandBuffer(), vertexCount, 1, 0, 0);
 }
 
 void VulkanHandler::beginFrame() {
@@ -720,6 +717,7 @@ void VulkanHandler::beginFrame() {
 		state = State::ErrorBeginCommandBuffer;
 		return;
 	}
+	OWL_CORE_FRAME_TRACE("Frame Trace: Begin Command buffer")
 
 	const VkRenderPassBeginInfo renderPassInfo{
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
@@ -732,13 +730,16 @@ void VulkanHandler::beginFrame() {
 			.clearValueCount = 1,
 			.pClearValues = &clearColor};
 	vkCmdBeginRenderPass(getCurrentCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	OWL_CORE_FRAME_TRACE("Frame Trace: Begin render Pass")
 }
 
 void VulkanHandler::endFrame() {
 	if (state != State::Running)
 		return;
+	OWL_CORE_FRAME_TRACE("Frame Trace: End render Pass")
 	vkCmdEndRenderPass(getCurrentCommandBuffer());
 
+	OWL_CORE_FRAME_TRACE("Frame Trace: End command buffer")
 	if (const VkResult result = vkEndCommandBuffer(getCurrentCommandBuffer()); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to end command buffer ({}).", resultString(result))
 		state = State::ErrorEndCommandBuffer;
@@ -762,11 +763,13 @@ void VulkanHandler::swapFrame() {
 			.signalSemaphoreCount = 1,
 			.pSignalSemaphores = signalSemaphores};
 
+	vkResetFences(logicalDevice, 1, &inFlightFences[currentFrame]);
 	if (const VkResult result = vkQueueSubmit(physicalDevice.queues.graphics, 1, &submitInfo, inFlightFences[currentFrame]); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to submit draw command buffer ({}).", resultString(result))
 		state = State::ErrorSubmitingDrawCommand;
 		return;
 	}
+	OWL_CORE_FRAME_TRACE("Frame Trace: Queue submit")
 
 	const VkSwapchainKHR swapChains[] = {swapChain.swapChain};
 	const VkPresentInfoKHR presentInfo{
@@ -788,6 +791,7 @@ void VulkanHandler::swapFrame() {
 			state = State::ErrorPresentingQueue;
 		}
 	}
+	OWL_CORE_FRAME_TRACE("Frame Trace: Queue present")
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
@@ -799,6 +803,7 @@ void VulkanHandler::bindPipeline(const int32_t id) {
 		OWL_CORE_WARN("Vulkan: cannot bind pipeline with id {}", id)
 		return;
 	}
+	OWL_CORE_FRAME_TRACE("Frame Trace: Binding pipeline {}", id)
 	vkCmdBindPipeline(getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipeLines[id].pipeLine);
 	vkCmdBindDescriptorSets(getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipeLines[id].layout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
 }
@@ -809,6 +814,8 @@ void VulkanHandler::setResize() {
 }
 
 void VulkanHandler::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const {
+
+	OWL_CORE_FRAME_TRACE("Frame Trace: Begin copy buffer size {}", size)
 	const VkCommandBufferAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.pNext = nullptr,
@@ -817,20 +824,29 @@ void VulkanHandler::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceS
 			.commandBufferCount = 1};
 
 	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
+	if (const VkResult result = vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create command buffer for buffer copy.")
+		return;
+	}
 
 	constexpr VkCommandBufferBeginInfo beginInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 			.pNext = nullptr,
 			.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
 			.pInheritanceInfo = nullptr};
-	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+	if (const VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to begin command buffer for buffer copy.")
+		return;
+	}
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	vkEndCommandBuffer(commandBuffer);
+	if (const VkResult result = vkEndCommandBuffer(commandBuffer); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to end command buffer for buffer copy.")
+		return;
+	}
 
 	const VkSubmitInfo submitInfo{
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -843,10 +859,17 @@ void VulkanHandler::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceS
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr};
 
-	vkQueueSubmit(physicalDevice.queues.graphics, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(physicalDevice.queues.graphics);
+	if (const VkResult result = vkQueueSubmit(physicalDevice.queues.graphics, 1, &submitInfo, VK_NULL_HANDLE); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to submit to queue for buffer copy.")
+		return;
+	}
+	if (const VkResult result = vkQueueWaitIdle(physicalDevice.queues.graphics); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to wait for idle queue for buffer copy.")
+		return;
+	}
 
 	vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
+	OWL_CORE_FRAME_TRACE("Frame Trace: End copy buffer!")
 }
 
 void VulkanHandler::createDescriptorSetLayout() {
@@ -875,8 +898,9 @@ void VulkanHandler::createUniformBuffers(const size_t size) {
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		createBuffer(size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
-
-		vkMapMemory(logicalDevice, uniformBuffersMemory[i], 0, size, 0, &uniformBuffersMapped[i]);
+		if (const auto result = vkMapMemory(logicalDevice, uniformBuffersMemory[i], 0, size, 0, &uniformBuffersMapped[i]); result != VK_SUCCESS) {
+			OWL_CORE_ERROR("Vulkan: Failed to create uniform buffer {}.", i)
+		}
 	}
 	createDescriptorSets(size);
 }
@@ -917,6 +941,7 @@ void VulkanHandler::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, Vk
 }
 
 void VulkanHandler::setUniformData(const void *data, size_t size) const {
+	OWL_CORE_FRAME_TRACE("Frame Trace: Set Uniform data size {}.", size)
 	memcpy(uniformBuffersMapped[currentFrame], data, size);
 }
 

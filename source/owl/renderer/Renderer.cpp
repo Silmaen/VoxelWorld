@@ -18,14 +18,14 @@ shared<Renderer::SceneData> Renderer::sceneData = nullptr;
 shared<ShaderLibrary> Renderer::shaderLibrary = nullptr;
 shared<TextureLibrary> Renderer::textureLibrary = nullptr;
 
-void Renderer::init(bool extraDebugging) {
+void Renderer::init() {
 	OWL_PROFILE_FUNCTION()
 
 	sceneData = mk_shared<SceneData>();
 	shaderLibrary = mk_shared<ShaderLibrary>();
 	textureLibrary = mk_shared<TextureLibrary>();
 
-	RenderCommand::init(extraDebugging);
+	RenderCommand::init();
 	if (RenderCommand::getState() != RenderAPI::State::Ready) {
 		internalState = State::Error;
 		return;

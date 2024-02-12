@@ -21,8 +21,10 @@ RenderAPI::~RenderAPI() {
 	vkh.release();
 }
 
-void RenderAPI::init(bool extraDebugging) {
+void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
+	auto &app = core::Application::get();
+	bool extraDebugging = app.getInitParams().useDebugging;
 
 	if (getState() != State::Created) return;
 
@@ -60,8 +62,9 @@ void RenderAPI::clear() {}
 void RenderAPI::drawData(const shared<DrawData> &data, uint32_t index) {
 	const auto &vkh = internal::VulkanHandler::get();
 	data->bind();
+	const bool isIndexed = data->getIndexCount() > 0;
 	const uint32_t count = index ? index : data->getIndexCount();
-	vkh.drawData(count);
+	vkh.drawData(count, isIndexed);
 }
 
 void RenderAPI::setLineWidth(float) {}

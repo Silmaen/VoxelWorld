@@ -15,30 +15,39 @@ namespace owl::renderer::opengl {
 DrawData::~DrawData() = default;
 
 void DrawData::init(const BufferLayout &layout, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) {
-	vertexArray = mk_shared<opengl::VertexArray>();
-	vertexBuffer = mk_shared<opengl::VertexBuffer>(layout.getStride() * indices.size());
-	vertexBuffer->setLayout(layout);
-	vertexArray->addVertexBuffer(vertexBuffer);
-	vertexArray->setIndexBuffer(mk_shared<IndexBuffer>(indices.data(), indices.size()));
-	setShader(shaderName, renderer);
+	if (layout.getStride() > 0) {
+		vertexArray = mk_shared<opengl::VertexArray>();
+		vertexBuffer = mk_shared<opengl::VertexBuffer>(layout.getStride() * indices.size());
+		vertexBuffer->setLayout(layout);
+		vertexArray->addVertexBuffer(vertexBuffer);
+		vertexArray->setIndexBuffer(mk_shared<IndexBuffer>(indices.data(), indices.size()));
+		setShader(shaderName, renderer);
+	}
 }
 
 void DrawData::bind() const {
-	shader->bind();
-	vertexArray->bind();
+	if (shader)
+		shader->bind();
+	if (vertexArray)
+		vertexArray->bind();
 }
 
 void DrawData::unbind() const {
-	vertexArray->unbind();
-	shader->unbind();
+	if (vertexArray)
+		vertexArray->unbind();
+	if (shader)
+		shader->unbind();
 }
 
 void DrawData::setVertexData(const void *data, uint32_t size) {
-	vertexBuffer->setData(data, size);
+	if (vertexBuffer)
+		vertexBuffer->setData(data, size);
 }
 
 uint32_t DrawData::getIndexCount() const {
-	return vertexArray->getIndexBuffer()->getCount();
+	if (vertexArray)
+		return vertexArray->getIndexBuffer()->getCount();
+	return 0;
 }
 
 void DrawData::setShader(const std::string &shaderName, const std::string &renderer) {

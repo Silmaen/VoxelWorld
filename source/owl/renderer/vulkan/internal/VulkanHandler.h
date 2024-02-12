@@ -133,7 +133,7 @@ public:
 	void endFrame();
 	void swapFrame();
 
-	void drawData(uint32_t vertexCount) const;
+	void drawData(uint32_t vertexCount, bool indexed = true) const;
 
 	void setClearColor(const VkClearValue &color) { clearColor = color; }
 	void setResize();

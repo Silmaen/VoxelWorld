@@ -13,11 +13,11 @@ layout (location = 0) in VertexOutput Input;
 layout (location = 3) in flat float v_TexIndex;
 layout (location = 4) in flat int v_EntityID;
 
-layout (binding = 0) uniform sampler2D u_Textures[32];
+//layout (binding = 0) uniform sampler2D u_Textures[32];
 
 void main() {
     vec4 texColor = Input.Color;
-    switch (int(v_TexIndex)) {
+    /*switch (int(v_TexIndex)) {
         case 0: texColor *= texture(u_Textures[0], Input.TexCoord * Input.TilingFactor); break;
         case 1: texColor *= texture(u_Textures[1], Input.TexCoord * Input.TilingFactor); break;
         case 2: texColor *= texture(u_Textures[2], Input.TexCoord * Input.TilingFactor); break;
@@ -50,7 +50,7 @@ void main() {
         case 29: texColor *= texture(u_Textures[29], Input.TexCoord * Input.TilingFactor); break;
         case 30: texColor *= texture(u_Textures[30], Input.TexCoord * Input.TilingFactor); break;
         case 31: texColor *= texture(u_Textures[31], Input.TexCoord * Input.TilingFactor); break;
-    }
+    }*/
     color = texColor;
 
     color2 = v_EntityID;// placeholder for our entity ID

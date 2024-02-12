@@ -77,11 +77,22 @@ get_filename_component(VULKAN_DIR ${VulkanLoader_DIR} DIRECTORY)
 get_filename_component(VULKAN_DIR ${VULKAN_DIR} DIRECTORY)
 message(STATUS "Found Vulkan version ${VulkanLoader_VERSION} @ ${VULKAN_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC Vulkan::Loader)
-
 find_package(VulkanUtilityLibraries REQUIRED)
 message(STATUS "Found VulkanUtilityLibrary version ${VulkanLoader_VERSION} @ ${VULKAN_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC Vulkan::LayerSettings)
 target_link_libraries(${ENGINE_NAME} PUBLIC Vulkan::UtilityHeaders)
+# Vulkan layers
+if (${PRJPREFIX}_DEFINE_VULKAN_LAYERS)
+    if (${PRJPREFIX}_PLATFORM_WINDOWS)
+        set(${PRJPREFIX}_VULKAN_LAYER_PATH ${VULKAN_DIR}/bin)
+        set(${PRJPREFIX}_VULKAN_LAYER_BIN_PATH ${VULKAN_DIR}/bin)
+    else ()
+        set(${PRJPREFIX}_VULKAN_LAYER_PATH ${VULKAN_DIR}/share/vulkan/explicit_layer.d)
+        set(${PRJPREFIX}_VULKAN_LAYER_BIN_PATH ${VULKAN_DIR}/lib)
+    endif ()
+    target_compile_definitions(${ENGINE_NAME} PUBLIC ${PRJPREFIX}_VULKAN_LAYER_PATH="${${PRJPREFIX}_VULKAN_LAYER_PATH}")
+    target_compile_definitions(${ENGINE_NAME} PUBLIC ${PRJPREFIX}_VULKAN_LAYER_BIN_PATH="${${PRJPREFIX}_VULKAN_LAYER_BIN_PATH}")
+endif ()
 
 # ImGui
 find_package(imgui REQUIRED)

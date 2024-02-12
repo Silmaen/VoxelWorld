@@ -29,7 +29,7 @@ public:
 	/**
 	 * @brief initialize the logging system.
 	 */
-	static void init(const spdlog::level::level_enum &level = spdlog::level::trace);
+	static void init(const spdlog::level::level_enum &level = spdlog::level::trace, uint64_t freq = 100);
 
 	/**
 	 * @brief Access to the logger for the core system.
@@ -60,13 +60,34 @@ public:
 	 */
 	static bool initiated() { return coreLogger != nullptr; }
 
+	/**
+	 * @brief To know if in logging frame.
+	 * @return True if in logging frame.
+	 */
+	static bool frameLog() { return frequency > 0 && frameCounter % frequency == 0; }
+
+	/**
+	 * @brief Start a new logging frame.
+	 */
+	static void newFrame();
+
+	/**
+	 * @brief define a new frame log frequncy.
+	 * @param freq New frequency.
+	 */
+	static void setFrameFrequency(const uint64_t freq) { frequency = freq; }
+
 private:
 	/// The core logger.
 	static shared<spdlog::logger> coreLogger;
 	/// The application logger.
 	static shared<spdlog::logger> clientLogger;
-	/// The level of verbosity
+	/// The level of verbosity.
 	static spdlog::level::level_enum verbosity;
+	/// Counter for the frames.
+	static uint64_t frameCounter;
+	/// Frequency of frame trace.
+	static uint64_t frequency;
 };
 }// namespace owl::core
 
@@ -115,7 +136,11 @@ inline OStream &operator<<(OStream &os, glm::qua<T, Q> quaternion) {
 	return os << glm::to_string(quaternion);
 }
 
-// Core log macros
+// Core log macros;
+#define OWL_CORE_FRAME_TRACE(...) \
+	if (::owl::core::Log::frameLog()) { ::owl::core::Log::getCoreLogger()->trace(__VA_ARGS__); }
+#define OWL_CORE_FRAME_ADVANCE ::owl::core::Log::newFrame();
+
 #define OWL_CORE_TRACE(...) ::owl::core::Log::getCoreLogger()->trace(__VA_ARGS__);
 #define OWL_CORE_INFO(...) ::owl::core::Log::getCoreLogger()->info(__VA_ARGS__);
 #define OWL_CORE_WARN(...) ::owl::core::Log::getCoreLogger()->warn(__VA_ARGS__);

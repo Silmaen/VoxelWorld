@@ -12,7 +12,7 @@
 
 namespace owl::renderer::null {
 
-void RenderAPI::init(bool) {
+void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
 	if (getState() != State::Created)
