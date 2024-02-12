@@ -164,12 +164,12 @@ void VulkanHandler::createDescriptorPool() {
 	const auto &core = VulkanCore::get();
 	VkDescriptorPoolSize poolSize{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = static_cast<uint32_t>(2)};
+			.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT)};
 	const VkDescriptorPoolCreateInfo poolInfo{
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
-			.maxSets = static_cast<uint32_t>(2),
+			.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT),
 			.poolSizeCount = 1,
 			.pPoolSizes = &poolSize};
 	if (const VkResult result = vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr, &descriptorPool); result != VK_SUCCESS) {
@@ -264,7 +264,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.rasterizerDiscardEnable = VK_FALSE,
 			.polygonMode = VK_POLYGON_MODE_FILL,
 			.cullMode = VK_CULL_MODE_BACK_BIT,
-			.frontFace = VK_FRONT_FACE_CLOCKWISE,
+			.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 			.depthBiasEnable = VK_FALSE,
 			.depthBiasConstantFactor = 0.0f,
 			.depthBiasClamp = 0.0,

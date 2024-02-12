@@ -108,8 +108,6 @@ public:
 
 	[[nodiscard]] VkRenderPass getRenderPath() const { return swapChain.renderPass; }
 
-	[[nodiscard]] static VkDevice getDevice() { return VulkanCore::get().getLogicalDevice(); }
-	[[nodiscard]] static VkPhysicalDevice getPhysicalDevice() { return VulkanCore::get().getPhysicalDevice(); }
 	[[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const;
 
 

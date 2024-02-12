@@ -43,8 +43,8 @@ void GraphContext::destroySurface(const VkInstance instance) {
 
 void GraphContext::waitIdle() {
 	OWL_CORE_TRACE("GraphContext Wait for Idle.")
-	auto &vkh = internal::VulkanHandler::get();
-	vkDeviceWaitIdle(vkh.getDevice());
+	auto &vkh = internal::VulkanCore::get();
+	vkDeviceWaitIdle(vkh.getLogicalDevice());
 }
 
 }// namespace owl::renderer::vulkan

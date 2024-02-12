@@ -302,7 +302,7 @@ float Renderer2D::getLineWidth() {
 	return data->lineWidth;
 }
 
-void Renderer2D::setLineWidth(float width) {
+void Renderer2D::setLineWidth(const float width) {
 	data->lineWidth = width;
 }
 void Renderer2D::drawDebugTriangle() {
@@ -315,14 +315,14 @@ void Renderer2D::drawLine(const LineData &lineData) {
 	data->stats.drawCalls++;
 }
 
-void Renderer2D::drawRect(const RectData &lineData) {
-	glm::mat4 trans = lineData.transform.transform;
+void Renderer2D::drawRect(const RectData &rectData) {
+	const glm::mat4 trans = rectData.transform.transform;
 	std::vector<glm::vec3> points;
 	static const std::vector<std::pair<uint8_t, uint8_t>> idx = {{0, 1}, {1, 2}, {2, 3}, {3, 0}};
 	for (const auto &vtx: utils::quadVertexPositions)
 		points.emplace_back(trans * vtx);
 	for (const auto &[p1, p2]: idx)
-		drawLine({points[p1], points[p2], lineData.color, lineData.entityID});
+		drawLine({points[p1], points[p2], rectData.color, rectData.entityID});
 }
 
 void Renderer2D::drawPolyLine(const PolyLineData &lineData) {
@@ -330,7 +330,7 @@ void Renderer2D::drawPolyLine(const PolyLineData &lineData) {
 		OWL_CORE_WARN("Too few points in the multiline with ID {}", lineData.entityID)
 		return;
 	}
-	glm::mat4 trans = lineData.transform.transform;
+	const glm::mat4 trans = lineData.transform.transform;
 	std::vector<glm::vec3> points;
 	std::vector<std::pair<uint32_t, uint32_t>> link;
 	uint32_t i = 0;
@@ -402,7 +402,7 @@ void Renderer2D::drawQuad(const Quad2DData &quadData) {
 	data->stats.quadCount++;
 }
 
-void Renderer2D::drawSprite(const glm::mat4 &transform, scene::component::SpriteRenderer &src, int entityID) {
+void Renderer2D::drawSprite(const glm::mat4 &transform, const scene::component::SpriteRenderer &src, const int entityID) {
 	drawQuad({.transform = transform,
 			  .color = src.color,
 			  .texture = src.texture,

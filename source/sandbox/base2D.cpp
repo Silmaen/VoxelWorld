@@ -79,7 +79,7 @@ void base2D::onUpdate(const core::Timestep &ts) {
 		renderer::Renderer2D::endScene();
 	}
 	// second part of the scene
-	{
+	if ((false)) {
 		OWL_PROFILE_SCOPE("Render Draws 2")
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
 		int32_t id = 0;

@@ -72,48 +72,39 @@ void SwapChain::release() {
 void SwapChain::createSwapChain(const VkExtent2D &extent) {
 	const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
 	const auto &core = VulkanCore::get();
-	const VkSurfaceFormatKHR surfaceFormat = core.getSurfaceFormat();
-	const VkPresentModeKHR presentMode = core.getPresentMode();
 	uint32_t imageCount = core.getImagecount();
-
-	VkSwapchainCreateInfoKHR createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	createInfo.surface = gc->getSurface();
-
-	createInfo.minImageCount = imageCount;
-	createInfo.imageFormat = surfaceFormat.format;
-	createInfo.imageColorSpace = surfaceFormat.colorSpace;
-	createInfo.imageExtent = extent;
-	createInfo.imageArrayLayers = 1;
-	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
 	const auto queueFamilyIndices = core.getQueueIndicies();
-	if (queueFamilyIndices.size() > 1) {
-		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-		createInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices.size());
-		createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
-	} else {
-		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	}
-
-	createInfo.preTransform = core.getCurrentTransform();
-	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	createInfo.presentMode = presentMode;
-	createInfo.clipped = VK_TRUE;
-
-	createInfo.oldSwapchain = VK_NULL_HANDLE;
+	const bool shares = queueFamilyIndices.size() > 1;
+	const VkSwapchainCreateInfoKHR createInfo{
+			.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+			.pNext = nullptr,
+			.flags = {},
+			.surface = gc->getSurface(),
+			.minImageCount = imageCount,
+			.imageFormat = core.getSurfaceFormat().format,
+			.imageColorSpace = core.getSurfaceFormat().colorSpace,
+			.imageExtent = extent,
+			.imageArrayLayers = 1,
+			.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+			.imageSharingMode = shares ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE,
+			.queueFamilyIndexCount = shares ? static_cast<uint32_t>(queueFamilyIndices.size()) : 0,
+			.pQueueFamilyIndices = shares ? queueFamilyIndices.data() : nullptr,
+			.preTransform = core.getCurrentTransform(),
+			.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+			.presentMode = core.getPresentMode(),
+			.clipped = VK_TRUE,
+			.oldSwapchain = VK_NULL_HANDLE};
 
 	if (const VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create swap chain ({}).", resultString(result))
 		state = State::ErrorCreatingSwapChain;
 		return;
 	}
-
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
 	swapChainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data());
 
-	swapChainImageFormat = surfaceFormat.format;
+	swapChainImageFormat = core.getSurfaceFormat().format;
 	swapChainExtent = extent;
 }
 
@@ -125,7 +116,7 @@ void SwapChain::createImageViews() {
 				.pNext = nullptr,
 				.flags = {},
 				.image = swapChainImages[i],
-				.viewType = VK_IMAGE_VIEW_TYPE_3D,
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
 				.format = swapChainImageFormat,
 				.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
 				.subresourceRange = {

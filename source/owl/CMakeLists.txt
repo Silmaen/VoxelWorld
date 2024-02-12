@@ -71,6 +71,7 @@ message(STATUS "Found glm version ${glm_VERSION} @ ${glm_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC glm::glm)
 
 # Vulkan
+# ----------------------
 find_package(VulkanHeaders REQUIRED)
 find_package(VulkanLoader REQUIRED)
 get_filename_component(VULKAN_DIR ${VulkanLoader_DIR} DIRECTORY)
@@ -93,6 +94,7 @@ if (${PRJPREFIX}_DEFINE_VULKAN_LAYERS)
     target_compile_definitions(${ENGINE_NAME} PUBLIC ${PRJPREFIX}_VULKAN_LAYER_PATH="${${PRJPREFIX}_VULKAN_LAYER_PATH}")
     target_compile_definitions(${ENGINE_NAME} PUBLIC ${PRJPREFIX}_VULKAN_LAYER_BIN_PATH="${${PRJPREFIX}_VULKAN_LAYER_BIN_PATH}")
 endif ()
+# ----------------------
 
 # ImGui
 find_package(imgui REQUIRED)
@@ -176,45 +178,4 @@ if (OWL_PLATFORM_WINDOWS)
         endforeach ()
     endif ()
 
-endif ()
-
-# copy the Vulkan layers & configs
-if (${PRJPREFIX}_COPY_VULKAN_LAYERS)
-    if (OWL_PLATFORM_WINDOWS)
-        set(VULKAN_BIN_DIR ${VULKAN_DIR}/bin)
-        set(VULKAN_LIB_DIR ${VULKAN_DIR}/lib)
-
-        message(STATUS "Vulkan dir:  ${VULKAN_DIR}")
-        file(GLOB VK_LAYER_BIN_FILES LIST_DIRECTORIES false ${VULKAN_BIN_DIR}/*VkLayer*)
-        file(GLOB VK_LAYER_LIB_FILES LIST_DIRECTORIES false ${VULKAN_LIB_DIR}/*VkLayer*)
-        set(VK_LAYER_FILES ${VK_LAYER_BIN_FILES} ${VK_LAYER_LIB_FILES})
-
-        foreach (file ${VK_LAYER_FILES})
-            get_filename_component(filename ${file} NAME)
-            set(destination "$<TARGET_FILE_DIR:${ENGINE_NAME}>/${filename}")
-
-            add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-                    COMMAND "${CMAKE_COMMAND}" -E "$<IF:$<CONFIG:Debug>,echo,true>" "Copying VkLayer file ${file} for debug configuration..."
-                    COMMAND "${CMAKE_COMMAND}" -E "$<IF:$<CONFIG:Debug>,copy_if_different,true>" "${file}" "${destination}"
-            )
-        endforeach ()
-    else ()
-        set(VULKAN_LIB_DIR ${VULKAN_DIR}/lib)
-        set(VULKAN_LAYER_DIR ${VULKAN_DIR}/share/vulkan/explicit_layer.d)
-
-        message(STATUS "Vulkan dir:  ${VULKAN_DIR}")
-        file(GLOB VK_LAYER_BIN_FILES LIST_DIRECTORIES false ${VULKAN_LIB_DIR}/*VkLayer*)
-        file(GLOB VK_LAYER_LIB_FILES LIST_DIRECTORIES false ${VULKAN_LAYER_DIR}/*VkLayer*)
-        set(VK_LAYER_FILES ${VK_LAYER_BIN_FILES} ${VK_LAYER_LIB_FILES})
-
-        foreach (file ${VK_LAYER_FILES})
-            get_filename_component(filename ${file} NAME)
-            set(destination "$<TARGET_FILE_DIR:${ENGINE_NAME}>/${filename}")
-
-            add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-                    COMMAND "${CMAKE_COMMAND}" -E "$<IF:$<CONFIG:Debug>,echo,true>" "Copying VkLayer file ${file} for debug configuration..."
-                    COMMAND "${CMAKE_COMMAND}" -E "$<IF:$<CONFIG:Debug>,copy_if_different,true>" "${file}" "${destination}"
-            )
-        endforeach ()
-    endif ()
 endif ()
