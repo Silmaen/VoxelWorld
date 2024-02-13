@@ -49,6 +49,7 @@ void base2D::onUpdate(const core::Timestep &ts) {
 	{
 		OWL_PROFILE_SCOPE("Render Draws 1")
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
+		renderer::Renderer2D::drawDebugTriangle();
 		renderer::Renderer2D::drawQuad({
 				.transform = renderer::utils::PRS{
 						.position = {1.0f, 0.0f, 0.0f},

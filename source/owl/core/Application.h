@@ -45,6 +45,8 @@ struct OWL_API AppParams {
 	char **args = nullptr;
 	/// If extra debugging symbols should be loaded.
 	bool useDebugging = false;
+	/// The frequency for the frame debugging
+	uint64_t frameLogFrequency = 0;
 
 	/**
 	 * @brief Access to the given command line argument.

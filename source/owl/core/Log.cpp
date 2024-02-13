@@ -22,8 +22,10 @@ namespace owl::core {
 std::shared_ptr<spdlog::logger> Log::coreLogger;
 std::shared_ptr<spdlog::logger> Log::clientLogger;
 spdlog::level::level_enum Log::verbosity = spdlog::level::trace;
+uint64_t Log::frameCounter = 0;
+uint64_t Log::frequency = 100;
 
-void Log::init(const spdlog::level::level_enum &level) {
+void Log::init(const spdlog::level::level_enum &level, const uint64_t freq) {
 	OWL_SCOPE_UNTRACK
 	if (coreLogger != nullptr) {
 		OWL_CORE_INFO("Logger already initiated.")
@@ -46,6 +48,8 @@ void Log::init(const spdlog::level::level_enum &level) {
 	clientLogger = std::make_shared<spdlog::logger>("APP", begin(logSinks), end(logSinks));
 	spdlog::register_logger(clientLogger);
 	setVerbosityLevel(level);
+	frameCounter = 0;
+	frequency = freq;
 }
 
 void Log::setVerbosityLevel(const spdlog::level::level_enum &level) {
@@ -65,6 +69,12 @@ void Log::invalidate() {
 	spdlog::drop_all();
 	coreLogger.reset();
 	clientLogger.reset();
+}
+
+void Log::newFrame() {
+	OWL_CORE_FRAME_TRACE(" ---- END FRAME ----")
+	++frameCounter;
+	OWL_CORE_FRAME_TRACE(" ---- NEW FRAME ----")
 }
 
 }// namespace owl::core

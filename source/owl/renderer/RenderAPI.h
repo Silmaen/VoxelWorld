@@ -32,9 +32,8 @@ public:
 
 	/**
 	 * @brief Initialize the renderer.
-	 * @param extraDebugging If extra debug tools should be loaded.
 	 */
-	virtual void init(bool extraDebugging = false) = 0;
+	virtual void init() = 0;
 
 	/**
 	 * @brief Define the view port for this API.

@@ -235,6 +235,10 @@ public:
 	static void drawQuad(const Quad2DData &quadData);
 
 	/**
+	 * @brief Draws a Debug triangle on the screen.
+	 */
+	static void drawDebugTriangle();
+	/**
 	 * @brief Draw a sprite entity on the screen.
 	 * @param transform Sprite transformations.
 	 * @param src The sprite to render.

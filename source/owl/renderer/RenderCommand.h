@@ -31,11 +31,10 @@ public:
 
 	/**
 	 * @brief Initialize the renderer.
-	 * @param extraDebugging If extra debug tools should be loaded.
 	 */
-	static void init(bool extraDebugging = false) {
+	static void init() {
 		if (renderAPI)
-			renderAPI->init(extraDebugging);
+			renderAPI->init();
 	}
 
 	/**

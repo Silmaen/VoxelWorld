@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <utility>
 
+#include "Environment.h"
 #include "core/external/yaml.h"
 #include "debug/Tracker.h"
 #include "input/Input.h"
@@ -35,11 +36,6 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 		// Assuming present of a folder 'res' containing the data
 		workingDirectory = absolute(std::filesystem::current_path());
 		OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
-#ifdef WIN32
-		_putenv_s("VK_ADD_LAYER_PATH", workingDirectory.string().c_str());
-#else
-		setenv("VK_ADD_LAYER_PATH", (workingDirectory.parent_path() / "lib").string().c_str(), 1);
-#endif
 
 		// load config file if any
 		const auto configPath = workingDirectory / "config.yml";
@@ -48,6 +44,14 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 		// save config
 		initParams.saveToFile(configPath);
 
+		if (initParams.useDebugging) {
+			appendEnv("VK_ADD_LAYER_PATH", workingDirectory.string());
+#ifdef OWL_VULKAN_LAYER_PATH
+			appendEnv("VK_ADD_LAYER_PATH", OWL_VULKAN_LAYER_PATH);
+#endif
+		}
+
+		Log::setFrameFrequency(initParams.frameLogFrequency);
 		[[maybe_unused]] const bool assetFound = searchAssets(initParams.assetsPattern);
 		OWL_CORE_ASSERT(assetFound, "Unable to find assets")
 	}
@@ -77,7 +81,7 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 
 	// initialize the renderer
 	{
-		renderer::Renderer::init(initParams.useDebugging);
+		renderer::Renderer::init();
 		// check renderer initialization
 		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
 			OWL_CORE_ERROR("ERROR while Initializing Renderer")
@@ -144,6 +148,7 @@ void Application::run() {
 #endif
 	while (state == State::Running) {
 		OWL_PROFILE_SCOPE("RunLoop")
+		OWL_CORE_FRAME_ADVANCE
 
 		stepper.update();
 		if (!minimized) {
@@ -270,6 +275,7 @@ void AppParams::loadFromFile(const std::filesystem::path &file) {
 		}
 		if (appConfig["hasGui"]) hasGui = appConfig["hasGui"].as<bool>();
 		if (appConfig["useDebugging"]) useDebugging = appConfig["useDebugging"].as<bool>();
+		if (appConfig["frameLogFrequency"]) frameLogFrequency = appConfig["frameLogFrequency"].as<uint64_t>();
 	}
 }
 
@@ -283,6 +289,7 @@ void AppParams::saveToFile(const std::filesystem::path &file) const {
 	out << YAML::Key << "renderer" << YAML::Value << std::string(magic_enum::enum_name(renderer));
 	out << YAML::Key << "hasGui" << YAML::Value << hasGui;
 	out << YAML::Key << "useDebugging" << YAML::Value << useDebugging;
+	out << YAML::Key << "frameLogFrequency" << YAML::Value << frameLogFrequency;
 
 	out << YAML::EndMap;
 	out << YAML::EndMap;

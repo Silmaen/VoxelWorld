@@ -18,23 +18,28 @@ DrawData::~DrawData() = default;
 
 void DrawData::init(const BufferLayout &layout, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) {
 	setShader(shaderName, renderer);
-	vertexBuffer = mk_shared<VertexBuffer>(layout.getStride() * indices.size());
-	vertexBuffer->setLayout(layout);
-	indexBuffer = mk_shared<IndexBuffer>(indices.data(), indices.size());
-
+	if (layout.getStride() != 0) {
+		vertexBuffer = mk_shared<VertexBuffer>(layout.getStride() * indices.size());
+		vertexBuffer->setLayout(layout);
+		indexBuffer = mk_shared<IndexBuffer>(indices.data(), indices.size());
+	}
 	auto &vkh = internal::VulkanHandler::get();
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages = shader->getStagesInfo();
 
-	const auto bindingDescription = vertexBuffer->getBindingDescription();
-	const auto attributeDescriptions = vertexBuffer->getAttributeDescriptions();
+	VkVertexInputBindingDescription bindingDescription;
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+	if (vertexBuffer) {
+		attributeDescriptions = vertexBuffer->getAttributeDescriptions();
+		bindingDescription = vertexBuffer->getBindingDescription();
+	}
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
-			.vertexBindingDescriptionCount = 1,
-			.pVertexBindingDescriptions = &bindingDescription,
-			.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size()),
-			.pVertexAttributeDescriptions = attributeDescriptions.data(),
+			.vertexBindingDescriptionCount = vertexBuffer ? 1u : 0u,
+			.pVertexBindingDescriptions = vertexBuffer ? &bindingDescription : nullptr,
+			.vertexAttributeDescriptionCount = vertexBuffer ? static_cast<uint32_t>(attributeDescriptions.size()) : 0,
+			.pVertexAttributeDescriptions = vertexBuffer ? attributeDescriptions.data() : nullptr,
 	};
 	if (pipelineId >= 0)
 		vkh.popPipeline(pipelineId);
@@ -58,8 +63,10 @@ void DrawData::bind() const {
 		return;
 	auto &vkh = internal::VulkanHandler::get();
 	vkh.bindPipeline(pipelineId);
-	vertexBuffer->bind();
-	indexBuffer->bind();
+	if (vertexBuffer)
+		vertexBuffer->bind();
+	if (indexBuffer)
+		indexBuffer->bind();
 }
 
 void DrawData::unbind() const {
@@ -68,13 +75,16 @@ void DrawData::unbind() const {
 void DrawData::setVertexData(const void *data, uint32_t size) {
 	if (pipelineId < 0)
 		return;
-	vertexBuffer->setData(data, size);
+	if (vertexBuffer)
+		vertexBuffer->setData(data, size);
 }
 
 uint32_t DrawData::getIndexCount() const {
 	if (pipelineId < 0)
 		return 0;
-	return indexBuffer->getCount();
+	if (indexBuffer)
+		return indexBuffer->getCount();
+	return 0;
 }
 
 }// namespace owl::renderer::vulkan
