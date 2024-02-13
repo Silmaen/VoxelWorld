@@ -154,10 +154,14 @@ IndexBuffer::IndexBuffer(uint32_t *data, uint32_t size) : count(size) {
 		OWL_CORE_WARN("Vulkan index buffer: Trying to create index buffer data after VulkanHander release...")
 		return;
 	}
-	const VkDeviceSize bufferSize = sizeof(uint32_t) * size;
+	const VkDeviceSize bufferSize = sizeof(uint16_t) * size;
 	vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
 
+	OWL_CORE_TRACE("Vulkan IndexBuffer: Create Buffer size: {}", bufferSize)
 	if (data != nullptr) {
+		for (uint32_t i = 0; i < 100; ++i) {
+			OWL_CORE_TRACE("Vulkan IndexBuffer:      index {} val {}", i, data[i])
+		}
 		VkBuffer stagingBuffer;
 		VkDeviceMemory stagingBufferMemory;
 		vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
@@ -200,7 +204,7 @@ void IndexBuffer::bind() const {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to bind vertex buffer after VulkanHander release...")
 		return;
 	}
-	vkCmdBindIndexBuffer(vkh.getCurrentCommandBuffer(), indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(vkh.getCurrentCommandBuffer(), indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
 void IndexBuffer::unbind() const {}

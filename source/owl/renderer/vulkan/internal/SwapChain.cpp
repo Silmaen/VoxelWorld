@@ -116,7 +116,7 @@ void SwapChain::createImageViews() {
 				.pNext = nullptr,
 				.flags = {},
 				.image = swapChainImages[i],
-				.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				.viewType = VK_IMAGE_VIEW_TYPE_3D,
 				.format = swapChainImageFormat,
 				.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
 				.subresourceRange = {

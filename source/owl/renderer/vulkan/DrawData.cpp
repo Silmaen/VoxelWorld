@@ -17,6 +17,8 @@ namespace owl::renderer::vulkan {
 DrawData::~DrawData() = default;
 
 void DrawData::init(const BufferLayout &layout, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) {
+	shaderName_ = shaderName;
+	renderer_ = renderer;
 	setShader(shaderName, renderer);
 	if (layout.getStride() != 0) {
 		vertexBuffer = mk_shared<VertexBuffer>(layout.getStride() * indices.size());

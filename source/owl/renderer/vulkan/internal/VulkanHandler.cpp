@@ -262,9 +262,9 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.flags = {},
 			.depthClampEnable = VK_FALSE,
 			.rasterizerDiscardEnable = VK_FALSE,
-			.polygonMode = VK_POLYGON_MODE_FILL,
+			.polygonMode = VK_POLYGON_MODE_FILL,// VK_POLYGON_MODE_LINE
 			.cullMode = VK_CULL_MODE_BACK_BIT,
-			.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+			.frontFace = VK_FRONT_FACE_CLOCKWISE,
 			.depthBiasEnable = VK_FALSE,
 			.depthBiasConstantFactor = 0.0f,
 			.depthBiasClamp = 0.0,
@@ -285,8 +285,8 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
 			.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
 			.colorBlendOp = {},
-			.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
-			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+			.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
 			.alphaBlendOp = {},
 			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT};
 	VkPipelineColorBlendStateCreateInfo colorBlending{
