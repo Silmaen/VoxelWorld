@@ -111,6 +111,7 @@ public:
 	[[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const;
 
 
+	// Pipelines management.
 	struct PipeLineData {
 		VkPipeline pipeLine = nullptr;
 		VkPipelineLayout layout = nullptr;
@@ -120,13 +121,23 @@ public:
 	void popPipeline(int32_t id);
 	void bindPipeline(int32_t id);
 
+	// Command buffer data
+	VkCommandPool commandPool{nullptr};
+	std::vector<VkCommandBuffer> commandBuffers{nullptr};
+	void beginBatch();
+	void endBatch();
+	bool inBatch = false;
+	bool firstBatch = true;
+
 	void beginFrame();
 	void endFrame();
+
 	void swapFrame();
 
-	void drawData(uint32_t vertexCount, bool indexed = true) const;
-
+	void drawData(uint32_t vertexCount, bool indexed = true);
 	void setClearColor(const VkClearValue &color) { clearColor = color; }
+	void clear();
+
 	void setResize();
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory) const;
@@ -163,24 +174,25 @@ private:
 	/// The swapchain.
 	SwapChain swapChain;
 
+	VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
 
 	/// List of piplines.
 	std::map<int32_t, PipeLineData> pipeLines;
-	VkCommandPool commandPool{nullptr};
 
-	std::vector<VkCommandBuffer> commandBuffers{nullptr};
+
+	/// Main FrameBuffers
 	std::vector<VkSemaphore> imageAvailableSemaphores{nullptr};
 	std::vector<VkSemaphore> renderFinishedSemaphores{nullptr};
 	std::vector<VkFence> inFlightFences{nullptr};
 	int currentFrame = 0;
 
 	uint32_t imageIndex = 0;
-	VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
 
+
+	// Uniform data
 	VkDescriptorSetLayout descriptorSetLayout{nullptr};
 	VkDescriptorPool descriptorPool{nullptr};
 	void createDescriptorSets(size_t size);
-
 	std::vector<VkDescriptorSet> descriptorSets;
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;

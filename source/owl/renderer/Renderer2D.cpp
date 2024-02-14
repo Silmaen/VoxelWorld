@@ -283,9 +283,11 @@ void Renderer2D::flush() {
 	if (data->doTriangleDraw) {
 		RenderCommand::drawData(data->drawDataTriangle, 3);
 	}
+	RenderCommand::endBatch();
 }
 
 void Renderer2D::startBatch() {
+	RenderCommand::beginBatch();
 	utils::resetDrawData(data->quad);
 	utils::resetDrawData(data->circle);
 	utils::resetDrawData(data->line);

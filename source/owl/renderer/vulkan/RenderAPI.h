@@ -80,7 +80,15 @@ public:
 	 * @brief Reset value for the frame to render.
 	 */
 	void beginFrame() override;
+	/**
+		 * @brief Reset value for the batch to render.
+		 */
+	void beginBatch() override;
 
+	/**
+	 * @brief Ends draw call for the current batch.
+	 */
+	void endBatch() override;
 	/**
 	 * @brief Ends draw call for the current frame.
 	 */

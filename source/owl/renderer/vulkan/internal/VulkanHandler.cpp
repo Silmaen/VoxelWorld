@@ -122,7 +122,11 @@ void VulkanHandler::release() {
 	state = State::Uninitialized;
 }
 
-static void func(VkResult) {}
+static void func(VkResult result) {
+	if (result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan Imgui: Error detected: {}", resultString(result))
+	}
+}
 
 ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 	const auto &core = VulkanCore::get();
@@ -307,6 +311,19 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.flags = {},
 			.dynamicStateCount = 2,
 			.pDynamicStates = dynamicStates};
+	VkPipelineDepthStencilStateCreateInfo depthStensil{
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = {},
+			.depthTestEnable = VK_TRUE,
+			.depthWriteEnable = VK_TRUE,
+			.depthCompareOp = VK_COMPARE_OP_LESS,
+			.depthBoundsTestEnable = VK_FALSE,
+			.stencilTestEnable = VK_FALSE,
+			.front = {},
+			.back = {},
+			.minDepthBounds = 0.0f,
+			.maxDepthBounds = 1.0f};
 	VkGraphicsPipelineCreateInfo pipelineInfo{
 			.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 			.pNext = nullptr,
@@ -319,7 +336,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.pViewportState = &viewportState,
 			.pRasterizationState = &rasterizer,
 			.pMultisampleState = &multisampling,
-			.pDepthStencilState = nullptr,
+			.pDepthStencilState = &depthStensil,
 			.pColorBlendState = &colorBlending,
 			.pDynamicState = &dynamicState,
 			.layout = pData.layout,
@@ -415,21 +432,57 @@ void VulkanHandler::createSyncObjects() {
 	}
 }
 
-void VulkanHandler::drawData(uint32_t vertexCount, bool indexed) const {
+void VulkanHandler::clear() {
+	constexpr VkCommandBufferBeginInfo beginInfo{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+			.pNext = nullptr,
+			.flags = {},
+			.pInheritanceInfo = nullptr};
+	if (const VkResult result = vkBeginCommandBuffer(getCurrentCommandBuffer(), &beginInfo); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to begin recording command buffer ({}).", resultString(result))
+		state = State::ErrorBeginCommandBuffer;
+		return;
+	}
+	const VkRenderPassBeginInfo renderPassInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+			.pNext = nullptr,
+			.renderPass = swapChain.clearingPass,
+			.framebuffer = swapChain.swapChainFramebuffers[imageIndex],
+			.renderArea = {
+					.offset = {0, 0},
+					.extent = swapChain.swapChainExtent},
+			.clearValueCount = 1,
+			.pClearValues = &clearColor};
+	vkCmdBeginRenderPass(getCurrentCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdEndRenderPass(getCurrentCommandBuffer());
+	if (const VkResult result = vkEndCommandBuffer(getCurrentCommandBuffer()); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to end command buffer ({}).", resultString(result))
+		state = State::ErrorEndCommandBuffer;
+	}
+	const VkSubmitInfo submitInfo{
+			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+			.pNext = nullptr,
+			.waitSemaphoreCount = 0,
+			.pWaitSemaphores = nullptr,
+			.pWaitDstStageMask = nullptr,
+			.commandBufferCount = 1,
+			.pCommandBuffers = &commandBuffers[currentFrame],
+			.signalSemaphoreCount = 0,
+			.pSignalSemaphores = nullptr};
+	const auto &core = VulkanCore::get();
+	vkResetFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
+	if (const VkResult result = vkQueueSubmit(core.getGraphicQueue(), 1, &submitInfo, inFlightFences[currentFrame]); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to submit draw command buffer ({}).", resultString(result))
+		state = State::ErrorSubmitingDrawCommand;
+	}
+	vkWaitForFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+}
+
+void VulkanHandler::drawData(uint32_t vertexCount, bool indexed) {
 	if (state != State::Running)
 		return;
-	const VkViewport viewport{
-			.x = 0.0f,
-			.y = 0.0f,
-			.width = static_cast<float>(swapChain.swapChainExtent.width),
-			.height = static_cast<float>(swapChain.swapChainExtent.height),
-			.minDepth = 0.0f,
-			.maxDepth = 1.0f};
-	vkCmdSetViewport(getCurrentCommandBuffer(), 0, 1, &viewport);
-	const VkRect2D scissor{
-			.offset = {0, 0},
-			.extent = swapChain.swapChainExtent};
-	vkCmdSetScissor(getCurrentCommandBuffer(), 0, 1, &scissor);
+	if (!inBatch)
+		beginBatch();
 	OWL_CORE_FRAME_TRACE("Frame Trace: draw {} vertices {}", vertexCount, indexed)
 	if (indexed)
 		vkCmdDrawIndexed(getCurrentCommandBuffer(), vertexCount, 1, 0, 0, 0);
@@ -454,13 +507,28 @@ void VulkanHandler::beginFrame() {
 		}
 		vkResetFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
 	}
+}
+
+void VulkanHandler::endFrame() {
+	if (state != State::Running)
+		return;
+	if (inBatch)
+		endBatch();
+	firstBatch = true;
+}
+
+void VulkanHandler::beginBatch() {
+	inBatch = true;
+
+	const auto &core = VulkanCore::get();
+	vkWaitForFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+	vkResetFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
 
 	if (const VkResult result = vkResetCommandBuffer(getCurrentCommandBuffer(), /*VkCommandBufferResetFlagBits*/ 0); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to reset recording command buffer ({}).", resultString(result))
 		state = State::ErrorResetCommandBuffer;
 		return;
 	}
-
 	constexpr VkCommandBufferBeginInfo beginInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 			.pNext = nullptr,
@@ -471,8 +539,6 @@ void VulkanHandler::beginFrame() {
 		state = State::ErrorBeginCommandBuffer;
 		return;
 	}
-	OWL_CORE_FRAME_TRACE("Frame Trace: Begin Command buffer")
-
 	const VkRenderPassBeginInfo renderPassInfo{
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
@@ -484,33 +550,35 @@ void VulkanHandler::beginFrame() {
 			.clearValueCount = 1,
 			.pClearValues = &clearColor};
 	vkCmdBeginRenderPass(getCurrentCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	OWL_CORE_FRAME_TRACE("Frame Trace: Begin render Pass")
+	const VkViewport viewport{
+			.x = 0.0f,
+			.y = 0.0f,
+			.width = static_cast<float>(swapChain.swapChainExtent.width),
+			.height = static_cast<float>(swapChain.swapChainExtent.height),
+			.minDepth = 0.0f,
+			.maxDepth = 1.0f};
+	vkCmdSetViewport(getCurrentCommandBuffer(), 0, 1, &viewport);
+	const VkRect2D scissor{
+			.offset = {0, 0},
+			.extent = swapChain.swapChainExtent};
+	vkCmdSetScissor(getCurrentCommandBuffer(), 0, 1, &scissor);
 }
 
-void VulkanHandler::endFrame() {
-	if (state != State::Running)
-		return;
-	OWL_CORE_FRAME_TRACE("Frame Trace: End render Pass")
+void VulkanHandler::endBatch() {
 	vkCmdEndRenderPass(getCurrentCommandBuffer());
-
-	OWL_CORE_FRAME_TRACE("Frame Trace: End command buffer")
 	if (const VkResult result = vkEndCommandBuffer(getCurrentCommandBuffer()); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to end command buffer ({}).", resultString(result))
 		state = State::ErrorEndCommandBuffer;
 	}
-}
-
-void VulkanHandler::swapFrame() {
-	if (state != State::Running)
-		return;
-	const VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
+	const VkSemaphore waitSemaphoresStart[] = {imageAvailableSemaphores[currentFrame]};
+	const VkSemaphore waitSemaphores[] = {renderFinishedSemaphores[currentFrame]};
 	constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 	const VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
 	const VkSubmitInfo submitInfo{
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 			.pNext = nullptr,
-			.waitSemaphoreCount = 1,
-			.pWaitSemaphores = waitSemaphores,
+			.waitSemaphoreCount = 1u,
+			.pWaitSemaphores = firstBatch ? waitSemaphoresStart : waitSemaphores,
 			.pWaitDstStageMask = waitStages,
 			.commandBufferCount = 1,
 			.pCommandBuffers = &commandBuffers[currentFrame],
@@ -518,14 +586,21 @@ void VulkanHandler::swapFrame() {
 			.pSignalSemaphores = signalSemaphores};
 
 	const auto &core = VulkanCore::get();
-	vkResetFences(core.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
 	if (const VkResult result = vkQueueSubmit(core.getGraphicQueue(), 1, &submitInfo, inFlightFences[currentFrame]); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to submit draw command buffer ({}).", resultString(result))
 		state = State::ErrorSubmitingDrawCommand;
 		return;
 	}
-	OWL_CORE_FRAME_TRACE("Frame Trace: Queue submit")
+	inBatch = false;
+	firstBatch = false;
+}
 
+void VulkanHandler::swapFrame() {
+	if (state != State::Running)
+		return;
+	if (inBatch)
+		endFrame();
+	const VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
 	const VkSwapchainKHR swapChains[] = {swapChain.swapChain};
 	const VkPresentInfoKHR presentInfo{
 			.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
@@ -536,7 +611,7 @@ void VulkanHandler::swapFrame() {
 			.pSwapchains = swapChains,
 			.pImageIndices = &imageIndex,
 			.pResults = nullptr};
-
+	const auto &core = VulkanCore::get();
 	if (const VkResult result = vkQueuePresentKHR(core.getPresentQueue(), &presentInfo); result != VK_SUCCESS) {
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || resize) {
 			resize = false;
@@ -546,7 +621,6 @@ void VulkanHandler::swapFrame() {
 			state = State::ErrorPresentingQueue;
 		}
 	}
-	OWL_CORE_FRAME_TRACE("Frame Trace: Queue present")
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
@@ -558,7 +632,6 @@ void VulkanHandler::bindPipeline(const int32_t id) {
 		OWL_CORE_WARN("Vulkan: cannot bind pipeline with id {}", id)
 		return;
 	}
-	OWL_CORE_FRAME_TRACE("Frame Trace: Binding pipeline {}", id)
 	vkCmdBindPipeline(getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipeLines[id].pipeLine);
 	vkCmdBindDescriptorSets(getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipeLines[id].layout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
 }

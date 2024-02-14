@@ -23,6 +23,7 @@ struct SwapChain {
 	std::vector<VkImageView> swapChainImageViews{};
 	std::vector<VkFramebuffer> swapChainFramebuffers{};
 	/// The render pass.
+	VkRenderPass clearingPass = nullptr;
 	VkRenderPass renderPass = nullptr;
 
 	void create(const VkDevice &logicDevice, const VkPhysicalDevice &physicalDevice);
@@ -43,7 +44,7 @@ private:
 	void cleanup();
 	void createSwapChain(const VkExtent2D &extent);
 	void createImageViews();
-	void createRenderPass();
+	void createRenderPasses();
 	void createSwapChainFrameBuffers();
 	VkDevice device{nullptr};
 	VkPhysicalDevice phy{nullptr};

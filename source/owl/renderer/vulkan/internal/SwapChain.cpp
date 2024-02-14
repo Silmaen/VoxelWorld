@@ -30,7 +30,7 @@ void SwapChain::create(const VkDevice &logicDevice, const VkPhysicalDevice &phys
 	if (state != State::Created)
 		return;
 	OWL_CORE_TRACE("  Internal swapchain imageviews created.")
-	createRenderPass();
+	createRenderPasses();
 	if (state != State::Created)
 		return;
 	OWL_CORE_TRACE("  Internal swapchain renderpass created.")
@@ -65,6 +65,10 @@ void SwapChain::release() {
 	if (renderPass != nullptr) {
 		vkDestroyRenderPass(device, renderPass, nullptr);
 		renderPass = nullptr;
+	}
+	if (clearingPass != nullptr) {
+		vkDestroyRenderPass(device, clearingPass, nullptr);
+		clearingPass = nullptr;
 	}
 	state = State::Created;
 }
@@ -116,7 +120,7 @@ void SwapChain::createImageViews() {
 				.pNext = nullptr,
 				.flags = {},
 				.image = swapChainImages[i],
-				.viewType = VK_IMAGE_VIEW_TYPE_3D,
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
 				.format = swapChainImageFormat,
 				.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
 				.subresourceRange = {
@@ -132,16 +136,27 @@ void SwapChain::createImageViews() {
 	}
 }
 
-void SwapChain::createRenderPass() {
-	VkAttachmentDescription colorAttachment{
+void SwapChain::createRenderPasses() {
+	VkAttachmentDescription colorAttachmentClear{
 			.flags = {},
 			.format = swapChainImageFormat,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
 			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
 			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE,
 			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
+
+	VkAttachmentDescription colorAttachment{
+			.flags = {},
+			.format = swapChainImageFormat,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 			.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
 	VkAttachmentReference colorAttachmentRef{
 			.attachment = 0,
@@ -165,6 +180,20 @@ void SwapChain::createRenderPass() {
 			.srcAccessMask = 0,
 			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 			.dependencyFlags = {}};
+	const VkRenderPassCreateInfo clearingPassInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = {},
+			.attachmentCount = 1,
+			.pAttachments = &colorAttachmentClear,
+			.subpassCount = 1,
+			.pSubpasses = &subpass,
+			.dependencyCount = 1,
+			.pDependencies = &dependency};
+	if (const VkResult result = vkCreateRenderPass(device, &clearingPassInfo, nullptr, &clearingPass); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create render pass ({})", resultString(result))
+		state = State::ErrorCreatingRenderPass;
+	}
 	const VkRenderPassCreateInfo renderPassInfo{
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 			.pNext = nullptr,
@@ -175,7 +204,6 @@ void SwapChain::createRenderPass() {
 			.pSubpasses = &subpass,
 			.dependencyCount = 1,
 			.pDependencies = &dependency};
-
 	if (const VkResult result = vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create render pass ({})", resultString(result))
 		state = State::ErrorCreatingRenderPass;

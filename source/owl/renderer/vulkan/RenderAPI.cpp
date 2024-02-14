@@ -57,10 +57,13 @@ void RenderAPI::setClearColor(const glm::vec4 &col) {
 	vkh.setClearColor(val);
 }
 
-void RenderAPI::clear() {}
+void RenderAPI::clear() {
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.clear();
+}
 
 void RenderAPI::drawData(const shared<DrawData> &data, uint32_t index) {
-	const auto &vkh = internal::VulkanHandler::get();
+	auto &vkh = internal::VulkanHandler::get();
 	data->bind();
 	const bool isIndexed = data->getIndexCount() > 0;
 	const uint32_t count = index ? index : data->getIndexCount();
@@ -77,6 +80,16 @@ void RenderAPI::beginFrame() {
 		return;
 	}
 	vkh.beginFrame();
+}
+
+void RenderAPI::beginBatch() {
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.beginBatch();
+}
+
+void RenderAPI::endBatch() {
+	auto &vkh = internal::VulkanHandler::get();
+	vkh.endBatch();
 }
 
 void RenderAPI::endFrame() {
