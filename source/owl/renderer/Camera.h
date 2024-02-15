@@ -12,10 +12,6 @@
 
 namespace owl::renderer {
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class Camera.
  */
@@ -29,13 +25,13 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Camera() = default;
+	virtual ~Camera();
 
 	/**
 	 * @brief Construct the camera with a projection.
 	 * @param proj projection matrix.
 	 */
-	Camera(const glm::mat4 &proj) : projection{proj} {}
+	explicit Camera(const glm::mat4 &proj) : projection{proj} {}
 
 	/**
 	 * @brief Get the projection matrix of the camera.
@@ -47,8 +43,5 @@ protected:
 	/// Camera's projection.
 	glm::mat4 projection = glm::mat4(1.0f);
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 }// namespace owl::renderer

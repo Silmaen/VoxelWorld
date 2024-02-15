@@ -121,9 +121,15 @@ struct internalData {
 };
 
 glm::mat4 toTransform(const PRS &transform) {
-	return glm::translate(glm::mat4(1.0f), transform.position) *
-		   glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation), {0.0f, 0.0f, 1.0f}) *
-		   glm::scale(glm::mat4(1.0f), {transform.size.x, transform.size.y, 1.0f});
+	if (RenderCommand::getAPI() == RenderAPI::Type::Vulkan) {
+		return glm::translate(glm::mat4(1.0f), transform.position) *
+			   glm::rotate(glm::mat4(1.0f), glm::radians(-transform.rotation), {0.0f, 0.0f, 1.0f}) *
+			   glm::scale(glm::mat4(1.0f), {transform.size.x, transform.size.y, 1.0f});
+	} else {
+		return glm::translate(glm::mat4(1.0f), transform.position) *
+			   glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation), {0.0f, 0.0f, 1.0f}) *
+			   glm::scale(glm::mat4(1.0f), {transform.size.x, transform.size.y, 1.0f});
+	}
 }
 
 }// namespace utils

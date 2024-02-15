@@ -12,6 +12,7 @@
 #include "../DrawData.h"
 #include "../GraphContext.h"
 #include "core/Application.h"
+#include "math/ColorSpace.h"
 #include "renderer/utils/shaderFileUtils.h"
 #include "utils.h"
 
@@ -288,7 +289,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &pipeLineName, std::vector
 			.blendEnable = VK_TRUE,
 			.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
 			.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-			.colorBlendOp = {},
+			.colorBlendOp = VK_BLEND_OP_ADD,
 			.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
 			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
 			.alphaBlendOp = {},
@@ -432,6 +433,14 @@ void VulkanHandler::createSyncObjects() {
 	}
 }
 
+void VulkanHandler::setClearColor(const glm::vec4 &color) {
+	const glm::vec4 lin = math::sRGBToLinear(color);
+	clearColor.color.float32[0] = lin.r;
+	clearColor.color.float32[1] = lin.g;
+	clearColor.color.float32[2] = lin.b;
+	clearColor.color.float32[3] = color.a;
+}
+
 void VulkanHandler::clear() {
 	constexpr VkCommandBufferBeginInfo beginInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -443,6 +452,7 @@ void VulkanHandler::clear() {
 		state = State::ErrorBeginCommandBuffer;
 		return;
 	}
+
 	const VkRenderPassBeginInfo renderPassInfo{
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
@@ -483,7 +493,6 @@ void VulkanHandler::drawData(uint32_t vertexCount, bool indexed) {
 		return;
 	if (!inBatch)
 		beginBatch();
-	OWL_CORE_FRAME_TRACE("Frame Trace: draw {} vertices {}", vertexCount, indexed)
 	if (indexed)
 		vkCmdDrawIndexed(getCurrentCommandBuffer(), vertexCount, 1, 0, 0, 0);
 	else
@@ -644,7 +653,6 @@ void VulkanHandler::setResize() {
 
 void VulkanHandler::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const {
 
-	OWL_CORE_FRAME_TRACE("Frame Trace: Begin copy buffer size {}", size)
 	const auto &core = VulkanCore::get();
 	const VkCommandBufferAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -699,7 +707,6 @@ void VulkanHandler::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceS
 	}
 
 	vkFreeCommandBuffers(core.getLogicalDevice(), commandPool, 1, &commandBuffer);
-	OWL_CORE_FRAME_TRACE("Frame Trace: End copy buffer!")
 }
 
 void VulkanHandler::createDescriptorSetLayout() {
@@ -773,7 +780,6 @@ void VulkanHandler::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, Vk
 }
 
 void VulkanHandler::setUniformData(const void *data, size_t size) const {
-	OWL_CORE_FRAME_TRACE("Frame Trace: Set Uniform data size {}.", size)
 	memcpy(uniformBuffersMapped[currentFrame], data, size);
 }
 

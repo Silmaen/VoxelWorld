@@ -79,14 +79,15 @@ void SwapChain::createSwapChain(const VkExtent2D &extent) {
 	uint32_t imageCount = core.getImagecount();
 	const auto queueFamilyIndices = core.getQueueIndicies();
 	const bool shares = queueFamilyIndices.size() > 1;
+	const VkSurfaceFormatKHR surface = core.getSurfaceFormat();
 	const VkSwapchainCreateInfoKHR createInfo{
 			.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
 			.pNext = nullptr,
 			.flags = {},
 			.surface = gc->getSurface(),
 			.minImageCount = imageCount,
-			.imageFormat = core.getSurfaceFormat().format,
-			.imageColorSpace = core.getSurfaceFormat().colorSpace,
+			.imageFormat = surface.format,
+			.imageColorSpace = surface.colorSpace,
 			.imageExtent = extent,
 			.imageArrayLayers = 1,
 			.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
@@ -108,7 +109,7 @@ void SwapChain::createSwapChain(const VkExtent2D &extent) {
 	swapChainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data());
 
-	swapChainImageFormat = core.getSurfaceFormat().format;
+	swapChainImageFormat = surface.format;
 	swapChainExtent = extent;
 }
 

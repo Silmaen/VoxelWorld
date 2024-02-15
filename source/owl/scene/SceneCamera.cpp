@@ -44,11 +44,10 @@ void SceneCamera::recalculateProjection() {
 	if (projectionType == ProjectionType::Perspective) {
 		projection = glm::perspective(perspectiveFOV, aspectRatio, perspectiveNear, perspectiveFar);
 	} else {
-		float orthoLeft = -orthographicSize * aspectRatio * 0.5f;
-		float orthoRight = orthographicSize * aspectRatio * 0.5f;
-		float orthoBottom = -orthographicSize * 0.5f;
-		float orthoTop = orthographicSize * 0.5f;
-
+		const float orthoLeft = -orthographicSize * aspectRatio * 0.5f;
+		const float orthoRight = orthographicSize * aspectRatio * 0.5f;
+		const float orthoBottom = -orthographicSize * 0.5f;
+		const float orthoTop = orthographicSize * 0.5f;
 		projection = glm::ortho(orthoLeft, orthoRight,
 								orthoBottom, orthoTop, orthographicNear, orthographicFar);
 	}

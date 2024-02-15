@@ -47,14 +47,9 @@ void RenderAPI::setViewport(uint32_t, uint32_t, uint32_t, uint32_t) {
 	vkh.setResize();
 }
 
-void RenderAPI::setClearColor(const glm::vec4 &col) {
+void RenderAPI::setClearColor(const glm::vec4 &color) {
 	auto &vkh = internal::VulkanHandler::get();
-	VkClearValue val;
-	val.color.float32[0] = col.r;
-	val.color.float32[1] = col.g;
-	val.color.float32[2] = col.b;
-	val.color.float32[3] = col.a;
-	vkh.setClearColor(val);
+	vkh.setClearColor(color);
 }
 
 void RenderAPI::clear() {

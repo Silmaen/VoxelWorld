@@ -15,6 +15,17 @@ layout (location = 4) in flat int v_EntityID;
 
 //layout (binding = 0) uniform sampler2D u_Textures[32];
 
+// convert color space to linear!
+vec4 sRGBToLinear(vec4 srgbColor) {
+    vec4 linearColor;
+    // Convertir chaque composante de couleur sRGB en couleur linéaire
+    linearColor.r = (srgbColor.r <= 0.04045) ? (srgbColor.r / 12.92) : pow((srgbColor.r + 0.055) / 1.055, 2.4);
+    linearColor.g = (srgbColor.g <= 0.04045) ? (srgbColor.g / 12.92) : pow((srgbColor.g + 0.055) / 1.055, 2.4);
+    linearColor.b = (srgbColor.b <= 0.04045) ? (srgbColor.b / 12.92) : pow((srgbColor.b + 0.055) / 1.055, 2.4);
+    linearColor.a = srgbColor.a;
+    return linearColor;
+}
+
 void main() {
     vec4 texColor = Input.Color;
     /*switch (int(v_TexIndex)) {
@@ -51,7 +62,7 @@ void main() {
         case 30: texColor *= texture(u_Textures[30], Input.TexCoord * Input.TilingFactor); break;
         case 31: texColor *= texture(u_Textures[31], Input.TexCoord * Input.TilingFactor); break;
     }*/
-    color = texColor;
+    color = sRGBToLinear(texColor);
 
-    color2 = v_EntityID; // placeholder for our entity ID
+    color2 = v_EntityID;// placeholder for our entity ID
 }

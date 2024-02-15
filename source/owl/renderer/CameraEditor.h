@@ -23,7 +23,7 @@ namespace owl::renderer {
 class OWL_API CameraEditor : public Camera {
 public:
 	CameraEditor() = default;
-	~CameraEditor() override = default;
+	~CameraEditor() override;
 	CameraEditor(const CameraEditor &) = default;
 	CameraEditor(CameraEditor &&) = default;
 	CameraEditor &operator=(const CameraEditor &) = default;

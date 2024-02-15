@@ -135,7 +135,7 @@ public:
 	void swapFrame();
 
 	void drawData(uint32_t vertexCount, bool indexed = true);
-	void setClearColor(const VkClearValue &color) { clearColor = color; }
+	void setClearColor(const glm::vec4 &color);
 	void clear();
 
 	void setResize();
