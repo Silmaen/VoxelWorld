@@ -97,11 +97,11 @@ private:
 	void recalculateViewMatrix();
 
 	/// The projection matrix.
-	glm::mat4 projectionMatrix;
+	glm::mat4 projectionMatrix{};
 	/// The view matrix.
-	glm::mat4 viewMatrix;
+	glm::mat4 viewMatrix{};
 	/// The view projection matrix.
-	glm::mat4 viewProjectionMatrix;
+	glm::mat4 viewProjectionMatrix{};
 	/// Camera's position.
 	glm::vec3 m_Position = {0.0f, 0.0f, 0.0f};
 	/// Camera's rotation.

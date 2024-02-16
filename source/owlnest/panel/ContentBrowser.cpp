@@ -8,10 +8,7 @@
 
 #include "ContentBrowser.h"
 
-#include "core/Application.h"
-#include "debug/Tracker.h"
-
-#include <imgui.h>
+#include <owl.h>
 
 namespace owl::panel {
 

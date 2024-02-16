@@ -8,9 +8,7 @@
 
 #pragma once
 
-#include <filesystem>
-
-#include "renderer/Texture.h"
+#include <owl.h>
 
 namespace owl::panel {
 

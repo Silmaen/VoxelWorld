@@ -1,5 +1,5 @@
 /**
- * @file PlatformUtils.cpp
+ * @file FileDialog.cpp
  * @author Silmaen
  * @date 27/12/2022
  * Copyright © 2022 All rights reserved.
@@ -8,8 +8,6 @@
 #include "owlpch.h"
 
 #include "FileDialog.h"
-#include "core/Core.h"
-
 #include "core/Application.h"
 
 #include <nfd.hpp>

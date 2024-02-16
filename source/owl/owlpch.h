@@ -13,11 +13,15 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 
 #include <algorithm>
 #include <array>
+#include <chrono>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <list>
 #include <memory>
+#include <numeric>
+#include <queue>
 #include <random>
 #include <set>
 #include <streambuf>

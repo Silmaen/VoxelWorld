@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "core/Core.h"
 #include <glm/glm.hpp>
 
 namespace owl::renderer {
@@ -15,7 +16,7 @@ namespace owl::renderer {
 /**
  * @brief Class Camera.
  */
-class Camera {
+class OWL_API Camera {
 public:
 	Camera(const Camera &) = default;
 	Camera(Camera &&) = default;

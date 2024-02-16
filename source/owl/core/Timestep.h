@@ -9,9 +9,6 @@
 #pragma once
 
 #include "core/Core.h"
-#include <chrono>
-#include <numeric>
-#include <queue>
 
 namespace owl::core {
 
@@ -70,9 +67,7 @@ public:
 	 * @brief Get the mean number of update call in one second.
 	 * @return The Frame per second number.
 	 */
-	[[nodiscard]] float getStabilizedFps() const {
-		return statFps.empty() ? 0 : std::accumulate(statFps.begin(), statFps.end(), 0.f) / static_cast<float>(statFps.size());
-	}
+	[[nodiscard]] float getStabilizedFps() const;
 
 private:
 	/// Last update call point.

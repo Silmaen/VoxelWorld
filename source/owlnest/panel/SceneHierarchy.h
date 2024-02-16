@@ -8,12 +8,10 @@
 
 #pragma once
 
+#include <owl.h>
+
 #include <utility>
 
-#include "core/Core.h"
-#include "core/Log.h"
-#include "scene/Entity.h"
-#include "scene/Scene.h"
 
 namespace owl::panel {
 
