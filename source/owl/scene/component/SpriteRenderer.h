@@ -10,8 +10,6 @@
 
 #include "renderer/Texture.h"
 
-#include <glm/glm.hpp>
-
 namespace owl::scene::component {
 
 /**

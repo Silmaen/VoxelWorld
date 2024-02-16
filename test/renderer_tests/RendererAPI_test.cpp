@@ -1,7 +1,6 @@
 
 #include "testHelper.h"
 
-#include <filesystem>
 #include <renderer/Framebuffer.h>
 #include <renderer/GraphContext.h>
 #include <renderer/RenderAPI.h>
@@ -54,7 +53,7 @@ TEST(RenderAPI, badCreation) {
 
 TEST(RenderAPI, creation) {
 	owl::core::Log::init(spdlog::level::off);
-	auto api = RenderAPI::create(RenderAPI::Type::Null);
+	const auto api = RenderAPI::create(RenderAPI::Type::Null);
 	ASSERT_TRUE(api);
 	EXPECT_EQ(RenderAPI::getState(), RenderAPI::State::Created);
 	api->init();

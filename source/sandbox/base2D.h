@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include "owl.h"
+#include <owl.h>
 
 namespace owl {
 
 /**
  * @brief Class base2D
  */
-class base2D : public core::layer::Layer {
+class base2D final : public core::layer::Layer {
 public:
 	/**
 	 * @brief Default constructor.

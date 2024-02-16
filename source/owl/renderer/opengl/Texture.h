@@ -7,14 +7,14 @@
  */
 
 #pragma once
-#include "renderer/Texture.h"
 
+#include "renderer/Texture.h"
 
 namespace owl::renderer::opengl {
 /**
  * @brief Class Texture.
  */
-class Texture2D : public ::owl::renderer::Texture2D {
+class Texture2D final : public ::owl::renderer::Texture2D {
 public:
 	Texture2D(const Texture2D &) = default;
 	Texture2D(Texture2D &&) = default;

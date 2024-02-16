@@ -9,19 +9,13 @@
 #pragma once
 #include "Event.h"
 #include "input/MouseCode.h"
-#include <fmt/format.h>
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 
 namespace owl::event {
 
 /**
  * @brief Mouse move event.
  */
-class OWL_API MouseMovedEvent : public Event {
+class OWL_API MouseMovedEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
@@ -88,7 +82,7 @@ private:
 /**
  * @brief Event when mouse is scrolled.
  */
-class OWL_API MouseScrolledEvent : public Event {
+class OWL_API MouseScrolledEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
@@ -186,7 +180,7 @@ protected:
 /**
  * @brief Event for Mouse button pressed.
  */
-class OWL_API MouseButtonPressedEvent : public MouseButtonEvent {
+class OWL_API MouseButtonPressedEvent final : public MouseButtonEvent {
 public:
 	/**
 	 * @brief Constructor.
@@ -227,7 +221,7 @@ public:
 /**
  * @brief Event for mouse button released.
  */
-class OWL_API MouseButtonReleasedEvent : public MouseButtonEvent {
+class OWL_API MouseButtonReleasedEvent final : public MouseButtonEvent {
 public:
 	/**
 	 * @brief Constructor.
@@ -268,7 +262,3 @@ public:
 };
 
 }// namespace owl::event
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif

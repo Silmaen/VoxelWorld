@@ -7,15 +7,11 @@
  */
 #include "owlpch.h"
 
-#include "Renderer.h"
 #include "Renderer2D.h"
 
 #include "DrawData.h"
 #include "RenderCommand.h"
-#include "Shader.h"
 #include "UniformBuffer.h"
-
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace owl::renderer {
 
@@ -125,11 +121,10 @@ glm::mat4 toTransform(const PRS &transform) {
 		return glm::translate(glm::mat4(1.0f), transform.position) *
 			   glm::rotate(glm::mat4(1.0f), glm::radians(-transform.rotation), {0.0f, 0.0f, 1.0f}) *
 			   glm::scale(glm::mat4(1.0f), {transform.size.x, transform.size.y, 1.0f});
-	} else {
-		return glm::translate(glm::mat4(1.0f), transform.position) *
-			   glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation), {0.0f, 0.0f, 1.0f}) *
-			   glm::scale(glm::mat4(1.0f), {transform.size.x, transform.size.y, 1.0f});
 	}
+	return glm::translate(glm::mat4(1.0f), transform.position) *
+		   glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation), {0.0f, 0.0f, 1.0f}) *
+		   glm::scale(glm::mat4(1.0f), {transform.size.x, transform.size.y, 1.0f});
 }
 
 }// namespace utils

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
-
 namespace owl::scene::component {
 
 /**

@@ -7,19 +7,14 @@
  */
 
 #pragma once
-#include "Event.h"
-#include <fmt/format.h>
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
+#include "Event.h"
 
 namespace owl::event {
 /**
  * @brief Window Resize Event.
  */
-class OWL_API WindowResizeEvent : public Event {
+class OWL_API WindowResizeEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
@@ -87,7 +82,7 @@ private:
 /**
  * @brief Window close Event
  */
-class OWL_API WindowCloseEvent : public Event {
+class OWL_API WindowCloseEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
@@ -134,7 +129,7 @@ public:
 /**
  * @brief Application Tick Event
  */
-class OWL_API AppTickEvent : public Event {
+class OWL_API AppTickEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
@@ -181,7 +176,7 @@ public:
 /**
  * @brief Application Update Event
  */
-class OWL_API AppUpdateEvent : public Event {
+class OWL_API AppUpdateEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
@@ -228,7 +223,7 @@ public:
 /**
  * @brief Application Rendering Event
  */
-class OWL_API AppRenderEvent : public Event {
+class OWL_API AppRenderEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
@@ -273,7 +268,3 @@ public:
 };
 
 }// namespace owl::event
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif

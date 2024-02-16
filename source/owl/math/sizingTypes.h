@@ -15,7 +15,7 @@ namespace owl::math {
 /**
  * @brief Class to store a frame size.
  */
-class OWL_API FrameSize {
+class OWL_API FrameSize final {
 public:
 	/**
 	 * @brief Default constructor.

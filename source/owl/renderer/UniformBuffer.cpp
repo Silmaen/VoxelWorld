@@ -7,8 +7,6 @@
  */
 #include "owlpch.h"
 
-#include <magic_enum.hpp>
-
 #include "Renderer.h"
 #include "UniformBuffer.h"
 #include "null/UniformBuffer.h"

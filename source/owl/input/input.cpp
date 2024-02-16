@@ -58,7 +58,7 @@ float Input::getMouseY() {
 glm::vec2 Input::getMousePos() {
 	if (instance)
 		return instance->getMousePos_impl();
-	return glm::vec2();
+	return {};
 }
 
 void Input::injectKey(KeyCode keycode) {

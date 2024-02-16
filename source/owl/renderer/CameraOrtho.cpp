@@ -10,14 +10,6 @@
 #include "CameraOrtho.h"
 #include "RenderCommand.h"
 
-OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wdocumentation-unknown-command")
-OWL_DIAG_DISABLE_CLANG("-Wdocumentation-deprecated-sync")
-OWL_DIAG_DISABLE_CLANG("-Wdocumentation")
-
-#include <glm/gtc/matrix_transform.hpp>
-OWL_DIAG_POP
-
 namespace owl::renderer {
 
 CameraOrtho::CameraOrtho(float left, float right, float bottom, float top)
@@ -38,10 +30,10 @@ void CameraOrtho::recalculateViewMatrix() {
 	glm::mat4 transform;
 	if (RenderCommand::getAPI() == RenderAPI::Type::Vulkan) {
 		transform = glm::translate(glm::mat4(1.0f), m_Position) *
-						  glm::rotate(glm::mat4(1.0f), glm::radians(-m_Rotation), glm::vec3(0, 0, 1));
-	}else {
+					glm::rotate(glm::mat4(1.0f), glm::radians(-m_Rotation), glm::vec3(0, 0, 1));
+	} else {
 		transform = glm::translate(glm::mat4(1.0f), m_Position) *
-						  glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation), glm::vec3(0, 0, 1));
+					glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation), glm::vec3(0, 0, 1));
 	}
 
 	viewMatrix = glm::inverse(transform);

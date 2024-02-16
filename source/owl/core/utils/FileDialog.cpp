@@ -19,10 +19,10 @@ static std::vector<std::string_view> split(const std::string_view str, const cha
 	int indexCommaToRightOfColumn = -1;
 	for (uint32_t i = 0; i < str.size(); i++) {
 		if (str[i] == delimiter) {
-			int indexCommaToLeftOfColumn = indexCommaToRightOfColumn;
+			const int indexCommaToLeftOfColumn = indexCommaToRightOfColumn;
 			indexCommaToRightOfColumn = static_cast<int>(i);
-			int32_t index = indexCommaToLeftOfColumn + 1;
-			auto length = static_cast<uint32_t>(indexCommaToRightOfColumn - index);
+			const int32_t index = indexCommaToLeftOfColumn + 1;
+			const auto length = static_cast<uint32_t>(indexCommaToRightOfColumn - index);
 			std::string_view column(str.data() + index, length);
 			result.push_back(column);
 		}
@@ -54,10 +54,10 @@ std::filesystem::path FileDialog::openFile(const std::string &filter) {
 	nfdu8char_t *outPath;
 	std::filesystem::path resultPath;
 	std::string filters{filter};
-	auto ff = parseFilter(filters);
-	auto initialDir = Application::get().getAssetDirectory();
-	std::string tmp = initialDir.string();
-	auto result = NFD::OpenDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()), tmp.c_str());
+	const auto ff = parseFilter(filters);
+	const auto initialDir = Application::get().getAssetDirectory();
+	const std::string tmp = initialDir.string();
+	const auto result = NFD::OpenDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()), tmp.c_str());
 	if (result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {
@@ -76,9 +76,9 @@ std::filesystem::path FileDialog::saveFile([[maybe_unused]] const std::string &f
 	nfdu8char_t *outPath;
 	std::filesystem::path resultPath;
 	std::string filters{filter};
-	auto ff = parseFilter(filters);
-	auto initialDir = Application::get().getAssetDirectory();
-	auto result = NFD::SaveDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()), initialDir.string().c_str(), nullptr);
+	const auto ff = parseFilter(filters);
+	const auto initialDir = Application::get().getAssetDirectory();
+	const auto result = NFD::SaveDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()), initialDir.string().c_str(), nullptr);
 	if (result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {

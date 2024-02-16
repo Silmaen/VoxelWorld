@@ -6,7 +6,6 @@
  * All modification must get authorization from the author.
  */
 #include "BaseGauge.h"
-#include "renderer/Renderer.h"
 
 namespace drone::panels::gauge {
 
@@ -17,7 +16,7 @@ BaseGauge::BaseGauge() {
 	if (!textureLib.exists(texName))
 		textureLib.addFromStandardPath(texName);
 	coverTexture = textureLib.get(texName);
-};
+}
 
 BaseGauge::~BaseGauge() = default;
 

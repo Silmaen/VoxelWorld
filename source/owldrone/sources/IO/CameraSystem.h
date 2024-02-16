@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #pragma once
+
 #include <owl.h>
 
 namespace drone::IO {
@@ -13,7 +14,7 @@ namespace drone::IO {
 /**
  * @brief Class CameraSystem
  */
-class CameraSystem {
+class CameraSystem final {
 public:
 	/**
 	 * @brief Destructor.

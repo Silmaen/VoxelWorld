@@ -19,7 +19,6 @@
 #undef OWL_TRACKER_VERBOSITY
 #define OWL_TRACKER_VERBOSITY 1
 #endif
-//#define OWL_STACKTRACE
 #endif
 
 #ifdef OWL_STACKTRACE
@@ -29,7 +28,6 @@
 #endif
 #include <cpptrace/cpptrace.hpp>
 #endif
-#include <list>
 
 using size_t = std::size_t;
 

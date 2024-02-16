@@ -7,8 +7,6 @@
  */
 #include "owlpch.h"
 
-#include <magic_enum.hpp>
-
 #include "Framebuffer.h"
 #include "RenderAPI.h"
 #include "Renderer.h"

@@ -9,7 +9,6 @@
 
 #include "UniformBuffer.h"
 
-
 namespace owl::renderer::null {
 
 UniformBuffer::UniformBuffer(uint32_t, uint32_t) {}

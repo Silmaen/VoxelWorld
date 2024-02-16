@@ -11,7 +11,6 @@
 #include "IO/CameraSystem.h"
 #include "IO/DeviceManager.h"
 #include "IO/DroneSettings.h"
-#include "event/KeyEvent.h"
 #include "panels/Gauges.h"
 #include "panels/Information.h"
 #include "panels/Settings.h"
@@ -74,7 +73,7 @@ void droneLayer::onDetach() {
 	information.reset();
 	viewport.reset();
 
-	auto file = core::Application::get().getWorkingDirectory() / "droneConfig.yml";
+	const auto file = core::Application::get().getWorkingDirectory() / "droneConfig.yml";
 	IO::DroneSettings::get().saveToFile(file);
 }
 
@@ -132,7 +131,7 @@ void droneLayer::onImGuiRender(const core::Timestep &ts) {
 }
 
 void droneLayer::renderStats(const core::Timestep &ts) {
-	auto &tracker = debug::Tracker::get();
+	const auto &tracker = debug::Tracker::get();
 	ImGui::Begin("Stats");
 	ImGui::Text("%s", fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
 	ImGui::Separator();
@@ -148,7 +147,7 @@ void droneLayer::renderStats(const core::Timestep &ts) {
 								  tracker.globals().deallocationCalls)
 							  .c_str());
 	ImGui::Separator();
-	auto stats = renderer::Renderer2D::getStats();
+	const auto stats = renderer::Renderer2D::getStats();
 	ImGui::Text("Renderer2D Stats:");
 	ImGui::Text("Draw Calls: %d", stats.drawCalls);
 	ImGui::Text("Quads: %d", stats.quadCount);
@@ -177,7 +176,7 @@ void droneLayer::renderFakeDrone(const owl::core::Timestep &) {
 		rc->setAltitude(alt);
 
 	glm::vec3 rot = rc->getRotations();
-	if (ImGui::SliderFloat3("Rotations", static_cast<float *>(&rot.x), -180, 180))
+	if (ImGui::SliderFloat3("Rotations", &rot.x, -180, 180))
 		rc->setRotation(rot);
 
 	auto motors = rc->getMotorRates();
@@ -236,17 +235,17 @@ void droneLayer::renderToolbar() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-	auto &colors = ImGui::GetStyle().Colors;
+	const auto &colors = ImGui::GetStyle().Colors;
 	const auto &buttonHovered = colors[ImGuiCol_ButtonHovered];
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
 	const auto &buttonActive = colors[ImGuiCol_ButtonActive];
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
 
-	float size = ImGui::GetWindowHeight() * .95f;
-	float padding = ImGui::GetWindowHeight() * .025f;
+	const float size = ImGui::GetWindowHeight() * .95f;
+	const float padding = ImGui::GetWindowHeight() * .025f;
 	float posX = padding;
-	ImVec2 vsize = ImVec2(size, size);
+	const auto vsize = ImVec2(size, size);
 
 	auto &textureLib = renderer::Renderer::getTextureLibrary();
 
@@ -259,13 +258,7 @@ void droneLayer::renderToolbar() {
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureLib.get("icons/gauges")->getRendererID()), vsize, ImVec2(0, 1), ImVec2(1, 0), 0)) {
 		mode = DisplayMode::Gauges;
 	}
-	/*
-	posX += size + 2.f * padding;
-	ImGui::SetCursorPos(ImVec2(posX, padding));
-	if (ImGui::Button("btn3", vsize)) {
-	}
-*/
-	shared<renderer::Texture> iconCC = isConnected() ? textureLib.get("icons/connected") : textureLib.get("icons/connect");
+	const shared<renderer::Texture> iconCC = isConnected() ? textureLib.get("icons/connected") : textureLib.get("icons/connect");
 	ImGui::SetCursorPos(ImVec2((ImGui::GetWindowContentRegionMax().x) - (2.f * size + 3.f * padding), padding));
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(iconCC->getRendererID()), ImVec2(size, size), ImVec2(0, 1), ImVec2(1, 0), 0)) {
 		toggleConnect();

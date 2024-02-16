@@ -6,13 +6,14 @@
  * All modification must get authorization from the author.
  */
 
-#include "event/KeyEvent.h"
 #include "testHelper.h"
+
+#include <event/KeyEvent.h>
 
 using namespace owl::event;
 
 TEST(KeyEvent, Pressed) {
-	KeyPressedEvent event(owl::input::key::A, 12);
+	const KeyPressedEvent event(owl::input::key::A, 12);
 	EXPECT_STREQ(event.getName().c_str(), "KeyPressedEvent");
 	EXPECT_EQ(event.getType(), type::KeyPressed);
 	EXPECT_EQ(event.getStaticType(), type::KeyPressed);
@@ -29,7 +30,7 @@ TEST(KeyEvent, Pressed) {
 }
 
 TEST(KeyEvent, Typed) {
-	KeyTypedEvent event(12);
+	const KeyTypedEvent event(12);
 	EXPECT_STREQ(event.getName().c_str(), "KeyTypedEvent");
 	EXPECT_EQ(event.getType(), type::KeyTyped);
 	EXPECT_EQ(event.getStaticType(), type::KeyTyped);
@@ -44,7 +45,7 @@ TEST(KeyEvent, Typed) {
 }
 
 TEST(KeyEvent, Released) {
-	KeyReleasedEvent event(12);
+	const KeyReleasedEvent event(12);
 	EXPECT_STREQ(event.getName().c_str(), "KeyReleasedEvent");
 	EXPECT_EQ(event.getType(), type::KeyReleased);
 	EXPECT_EQ(event.getStaticType(), type::KeyReleased);

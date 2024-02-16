@@ -13,7 +13,7 @@
 
 namespace owl {
 
-class OwlNest : public core::Application {
+class OwlNest final : public core::Application {
 public:
 	OwlNest() = delete;
 	explicit OwlNest(const core::AppParams &param) : core::Application(param) {

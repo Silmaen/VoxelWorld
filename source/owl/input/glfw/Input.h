@@ -15,7 +15,7 @@ namespace owl::input::glfw {
 /**
  * @brief Class Input
  */
-class OWL_API Input : public ::owl::input::Input {
+class OWL_API Input final: public ::owl::input::Input {
 public:
 	Input(const Input &) = delete;
 	Input(Input &&) = delete;

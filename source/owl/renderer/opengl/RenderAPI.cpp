@@ -26,7 +26,6 @@ namespace owl::renderer::opengl {
 			return;
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
 			OWL_CORE_TRACE("OpenGL: {}({})-{} : {} / {}", source, type, id, message, userParam)
-			return;
 	}
 
 	OWL_CORE_ASSERT(false, "Unknown severity level!")
@@ -77,7 +76,7 @@ void RenderAPI::clear() {
 
 void RenderAPI::drawData(const shared<DrawData> &data, uint32_t indexCount) {
 	data->bind();
-	uint32_t count = indexCount ? indexCount : data->getIndexCount();
+	const uint32_t count = indexCount ? indexCount : data->getIndexCount();
 	glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
 }
 

@@ -9,7 +9,6 @@
 #pragma once
 
 #include "core/Core.h"
-#include <string>
 
 namespace owl::scene::component {
 

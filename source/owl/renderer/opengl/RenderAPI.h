@@ -18,7 +18,7 @@ namespace owl::renderer::opengl {
 /**
  * @brief Class RenderAPI.
  */
-class RenderAPI : public ::owl::renderer::RenderAPI {
+class RenderAPI final: public ::owl::renderer::RenderAPI {
 public:
 	RenderAPI() = default;
 	RenderAPI(const RenderAPI &) = delete;

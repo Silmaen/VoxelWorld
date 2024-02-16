@@ -8,19 +8,17 @@
 
 #pragma once
 
-#include "owl.h"
+#include <owl.h>
 
-#include "event/KeyEvent.h"
 #include "panel/ContentBrowser.h"
 #include "panel/SceneHierarchy.h"
-#include "renderer/CameraEditor.h"
 
 namespace owl {
 
 /**
  * @brief Class EditorLayer
  */
-class EditorLayer : public core::layer::Layer {
+class EditorLayer final : public core::layer::Layer {
 public:
 	EditorLayer(const EditorLayer &) = delete;
 	EditorLayer(EditorLayer &&) = delete;

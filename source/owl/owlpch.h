@@ -19,6 +19,7 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <fstream>
 #include <functional>
 #include <list>
+#include <map>
 #include <memory>
 #include <numeric>
 #include <queue>
@@ -36,6 +37,9 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include "debug/Profiler.h"
 
 // third party
+#include <entt/entt.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <magic_enum.hpp>
 
 OWL_DIAG_POP

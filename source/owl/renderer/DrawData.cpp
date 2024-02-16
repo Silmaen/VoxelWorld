@@ -13,7 +13,6 @@
 #include "opengl/DrawData.h"
 #include "opengl_legacy/DrawData.h"
 #include "vulkan/DrawData.h"
-#include <magic_enum.hpp>
 
 namespace owl::renderer {
 

@@ -9,7 +9,7 @@ TEST(input, Input_uninitialized) {
 	EXPECT_FALSE(Input::isKeyPressed(0));
 	EXPECT_EQ(Input::getMouseX(), 0);
 	EXPECT_EQ(Input::getMouseY(), 0);
-	auto pos = Input::getMousePos();
+	const auto pos = Input::getMousePos();
 	Input::injectKey(0);
 	Input::injectMouseButton(0);
 	Input::injectMousePos(pos);

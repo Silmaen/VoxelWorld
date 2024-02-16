@@ -13,7 +13,6 @@
 #include "gauge/Compas.h"
 #include "gauge/MotorRate.h"
 #include "gauge/VerticalSpeed.h"
-#include <imgui.h>
 
 using namespace owl;
 
@@ -65,10 +64,10 @@ void Gauges::onUpdate(const owl::core::Timestep &) {
 	}
 
 	// Draw into the frame buffer
-	auto spec = framebuffer->getSpecification();
-	auto width = static_cast<uint32_t>(viewportSize.x);
-	auto height = static_cast<uint32_t>(viewportSize.y);
-	float aspectRatio = viewportSize.x / viewportSize.y;
+	const auto spec = framebuffer->getSpecification();
+	const auto width = static_cast<uint32_t>(viewportSize.x);
+	const auto height = static_cast<uint32_t>(viewportSize.y);
+	const float aspectRatio = viewportSize.x / viewportSize.y;
 	float scaling = std::min(aspectRatio, 0.666f);
 
 	if (width > 0 && height > 0 && (width != spec.width || height != spec.height)) {
@@ -86,7 +85,7 @@ void Gauges::onUpdate(const owl::core::Timestep &) {
 
 	// defines pos an scale
 	glm::vec3 pos = {-0.5f * scaling, 1.f * scaling, 0};
-	for (auto &gauge: gauges) {
+	for (const auto &gauge: gauges) {
 		gauge->setScale({scaling, scaling});
 		gauge->setPosition(pos);
 		pos.x *= -1;
@@ -98,16 +97,16 @@ void Gauges::onUpdate(const owl::core::Timestep &) {
 	renderer::Renderer2D::beginScene(*camera);
 
 	// draw all backgrounds
-	for (auto &gauge: gauges) {
+	for (const auto &gauge: gauges) {
 		gauge->drawBack();
 	}
 	// draw all cursors
 
-	for (auto &gauge: gauges) {
+	for (const auto &gauge: gauges) {
 		gauge->drawCursors();
 	}
 	// draw all covers
-	for (auto &gauge: gauges) {
+	for (const auto &gauge: gauges) {
 		gauge->drawCover();
 	}
 
@@ -122,9 +121,9 @@ void Gauges::onRender() {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
 	ImGui::Begin("Drone Gauges");
-	auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-	auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-	auto viewportOffset = ImGui::GetWindowPos();
+	const auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+	const auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+	const auto viewportOffset = ImGui::GetWindowPos();
 	viewportBounds[0] = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
 	viewportBounds[1] = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
 

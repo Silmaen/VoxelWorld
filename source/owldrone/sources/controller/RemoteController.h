@@ -14,18 +14,18 @@ namespace drone::controller {
 /**
  * @brief Class RemoteController
  */
-class RemoteController {
+class RemoteController final {
 public:
 	/**
 	 * @brief Constructor.
 	 * @param motorNumber The number of motor in the device.
 	 */
-	RemoteController(size_t motorNumber = 4);
+	explicit RemoteController(size_t motorNumber = 4);
 
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~RemoteController();
+	~RemoteController();
 
 	/**
 	 * @brief Copy constructor.

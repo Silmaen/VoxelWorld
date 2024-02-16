@@ -7,17 +7,17 @@
  */
 
 #pragma once
+
 #include "Scene.h"
 #include "component/ID.h"
 #include "component/Tag.h"
-#include <entt/entt.hpp>
 
 namespace owl::scene {
 
 /**
  * @brief Class Entity.
  */
-class OWL_API Entity {
+class OWL_API Entity final {
 public:
 	Entity() = default;
 	Entity(const Entity &) = default;
@@ -28,7 +28,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Entity() = default;
+	~Entity();
 
 	/**
 	 * @brief Constructor.
@@ -96,7 +96,7 @@ public:
 	 * @tparam T The type of component.
 	 */
 	template<typename T>
-	void removeComponent() {
+	void removeComponent() const {
 		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!")
 		scene->registry.remove<T>(entityHandle);
 	}

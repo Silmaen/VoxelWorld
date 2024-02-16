@@ -9,14 +9,13 @@
 
 #include "Buffer.h"
 
-
 namespace owl::renderer::null {
 
 VertexBuffer::VertexBuffer(uint32_t) {}
 
 VertexBuffer::VertexBuffer(float *, uint32_t) {}
 
-VertexBuffer::~VertexBuffer() {}
+VertexBuffer::~VertexBuffer() = default;
 
 void VertexBuffer::bind() const {}
 
@@ -26,7 +25,7 @@ void VertexBuffer::setData(const void *, uint32_t) {}
 
 IndexBuffer::IndexBuffer(uint32_t *, uint32_t size) : count(size) {}
 
-IndexBuffer::~IndexBuffer() {}
+IndexBuffer::~IndexBuffer() = default;
 
 void IndexBuffer::bind() const {}
 

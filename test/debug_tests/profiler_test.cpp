@@ -1,7 +1,7 @@
 
-#include "debug/Profiler.h"
 #include "testHelper.h"
-#include <filesystem>
+
+#include <debug/Profiler.h>
 
 using namespace owl::debug;
 
@@ -12,9 +12,9 @@ TEST(profiler, creation) {
 	owl::core::Log::init(spdlog::level::off);
 	prof.beginSession("bob", "");
 	prof.endSession();
-	std::filesystem::path file("test_profile.json");
+	const std::filesystem::path file("test_profile.json");
 	prof.beginSession("bob2", file.string());
-	std::filesystem::path file2("test_profile2.json");
+	const std::filesystem::path file2("test_profile2.json");
 	prof.beginSession("bob2", file.string());
 	prof.endSession();
 	EXPECT_TRUE(exists(file));

@@ -17,10 +17,9 @@ namespace owl::renderer::opengl_legacy {
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
-	auto vers = core::Application::get().getWindow().getGraphContext()->getVersion();
+	const auto vers = core::Application::get().getWindow().getGraphContext()->getVersion();
 
-	bool goodVersion = vers.major > 2 || (vers.major == 2 && vers.minor >= 1);
-	if (!goodVersion) {
+	if (const bool goodVersion = vers.major > 2 || (vers.major == 2 && vers.minor >= 1); !goodVersion) {
 		setState(State::Error);
 		OWL_CORE_ERROR("Owl Engine legacy OpenGL Renderer requires at least OpenGL version 2.1 but version {}.{} found", vers.major, vers.minor)
 	}
@@ -52,7 +51,7 @@ void RenderAPI::clear() {
 
 void RenderAPI::drawData(const shared<DrawData> &data, uint32_t indexCount) {
 	data->bind();
-	uint32_t count = indexCount ? indexCount : data->getIndexCount();
+	const uint32_t count = indexCount ? indexCount : data->getIndexCount();
 	glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
 	data->unbind();
 }

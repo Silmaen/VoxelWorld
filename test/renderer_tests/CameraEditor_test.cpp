@@ -1,7 +1,7 @@
 
-#include "input/Input.h"
 #include "testHelper.h"
 
+#include <input/Input.h>
 #include <renderer/CameraEditor.h>
 
 using namespace owl::renderer;

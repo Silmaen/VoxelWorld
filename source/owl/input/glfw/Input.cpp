@@ -11,18 +11,17 @@
 #include "core/Application.h"
 #include "core/external/glfw3.h"
 
-
 namespace owl::input::glfw {
 
 bool Input::isKeyPressed_impl(KeyCode keycode) {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
-	auto state = glfwGetKey(windows, keycode);
+	const auto state = glfwGetKey(windows, keycode);
 	return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
 bool Input::isMouseButtonPressed_impl(MouseCode mouseCode) {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
-	auto state = glfwGetMouseButton(windows, mouseCode);
+	const auto state = glfwGetMouseButton(windows, mouseCode);
 	return state == GLFW_PRESS;
 }
 

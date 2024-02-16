@@ -10,10 +10,6 @@
 
 #include "core/Core.h"
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Namespace for Events
  */
@@ -71,7 +67,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Event() = default;
+	virtual ~Event();
 
 	/**
 	 * @brief Get the Event type.
@@ -143,8 +139,3 @@ private:
 };
 
 }// namespace owl::event
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif

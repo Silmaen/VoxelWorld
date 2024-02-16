@@ -17,7 +17,7 @@ namespace owl::renderer::opengl {
 /**
  * @brief Class representing what is required for a draw.
  */
-class OWL_API DrawData : public owl::renderer::DrawData {
+class OWL_API DrawData final: public owl::renderer::DrawData {
 public:
 	DrawData(const DrawData &) = default;
 	DrawData(DrawData &&) = default;

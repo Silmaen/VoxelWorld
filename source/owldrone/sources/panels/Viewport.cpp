@@ -8,7 +8,6 @@
 #include "Viewport.h"
 
 #include "IO/CameraSystem.h"
-#include <imgui.h>
 
 using namespace owl;
 
@@ -35,11 +34,11 @@ void Viewport::onUpdate(const owl::core::Timestep &ts) {
 	auto &cam = IO::CameraSystem::get();
 	cam.onUpdate(ts);
 
-	auto spec = framebuffer->getSpecification();
-	auto width = static_cast<uint32_t>(viewportSize.x);
-	auto height = static_cast<uint32_t>(viewportSize.y);
-	float aspectRatio = viewportSize.x / viewportSize.y;
-	float scaling = std::min(aspectRatio, 2.f);
+	const auto spec = framebuffer->getSpecification();
+	const auto width = static_cast<uint32_t>(viewportSize.x);
+	const auto height = static_cast<uint32_t>(viewportSize.y);
+	const float aspectRatio = viewportSize.x / viewportSize.y;
+	const float scaling = std::min(aspectRatio, 2.f);
 
 	if (width > 0 && height > 0 && (width != spec.width || height != spec.height)) {
 		framebuffer->resize(width, height);

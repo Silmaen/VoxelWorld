@@ -115,7 +115,7 @@ void Window::init(const Properties &props) {
 			WindowData &data =
 					*static_cast<WindowData *>(glfwGetWindowUserPointer(window));
 
-			auto cKey = static_cast<input::KeyCode>(key);
+			const auto cKey = static_cast<input::KeyCode>(key);
 			switch (action) {
 				case GLFW_PRESS: {
 					event::KeyPressedEvent event(cKey, false);

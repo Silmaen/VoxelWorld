@@ -1,17 +1,17 @@
 /**
- * @file ${FILE}
+ * @file Device.cpp
  * @author Silmaen
  * @date 03/01/2024
  * Copyright © 2024 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "owlpch.h"
 
 #include "Device.h"
 
 #if defined(OWL_PLATFORM_WINDOWS)
 
 #include "WPointer.h"
-#include "math/simpleFunctions.h"
 #include <initguid.h>
 #include <mfapi.h>
 #include <windows.h>
@@ -57,100 +57,100 @@ ComControl cc;
 
 std::string getPixelFormatString(const GUID &videoFormat) {
 	if (videoFormat == MFVideoFormat_AI44) return "AI44";
-	else if (videoFormat == MFVideoFormat_ARGB32)
+	if (videoFormat == MFVideoFormat_ARGB32)
 		return "ARGB32";
-	else if (videoFormat == MFVideoFormat_AYUV)
+	if (videoFormat == MFVideoFormat_AYUV)
 		return "AYUV";
-	else if (videoFormat == MFVideoFormat_DV25)
+	if (videoFormat == MFVideoFormat_DV25)
 		return "DV25";
-	else if (videoFormat == MFVideoFormat_DV50)
+	if (videoFormat == MFVideoFormat_DV50)
 		return "DV50";
-	else if (videoFormat == MFVideoFormat_MJPG)
+	if (videoFormat == MFVideoFormat_MJPG)
 		return "MJPG";
-	else if (videoFormat == MFVideoFormat_RGB32)
+	if (videoFormat == MFVideoFormat_RGB32)
 		return "RGB32";
-	else if (videoFormat == MFVideoFormat_RGB24)
+	if (videoFormat == MFVideoFormat_RGB24)
 		return "RGB24";
-	else if (videoFormat == MFVideoFormat_RGB555)
+	if (videoFormat == MFVideoFormat_RGB555)
 		return "RGB555";
-	else if (videoFormat == MFVideoFormat_RGB565)
+	if (videoFormat == MFVideoFormat_RGB565)
 		return "RGB565";
-	else if (videoFormat == MFVideoFormat_UYVY)
+	if (videoFormat == MFVideoFormat_UYVY)
 		return "UYVY";
-	//else if (videoFormat == MFVideoFormat_Y411) return "Y411";
-	else if (videoFormat == MFVideoFormat_Y41P)
+	//if (videoFormat == MFVideoFormat_Y411) return "Y411";
+	if (videoFormat == MFVideoFormat_Y41P)
 		return "Y41P";
-	//else if (videoFormat == MFVideoFormat_YUV) return "YUV";
-	else if (videoFormat == MFVideoFormat_YUY2)
+	//if (videoFormat == MFVideoFormat_YUV) return "YUV";
+	if (videoFormat == MFVideoFormat_YUY2)
 		return "YUY2";
-	else if (videoFormat == MFVideoFormat_YV12)
+	if (videoFormat == MFVideoFormat_YV12)
 		return "YV12";
-	else if (videoFormat == MFVideoFormat_YVU9)
+	if (videoFormat == MFVideoFormat_YVU9)
 		return "YVU9";
-	else if (videoFormat == MFVideoFormat_NV11)
+	if (videoFormat == MFVideoFormat_NV11)
 		return "NV11";
-	else if (videoFormat == MFVideoFormat_NV12)
+	if (videoFormat == MFVideoFormat_NV12)
 		return "NV12";
-	else if (videoFormat == MFVideoFormat_P010)
+	if (videoFormat == MFVideoFormat_P010)
 		return "P010";
-	else if (videoFormat == MFVideoFormat_P016)
+	if (videoFormat == MFVideoFormat_P016)
 		return "P016";
-	else if (videoFormat == MFVideoFormat_P210)
+	if (videoFormat == MFVideoFormat_P210)
 		return "P210";
-	else if (videoFormat == MFVideoFormat_P216)
+	if (videoFormat == MFVideoFormat_P216)
 		return "P216";
-	else if (videoFormat == MFVideoFormat_v210)
+	if (videoFormat == MFVideoFormat_v210)
 		return "v210";
-	else if (videoFormat == MFVideoFormat_v216)
+	if (videoFormat == MFVideoFormat_v216)
 		return "v216";
-	else if (videoFormat == MFVideoFormat_v410)
+	if (videoFormat == MFVideoFormat_v410)
 		return "v410";
-	else if (videoFormat == MFVideoFormat_I420)
+	if (videoFormat == MFVideoFormat_I420)
 		return "I420";
-	else if (videoFormat == MFVideoFormat_IYUV)
+	if (videoFormat == MFVideoFormat_IYUV)
 		return "IYUV";
-	//else if (videoFormat == MFVideoFormat_U420) return "U420";
-	else if (videoFormat == MFVideoFormat_Y210)
+	//if (videoFormat == MFVideoFormat_U420) return "U420";
+	if (videoFormat == MFVideoFormat_Y210)
 		return "Y210";
-	else if (videoFormat == MFVideoFormat_Y216)
+	if (videoFormat == MFVideoFormat_Y216)
 		return "Y216";
-	else if (videoFormat == MFVideoFormat_Y410)
+	if (videoFormat == MFVideoFormat_Y410)
 		return "Y410";
-	else if (videoFormat == MFVideoFormat_Y416)
+	if (videoFormat == MFVideoFormat_Y416)
 		return "Y416";
-	else if (videoFormat == MFVideoFormat_Y41T)
+	if (videoFormat == MFVideoFormat_Y41T)
 		return "Y41T";
-	else if (videoFormat == MFVideoFormat_Y42T)
+	if (videoFormat == MFVideoFormat_Y42T)
 		return "Y42T";
-	//else if (videoFormat == MFVideoFormat_YVU420_MPEG2) return "YVU420_MPEG2";
-	else if (videoFormat == MFVideoFormat_DVHD)
+	//if (videoFormat == MFVideoFormat_YVU420_MPEG2) return "YVU420_MPEG2";
+	if (videoFormat == MFVideoFormat_DVHD)
 		return "DVHD";
-	else if (videoFormat == MFVideoFormat_DVSD)
+	if (videoFormat == MFVideoFormat_DVSD)
 		return "DVSD";
-	else if (videoFormat == MFVideoFormat_DVSL)
+	if (videoFormat == MFVideoFormat_DVSL)
 		return "DVSL";
-	else if (videoFormat == MFVideoFormat_H264)
+	if (videoFormat == MFVideoFormat_H264)
 		return "H264";
-	else if (videoFormat == MFVideoFormat_H265)
+	if (videoFormat == MFVideoFormat_H265)
 		return "H265";
-	else if (videoFormat == MFVideoFormat_MPEG2)
+	if (videoFormat == MFVideoFormat_MPEG2)
 		return "MPEG2";
-	else if (videoFormat == MFVideoFormat_MPG1)
+	if (videoFormat == MFVideoFormat_MPG1)
 		return "MPG1";
-	else if (videoFormat == MFVideoFormat_MPG2)
+	if (videoFormat == MFVideoFormat_MPG2)
 		return "MPG2";
-	//else if (videoFormat == MFVideoFormat_MPG3) return "MPG3";
-	//else if (videoFormat == MFVideoFormat_MPG4) return "MPG4";
-	else if (videoFormat == MFVideoFormat_WMV1)
+	//if (videoFormat == MFVideoFormat_MPG3) return "MPG3";
+	//if (videoFormat == MFVideoFormat_MPG4) return "MPG4";
+	if (videoFormat == MFVideoFormat_WMV1)
 		return "WMV1";
-	else if (videoFormat == MFVideoFormat_WMV2)
+	if (videoFormat == MFVideoFormat_WMV2)
 		return "WMV2";
-	else if (videoFormat == MFVideoFormat_WMV3)
+	if (videoFormat == MFVideoFormat_WMV3)
 		return "WMV3";
-	else if (videoFormat == MFVideoFormat_WVC1)
+	if (videoFormat == MFVideoFormat_WVC1)
 		return "WVC1";
-	//else if (videoFormat == MFVideoFormat_FLV1) return "FLV1";
-	else if (videoFormat == MFVideoFormat_HEVC)
+	//if (videoFormat == MFVideoFormat_FLV1) return "FLV1";
+	if (videoFormat == MFVideoFormat_HEVC)
 		return "HEVC";
 	// Ajoutez d'autres formats vidéo au besoin
 
@@ -161,11 +161,11 @@ std::string getPixelFormatString(const GUID &videoFormat) {
 Device::PixelFormat getDevicePixelFormat(const GUID &videoFormat) {
 	if (videoFormat == MFVideoFormat_RGB24)
 		return Device::PixelFormat::RGB24;
-	else if (videoFormat == MFVideoFormat_NV12)
+	if (videoFormat == MFVideoFormat_NV12)
 		return Device::PixelFormat::NV12;
-	else if (videoFormat == MFVideoFormat_MJPG)
+	if (videoFormat == MFVideoFormat_MJPG)
 		return Device::PixelFormat::MJPEG;
-	else if (videoFormat == MFVideoFormat_YUY2)
+	if (videoFormat == MFVideoFormat_YUY2)
 		return Device::PixelFormat::YUYV;
 
 	// Format inconnu
@@ -214,7 +214,7 @@ void updateList(std::vector<shared<video::Device>> &list) {
 		auto testDev = mk_shared<Device>(devivce);
 		if (!testDev->isValid()) { continue; }
 		// don't add a device that already exists
-		if (std::find_if(list.begin(), list.end(),
+		if (std::ranges::find_if(list.begin(), list.end(),
 						 [&testDev](const shared<video::Device> &dev) { return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo(); }) != list.end())
 			continue;
 		OWL_CORE_TRACE("Found: {} ({}) [{}] ", devCounter, testDev->getName(), testDev->getBusInfo())
@@ -347,8 +347,7 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 		return;
 	}
 	WPointer<IMFMediaBuffer> buffer;
-	HRESULT hr = sample->ConvertToContiguousBuffer(buffer.addr());
-	if (FAILED(hr)) {
+	if (FAILED(sample->ConvertToContiguousBuffer(buffer.addr()))) {
 		OWL_CORE_WARN("Device ({}): Unable to Convert buffer.", name)
 		return;
 	}

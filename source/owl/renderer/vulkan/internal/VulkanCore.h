@@ -10,7 +10,6 @@
 
 #include "PhysicalDeviceCapabilities.h"
 
-
 #include <vulkan/vulkan.h>
 
 /**

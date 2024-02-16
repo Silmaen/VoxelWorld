@@ -1,5 +1,6 @@
 
 #include "testHelper.h"
+
 #include <input/CameraOrthoController.h>
 
 using namespace owl::input;

@@ -8,9 +8,8 @@
 
 #include "owlpch.h"
 
+#include "core/Application.h"
 #include "shaderFileUtils.h"
-#include <core/Application.h>
-
 
 namespace owl::renderer::utils {
 
@@ -46,13 +45,13 @@ std::filesystem::path getRelativeShaderPath(const std::string &shaderName, const
 
 std::string getExtension(const ShaderType &stage) {
 	auto ext = fmt::format(".{}", magic_enum::enum_name(stage).substr(0, 4));
-	std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
+	std::ranges::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
 	return ext;
 }
 
 std::string getCacheExtension(const ShaderType &stage) {
 	auto ext = fmt::format(".{}.spv", magic_enum::enum_name(stage).substr(0, 4));
-	std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
+	std::ranges::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
 	return ext;
 }
 

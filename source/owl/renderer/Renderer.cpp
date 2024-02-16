@@ -10,7 +10,6 @@
 #include "Renderer.h"
 #include "Renderer2D.h"
 
-
 namespace owl::renderer {
 
 Renderer::State Renderer::internalState = Renderer::State::Created;

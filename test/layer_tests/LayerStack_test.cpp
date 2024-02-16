@@ -6,8 +6,9 @@
  * All modification must get authorization from the author.
  */
 
-#include "core/layer/LayerStack.h"
 #include "testHelper.h"
+
+#include <core/layer/LayerStack.h>
 
 using namespace owl::core::layer;
 
@@ -38,9 +39,9 @@ TEST(LayerStack, pushLayer) {
 		stack.pushLayer(owl::mk_shared<Layer>("Layer 2"));
 		stack.pushOverlay(owl::mk_shared<Layer>("Overlay 1"));
 		stack.pushLayer(owl::mk_shared<Layer>("Layer 3"));
-		auto item = *(stack.begin() + 2);
+		const auto item = *(stack.begin() + 2);
 		EXPECT_STREQ(item->getName().c_str(), "Layer 3");
-		auto item2 = *(stack.begin() + 3);
+		const auto item2 = *(stack.begin() + 3);
 		EXPECT_STREQ(item2->getName().c_str(), "Overlay 1");
 	}
 	{
@@ -49,8 +50,8 @@ TEST(LayerStack, pushLayer) {
 		stack.pushLayer(owl::mk_shared<Layer>("Layer 2"));
 		stack.pushOverlay(owl::mk_shared<Layer>("Overlay 1"));
 		stack.pushLayer(owl::mk_shared<Layer>("Layer 3"));
-		auto item = *(stack.begin() + 2);
-		auto item2 = *(stack.begin() + 3);
+		const auto item = *(stack.begin() + 2);
+		const auto item2 = *(stack.begin() + 3);
 		stack.popLayer(item);
 		stack.popOverlay(item2);
 		stack.popLayer(item);

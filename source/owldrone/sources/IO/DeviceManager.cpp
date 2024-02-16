@@ -22,15 +22,14 @@ namespace drone::IO {
 static void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
 	constexpr int maxPort = 32;
 	char lpTargetPath[5000];// buffer to store the path of the COMPORTS
-	DWORD test;
 	for (int i = 0; i < maxPort; i++)// checking ports from COM0 to COM255
 	{
 		std::string ComName = "COM" + std::to_string(i);// converting to COM0, COM1, COM2
-		test = QueryDosDevice(reinterpret_cast<LPCSTR>(ComName.c_str()), reinterpret_cast<LPSTR>(lpTargetPath), 5000);
+
 
 		// Test the return value and error if any
-		if (test != 0) {//QueryDosDevice returns zero if it didn't find an object
-			std::string name{"usbserial"};
+		if (QueryDosDevice(reinterpret_cast<LPCSTR>(ComName.c_str()), reinterpret_cast<LPSTR>(lpTargetPath), 5000) != 0) {//QueryDosDevice returns zero if it didn't find an object
+			const std::string name{"usbserial"};
 			std::string path{lpTargetPath};
 			OWL_TRACE("Serial Found: ({}) [{}] ", ComName.c_str(), path.c_str())
 			listToUpdate.push_back({.port = "COM" + std::to_string(i), .name = name, .busInfo = path});
@@ -94,13 +93,13 @@ void DeviceManager::updateList() {
 }
 
 owl::shared<Device> DeviceManager::getDeviceByName(const std::string &name) const {
-	auto it = std::find_if(devices.begin(), devices.end(), [&name](const Device &T) { return T.name == name; });
+	const auto it = std::ranges::find_if(devices.begin(), devices.end(), [&name](const Device &T) { return T.name == name; });
 	if (it == devices.end()) return nullptr;
 	return owl::mk_shared<Device>(*it);
 }
 
 owl::shared<Device> DeviceManager::getDeviceByPort(const std::string &port) const {
-	auto it = std::find_if(devices.begin(), devices.end(), [&port](const Device &T) { return T.port == port; });
+	const auto it = std::ranges::find_if(devices.begin(), devices.end(), [&port](const Device &T) { return T.port == port; });
 	if (it == devices.end()) return nullptr;
 	return owl::mk_shared<Device>(*it);
 }

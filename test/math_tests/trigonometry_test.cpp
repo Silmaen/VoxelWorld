@@ -1,5 +1,6 @@
 
 #include "testHelper.h"
+
 #include <math/trigonometry.h>
 
 using namespace owl::math;

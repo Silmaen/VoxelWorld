@@ -14,7 +14,7 @@ namespace drone::panels::gauge {
 /**
  * @brief Class Altitude
  */
-class Altitude : public BaseGauge {
+class Altitude final: public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.

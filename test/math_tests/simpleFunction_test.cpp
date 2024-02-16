@@ -1,6 +1,7 @@
 
-#include "math/simpleFunctions.h"
 #include "testHelper.h"
+
+#include <math/simpleFunctions.h>
 
 using namespace owl::math;
 

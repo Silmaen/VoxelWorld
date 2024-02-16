@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 
+#include "owlpch.h"
 
 #include "GraphContext.h"
 
@@ -14,7 +15,7 @@
 namespace owl::renderer::vulkan {
 
 GraphContext::GraphContext(GLFWwindow *window)
-	: wnd(window){};
+	: wnd(window){}
 
 GraphContext::~GraphContext() = default;
 
@@ -27,7 +28,7 @@ void GraphContext::init() {
 }
 
 GraphContext::Version GraphContext::getVersion() const {
-	int version = internal::VulkanHandler::get().getVersion();
+	const int version = internal::VulkanHandler::get().getVersion();
 	return {static_cast<int32_t>(VK_API_VERSION_MAJOR(version)), static_cast<int32_t>(VK_API_VERSION_MAJOR(version))};
 }
 
@@ -43,7 +44,7 @@ void GraphContext::destroySurface(const VkInstance instance) {
 
 void GraphContext::waitIdle() {
 	OWL_CORE_TRACE("GraphContext Wait for Idle.")
-	auto &vkh = internal::VulkanCore::get();
+	const auto &vkh = internal::VulkanCore::get();
 	vkDeviceWaitIdle(vkh.getLogicalDevice());
 }
 

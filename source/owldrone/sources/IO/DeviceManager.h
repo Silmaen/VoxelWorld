@@ -7,6 +7,7 @@
  */
 
 #pragma once
+
 #include <owl.h>
 
 namespace drone::IO {

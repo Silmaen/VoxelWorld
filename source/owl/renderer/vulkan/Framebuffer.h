@@ -15,7 +15,7 @@ namespace owl::renderer::vulkan {
 /**
  * @brief Class Framebuffer.
  */
-class Framebuffer : public ::owl::renderer::Framebuffer {
+class Framebuffer final: public ::owl::renderer::Framebuffer {
 public:
 	Framebuffer(const Framebuffer &) = default;
 	Framebuffer(Framebuffer &&) = default;

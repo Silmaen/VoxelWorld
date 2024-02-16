@@ -10,10 +10,8 @@
 #include "Texture.h"
 #include "core/external/opengl46.h"
 #include <stb_image.h>
-#include <utility>
 
 namespace owl::renderer::opengl {
-
 
 Texture2D::Texture2D(math::FrameSize size_, bool withAlpha) : size{std::move(size_)}, hasAlpha{withAlpha} {
 	OWL_PROFILE_FUNCTION()

@@ -7,7 +7,6 @@
  */
 #include "CameraSystem.h"
 #include "DroneSettings.h"
-#include "math/simpleFunctions.h"
 
 namespace drone::IO {
 
@@ -93,7 +92,7 @@ int32_t CameraSystem::getCurrentCameraId() const {
 	return owl::input::video::Manager::get().getCurrentDeviceId();
 }
 std::string CameraSystem::getCurrentCameraName() const {
-	auto &sys = owl::input::video::Manager::get();
+	const auto &sys = owl::input::video::Manager::get();
 	if (!sys.isOpened())
 		return "";
 	return sys.getDevicesNames()[static_cast<size_t>(sys.getCurrentDeviceId())];

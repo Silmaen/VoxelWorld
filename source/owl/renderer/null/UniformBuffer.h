@@ -14,7 +14,7 @@ namespace owl::renderer::null {
 /**
  * @brief Class UniformBuffer.
  */
-class UniformBuffer : public ::owl::renderer::UniformBuffer {
+class UniformBuffer final : public ::owl::renderer::UniformBuffer {
 public:
 	UniformBuffer() = delete;
 	UniformBuffer(const UniformBuffer &) = default;
@@ -28,7 +28,7 @@ public:
 	 * @param binding Buffer's binding.
 	 */
 	UniformBuffer(uint32_t size, uint32_t binding);
-	
+
 	/**
 	 * @brief Destructor.
 	 */

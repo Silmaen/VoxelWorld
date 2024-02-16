@@ -9,7 +9,6 @@
 #pragma once
 
 #include "core/Core.h"
-#include <glm/glm.hpp>
 
 namespace owl::renderer {
 

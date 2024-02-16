@@ -9,7 +9,6 @@
 
 #include "RenderAPI.h"
 
-
 namespace owl::renderer::null {
 
 void RenderAPI::init() {

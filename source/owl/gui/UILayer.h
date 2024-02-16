@@ -18,7 +18,7 @@ namespace owl::gui {
 /**
  * @brief Class ImGuiLayer
  */
-class OWL_API UILayer : public core::layer::Layer {
+class OWL_API UILayer final : public core::layer::Layer {
 public:
 	UILayer(const UILayer &) = delete;
 	UILayer(UILayer &&) = delete;
@@ -59,7 +59,7 @@ public:
 	/**
 	 * @brief End layer definition.
 	 */
-	void end();
+	void end() const;
 
 	/**
 	 * @brief Defines layer as blocking events.

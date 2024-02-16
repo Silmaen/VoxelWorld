@@ -13,7 +13,7 @@ namespace drone::panels::gauge {
 /**
  * @brief Class Compas
  */
-class Compas : public BaseGauge {
+class Compas final: public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.

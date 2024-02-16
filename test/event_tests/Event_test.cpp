@@ -6,8 +6,9 @@
  * All modification must get authorization from the author.
  */
 
-#include "event/AppEvent.h"
 #include "testHelper.h"
+
+#include <event/AppEvent.h>
 
 using namespace owl::event;
 

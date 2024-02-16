@@ -244,7 +244,6 @@ void VulkanCore::createLogicalDevice() {
 	if (const VkResult result = vkCreateDevice(physicalDevice, &deviceCI, nullptr, &logicalDevice); result != VK_SUCCESS) {
 		state = State::Error;
 		OWL_CORE_ERROR("Vulkan: Error while creating the logical device ({})", resultString(result))
-		return;
 	}
 }
 

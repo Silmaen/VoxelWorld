@@ -59,7 +59,7 @@ shared<Scene> Scene::copy(const shared<Scene> &other) {
 
 	// Create entities in new scene
 	auto idView = srcSceneRegistry.view<component::ID>();
-	for (auto e: idView) {
+	for (const auto e: idView) {
 		core::UUID uuid = srcSceneRegistry.get<component::ID>(e).id;
 		const auto &name = srcSceneRegistry.get<component::Tag>(e).tag;
 		Entity newEntity = newScene->createEntityWithUUID(uuid, name);
@@ -111,11 +111,11 @@ void Scene::onUpdateRuntime(const core::Timestep &ts) {
 		});
 	}
 	// Render 2D
-	renderer::Camera *mainCamera = nullptr;
+	const renderer::Camera *mainCamera = nullptr;
 	glm::mat4 cameraTransform;
 	{
 		auto view = registry.view<component::Transform, component::Camera>();
-		for (auto entity: view) {
+		for (const auto entity: view) {
 			auto [transform, camera] = view.get<component::Transform, component::Camera>(entity);
 			if (camera.primary) {
 				mainCamera = &camera.camera;
@@ -189,7 +189,7 @@ void Scene::onViewportResize(uint32_t width, uint32_t height) {
 
 	// Resize our non-FixedAspectRatio cameras
 	auto view = registry.view<component::Camera>();
-	for (auto entity: view) {
+	for (const auto entity: view) {
 		auto &cameraComponent = view.get<component::Camera>(entity);
 		if (!cameraComponent.fixedAspectRatio)
 			cameraComponent.camera.setViewportSize(width, height);
@@ -197,7 +197,7 @@ void Scene::onViewportResize(uint32_t width, uint32_t height) {
 }
 
 Entity Scene::duplicateEntity(const Entity &entity) {
-	std::string name = entity.getName();
+	const std::string name = entity.getName();
 	Entity newEntity = createEntity(name);
 
 	copyComponentIfExists<component::Transform>(newEntity, entity);
@@ -212,8 +212,8 @@ Entity Scene::duplicateEntity(const Entity &entity) {
 }
 
 Entity Scene::getPrimaryCamera() {
-	auto view = registry.view<component::Camera>();
-	for (auto entity: view) {
+	const auto view = registry.view<component::Camera>();
+	for (const auto entity: view) {
 		const auto &camera = view.get<component::Camera>(entity);
 		if (camera.primary)
 			return Entity{entity, this};

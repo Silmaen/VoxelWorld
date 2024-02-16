@@ -14,7 +14,7 @@ namespace drone::panels {
 /**
  * @brief Class Settings
  */
-class Settings : public BasePanel {
+class Settings final: public BasePanel {
 public:
 	/**
 	 * @brief Constructor.

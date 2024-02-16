@@ -9,7 +9,6 @@
 #include "base2D.h"
 
 #include <glm/gtc/type_ptr.hpp>
-#include <imgui.h>
 
 namespace owl {
 
@@ -19,7 +18,7 @@ base2D::base2D() : core::layer::Layer("base2D"), cameraController{1280.0f / 720.
 void base2D::onAttach() {
 	OWL_PROFILE_FUNCTION()
 
-	auto texturePath = core::Application::get().getAssetDirectory() / "textures";
+	const auto texturePath = core::Application::get().getAssetDirectory() / "textures";
 	checkerboardTexture = renderer::Texture2D::create(texturePath / "CheckerBoard.png");
 }
 
@@ -60,12 +59,12 @@ void base2D::onUpdate(const core::Timestep &ts) {
 		OWL_PROFILE_SCOPE("Render Draws 2")
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
 		int32_t id = 0;
-		float scalex = 1.f;
-		float scaley = 1.f;
-		float marg = 0.9f;
+		constexpr float scaley = 1.f;
 		for (float y = -5.0f; y < 5.0f; y += scaley) {
+			constexpr float scalex = 1.f;
 			for (float x = -5.0f; x < 5.0f; x += scalex) {
-				glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f};
+				constexpr float marg = 0.9f;
+				const glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f};
 				renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{
 														.position = {x, y, -0.05},
 														.size = {scalex * marg, scaley * marg}},
@@ -121,7 +120,7 @@ void base2D::onImGuiRender(const core::Timestep &ts) {
 	}
 	// ==================================================================
 	{
-		auto &tracker = debug::Tracker::get();
+		const auto &tracker = debug::Tracker::get();
 		ImGui::Begin("Statistics");
 		ImGui::Text("%s", fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
 		ImGui::Text("%s", fmt::format("Current used memory: {}",
@@ -136,7 +135,7 @@ void base2D::onImGuiRender(const core::Timestep &ts) {
 									  tracker.globals().deallocationCalls)
 								  .c_str());
 
-		auto stats = renderer::Renderer2D::getStats();
+		const auto stats = renderer::Renderer2D::getStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.drawCalls);
 		ImGui::Text("Quads: %d", stats.quadCount);

@@ -10,8 +10,6 @@
 
 #include "DrawData.h"
 
-#include <glm/glm.hpp>
-
 namespace owl::renderer {
 
 /**

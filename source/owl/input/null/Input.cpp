@@ -9,8 +9,6 @@
 
 #include "Input.h"
 #include "core/Application.h"
-#include "core/external/glfw3.h"
-
 
 namespace owl::input::null {
 

@@ -18,7 +18,7 @@ namespace owl::input::null {
 /**
  * @brief GLFW implementation of window.
  */
-class OWL_API Window : public ::owl::input::Window {
+class OWL_API Window final : public ::owl::input::Window {
 public:
 	Window(const Window &) = delete;
 	Window(Window &&) = delete;
