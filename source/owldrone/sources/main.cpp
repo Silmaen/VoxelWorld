@@ -5,11 +5,11 @@
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
  */
-// ------ Entry Point ------
-#include "droneLayer.h"
+#include <owl.h>
+
 #include <core/EntryPoint.h>
-#include <debug/TrakerClient.h>
-// -------------------------
+
+#include "droneLayer.h"
 
 class OwlNest : public owl::core::Application {
 public:

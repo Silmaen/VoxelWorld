@@ -15,11 +15,14 @@
 
 namespace owl::renderer {
 
+Camera::~Camera() = default;
 
 CameraEditor::CameraEditor(float fov, float aspectRatio_, float nearClip_, float farClip_) : Camera(glm::perspective(glm::radians(fov), aspectRatio_, nearClip_, farClip_)),
 																							 FOV(fov), aspectRatio(aspectRatio_), nearClip(nearClip_), farClip(farClip_) {
 	updateView();
 }
+
+CameraEditor::~CameraEditor() = default;
 
 void CameraEditor::onUpdate([[maybe_unused]] core::Timestep ts) {
 	if (input::Input::isKeyPressed(input::key::LeftAlt)) {

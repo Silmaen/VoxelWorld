@@ -9,10 +9,6 @@
 #include "owlpch.h"
 
 #include "Application.h"
-
-#include <cstdlib>
-#include <utility>
-
 #include "Environment.h"
 #include "core/external/yaml.h"
 #include "debug/Tracker.h"

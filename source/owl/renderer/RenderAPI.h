@@ -120,6 +120,16 @@ public:
 	virtual void beginFrame() {}
 
 	/**
+	 * @brief Reset value for the batch to render.
+	 */
+	virtual void beginBatch() {}
+
+	/**
+	 * @brief Ends draw call for the current batch.
+	 */
+	virtual void endBatch() {}
+
+	/**
 	 * @brief Ends draw call for the current frame.
 	 */
 	virtual void endFrame() {}

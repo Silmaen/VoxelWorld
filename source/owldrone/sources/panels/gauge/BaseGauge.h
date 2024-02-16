@@ -7,8 +7,7 @@
  */
 #pragma once
 
-#include <renderer/Renderer2D.h>
-#include <renderer/Texture.h>
+#include <owl.h>
 
 namespace drone::panels::gauge {
 

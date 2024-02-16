@@ -8,6 +8,13 @@
 
 #pragma once
 
+// -------- STD ------------
+#include <filesystem>
+// -------------------------
+
+// ------- 3rd party -------
+#include <imgui.h>
+// -------------------------
 
 // ------- core ------------
 #include "core/Application.h"
@@ -28,6 +35,11 @@
 // ------- scene -----------
 #include "scene/Entity.h"
 #include "scene/Scene.h"
+#include "scene/component/Camera.h"
+#include "scene/component/CircleRenderer.h"
+#include "scene/component/ID.h"
+#include "scene/component/Tag.h"
+#include "scene/component/Transform.h"
 //--------------------------
 
 // ------ renderer ---------

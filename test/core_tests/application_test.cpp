@@ -1,5 +1,7 @@
 
 #include "testHelper.h"
+#include <filesystem>
+
 #include <core/Application.h>
 #include <core/utils/FileUtils.h>
 #include <fstream>

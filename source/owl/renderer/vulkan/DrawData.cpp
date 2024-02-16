@@ -17,6 +17,8 @@ namespace owl::renderer::vulkan {
 DrawData::~DrawData() = default;
 
 void DrawData::init(const BufferLayout &layout, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) {
+	shaderName_ = shaderName;
+	renderer_ = renderer;
 	setShader(shaderName, renderer);
 	if (layout.getStride() != 0) {
 		vertexBuffer = mk_shared<VertexBuffer>(layout.getStride() * indices.size());
@@ -44,8 +46,10 @@ void DrawData::init(const BufferLayout &layout, const std::string &renderer, std
 	if (pipelineId >= 0)
 		vkh.popPipeline(pipelineId);
 	pipelineId = vkh.pushPipeline(shader->getName(), shaderStages, vertexInputInfo);
+	const auto &vkc = internal::VulkanCore::get();
+
 	for (const auto &stage: shaderStages) {
-		vkDestroyShaderModule(vkh.getDevice(), stage.module, nullptr);
+		vkDestroyShaderModule(vkc.getLogicalDevice(), stage.module, nullptr);
 	}
 	if (pipelineId < 0) {
 		OWL_CORE_WARN("Vulkan shader: Failed to register pipeline {}.", shader->getName())

@@ -244,7 +244,7 @@ public:
 	 * @param src The sprite to render.
 	 * @param entityID The entity ID.
 	 */
-	static void drawSprite(const glm::mat4 &transform, scene::component::SpriteRenderer &src, int entityID);
+	static void drawSprite(const glm::mat4 &transform, const scene::component::SpriteRenderer &src, int entityID);
 
 	/**
 	 * @brief Statistics.

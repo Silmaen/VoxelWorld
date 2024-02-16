@@ -8,24 +8,19 @@
 
 #include "SwapChain.h"
 
+#include "VulkanCore.h"
 #include "core/Application.h"
 #include "renderer/vulkan/GraphContext.h"
 #include "utils.h"
 
 namespace owl::renderer::vulkan::internal {
 
-void SwapChain::create(const VkDevice &logicDevice, const PhysicalDevice &physicalDevice) {
+void SwapChain::create(const VkDevice &logicDevice, const VkPhysicalDevice &physicalDevice) {
 	device = logicDevice;
-	phy = &physicalDevice;
+	phy = physicalDevice;
 
-	VkExtent2D extent;
-	if (phy->capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-		extent = phy->capabilities.currentExtent;
-	} else {
-		auto sizes = core::Application::get().getWindow().getSize();
-		extent.width = std::clamp(sizes.width(), phy->capabilities.minImageExtent.width, phy->capabilities.maxImageExtent.width);
-		extent.height = std::clamp(sizes.height(), phy->capabilities.minImageExtent.height, phy->capabilities.maxImageExtent.height);
-	}
+	const auto &core = VulkanCore::get();
+	const VkExtent2D extent = core.getCurrentExtent();
 
 	createSwapChain(extent);
 	if (state != State::Created)
@@ -35,7 +30,7 @@ void SwapChain::create(const VkDevice &logicDevice, const PhysicalDevice &physic
 	if (state != State::Created)
 		return;
 	OWL_CORE_TRACE("  Internal swapchain imageviews created.")
-	createRenderPass();
+	createRenderPasses();
 	if (state != State::Created)
 		return;
 	OWL_CORE_TRACE("  Internal swapchain renderpass created.")
@@ -71,139 +66,146 @@ void SwapChain::release() {
 		vkDestroyRenderPass(device, renderPass, nullptr);
 		renderPass = nullptr;
 	}
+	if (clearingPass != nullptr) {
+		vkDestroyRenderPass(device, clearingPass, nullptr);
+		clearingPass = nullptr;
+	}
 	state = State::Created;
 }
 
 void SwapChain::createSwapChain(const VkExtent2D &extent) {
-	auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
+	const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
+	const auto &core = VulkanCore::get();
+	uint32_t imageCount = core.getImagecount();
+	const auto queueFamilyIndices = core.getQueueIndicies();
+	const bool shares = queueFamilyIndices.size() > 1;
+	const VkSurfaceFormatKHR surface = core.getSurfaceFormat();
+	const VkSwapchainCreateInfoKHR createInfo{
+			.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+			.pNext = nullptr,
+			.flags = {},
+			.surface = gc->getSurface(),
+			.minImageCount = imageCount,
+			.imageFormat = surface.format,
+			.imageColorSpace = surface.colorSpace,
+			.imageExtent = extent,
+			.imageArrayLayers = 1,
+			.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+			.imageSharingMode = shares ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE,
+			.queueFamilyIndexCount = shares ? static_cast<uint32_t>(queueFamilyIndices.size()) : 0,
+			.pQueueFamilyIndices = shares ? queueFamilyIndices.data() : nullptr,
+			.preTransform = core.getCurrentTransform(),
+			.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+			.presentMode = core.getPresentMode(),
+			.clipped = VK_TRUE,
+			.oldSwapchain = VK_NULL_HANDLE};
 
-	VkSurfaceFormatKHR surfaceFormat = phy->formats.front();
-	for (const auto &availableFormat: phy->formats) {
-		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
-			availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-			surfaceFormat = availableFormat;
-		}
-	}
-	VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
-	for (const auto &availablePresentMode: phy->presentModes) {
-		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-			presentMode = availablePresentMode;
-		}
-	}
-
-	uint32_t imageCount = phy->capabilities.minImageCount + 1;
-	if (phy->capabilities.maxImageCount > 0 && imageCount > phy->capabilities.maxImageCount) {
-		imageCount = phy->capabilities.maxImageCount;
-	}
-
-	VkSwapchainCreateInfoKHR createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	createInfo.surface = gc->getSurface();
-
-	createInfo.minImageCount = imageCount;
-	createInfo.imageFormat = surfaceFormat.format;
-	createInfo.imageColorSpace = surfaceFormat.colorSpace;
-	createInfo.imageExtent = extent;
-	createInfo.imageArrayLayers = 1;
-	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-	const auto queueFamilyIndices = phy->queues.getIndices();
-	if (queueFamilyIndices.size() > 1) {
-		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-		createInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices.size());
-		createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
-	} else {
-		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	}
-
-	createInfo.preTransform = phy->capabilities.currentTransform;
-	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	createInfo.presentMode = presentMode;
-	createInfo.clipped = VK_TRUE;
-
-	createInfo.oldSwapchain = VK_NULL_HANDLE;
-
-	const VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain);
-	if (result != VK_SUCCESS) {
+	if (const VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create swap chain ({}).", resultString(result))
 		state = State::ErrorCreatingSwapChain;
 		return;
 	}
-
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
 	swapChainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data());
 
-	swapChainImageFormat = surfaceFormat.format;
+	swapChainImageFormat = surface.format;
 	swapChainExtent = extent;
 }
 
 void SwapChain::createImageViews() {
 	swapChainImageViews.resize(swapChainImages.size());
-
 	for (size_t i = 0; i < swapChainImages.size(); i++) {
-		VkImageViewCreateInfo createInfo{};
-		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image = swapChainImages[i];
-		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		createInfo.format = swapChainImageFormat;
-		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		createInfo.subresourceRange.baseMipLevel = 0;
-		createInfo.subresourceRange.levelCount = 1;
-		createInfo.subresourceRange.baseArrayLayer = 0;
-		createInfo.subresourceRange.layerCount = 1;
-
-		const VkResult result = vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]);
-		if (result != VK_SUCCESS) {
+		VkImageViewCreateInfo createInfo{
+				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = {},
+				.image = swapChainImages[i],
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				.format = swapChainImageFormat,
+				.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
+				.subresourceRange = {
+						.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+						.baseMipLevel = 0,
+						.levelCount = 1,
+						.baseArrayLayer = 0,
+						.layerCount = 1}};
+		if (const VkResult result = vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]); result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan SwapChain: Error creating image views ({}).", resultString(result))
 			state = State::ErrorCreatingImagesView;
 		}
 	}
 }
 
-void SwapChain::createRenderPass() {
-	VkAttachmentDescription colorAttachment{};
-	colorAttachment.format = swapChainImageFormat;
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+void SwapChain::createRenderPasses() {
+	VkAttachmentDescription colorAttachmentClear{
+			.flags = {},
+			.format = swapChainImageFormat,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
 
-	VkAttachmentReference colorAttachmentRef{};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	VkSubpassDescription subpass{};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-
-	VkSubpassDependency dependency{};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-	VkRenderPassCreateInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = 1;
-	renderPassInfo.pAttachments = &colorAttachment;
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 1;
-	renderPassInfo.pDependencies = &dependency;
-
-	const VkResult result = vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass);
-	if (result != VK_SUCCESS) {
+	VkAttachmentDescription colorAttachment{
+			.flags = {},
+			.format = swapChainImageFormat,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
+	VkAttachmentReference colorAttachmentRef{
+			.attachment = 0,
+			.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+	const VkSubpassDescription subpass{
+			.flags = {},
+			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+			.inputAttachmentCount = 0,
+			.pInputAttachments = nullptr,
+			.colorAttachmentCount = 1,
+			.pColorAttachments = &colorAttachmentRef,
+			.pResolveAttachments = nullptr,
+			.pDepthStencilAttachment = nullptr,
+			.preserveAttachmentCount = 0,
+			.pPreserveAttachments = nullptr};
+	constexpr VkSubpassDependency dependency{
+			.srcSubpass = VK_SUBPASS_EXTERNAL,
+			.dstSubpass = 0,
+			.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			.srcAccessMask = 0,
+			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+			.dependencyFlags = {}};
+	const VkRenderPassCreateInfo clearingPassInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = {},
+			.attachmentCount = 1,
+			.pAttachments = &colorAttachmentClear,
+			.subpassCount = 1,
+			.pSubpasses = &subpass,
+			.dependencyCount = 1,
+			.pDependencies = &dependency};
+	if (const VkResult result = vkCreateRenderPass(device, &clearingPassInfo, nullptr, &clearingPass); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create render pass ({})", resultString(result))
+		state = State::ErrorCreatingRenderPass;
+	}
+	const VkRenderPassCreateInfo renderPassInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = {},
+			.attachmentCount = 1,
+			.pAttachments = &colorAttachment,
+			.subpassCount = 1,
+			.pSubpasses = &subpass,
+			.dependencyCount = 1,
+			.pDependencies = &dependency};
+	if (const VkResult result = vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create render pass ({})", resultString(result))
 		state = State::ErrorCreatingRenderPass;
 	}
@@ -211,35 +213,31 @@ void SwapChain::createRenderPass() {
 
 void SwapChain::createSwapChainFrameBuffers() {
 	swapChainFramebuffers.resize(swapChainImageViews.size());
-
 	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-		VkImageView attachments[] = {swapChainImageViews[i]};
+		const VkImageView attachments[] = {swapChainImageViews[i]};
+		VkFramebufferCreateInfo framebufferInfo{
+				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = {},
+				.renderPass = renderPass,
+				.attachmentCount = 1,
+				.pAttachments = attachments,
+				.width = swapChainExtent.width,
+				.height = swapChainExtent.height,
+				.layers = 1};
 
-		VkFramebufferCreateInfo framebufferInfo{};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderPass;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = attachments;
-		framebufferInfo.width = swapChainExtent.width;
-		framebufferInfo.height = swapChainExtent.height;
-		framebufferInfo.layers = 1;
-		const VkResult result = vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]);
-		if (result != VK_SUCCESS) {
+		if (const VkResult result = vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]); result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan SwapChain: Error creating image views ({}).", resultString(result))
 			state = State::ErrorCreatingFramebuffer;
 		}
 	}
 }
 
-void SwapChain::recreate(VkExtent2D extent) {
-
+void SwapChain::recreate(const VkExtent2D extent) {
 	if (extent.width == swapChainExtent.width && extent.height == swapChainExtent.height)
 		return;
-
 	vkDeviceWaitIdle(device);
-
 	cleanup();
-
 	createSwapChain(extent);
 	createImageViews();
 	createSwapChainFrameBuffers();

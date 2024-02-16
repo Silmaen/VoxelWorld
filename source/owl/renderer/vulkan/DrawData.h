@@ -67,6 +67,8 @@ public:
 	 */
 	void setShader(const std::string &shaderName, const std::string &renderer) override;
 
+	[[nodiscard]] std::string getName() const { return fmt::format("{}_{}", renderer_, shaderName_); }
+
 private:
 	/// index of the pipeline.
 	int32_t pipelineId = -1;
@@ -76,6 +78,8 @@ private:
 	shared<VertexBuffer> vertexBuffer;
 	/// Pointer to the index buffer.
 	shared<IndexBuffer> indexBuffer;
+	std::string shaderName_{};
+	std::string renderer_{};
 };
 
 }// namespace owl::renderer::vulkan

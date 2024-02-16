@@ -8,6 +8,7 @@
 
 #pragma once
 #include "SwapChain.h"
+#include "VulkanCore.h"
 
 #include <backends/imgui_impl_vulkan.h>
 #include <map>
@@ -20,7 +21,7 @@ namespace owl::renderer::vulkan::internal {
 /**
  * @brief Class VulkanHandler.
  */
-class VulkanHandler {
+class VulkanHandler final {
 public:
 	VulkanHandler(const VulkanHandler &) = delete;
 	VulkanHandler(VulkanHandler &&) = delete;
@@ -30,7 +31,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~VulkanHandler();
+	~VulkanHandler();
 
 	/**
 	 * @brief Handler for vulkan objects
@@ -57,16 +58,8 @@ public:
 		Uninitialized,
 		/// Initialized and ready.
 		Running,
-		/// Encounter an error while creating the instance.
-		ErrorCreatingInstance,
-		/// Encounter an error while setuping the debug.
-		ErrorSetupDebugging,
-		/// Encounter an error while enumerating the physical devices.
-		ErrorEnumeratingPhysicalDevices,
-		/// No compatible GPU found.
-		ErrorNoGpuFound,
-		ErrorCreatingLogicalDevice,
-		ErrorCreatingWindowSurface,
+		/// Encounter an error while creating the core of vulkan.
+		ErrorCreatingCore,
 		ErrorCreatingSwapChain,
 		ErrorCreatingImagesView,
 		ErrorCreatingRenderPass,
@@ -115,11 +108,10 @@ public:
 
 	[[nodiscard]] VkRenderPass getRenderPath() const { return swapChain.renderPass; }
 
-	[[nodiscard]] VkDevice getDevice() const { return logicalDevice; }
-	[[nodiscard]] const PhysicalDevice &getPhysicalDevice() const { return physicalDevice; }
 	[[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const;
 
 
+	// Pipelines management.
 	struct PipeLineData {
 		VkPipeline pipeLine = nullptr;
 		VkPipelineLayout layout = nullptr;
@@ -129,13 +121,23 @@ public:
 	void popPipeline(int32_t id);
 	void bindPipeline(int32_t id);
 
+	// Command buffer data
+	VkCommandPool commandPool{nullptr};
+	std::vector<VkCommandBuffer> commandBuffers{nullptr};
+	void beginBatch();
+	void endBatch();
+	bool inBatch = false;
+	bool firstBatch = true;
+
 	void beginFrame();
 	void endFrame();
+
 	void swapFrame();
 
-	void drawData(uint32_t vertexCount, bool indexed = true) const;
+	void drawData(uint32_t vertexCount, bool indexed = true);
+	void setClearColor(const glm::vec4 &color);
+	void clear();
 
-	void setClearColor(const VkClearValue &color) { clearColor = color; }
 	void setResize();
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory) const;
@@ -152,10 +154,7 @@ private:
 	/**
 	 * @brief Create the instance.
 	 */
-	void createInstance();
-	void createSurface();
-	void createPhysicalDevice();
-	void createLogicalDevice();
+	void createCore();
 	void createSwapChain();
 	void createDescriptorPool();
 	void createCommandPool();
@@ -163,9 +162,6 @@ private:
 	void createSyncObjects();
 	void createDescriptorSetLayout();
 
-	void setupDebugging();
-
-	//void drawFrame();
 
 	/// The current state of the handler.
 	State state = State::Uninitialized;
@@ -173,44 +169,30 @@ private:
 	int version = 0;
 	/// Enable Validation layers.
 	bool validation = false;
-	/// Validation layers available?.
-	bool validationPresent = false;
 	bool resize = false;
 
-	/// Vulkan Instance
-	VkInstance instance = nullptr;
-	/// The list of supported extensions.
-	std::vector<std::string> supportedInstanceExtensions;
-
-	/// Debug messenger.
-	VkDebugUtilsMessengerEXT debugUtilsMessenger{};
-
-	/// The physical device.
-	PhysicalDevice physicalDevice;
-
-	/// The logical device.
-	VkDevice logicalDevice = nullptr;
 	/// The swapchain.
 	SwapChain swapChain;
 
+	VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
 
 	/// List of piplines.
 	std::map<int32_t, PipeLineData> pipeLines;
-	VkCommandPool commandPool{nullptr};
 
-	std::vector<VkCommandBuffer> commandBuffers{nullptr};
+
+	/// Main FrameBuffers
 	std::vector<VkSemaphore> imageAvailableSemaphores{nullptr};
 	std::vector<VkSemaphore> renderFinishedSemaphores{nullptr};
 	std::vector<VkFence> inFlightFences{nullptr};
 	int currentFrame = 0;
 
 	uint32_t imageIndex = 0;
-	VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
 
+
+	// Uniform data
 	VkDescriptorSetLayout descriptorSetLayout{nullptr};
 	VkDescriptorPool descriptorPool{nullptr};
 	void createDescriptorSets(size_t size);
-
 	std::vector<VkDescriptorSet> descriptorSets;
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;

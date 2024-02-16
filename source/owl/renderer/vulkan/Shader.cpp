@@ -42,14 +42,11 @@ static VkShaderModule createShaderModule(VkDevice logicalDevice, const std::vect
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.codeSize = code.size() * sizeof(uint32_t);
 	createInfo.pCode = code.data();
-
 	VkShaderModule shaderModule;
-	const VkResult result = vkCreateShaderModule(logicalDevice, &createInfo, nullptr, &shaderModule);
-	if (result != VK_SUCCESS) {
+	if (const VkResult result = vkCreateShaderModule(logicalDevice, &createInfo, nullptr, &shaderModule); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("failed to create shader module ({}).", internal::resultString(result))
 		return nullptr;
 	}
-
 	return shaderModule;
 }
 
@@ -164,12 +161,13 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 
 std::vector<VkPipelineShaderStageCreateInfo> Shader::getStagesInfo() {
 	auto &vkh = internal::VulkanHandler::get();
+	const auto &vkc = internal::VulkanCore::get();
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
 	for (auto &&[stage, code]: vulkanSPIRV) {
 		shaderStages.emplace_back();
 		shaderStages.back().sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStages.back().stage = utils::shaderStageToVkStageBit(stage);
-		shaderStages.back().module = utils::createShaderModule(vkh.getDevice(), code);
+		shaderStages.back().module = utils::createShaderModule(vkc.getLogicalDevice(), code);
 		if (shaderStages.back().module == nullptr) {
 			OWL_CORE_ERROR("Vulkan: Failed create shader module {} {}", getName(), magic_enum::enum_name(stage))
 			vkh.setState(internal::VulkanHandler::State::ErrorCreatingPipeline);

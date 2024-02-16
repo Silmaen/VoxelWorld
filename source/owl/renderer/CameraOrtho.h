@@ -37,8 +37,10 @@ public:
 	 * @param right Right of the screen's coordinate.
 	 * @param bottom Bottom of the screen's coordinate.
 	 * @param top Top of the screen's coordinate.
+	 * @param near The near distance.
+	 * @param far The far distance.
 	 */
-	void setProjection(float left, float right, float bottom, float top);
+	void setProjection(float left, float right, float bottom, float top, float near = -1.0f, float far = 1.0f);
 
 	/**
 	 * @brief Access to camera's position.
@@ -95,11 +97,11 @@ private:
 	void recalculateViewMatrix();
 
 	/// The projection matrix.
-	glm::mat4 projectionMatrix;
+	glm::mat4 projectionMatrix{};
 	/// The view matrix.
-	glm::mat4 viewMatrix;
+	glm::mat4 viewMatrix{};
 	/// The view projection matrix.
-	glm::mat4 viewProjectionMatrix;
+	glm::mat4 viewProjectionMatrix{};
 	/// Camera's position.
 	glm::vec3 m_Position = {0.0f, 0.0f, 0.0f};
 	/// Camera's rotation.

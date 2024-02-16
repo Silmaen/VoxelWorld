@@ -5,10 +5,9 @@
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
  */
-// ------ Entry Point ------
-#include "core/EntryPoint.h"
-#include "debug/TrakerClient.h"
-// -------------------------
+#include <owl.h>
+
+#include <core/EntryPoint.h>
 
 #include "base2D.h"
 

@@ -115,7 +115,15 @@ public:
 	 * @brief Reset value for the frame to render.
 	 */
 	static void beginFrame() { renderAPI->beginFrame(); }
+	/**
+	 * @brief Reset value for the batch to render.
+	 */
+	static void beginBatch() { renderAPI->beginBatch(); }
 
+	/**
+	 * @brief Ends draw call for the current batch.
+	 */
+	static void endBatch() { renderAPI->endBatch(); }
 	/**
 	 * @brief Ends draw call for the current frame.
 	 */

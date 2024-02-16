@@ -8,19 +8,9 @@
 
 #include "SceneHierarchy.h"
 
-#include <imgui.h>
-
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui_internal.h>
 #include <magic_enum.hpp>
-
-#include "core/Application.h"
-#include "scene/SceneCamera.h"
-#include "scene/component/Camera.h"
-#include "scene/component/CircleRenderer.h"
-#include "scene/component/SpriteRenderer.h"
-#include "scene/component/Tag.h"
-#include "scene/component/Transform.h"
 
 namespace owl::panel {
 

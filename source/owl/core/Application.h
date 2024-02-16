@@ -7,9 +7,7 @@
  */
 
 #pragma once
-#include <filesystem>
 
-#include "Log.h"
 #include "Timestep.h"
 #include "event/AppEvent.h"
 #include "gui/UILayer.h"
