@@ -38,4 +38,7 @@ output*
 
 # Cache
 *.spv
+cache
+
+# cmake presets
 /CMakeUserPresets.json

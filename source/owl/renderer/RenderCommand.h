@@ -18,10 +18,10 @@ namespace owl::renderer {
 class OWL_API RenderCommand final {
 public:
 	RenderCommand() = default;
-	RenderCommand(const RenderCommand&) = delete;
-	RenderCommand(RenderCommand&&) = delete;
-	RenderCommand& operator=(const RenderCommand&) = delete;
-	RenderCommand& operator=(RenderCommand&&) = delete;
+	RenderCommand(const RenderCommand &) = delete;
+	RenderCommand(RenderCommand &&) = delete;
+	RenderCommand &operator=(const RenderCommand &) = delete;
+	RenderCommand &operator=(RenderCommand &&) = delete;
 
 	/**
 	 * @brief Destructor.
@@ -62,7 +62,7 @@ public:
 	 * @brief Binding to the definition of background color.
 	 * @param[in] iColor The new background color.
 	 */
-	static void setClearColor(const glm::vec4& iColor) { mu_renderAPI->setClearColor(iColor); }
+	static void setClearColor(const glm::vec4 &iColor) { mu_renderAPI->setClearColor(iColor); }
 
 	/**
 	 * @brief Binding to clear screen.
@@ -74,7 +74,7 @@ public:
 	 * @param[in] iData Draw data to render.
 	 * @param[in] iIndexCount Number of vertex to draw (=0 all).
 	 */
-	static void drawData(const shared<DrawData>& iData, const uint32_t iIndexCount = 0) {
+	static void drawData(const shared<DrawData> &iData, const uint32_t iIndexCount = 0) {
 		mu_renderAPI->drawData(iData, iIndexCount);
 	}
 
@@ -88,7 +88,7 @@ public:
 	 * @brief Create or replace the API base on it type.
 	 * @param[in] iType The type of the new render API.
 	 */
-	static void create(const RenderAPI::Type& iType);
+	static void create(const RenderAPI::Type &iType);
 
 	/**
 	 * @brief Get the actual API type.
@@ -110,6 +110,10 @@ public:
 	 * @brief Reset value for the batch to render.
 	 */
 	static void beginBatch() { mu_renderAPI->beginBatch(); }
+	/**
+	 * @brief Reset value for the teture load.
+	 */
+	static void beginTextureLoad() { mu_renderAPI->beginTextureLoad(); }
 
 	/**
 	 * @brief Ends draw call for the current batch.
@@ -119,9 +123,13 @@ public:
 	 * @brief Ends draw call for the current frame.
 	 */
 	static void endFrame() { mu_renderAPI->endFrame(); }
+	/**
+	 * @brief Ends texture load.
+	 */
+	static void endTextureLoad() { mu_renderAPI->endTextureLoad(); }
 
 private:
 	/// Pointer to the render API
 	static uniq<RenderAPI> mu_renderAPI;
 };
-} // namespace owl::renderer
+}// namespace owl::renderer

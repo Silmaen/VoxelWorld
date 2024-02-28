@@ -125,6 +125,16 @@ public:
 	virtual void beginBatch() {}
 
 	/**
+	 * @brief Reset value for the texture load.
+	 */
+	virtual void beginTextureLoad() {}
+
+	/**
+	 * @brief Ends texture load.
+	 */
+	virtual void endTextureLoad() {}
+
+	/**
 	 * @brief Ends draw call for the current batch.
 	 */
 	virtual void endBatch() {}

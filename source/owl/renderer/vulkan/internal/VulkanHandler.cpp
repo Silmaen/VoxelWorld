@@ -9,6 +9,7 @@
 
 #include "VulkanHandler.h"
 
+#include "Descriptors.h"
 #include "../GraphContext.h"
 #include "core/Application.h"
 #include "math/ColorSpace.h"
@@ -16,12 +17,6 @@
 #include "utils.h"
 
 namespace owl::renderer::vulkan::internal {
-
-namespace {
-
-constexpr int g_maxFrameInFlight = 2;
-
-}// namespace
 
 VulkanHandler::VulkanHandler() = default;
 
@@ -41,7 +36,8 @@ void VulkanHandler::initVulkan() {
 		OWL_CORE_TRACE("Vulkan: Swap Chain created.")
 	}
 	{
-		createDescriptorPool();
+		auto &desc = Descriptors::get();
+		desc.createDescriptors();
 		if (m_state != State::Uninitialized)
 			return;
 		OWL_CORE_TRACE("Vulkan: Descriptor pool created.")
@@ -64,12 +60,6 @@ void VulkanHandler::initVulkan() {
 			return;
 		OWL_CORE_TRACE("Vulkan: Sync objects Created.")
 	}
-	{
-		createDescriptorSetLayout();
-		if (m_state != State::Uninitialized)
-			return;
-		OWL_CORE_TRACE("Vulkan: Desciptor set Layout Created.")
-	}
 	m_state = State::Running;
 }
 
@@ -85,14 +75,10 @@ void VulkanHandler::release() {
 			vkDestroyPipelineLayout(core.getLogicalDevice(), pipeLine.layout, nullptr);
 	}
 	m_pipeLines.clear();
-	for (size_t i = 0; i < g_maxFrameInFlight; ++i) {
-		vkDestroyBuffer(core.getLogicalDevice(), m_uniformBuffers[i], nullptr);
-		vkFreeMemory(core.getLogicalDevice(), m_uniformBuffersMemory[i], nullptr);
-	}
-	if (m_descriptorSetLayout != nullptr) {
-		vkDestroyDescriptorSetLayout(core.getLogicalDevice(), m_descriptorSetLayout, nullptr);
-		OWL_CORE_TRACE("Vulkan: descriptorSetLayout destroyed.")
-	}
+
+	auto &vkd = Descriptors::get();
+	vkd.release();
+
 	for (size_t i = 0; i < g_maxFrameInFlight; ++i) {
 		if (m_renderFinishedSemaphores[i] != nullptr) {
 			vkDestroySemaphore(core.getLogicalDevice(), m_renderFinishedSemaphores[i], nullptr);
@@ -111,11 +97,6 @@ void VulkanHandler::release() {
 		vkDestroyCommandPool(core.getLogicalDevice(), commandPool, nullptr);
 		OWL_CORE_TRACE("Vulkan: commandPool destroyed.")
 	}
-	if (m_descriptorPool != nullptr) {
-		vkDestroyDescriptorPool(core.getLogicalDevice(), m_descriptorPool, nullptr);
-		m_descriptorPool = nullptr;
-		OWL_CORE_TRACE("Vulkan: descriptorPool destroyed.")
-	}
 	m_swapChain.release();
 	OWL_CORE_TRACE("Vulkan: swap destroyed.")
 	core.release();
@@ -124,11 +105,13 @@ void VulkanHandler::release() {
 }
 
 static void func(const VkResult iResult) {
-	if (iResult != VK_SUCCESS) { OWL_CORE_ERROR("Vulkan Imgui: Error detected: {}", resultString(iResult)) }
+	if (iResult != VK_SUCCESS)
+		OWL_CORE_ERROR("Vulkan Imgui: Error detected: {}", resultString(iResult))
 }
 
 ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 	const auto &core = VulkanCore::get();
+	const auto &vkd = Descriptors::get();
 	return {
 			.Instance = core.getInstance(),
 			.PhysicalDevice = core.getPhysicalDevice(),
@@ -136,7 +119,7 @@ ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 			.QueueFamily = core.getGraphQueueFamilyIndex(),
 			.Queue = core.getGraphicQueue(),
 			.PipelineCache = {},
-			.DescriptorPool = m_descriptorPool,
+			.DescriptorPool = vkd.getDescriptorPool(),
 			.Subpass = 0,
 			.MinImageCount = 2,
 			.ImageCount = 2,
@@ -151,7 +134,8 @@ ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 void VulkanHandler::createCore() {
 	auto &core = VulkanCore::get();
 	core.init({.activeValidation = m_validation});
-	if (core.getState() == VulkanCore::State::Error) { m_state = State::ErrorCreatingCore; }
+	if (core.getState() == VulkanCore::State::Error)
+		m_state = State::ErrorCreatingCore;
 }
 
 void VulkanHandler::createSwapChain() {
@@ -159,62 +143,6 @@ void VulkanHandler::createSwapChain() {
 	m_swapChain.create(core.getLogicalDevice(), core.getPhysicalDevice());
 	if (m_swapChain.state != SwapChain::State::Initialized)
 		m_state = State::ErrorCreatingSwapChain;
-}
-
-void VulkanHandler::createDescriptorPool() {
-	const auto &core = VulkanCore::get();
-	VkDescriptorPoolSize poolSize{
-			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = static_cast<uint32_t>(g_maxFrameInFlight)};
-	const VkDescriptorPoolCreateInfo poolInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.maxSets = static_cast<uint32_t>(g_maxFrameInFlight),
-			.poolSizeCount = 1,
-			.pPoolSizes = &poolSize};
-	if (const VkResult result = vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr, &m_descriptorPool);
-		result != VK_SUCCESS) {
-		OWL_CORE_ERROR("failed to create descriptor pool ({})", resultString(result))
-		m_state = State::ErrorCreatingDescriptorPool;
-	}
-}
-
-void VulkanHandler::createDescriptorSets(const size_t iSize) {
-	const auto &core = VulkanCore::get();
-	std::vector<VkDescriptorSetLayout> layouts(g_maxFrameInFlight, m_descriptorSetLayout);
-	const VkDescriptorSetAllocateInfo allocInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-			.pNext = nullptr,
-			.descriptorPool = m_descriptorPool,
-			.descriptorSetCount = static_cast<uint32_t>(g_maxFrameInFlight),
-			.pSetLayouts = layouts.data()};
-	m_descriptorSets.resize(g_maxFrameInFlight);
-	if (const auto result = vkAllocateDescriptorSets(core.getLogicalDevice(), &allocInfo, m_descriptorSets.data());
-		result != VK_SUCCESS) {
-		OWL_CORE_ERROR("Vulkan: failed to allocate descriptor sets ({})", resultString(result))
-		m_state = State::ErrorCreatingDescriptorSet;
-		return;
-	}
-
-	for (size_t i = 0; i < g_maxFrameInFlight; i++) {
-		VkDescriptorBufferInfo bufferInfo{
-				.buffer = m_uniformBuffers[i],
-				.offset = 0,
-				.range = iSize};
-		VkWriteDescriptorSet descriptorWrite{
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.pNext = nullptr,
-				.dstSet = m_descriptorSets[i],
-				.dstBinding = 0,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				.pImageInfo = nullptr,
-				.pBufferInfo = &bufferInfo,
-				.pTexelBufferView = nullptr};
-		vkUpdateDescriptorSets(core.getLogicalDevice(), 1, &descriptorWrite, 0, nullptr);
-	}
 }
 
 VulkanHandler::PipeLineData VulkanHandler::getPipeline(const int32_t iId) const {
@@ -229,6 +157,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 									std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
 									VkPipelineVertexInputStateCreateInfo iVertexInputInfo) {
 	const auto &core = VulkanCore::get();
+	auto &vkd = Descriptors::get();
 	PipeLineData pData;
 	// PipeLine Layout
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{
@@ -236,7 +165,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.pNext = nullptr,
 			.flags = {},
 			.setLayoutCount = 1,
-			.pSetLayouts = &m_descriptorSetLayout,
+			.pSetLayouts = vkd.getDescriptorSetLayout(),
 			.pushConstantRangeCount = 0,
 			.pPushConstantRanges = nullptr};
 	if (const VkResult result =
@@ -653,9 +582,10 @@ void VulkanHandler::bindPipeline(const int32_t iId) {
 		OWL_CORE_WARN("Vulkan: cannot bind pipeline with id {}", iId)
 		return;
 	}
+	auto &vkd = Descriptors::get();
 	vkCmdBindPipeline(getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeLines[iId].pipeLine);
 	vkCmdBindDescriptorSets(getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeLines[iId].layout, 0, 1,
-							&m_descriptorSets[m_currentFrame], 0, nullptr);
+							vkd.getDescriptorSet(m_currentFrame), 0, nullptr);
 }
 
 void VulkanHandler::setResize() {
@@ -664,8 +594,7 @@ void VulkanHandler::setResize() {
 	m_resize = true;
 }
 
-void VulkanHandler::copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, const VkDeviceSize iSize) const {
-
+VkCommandBuffer VulkanHandler::beginSingleTimeCommands() const {
 	const auto &core = VulkanCore::get();
 	const VkCommandBufferAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -678,7 +607,7 @@ void VulkanHandler::copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstB
 	if (const VkResult result = vkAllocateCommandBuffers(core.getLogicalDevice(), &allocInfo, &commandBuffer);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create command buffer for buffer copy.")
-		return;
+		return nullptr;
 	}
 
 	constexpr VkCommandBufferBeginInfo beginInfo{
@@ -688,14 +617,14 @@ void VulkanHandler::copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstB
 			.pInheritanceInfo = nullptr};
 	if (const VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to begin command buffer for buffer copy.")
-		return;
+		return nullptr;
 	}
+	return commandBuffer;
+}
 
-	VkBufferCopy copyRegion{};
-	copyRegion.size = iSize;
-	vkCmdCopyBuffer(commandBuffer, iSrcBuffer, iDstBuffer, 1, &copyRegion);
-
-	if (const VkResult result = vkEndCommandBuffer(commandBuffer); result != VK_SUCCESS) {
+void VulkanHandler::endSingleTimeCommands(VkCommandBuffer iCommandBuffer) const {
+	const auto &core = VulkanCore::get();
+	if (const VkResult result = vkEndCommandBuffer(iCommandBuffer); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to end command buffer for buffer copy.")
 		return;
 	}
@@ -707,7 +636,7 @@ void VulkanHandler::copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstB
 			.pWaitSemaphores = nullptr,
 			.pWaitDstStageMask = nullptr,
 			.commandBufferCount = 1,
-			.pCommandBuffers = &commandBuffer,
+			.pCommandBuffers = &iCommandBuffer,
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr};
 
@@ -721,46 +650,17 @@ void VulkanHandler::copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstB
 		return;
 	}
 
-	vkFreeCommandBuffers(core.getLogicalDevice(), commandPool, 1, &commandBuffer);
+	vkFreeCommandBuffers(core.getLogicalDevice(), commandPool, 1, &iCommandBuffer);
 }
 
-void VulkanHandler::createDescriptorSetLayout() {
-	const auto &core = VulkanCore::get();
-	VkDescriptorSetLayoutBinding uboLayoutBinding{
-			.binding = 0,
-			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-			.pImmutableSamplers = nullptr};
-	const VkDescriptorSetLayoutCreateInfo layoutInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.bindingCount = 1,
-			.pBindings = &uboLayoutBinding};
-	if (const auto result =
-				vkCreateDescriptorSetLayout(core.getLogicalDevice(), &layoutInfo, nullptr, &m_descriptorSetLayout);
-		result != VK_SUCCESS) {
-		OWL_CORE_ERROR("Vulkan: failed to create descriptor set layout ({}).", resultString(result))
-		m_state = State::ErrorCreatingDescriptorSetLayout;
-	}
-}
+void VulkanHandler::copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, const VkDeviceSize iSize) const {
+	const VkCommandBuffer &commandBuffer = beginSingleTimeCommands();
 
-void VulkanHandler::createUniformBuffers(const size_t iSize) {
-	m_uniformBuffers.resize(g_maxFrameInFlight);
-	m_uniformBuffersMemory.resize(g_maxFrameInFlight);
-	m_uniformBuffersMapped.resize(g_maxFrameInFlight);
-	const auto &core = VulkanCore::get();
-	for (size_t i = 0; i < g_maxFrameInFlight; i++) {
-		createBuffer(iSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-					 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_uniformBuffers[i],
-					 m_uniformBuffersMemory[i]);
-		if (const auto result = vkMapMemory(core.getLogicalDevice(), m_uniformBuffersMemory[i], 0, iSize, 0,
-											&m_uniformBuffersMapped[i]); result != VK_SUCCESS) {
-			OWL_CORE_ERROR("Vulkan: Failed to create uniform buffer {}.", i)
-		}
-	}
-	createDescriptorSets(iSize);
+	VkBufferCopy copyRegion{};
+	copyRegion.size = iSize;
+	vkCmdCopyBuffer(commandBuffer, iSrcBuffer, iDstBuffer, 1, &copyRegion);
+
+	endSingleTimeCommands(commandBuffer);
 }
 
 void VulkanHandler::createBuffer(const VkDeviceSize iSize, const VkBufferUsageFlags iUsage,
@@ -799,13 +699,82 @@ void VulkanHandler::createBuffer(const VkDeviceSize iSize, const VkBufferUsageFl
 	}
 
 	if (const VkResult result = vkBindBufferMemory(core.getLogicalDevice(), iBuffer, iBufferMemory, 0);
-		result != VK_SUCCESS) {
+		result != VK_SUCCESS)
 		OWL_CORE_ERROR("Vulkan vertex buffer: failed to bind memory buffer ({}).", resultString(result))
-	}
 }
 
-void VulkanHandler::setUniformData(const void *iData, const size_t iSize) const {
-	memcpy(m_uniformBuffersMapped[m_currentFrame], iData, iSize);
+
+void VulkanHandler::transitionImageLayout(const VkImage &iImage, const VkImageLayout iOldLayout,
+										  const VkImageLayout iNewLayout) const {
+	const auto &commandBuffer = beginSingleTimeCommands();
+
+	if ((iOldLayout != VK_IMAGE_LAYOUT_UNDEFINED || iNewLayout != VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) &&
+		(iOldLayout != VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL || iNewLayout !=
+		 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)) {
+		OWL_CORE_ERROR("Vulkan: transitionImageLayout: unsupported layout transition!")
+		return;
+	}
+	const VkAccessFlags srcAccessMask = (iOldLayout == VK_IMAGE_LAYOUT_UNDEFINED)
+											? VK_ACCESS_NONE
+											: VK_ACCESS_TRANSFER_WRITE_BIT;
+	const VkAccessFlags dstAccessMask = (iOldLayout == VK_IMAGE_LAYOUT_UNDEFINED)
+											? VK_ACCESS_TRANSFER_WRITE_BIT
+											: VK_ACCESS_SHADER_READ_BIT;
+	const VkImageMemoryBarrier barrier{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.pNext = nullptr,
+			.srcAccessMask = srcAccessMask,
+			.dstAccessMask = dstAccessMask,
+			.oldLayout = iOldLayout,
+			.newLayout = iNewLayout,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = iImage,
+			.subresourceRange = {
+					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1}};
+
+	const VkPipelineStageFlags sourceStage = iOldLayout == VK_IMAGE_LAYOUT_UNDEFINED
+												 ? VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT
+												 : VK_PIPELINE_STAGE_TRANSFER_BIT;
+	const VkPipelineStageFlags destinationStage = iOldLayout == VK_IMAGE_LAYOUT_UNDEFINED
+													  ? VK_PIPELINE_STAGE_TRANSFER_BIT
+													  : VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	vkCmdPipelineBarrier(
+			commandBuffer,
+			sourceStage, destinationStage,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &barrier);
+
+	endSingleTimeCommands(commandBuffer);
+}
+
+void VulkanHandler::copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const uint32_t iWidth,
+									  const uint32_t iHeight) const {
+	const auto &commandBuffer = beginSingleTimeCommands();
+
+	VkBufferImageCopy region{};
+	region.bufferOffset = 0;
+	region.bufferRowLength = 0;
+	region.bufferImageHeight = 0;
+	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	region.imageSubresource.mipLevel = 0;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.layerCount = 1;
+	region.imageOffset = {0, 0, 0};
+	region.imageExtent = {
+			iWidth,
+			iHeight,
+			1};
+
+	vkCmdCopyBufferToImage(commandBuffer, iBuffer, iImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+
+	endSingleTimeCommands(commandBuffer);
 }
 
 }// namespace owl::renderer::vulkan::internal

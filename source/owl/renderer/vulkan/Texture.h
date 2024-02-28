@@ -16,10 +16,10 @@ namespace owl::renderer::vulkan {
  */
 class Texture2D final : public ::owl::renderer::Texture2D {
 public:
-	Texture2D(const Texture2D&) = default;
-	Texture2D(Texture2D&&) = default;
-	Texture2D& operator=(const Texture2D&) = default;
-	Texture2D& operator=(Texture2D&&) = default;
+	Texture2D(const Texture2D &) = default;
+	Texture2D(Texture2D &&) = default;
+	Texture2D &operator=(const Texture2D &) = default;
+	Texture2D &operator=(Texture2D &&) = default;
 
 	/**
 	 * @brief Default constructor.
@@ -38,7 +38,7 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 */
-	explicit Texture2D(const math::FrameSize& iSize, bool iWithAlpha = true);
+	explicit Texture2D(const math::FrameSize &iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Destructor.
@@ -50,9 +50,7 @@ public:
 	 * @param[in] iOther Other texture to compare.
 	 * @return True if same.
 	 */
-	bool operator==(const Texture& iOther) const override {
-		return m_rendererId == (dynamic_cast<const Texture2D&>(iOther)).m_rendererId;
-	}
+	bool operator==(const Texture &iOther) const override;
 
 	/**
 	 * @brief Access to texture's width.
@@ -82,7 +80,7 @@ public:
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getRendererId() const override { return m_rendererId; }
+	[[nodiscard]] uint32_t getRendererId() const override { return 0; }
 
 	/**
 	 * @brief Activate the texture in the GPU.
@@ -95,22 +93,22 @@ public:
 	 * @param[in] iData Raw data.
 	 * @param[in] iSize Size of the data.
 	 */
-	void setData(void* iData, uint32_t iSize) override;
+	void setData(void *iData, uint32_t iSize) override;
 
 	/**
 	 * @brief Get Path to texture file.
 	 * @return Path to texture file.
 	 */
-	[[nodiscard]] const std::filesystem::path& getPath() const override {
-		return m_path;
-	}
+	[[nodiscard]] const std::filesystem::path &getPath() const override { return m_path; }
 
 private:
 	/// Path to the texture file.
 	std::filesystem::path m_path;
 	/// Texture's size.
 	math::FrameSize m_size = {0, 0};
-	/// OpenGL binding.
-	uint32_t m_rendererId = 0;
+
+	bool m_hasAlpha = false;
+	uint32_t m_textureId = 0;
+
 };
-} // namespace owl::renderer::vulkan
+}// namespace owl::renderer::vulkan
