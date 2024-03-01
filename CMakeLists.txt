@@ -11,13 +11,16 @@ project(Owl VERSION 0.1.0 LANGUAGES C CXX)
 # ---=== Options ===---
 #
 option(${PRJPREFIX}_BUILD_SHARED "If the Library must be build as shared library" OFF)
-option(${PRJPREFIX}_TESTING "Enable the unit tests" ON)
+option(${PRJPREFIX}_SKIP_DEPMANAGER "Don't use depmanager" OFF)
+option(${PRJPREFIX}_DEFINE_VULKAN_LAYERS "Copy vulkan layers in the binary directory" ON)
+
 option(${PRJPREFIX}_DOC_ONLY "To only generate documentation" OFF)
 option(${PRJPREFIX}_BUILD_NEST "If wanted to generate Owl Nest" ON)
 option(${PRJPREFIX}_BUILD_SANDBOX "If wanted to generate Sandbox" ON)
 option(${PRJPREFIX}_BUILD_DRONE "If wanted to generate OWl Drone" ON)
-option(${PRJPREFIX}_SKIP_DEPMANAGER "Don't use depmanager" OFF)
-option(${PRJPREFIX}_DEFINE_VULKAN_LAYERS "Copy vulkan layers in the binary directory" ON)
+
+option(${PRJPREFIX}_TESTING "Enable the unit tests" ON)
+option(${PRJPREFIX}_ENABLE_COVERAGE "Run code coverage during test run" OFF)
 
 #
 # ---=== Base Configs ===---
@@ -26,6 +29,11 @@ include(BaseConfig)
 
 if (NOT ${PRJPREFIX}_DOC_ONLY)
     #
+    # ---=== Sanitizers ===---
+    #
+    include(SaniTests)
+
+    #
     # ---=== The Program ===---
     #
     add_subdirectory(source)
@@ -33,7 +41,7 @@ if (NOT ${PRJPREFIX}_DOC_ONLY)
     #
     # ---=== TESTING PROCEDURES ===---
     #
-    if (${PRJPREFIX}_TESTING)
+    if (${PRJPREFIX}_TESTING AND NOT ${PRJPREFIX}_ENABLE_CLANG_TIDY)
         enable_testing()
         add_subdirectory(test)
     endif ()

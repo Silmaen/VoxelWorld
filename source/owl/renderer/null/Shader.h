@@ -11,39 +11,41 @@
 #include "../Shader.h"
 
 namespace owl::renderer::null {
-
 /**
  * @brief Class Shader.
  */
 class OWL_API Shader final : public owl::renderer::Shader {
 public:
-	Shader(const Shader &) = delete;
-	Shader(Shader &&) = delete;
+	Shader(const Shader&) = delete;
+	Shader(Shader&&) = delete;
 
 	/**
 	 * @brief Constructor.
-	 * @param shaderName Shader's name.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param vertexSrc Source of the vertex shader.
-	 * @param fragmentSrc Source of fragment shader.
+	 * @param[in] iShaderName Shader's name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iVertexSrc Source of the vertex shader.
+	 * @param[in] iFragmentSrc Source of fragment shader.
 	 */
-	Shader(const std::string &shaderName, const std::string &renderer, const std::string &vertexSrc, const std::string &fragmentSrc);
+	Shader(const std::string& iShaderName, const std::string& iRenderer, const std::string& iVertexSrc,
+	       const std::string& iFragmentSrc);
 
 	/**
 	 * @brief Constructor.
-	 * @param shaderName Shader's name.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param sources The shader's sources with type.
+	 * @param[in] iShaderName Shader's name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iSources The shader's sources with type.
 	 */
-	Shader(const std::string &shaderName, const std::string &renderer, const std::unordered_map<ShaderType, std::string> &sources);
+	Shader(const std::string& iShaderName, const std::string& iRenderer,
+	       const std::unordered_map<ShaderType, std::string>& iSources);
 
 	/**
 	 * @brief Constructor.
-	 * @param shaderName Shader's name.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param sources The shader source's path with type.
+	 * @param[in] iShaderName Shader's name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iSources The shader source's path with type.
 	 */
-	Shader(const std::string &shaderName, const std::string &renderer, const std::vector<std::filesystem::path> &sources);
+	Shader(const std::string& iShaderName, const std::string& iRenderer,
+	       const std::vector<std::filesystem::path>& iSources);
 
 	/**
 	 * @brief Destructor.
@@ -62,53 +64,52 @@ public:
 
 	/**
 	 * @brief Set shader's internal int variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setInt(const std::string &name, int value) override;
+	void setInt(const std::string& iName, int iValue) override;
 
 	/**
 	 * @brief Set shader's internal int variable array.
-	 * @param name Shader's variable's name.
-	 * @param values Shader's variable's raw values.
-	 * @param count Amount values.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValues Shader's variable's raw values.
+	 * @param[in] iCount Amount values.
 	 */
-	void setIntArray(const std::string &name, int *values, uint32_t count) override;
+	void setIntArray(const std::string& iName, int* iValues, uint32_t iCount) override;
 
 	/**
 	 * @brief Set shader's internal int variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setFloat(const std::string &name, float value) override;
+	void setFloat(const std::string& iName, float iValue) override;
 
 	/**
 	 * @brief Set shader's internal vector 2 variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setFloat2(const std::string &name, const glm::vec2 &value) override;
+	void setFloat2(const std::string& iName, const glm::vec2& iValue) override;
 
 	/**
 	 * @brief Set shader's internal vector 3 variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setFloat3(const std::string &name, const glm::vec3 &value) override;
+	void setFloat3(const std::string& iName, const glm::vec3& iValue) override;
 
 	/**
 	 * @brief Set shader's internal vector 4 variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setFloat4(const std::string &name, const glm::vec4 &value) override;
+	void setFloat4(const std::string& iName, const glm::vec4& iValue) override;
 
 	/**
 	 * @brief Set shader's internal Matrix 4 variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setMat4(const std::string &name, const glm::mat4 &value) override;
+	void setMat4(const std::string& iName, const glm::mat4& iValue) override;
 };
-
-}// namespace owl::renderer::null
+} // namespace owl::renderer::null

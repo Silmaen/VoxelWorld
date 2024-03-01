@@ -12,24 +12,24 @@
 #include "core/external/glfw3.h"
 
 namespace owl::renderer::opengl {
-
 /**
  * @brief Class GraphContext.
  */
-class OWL_API GraphContext final: public ::owl::renderer::GraphContext {
+class OWL_API GraphContext final : public renderer::GraphContext {
 public:
-	GraphContext(const GraphContext &) = delete;
-	GraphContext(GraphContext &&) = delete;
+	GraphContext(const GraphContext&) = delete;
+	GraphContext(GraphContext&&) = delete;
 
 	/**
 	 * @brief Default constructor.
+	 * @param[in,out] ioWindow The window into render context.
 	 */
-	explicit GraphContext(GLFWwindow *window);
+	explicit GraphContext(GLFWwindow* ioWindow);
 
 	/**
 	 * @brief Destructor.
 	 */
-	~GraphContext() override = default;//---UNCOVER---
+	~GraphContext() override = default;
 
 	/**
 	 * @brief Initialize the context.
@@ -49,9 +49,8 @@ public:
 
 private:
 	/// Link to the parent window.
-	GLFWwindow *windowHandle;
+	GLFWwindow* mp_windowHandle;
 	/// OpenGL version
-	int version;
+	int m_version = 0;
 };
-
-}// namespace owl::renderer::opengl
+} // namespace owl::renderer::opengl

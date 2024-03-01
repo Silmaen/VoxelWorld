@@ -8,26 +8,25 @@
 
 #include "owlpch.h"
 
-#include "Log.h"
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 OWL_DIAG_POP
-#include "debug/Tracker.h"
+
 
 namespace owl::core {
 
-std::shared_ptr<spdlog::logger> Log::coreLogger;
-std::shared_ptr<spdlog::logger> Log::clientLogger;
-spdlog::level::level_enum Log::verbosity = spdlog::level::trace;
-uint64_t Log::frameCounter = 0;
-uint64_t Log::frequency = 100;
+std::shared_ptr<spdlog::logger> Log::s_coreLogger;
+std::shared_ptr<spdlog::logger> Log::s_clientLogger;
+spdlog::level::level_enum Log::s_verbosity = spdlog::level::trace;
+uint64_t Log::s_frameCounter = 0;
+uint64_t Log::s_frequency = 100;
 
-void Log::init(const spdlog::level::level_enum &level, const uint64_t freq) {
+void Log::init(const spdlog::level::level_enum &iLevel, const uint64_t iFrequency) {
 	OWL_SCOPE_UNTRACK
-	if (coreLogger != nullptr) {
+	if (s_coreLogger != nullptr) {
 		OWL_CORE_INFO("Logger already initiated.")
 		return;
 	}
@@ -42,38 +41,38 @@ void Log::init(const spdlog::level::level_enum &level, const uint64_t freq) {
 	logSinks[0]->set_pattern("%^[%T] %n: %v%$");
 	logSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
-	coreLogger = std::make_shared<spdlog::logger>("OWL", begin(logSinks), end(logSinks));
-	spdlog::register_logger(coreLogger);
+	s_coreLogger = std::make_shared<spdlog::logger>("OWL", begin(logSinks), end(logSinks));
+	spdlog::register_logger(s_coreLogger);
 
-	clientLogger = std::make_shared<spdlog::logger>("APP", begin(logSinks), end(logSinks));
-	spdlog::register_logger(clientLogger);
-	setVerbosityLevel(level);
-	frameCounter = 0;
-	frequency = freq;
+	s_clientLogger = std::make_shared<spdlog::logger>("APP", begin(logSinks), end(logSinks));
+	spdlog::register_logger(s_clientLogger);
+	setVerbosityLevel(iLevel);
+	s_frameCounter = 0;
+	s_frequency = iFrequency;
 }
 
-void Log::setVerbosityLevel(const spdlog::level::level_enum &level) {
-	verbosity = level;
-	if (coreLogger) {
-		coreLogger->set_level(verbosity);
-		coreLogger->flush_on(verbosity);
+void Log::setVerbosityLevel(const spdlog::level::level_enum &iLevel) {
+	s_verbosity = iLevel;
+	if (s_coreLogger) {
+		s_coreLogger->set_level(s_verbosity);
+		s_coreLogger->flush_on(s_verbosity);
 	}
-	if (clientLogger) {
-		clientLogger->set_level(verbosity);
-		clientLogger->flush_on(verbosity);
+	if (s_clientLogger) {
+		s_clientLogger->set_level(s_verbosity);
+		s_clientLogger->flush_on(s_verbosity);
 	}
 }
 
 void Log::invalidate() {
 	OWL_SCOPE_UNTRACK
 	spdlog::drop_all();
-	coreLogger.reset();
-	clientLogger.reset();
+	s_coreLogger.reset();
+	s_clientLogger.reset();
 }
 
 void Log::newFrame() {
 	OWL_CORE_FRAME_TRACE(" ---- END FRAME ----")
-	++frameCounter;
+	++s_frameCounter;
 	OWL_CORE_FRAME_TRACE(" ---- NEW FRAME ----")
 }
 

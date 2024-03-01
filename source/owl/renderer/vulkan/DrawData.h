@@ -12,16 +12,15 @@
 #include "Shader.h"
 
 namespace owl::renderer::vulkan {
-
 /**
  * @brief Class representing what is required for a draw.
  */
 class OWL_API DrawData final : public owl::renderer::DrawData {
 public:
-	DrawData(const DrawData &) = default;
-	DrawData(DrawData &&) = default;
-	DrawData &operator=(const DrawData &) = default;
-	DrawData &operator=(DrawData &&) = default;
+	DrawData(const DrawData&) = default;
+	DrawData(DrawData&&) = default;
+	DrawData& operator=(const DrawData&) = default;
+	DrawData& operator=(DrawData&&) = default;
 	DrawData() = default;
 	/**
 	 * @brief Destructor.
@@ -30,12 +29,13 @@ public:
 
 	/**
 	 * @brief Initialize the draw data.
-	 * @param layout Layout of the vertex attributes.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param indices List of vertex indices.
-	 * @param shaderName The shader name.
+	 * @param[in] iLayout Layout of the vertex attributes.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iIndices List of vertex indices.
+	 * @param[in] iShaderName The shader name.
 	 */
-	void init(const BufferLayout &layout, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) override;
+	void init(const BufferLayout& iLayout, const std::string& iRenderer, std::vector<uint32_t>& iIndices,
+			  const std::string& iShaderName) override;
 
 	/**
 	 * @brief Bind this draw data.
@@ -49,10 +49,10 @@ public:
 
 	/**
 	 * @brief Push Vertices data  to the draw buffer.
-	 * @param data The raw vertices data
-	 * @param size The size of the raw data.
+	 * @param[in] iData The raw vertices data
+	 * @param[in] iSize The size of the raw data.
 	 */
-	void setVertexData(const void *data, uint32_t size) override;
+	void setVertexData(const void* iData, uint32_t iSize) override;
 
 	/**
 	 * @brief Get the number of vertex to draw.
@@ -62,24 +62,23 @@ public:
 
 	/**
 	 * @brief Define the shader for this object.
-	 * @param shaderName The shader name.
-	 * @param renderer Name of the shader's related renderer.
+	 * @param[in] iShaderName The shader name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
 	 */
-	void setShader(const std::string &shaderName, const std::string &renderer) override;
+	void setShader(const std::string& iShaderName, const std::string& iRenderer) override;
 
-	[[nodiscard]] std::string getName() const { return fmt::format("{}_{}", renderer_, shaderName_); }
+	[[nodiscard]] std::string getName() const { return fmt::format("{}_{}", m_renderer, m_shaderName); }
 
 private:
 	/// index of the pipeline.
-	int32_t pipelineId = -1;
+	int32_t m_pipelineId = -1;
 	/// Pointer to the shader/pipeline.
-	shared<Shader> shader;
+	shared<Shader> mp_shader;
 	/// Pointer to the vertex buffer.
-	shared<VertexBuffer> vertexBuffer;
+	shared<VertexBuffer> mp_vertexBuffer;
 	/// Pointer to the index buffer.
-	shared<IndexBuffer> indexBuffer;
-	std::string shaderName_{};
-	std::string renderer_{};
+	shared<IndexBuffer> mp_indexBuffer;
+	std::string m_shaderName{};
+	std::string m_renderer{};
 };
-
-}// namespace owl::renderer::vulkan
+} // namespace owl::renderer::vulkan

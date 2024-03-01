@@ -10,19 +10,29 @@
 
 namespace owl::math {
 
-constexpr glm::vec4 sRGBToLinear(const glm::vec4 &color) {
-	constexpr auto toLinear = [](float srgb) {
+/**
+ * \brief Convert sRGB color to linear color.
+ * \param[in] iColor Input sRGB color.
+ * \return Linear color.
+ */
+constexpr glm::vec4 sRGBToLinear(const glm::vec4 &iColor) {
+	constexpr auto toLinear = [](const float srgb) {
 		return (srgb <= 0.04045f) ? (srgb / 12.92f) : std::pow((srgb + 0.055f) / 1.055f, 2.4f);
 	};
-	return {toLinear(color.r), toLinear(color.g), toLinear(color.b), color.a};
+	return {toLinear(iColor.r), toLinear(iColor.g), toLinear(iColor.b), iColor.a};
 }
 
-constexpr glm::vec4 linearTosRGB(const glm::vec4 &color) {
-	constexpr auto toSRGB = [](float rgb) {
+/**
+ * \brief Convert linear color to sRgB color.
+ * \param[in] iColor Input linear color.
+ * \return sRGB colr.
+ */
+constexpr glm::vec4 linearTosRGB(const glm::vec4 &iColor) {
+	constexpr auto toSRGB = [](const float rgb) {
 		constexpr float power = 1.0f / 2.4f;
 		return rgb <= 0.0031308f ? 12.92f * rgb : 1.055f * std::pow(rgb, power) - 0.055f;
 	};
-	return {toSRGB(color.r), toSRGB(color.g), toSRGB(color.b), color.a};
+	return {toSRGB(iColor.r), toSRGB(iColor.g), toSRGB(iColor.b), iColor.a};
 }
 
 }// namespace owl::math

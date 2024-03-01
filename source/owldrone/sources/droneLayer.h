@@ -13,13 +13,12 @@
 #include <owl.h>
 
 namespace drone {
-
 class droneLayer final : public owl::core::layer::Layer {
 public:
-	droneLayer(const droneLayer &) = delete;
-	droneLayer(droneLayer &&) = delete;
-	droneLayer &operator=(const droneLayer &) = delete;
-	droneLayer &operator=(droneLayer &&) = delete;
+	droneLayer(const droneLayer&) = delete;
+	droneLayer(droneLayer&&) = delete;
+	droneLayer& operator=(const droneLayer&) = delete;
+	droneLayer& operator=(droneLayer&&) = delete;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -31,18 +30,18 @@ public:
 
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const owl::core::Timestep &ts) override;
-	void onEvent(owl::event::Event &event) override;
-	void onImGuiRender(const owl::core::Timestep &ts) override;
+	void onUpdate(const owl::core::Timestep& iTimeStep) override;
+	void onEvent(owl::event::Event& ioEvent) override;
+	void onImGuiRender(const owl::core::Timestep& iTimeStep) override;
 
 private:
-	void renderStats(const owl::core::Timestep &ts);
-	void renderFakeDrone(const owl::core::Timestep &ts);
+	void renderStats(const owl::core::Timestep& iTimeStep);
+	void renderFakeDrone(const owl::core::Timestep& iTimeStep);
 	void renderMenu();
 	void renderToolbar();
 
-	bool onKeyPressed(owl::event::KeyPressedEvent &e);
-	bool onMouseButtonPressed(owl::event::MouseButtonPressedEvent &e);
+	bool onKeyPressed(owl::event::KeyPressedEvent& ioEvent);
+	bool onMouseButtonPressed(owl::event::MouseButtonPressedEvent& ioEvent);
 
 	[[nodiscard]] bool isConnected() const;
 	void toggleConnect();
@@ -55,6 +54,7 @@ private:
 		Settings,
 		Gauges
 	};
+
 	DisplayMode mode = DisplayMode::Gauges;
 
 	// remote controller
@@ -66,5 +66,4 @@ private:
 	owl::shared<panels::BasePanel> settings;
 	owl::shared<panels::BasePanel> viewport;
 };
-
-}// namespace drone
+} // namespace drone

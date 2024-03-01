@@ -18,8 +18,8 @@
 
 namespace owl::input::video::windows {
 
-static const std::string baseName = "input::video::windows::";
-constexpr uint64_t mask32 = 0xffffffff;
+static const std::string g_baseName = "input::video::windows::";
+constexpr uint64_t g_mask32 = 0xffffffff;
 
 namespace {
 
@@ -40,6 +40,7 @@ struct ComControl {
 		++refCount;
 		return true;
 	}
+
 	void delRef() {
 		if (refCount == 0)
 			return;
@@ -53,10 +54,12 @@ struct ComControl {
 private:
 	uint64_t refCount = 0;
 };
+
 ComControl cc;
 
 std::string getPixelFormatString(const GUID &videoFormat) {
-	if (videoFormat == MFVideoFormat_AI44) return "AI44";
+	if (videoFormat == MFVideoFormat_AI44)
+		return "AI44";
 	if (videoFormat == MFVideoFormat_ARGB32)
 		return "ARGB32";
 	if (videoFormat == MFVideoFormat_AYUV)
@@ -160,13 +163,13 @@ std::string getPixelFormatString(const GUID &videoFormat) {
 
 Device::PixelFormat getDevicePixelFormat(const GUID &videoFormat) {
 	if (videoFormat == MFVideoFormat_RGB24)
-		return Device::PixelFormat::RGB24;
+		return Device::PixelFormat::Rgb24;
 	if (videoFormat == MFVideoFormat_NV12)
-		return Device::PixelFormat::NV12;
+		return Device::PixelFormat::Nv12;
 	if (videoFormat == MFVideoFormat_MJPG)
-		return Device::PixelFormat::MJPEG;
+		return Device::PixelFormat::MJpeg;
 	if (videoFormat == MFVideoFormat_YUY2)
-		return Device::PixelFormat::YUYV;
+		return Device::PixelFormat::YuYv;
 
 	// Format inconnu
 	return Device::PixelFormat::Unknwon;
@@ -174,17 +177,20 @@ Device::PixelFormat getDevicePixelFormat(const GUID &videoFormat) {
 
 }// namespace
 
-void updateList(std::vector<shared<video::Device>> &list) {
-	if (!cc.addRef()) return;
+void updateList(std::vector<shared<video::Device>> &ioList) {
+	if (!cc.addRef())
+		return;
 	// check if all listed devices still exists
-	if (std::remove_if(list.begin(), list.end(), [](const shared<video::Device> &dev) { return !std::static_pointer_cast<Device>(dev)->isValid(); }) != list.end()) { OWL_CORE_WARN("Possible problems during video input listing.") }
+	if (std::remove_if(ioList.begin(), ioList.end(), [](const shared<video::Device> &iDev) {
+		return !std::static_pointer_cast<Device>(iDev)->isValid();
+	}) != ioList.end()) { OWL_CORE_WARN("Possible problems during video input listing.") }
 
 	WPointer<IMFAttributes> pConfig;
 	HRESULT hr = MFCreateAttributes(pConfig.addr(), 1);
 
 	// Request video capture devices.
 	if (FAILED(hr)) {
-		OWL_CORE_ERROR("{}updateList: Unable to create MFAttribute.", baseName)
+		OWL_CORE_ERROR("{}updateList: Unable to create MFAttribute.", g_baseName)
 		return;
 	}
 	// define what we search: Video input!
@@ -192,7 +198,7 @@ void updateList(std::vector<shared<video::Device>> &list) {
 			MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
 			MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
 	if (FAILED(hr)) {
-		OWL_CORE_ERROR("{}updateList: Unable to setup attributes.", baseName)
+		OWL_CORE_ERROR("{}updateList: Unable to setup attributes.", g_baseName)
 		return;
 	}
 	std::vector<WPointer<IMFActivate>> devices;
@@ -205,42 +211,45 @@ void updateList(std::vector<shared<video::Device>> &list) {
 			devices.emplace_back(pDevices[i]);
 	}
 	if (devices.empty()) {
-		OWL_CORE_WARN("{}updateList: No devices found.", baseName)
+		OWL_CORE_WARN("{}updateList: No devices found.", g_baseName)
 		return;
 	}
 	// search for new devices.
 	size_t devCounter = 0;
 	for (auto &devivce: devices) {
-		auto testDev = mk_shared<Device>(devivce);
+		auto testDev = mkShared<Device>(devivce);
 		if (!testDev->isValid()) { continue; }
 		// don't add a device that already exists
-		if (std::ranges::find_if(list.begin(), list.end(),
-						 [&testDev](const shared<video::Device> &dev) { return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo(); }) != list.end())
+		if (std::ranges::find_if(ioList.begin(), ioList.end(),
+		                         [&testDev](const shared<video::Device> &dev) {
+			                         return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo();
+		                         }) != ioList.end())
 			continue;
 		OWL_CORE_TRACE("Found: {} ({}) [{}] ", devCounter, testDev->getName(), testDev->getBusInfo())
-		list.push_back(testDev);
+		ioList.push_back(testDev);
 		++devCounter;
 	}
 	cc.delRef();
 }
 
-Device::Device(WPointer<IMFActivate> &mfa) : owl::input::video::Device("") {
-	if (!cc.addRef()) return;
-	devActive.takeOwnershipFrom(mfa);
+Device::Device(WPointer<IMFActivate> &iMfa) : video::Device("") {
+	if (!cc.addRef())
+		return;
+	m_devActive.takeOwnershipFrom(iMfa);
 	{
 		wchar_t *fName = nullptr;
 		uint32_t len;
-		devActive->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &fName, &len);
+		m_devActive->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &fName, &len);
 		std::wstring ws(fName);
-		name = std::string(ws.begin(), ws.end());
+		m_name = std::string(ws.begin(), ws.end());
 		CoTaskMemFree(fName);
 	}
 	{
 		wchar_t *fName = nullptr;
 		uint32_t len;
-		devActive->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, &fName, &len);
+		m_devActive->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, &fName, &len);
 		std::wstring ws(fName);
-		busInfo = std::string(ws.begin(), ws.end());
+		m_busInfo = std::string(ws.begin(), ws.end());
 		CoTaskMemFree(fName);
 	}
 }
@@ -251,11 +260,11 @@ Device::~Device() {
 }
 
 void Device::open() {
-	OWL_CORE_INFO("Opening device {}", name)
+	OWL_CORE_INFO("Opening device {}", m_name)
 	// Media source activation!
-	HRESULT hr = devActive->ActivateObject(IID_PPV_ARGS(mediaSource.addr()));
+	HRESULT hr = m_devActive->ActivateObject(IID_PPV_ARGS(m_mediaSource.addr()));
 	if (FAILED(hr)) {
-		OWL_CORE_WARN("Device ({}): Unable to activate media source.", name)
+		OWL_CORE_WARN("Device ({}): Unable to activate media source.", m_name)
 		close();
 		return;
 	}
@@ -263,7 +272,7 @@ void Device::open() {
 	WPointer<IMFAttributes> pConfig;
 	hr = MFCreateAttributes(pConfig.addr(), 1);
 	if (FAILED(hr)) {
-		OWL_CORE_ERROR("Device ({}): Unable to create MFAttribute.", name)
+		OWL_CORE_ERROR("Device ({}): Unable to create MFAttribute.", m_name)
 		return;
 	}
 	// define what we search: Video input!
@@ -271,92 +280,87 @@ void Device::open() {
 			MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
 			MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
 	if (FAILED(hr)) {
-		OWL_CORE_ERROR("Device ({}): Unable to setup attributes.", name)
+		OWL_CORE_ERROR("Device ({}): Unable to setup attributes.", m_name)
 		return;
 	}
-	hr = MFCreateSourceReaderFromMediaSource(mediaSource.get(), pConfig.get(), sourceReader.addr());
+	hr = MFCreateSourceReaderFromMediaSource(m_mediaSource.get(), pConfig.get(), m_sourceReader.addr());
 	if (FAILED(hr)) {
-		OWL_CORE_WARN("Device ({}): Unable to create media reader.", name)
+		OWL_CORE_WARN("Device ({}): Unable to create media reader.", m_name)
 		close();
 		return;
 	}
 	WPointer<IMFMediaType> mediaType;
-	hr = sourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READER_CURRENT_TYPE_INDEX, mediaType.addr());
+	hr = m_sourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READER_CURRENT_TYPE_INDEX,
+	                                        mediaType.addr());
 	if (FAILED(hr)) {
-		OWL_CORE_WARN("Device ({}): Unable to get native media type.", name)
+		OWL_CORE_WARN("Device ({}): Unable to get native media type.", m_name)
 		close();
 		return;
 	}
 	uint64_t superSize;
 	mediaType->GetUINT64(MF_MT_FRAME_SIZE, &superSize);
-	size = {static_cast<uint32_t>((superSize >> 32) & mask32), static_cast<uint32_t>(superSize & mask32)};
-	OWL_CORE_INFO("Device ({}): Frame size seen: {} {}.", name, size.getWidth(), size.getHeight())
+	m_size = {static_cast<uint32_t>((superSize >> 32) & g_mask32), static_cast<uint32_t>(superSize & g_mask32)};
+	OWL_CORE_INFO("Device ({}): Frame size seen: {} {}.", m_name, m_size.getWidth(), m_size.getHeight())
 	GUID format;
 	mediaType->GetGUID(MF_MT_SUBTYPE, &format);
-	OWL_CORE_INFO("Device ({}): Native media sub type: {}.", name, getPixelFormatString(format))
-	pixFormat = getDevicePixelFormat(format);
+	OWL_CORE_INFO("Device ({}): Native media sub type: {}.", m_name, getPixelFormatString(format))
+	m_pixFormat = getDevicePixelFormat(format);
 	mediaType->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive);
 	mediaType->SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT, TRUE);
-	hr = sourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, nullptr, mediaType.get());
+	hr = m_sourceReader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, nullptr, mediaType.get());
 	if (FAILED(hr)) {
-		OWL_CORE_WARN("Device ({}): Unable to set native media type.", name)
+		OWL_CORE_WARN("Device ({}): Unable to set native media type.", m_name)
 		close();
-		return;
 	}
 }
 
 void Device::close() {
-	if (sourceReader) {
-		sourceReader.release();
+	if (m_sourceReader) { m_sourceReader.release(); }
+	if (m_mediaSource) {
+		m_mediaSource->Shutdown();
+		m_mediaSource.release();
 	}
-	if (mediaSource) {
-		mediaSource->Shutdown();
-		mediaSource.release();
-	}
-	size = {1, 1};
+	m_size = {1, 1};
 }
 
-bool Device::isOpened() const {
-	return size.surface() > 1;
-}
+bool Device::isOpened() const { return m_size.surface() > 1; }
 
 void Device::fillFrame(shared<renderer::Texture> &frame) {
 	if (!isOpened())
 		return;
 	// Resizing the frame.
-	if (size.surface() == 0)
+	if (m_size.surface() == 0)
 		return;
-	if (!frame || frame->getSize() != size) {
-		frame = renderer::Texture2D::create(size, false);
-	}
+	if (!frame || frame->getSize() != m_size) { frame = renderer::Texture2D::create(m_size, false); }
 	// For now only fill with black
 	WPointer<IMFSample> sample;
 	int64_t timestamp;
 	u_long actualIndex, sampleFlags;
 	do {
-		HRESULT hr = sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &actualIndex, &sampleFlags, &timestamp, sample.addr());
+		HRESULT hr = m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &actualIndex, &sampleFlags,
+		                                        &timestamp, sample.addr());
 		if (FAILED(hr)) {
-			OWL_CORE_WARN("Device ({}): Unable to read sample from device.", name)
+			OWL_CORE_WARN("Device ({}): Unable to read sample from device.", m_name)
 			return;
 		}
 	} while (sampleFlags & MF_SOURCE_READERF_STREAMTICK);
 	u_long count;
 	sample->GetBufferCount(&count);
 	if (count == 0) {
-		OWL_CORE_WARN("Device ({}): No  buffer found in the sample from device.", name)
+		OWL_CORE_WARN("Device ({}): No  buffer found in the sample from device.", m_name)
 		return;
 	}
 	WPointer<IMFMediaBuffer> buffer;
 	if (FAILED(sample->ConvertToContiguousBuffer(buffer.addr()))) {
-		OWL_CORE_WARN("Device ({}): Unable to Convert buffer.", name)
+		OWL_CORE_WARN("Device ({}): Unable to Convert buffer.", m_name)
 		return;
 	}
 	byte *byteBuffer;
 	u_long bCurLen = 0;
 	buffer->Lock(&byteBuffer, nullptr, &bCurLen);
-	std::vector<byte> convertedBuffer = getRGBBuffer(byteBuffer, static_cast<int32_t>(bCurLen));
-	if (size.surface() * 3 != convertedBuffer.size()) {
-		OWL_CORE_WARN("Frame size missmatch {} buffer: {}.", size.surface() * 3, convertedBuffer.size())
+	std::vector<byte> convertedBuffer = getRgbBuffer(byteBuffer, static_cast<int32_t>(bCurLen));
+	if (m_size.surface() * 3 != convertedBuffer.size()) {
+		OWL_CORE_WARN("Frame size missmatch {} buffer: {}.", m_size.surface() * 3, convertedBuffer.size())
 		buffer->Unlock();
 		return;
 	}
@@ -364,9 +368,7 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 	buffer->Unlock();
 }
 
-bool owl::input::video::windows::Device::isValid() const {
-	return !name.empty() && !busInfo.empty();
-}
+bool Device::isValid() const { return !m_name.empty() && !m_busInfo.empty(); }
 
 }// namespace owl::input::video::windows
 

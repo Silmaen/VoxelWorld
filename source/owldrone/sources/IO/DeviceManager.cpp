@@ -95,13 +95,13 @@ void DeviceManager::updateList() {
 owl::shared<Device> DeviceManager::getDeviceByName(const std::string &name) const {
 	const auto it = std::ranges::find_if(devices.begin(), devices.end(), [&name](const Device &T) { return T.name == name; });
 	if (it == devices.end()) return nullptr;
-	return owl::mk_shared<Device>(*it);
+	return owl::mkShared<Device>(*it);
 }
 
 owl::shared<Device> DeviceManager::getDeviceByPort(const std::string &port) const {
 	const auto it = std::ranges::find_if(devices.begin(), devices.end(), [&port](const Device &T) { return T.port == port; });
 	if (it == devices.end()) return nullptr;
-	return owl::mk_shared<Device>(*it);
+	return owl::mkShared<Device>(*it);
 }
 
 void DeviceManager::setCurrentDevice(const std::string &port) {

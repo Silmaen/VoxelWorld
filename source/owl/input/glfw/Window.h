@@ -28,9 +28,9 @@ public:
 
 	/**
 	 * @brief Default constructor.
-	 * @param props The window properties.
+	 * @param[in] iProps The window properties.
 	 */
-	explicit Window(const Properties &props);
+	explicit Window(const Properties &iProps);
 
 	/**
 	 * @brief Destructor.
@@ -46,19 +46,19 @@ public:
 	 * @brief Get Size attribute of width.
 	 * @return The window's width.
 	 */
-	[[nodiscard]] uint32_t getWidth() const override { return windowData.width; }
+	[[nodiscard]] uint32_t getWidth() const override { return m_windowData.width; }
 
 	/**
 	 * @brief Get Size attribute of height.
 	 * @return The window's height.
 	 */
-	[[nodiscard]] uint32_t getHeight() const override { return windowData.height; }
+	[[nodiscard]] uint32_t getHeight() const override { return m_windowData.height; }
 
 	/**
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] math::FrameSize getSize() const override { return {windowData.width, windowData.height}; }
+	[[nodiscard]] math::FrameSize getSize() const override { return {m_windowData.width, m_windowData.height}; }
 	/**
 	 * @brief Get the type of window manager.
 	 * @return The window manager's type.
@@ -67,16 +67,14 @@ public:
 
 	/**
 	 * @brief Define the Event Callback function.
-	 * @param callback The new callback function.
+	 * @paramv iCallback The new callback function.
 	 */
-	void setEventCallback(const EventCallback &callback) override {
-		windowData.eventCallback = callback;
-	}
+	void setEventCallback(const EventCallback &iCallback) override { m_windowData.eventCallback = iCallback; }
 	/**
 	 * @brief St the VSync.
-	 * @param enabled Should VSync enabled.
+	 * @param[in] iEnabled Should VSync enabled.
 	 */
-	void setVSync(bool enabled) override;
+	void setVSync(bool iEnabled) override;
 
 	/**
 	 * @brief Check for VSync.
@@ -88,7 +86,7 @@ public:
 	 * @brief Access to the Native Window.
 	 * @return Native window's raw pointer.
 	 */
-	[[nodiscard]] void *getNativeWindow() const override { return glfwWindow; }
+	[[nodiscard]] void *getNativeWindow() const override { return mp_glfwWindow; }
 
 	/**
 	 * @brief Terminate the window.
@@ -98,12 +96,12 @@ public:
 private:
 	/**
 	 * @brief Initialize the window.
-	 * @param props Properties of the window.
+	 * @param[in] iProps Properties of the window.
 	 */
-	void init(const Properties &props);
+	void init(const Properties &iProps);
 
 	/// Pointer to the GLFW window.
-	GLFWwindow *glfwWindow{nullptr};
+	GLFWwindow *mp_glfwWindow{nullptr};
 
 	/**
 	 * @brief Window's data.
@@ -116,13 +114,13 @@ private:
 		/// Window's height.
 		uint32_t height = 0;
 		/// Window's VSync property.
-		bool VSync = false;
+		bool vSync = false;
 		/// Event Call back.
 		EventCallback eventCallback{};
 	};
 
 	/// The Window's data.
-	WindowData windowData{};
+	WindowData m_windowData{};
 };
 
 }// namespace owl::input::glfw

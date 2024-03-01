@@ -12,11 +12,11 @@
 #include "core/UUID.h"
 #include "renderer/CameraEditor.h"
 
+#include <entt/entt.hpp>
 /**
  * @brief Namespace for the Scene elements
  */
 namespace owl::scene {
-
 class Entity;
 class ScriptableEntity;
 
@@ -25,10 +25,10 @@ class ScriptableEntity;
  */
 class OWL_API Scene final {
 public:
-	Scene(const Scene &) = delete;
-	Scene(Scene &&) = delete;
-	Scene &operator=(const Scene &) = delete;
-	Scene &operator=(Scene &&) = delete;
+	Scene(const Scene&) = delete;
+	Scene(Scene&&) = delete;
+	Scene& operator=(const Scene&) = delete;
+	Scene& operator=(Scene&&) = delete;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -36,62 +36,62 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Scene();
+	~Scene();
 
 	/**
 	 * @brief Create a copy of the scene.
-	 * @param other The scene to copy.
+	 * @param[in] iOther The scene to copy.
 	 * @return Pointer to the new scene.
 	 */
-	static shared<Scene> copy(const shared<Scene> &other);
+	static shared<Scene> copy(const shared<Scene>& iOther);
 
 	/**
 	 * @brief Create entity and add it to registry.
-	 * @param name Entity's name.
+	 * @param[in] iName Entity's name.
 	 * @return The Entity.
 	 */
-	Entity createEntity(const std::string &name = std::string());
+	Entity createEntity(const std::string& iName = std::string());
 
 	/**
 	 * @brief Create entity with UUID and add it to registry.
-	 * @param name Entity's name.
-	 * @param uuid The Entity's UUID.
+	 * @param[in] iName Entity's name.
+	 * @param[in] iUuid The Entity's UUID.
 	 * @return The Entity.
 	 */
-	Entity createEntityWithUUID(core::UUID uuid, const std::string &name = std::string());
+	Entity createEntityWithUUID(core::UUID iUuid, const std::string& iName = std::string());
 
 	/**
 	 * @brief Destroy n entity.
-	 * @param entity Entity to destroy.
+	 * @param[in,out] ioEntity Entity to destroy.
 	 */
-	void destroyEntity(Entity &entity);
+	void destroyEntity(Entity& ioEntity);
 
 	/**
 	 * @brief Update actions for the runtime.
-	 * @param ts The time step.
+	 * @param[in] iTimeStep The time step.
 	 */
-	void onUpdateRuntime(const core::Timestep &ts);
+	void onUpdateRuntime(const core::Timestep& iTimeStep);
 
 	/**
 	 * @brief Update action in the editor.
-	 * @param ts The time step.
-	 * @param camera The editor camera.
+	 * @param[in] iTimeStep The time step.
+	 * @param[in] iCamera The editor camera.
 	 */
-	void onUpdateEditor(core::Timestep ts, renderer::CameraEditor &camera);
+	void onUpdateEditor(const core::Timestep& iTimeStep, const renderer::CameraEditor& iCamera);
 
 	/**
 	 * @brief Action when viewport resized.
-	 * @param width New viewport's width.
-	 * @param height New viewport's height.
+	 * @param[in] iWidth New viewport's width.
+	 * @param[in] iHeight New viewport's height.
 	 */
-	void onViewportResize(uint32_t width, uint32_t height);
+	void onViewportResize(uint32_t iWidth, uint32_t iHeight);
 
 	/**
 	 * @brief Duplicate an entity.
-	 * @param entity Entity to duplicate.
+	 * @param[in] iEntity Entity to duplicate.
 	 * @return The created entity.
 	 */
-	Entity duplicateEntity(const Entity &entity);
+	Entity duplicateEntity(const Entity& iEntity);
 
 	/**
 	 * @brief Access to the primary Came.ra.
@@ -106,20 +106,19 @@ private:
 	/**
 	 * @brief Action when component is added to an entity.
 	 * @tparam T Type of the added component.
-	 * @param entity Entity receiving new component.
-	 * @param component The new component.
+	 * @param[in] iEntity Entity receiving new component.
+	 * @param[in,out] ioComponent The new component.
 	 */
-	template<typename T>
-	void onComponentAdded(const Entity &entity, T &component);
+	template <typename T>
+	void onComponentAdded(const Entity& iEntity, T& ioComponent);
 
 	/// The viewport's width.
-	uint32_t viewportWidth = 0;
+	uint32_t m_viewportWidth = 0;
 
 	/// The viewport's height.
-	uint32_t viewportHeight = 0;
+	uint32_t m_viewportHeight = 0;
 
 	friend class Entity;
 	friend class ScriptableEntity;
 };
-
-}// namespace owl::scene
+} // namespace owl::scene

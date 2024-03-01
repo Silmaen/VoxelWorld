@@ -11,31 +11,32 @@
 #include "../Buffer.h"
 
 namespace owl::renderer::null {
-
 /**
  * @brief Class VertexBuffer.
  */
 class VertexBuffer final : public ::owl::renderer::VertexBuffer {
 public:
-	VertexBuffer(const VertexBuffer &) = delete;
-	VertexBuffer(VertexBuffer &&) = delete;
-	VertexBuffer &operator=(const VertexBuffer &) = delete;
-	VertexBuffer &operator=(VertexBuffer &&) = delete;
+	VertexBuffer(const VertexBuffer&) = delete;
+	VertexBuffer(VertexBuffer&&) = delete;
+	VertexBuffer& operator=(const VertexBuffer&) = delete;
+	VertexBuffer& operator=(VertexBuffer&&) = delete;
 	/**
 	 * @brief Constructor.
-	 * @param size The buffer size.
+	 * @param[in] iSize The buffer size.
 	 */
-	VertexBuffer(uint32_t size);
+	explicit VertexBuffer(uint32_t iSize);
 
 	/**
 	 * @brief Default constructor.
+	 * @param[in] iVertices The Vertices.
+	 * @param[in] iSize The buffer size.
 	 */
-	VertexBuffer(float *vertices, uint32_t size);
+	VertexBuffer(float* iVertices, uint32_t iSize);
 
 	/**
 	 * @brief Destructor.
 	 */
-	~VertexBuffer() override;//---UNCOVER---
+	~VertexBuffer() override;
 
 	/**
 	 * @brief Activate the buffer in the GPU.
@@ -49,10 +50,10 @@ public:
 
 	/**
 	 * @brief Defines the data of the vertex buffer.
-	 * @param data The raw data.
-	 * @param size Number of data.
+	 * @param[in] iData The raw data.
+	 * @param[in] iSize Number of data.
 	 */
-	void setData(const void *data, uint32_t size) override;
+	void setData(const void* iData, uint32_t iSize) override;
 
 private:
 };
@@ -62,16 +63,16 @@ private:
  */
 class IndexBuffer final : public ::owl::renderer::IndexBuffer {
 public:
-	IndexBuffer(const IndexBuffer &) = delete;
-	IndexBuffer(IndexBuffer &&) = delete;
-	IndexBuffer &operator=(const IndexBuffer &) = delete;
-	IndexBuffer &operator=(IndexBuffer &&) = delete;
+	IndexBuffer(const IndexBuffer&) = delete;
+	IndexBuffer(IndexBuffer&&) = delete;
+	IndexBuffer& operator=(const IndexBuffer&) = delete;
+	IndexBuffer& operator=(IndexBuffer&&) = delete;
 	/**
 	 * @brief Default constructor.
-	 * @param indices Array of indices.
-	 * @param count Number of indices in the array.
+	 * @param[in] iIndices Array of indices.
+	 * @param[in] iCount Number of indices in the array.
 	 */
-	IndexBuffer(uint32_t *indices, uint32_t count);
+	IndexBuffer(uint32_t* iIndices, uint32_t iCount);
 
 	/**
 	 * @brief Destructor.
@@ -92,11 +93,10 @@ public:
 	 * @brief Get the number of element in the buffer.
 	 * @return Number of element in the buffer.
 	 */
-	[[nodiscard]] uint32_t getCount() const override { return count; }
+	[[nodiscard]] uint32_t getCount() const override { return m_count; }
 
 private:
 	/// Number of elements.
-	uint32_t count = 0;
+	uint32_t m_count = 0;
 };
-
-}// namespace owl::renderer::null
+} // namespace owl::renderer::null

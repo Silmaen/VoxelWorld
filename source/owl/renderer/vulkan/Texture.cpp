@@ -11,11 +11,11 @@
 
 namespace owl::renderer::vulkan {
 
-Texture2D::Texture2D(const math::FrameSize &size_, bool) : size{size_} {}
+Texture2D::Texture2D(const math::FrameSize &iSize, bool) : m_size{iSize} {}
 
-Texture2D::Texture2D(uint32_t width_, uint32_t height_, bool) : size{width_, height_} {}
+Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, bool) : m_size{iWidth, iHeight} {}
 
-Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {}
+Texture2D::Texture2D(std::filesystem::path iPath) : m_path{std::move(iPath)} {}
 
 Texture2D::~Texture2D() = default;
 

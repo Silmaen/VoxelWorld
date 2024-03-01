@@ -62,21 +62,23 @@ public:
 		Created,///< Renderer just created.
 		Running,///< Renderer in stable state.
 		Stopped,///< Renderer stopped.
-		Error,  ///< Render has an error.
+		Error,///< Render has an error.
 	};
-	static State getState() { return internalState; }
+
+	static State getState() { return m_internalState; }
 
 	/**
 	 * @brief Event on Window size change.
-	 * @param width New width.
-	 * @param height New height.
+	 * @param[in] iWidth New width.
+	 * @param[in] iHeight New height.
 	 */
-	static void onWindowResized(uint32_t width, uint32_t height);
+	static void onWindowResized(uint32_t iWidth, uint32_t iHeight);
 
 	/**
 	 * @brief Begins a scene.
+	 * @param[in] iCamera The camera.
 	 */
-	static void beginScene(const CameraOrtho &camera);
+	static void beginScene(const CameraOrtho &iCamera);
 
 	/**
 	 * @brief Ends a scene.
@@ -87,17 +89,17 @@ public:
 	 * @brief Access to the shader Library.
 	 * @return The shader library.
 	 */
-	static ShaderLibrary &getShaderLibrary() { return *shaderLibrary; }
+	static ShaderLibrary &getShaderLibrary() { return *m_shaderLibrary; }
 
 	/**
 	 * @brief Access to the texture Library.
 	 * @return The texture library.
 	 */
-	static TextureLibrary &getTextureLibrary() { return *textureLibrary; }
+	static TextureLibrary &getTextureLibrary() { return *m_textureLibrary; }
 
 private:
 	/// The state of the renderer.
-	static State internalState;
+	static State m_internalState;
 
 	/**
 	 * @brief Data for the current scene.
@@ -106,12 +108,13 @@ private:
 		/// View projection Matrix.
 		glm::mat4 viewProjectionMatrix;
 	};
+
 	/// The actual sceneData.
-	static shared<SceneData> sceneData;
+	static shared<SceneData> m_sceneData;
 	/// Actual library of shaders.
-	static shared<ShaderLibrary> shaderLibrary;
+	static shared<ShaderLibrary> m_shaderLibrary;
 	/// Actual library of textures.
-	static shared<TextureLibrary> textureLibrary;
+	static shared<TextureLibrary> m_textureLibrary;
 };
 
 }// namespace owl::renderer

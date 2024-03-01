@@ -14,12 +14,12 @@
 
 namespace owl::input {
 
-uniq<Window> Window::create(const Properties &props) {
-	switch (props.winType) {
+uniq<Window> Window::create(const Properties &iProps) {
+	switch (iProps.winType) {
 		case Type::GLFW:
-			return mk_uniq<glfw::Window>(props);
+			return mkUniq<glfw::Window>(iProps);
 		case Type::Null:
-			return mk_uniq<null::Window>(props);
+			return mkUniq<null::Window>(iProps);
 	}
 	return nullptr;
 }

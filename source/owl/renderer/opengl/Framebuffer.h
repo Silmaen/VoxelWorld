@@ -11,22 +11,21 @@
 #include "../Framebuffer.h"
 
 namespace owl::renderer::opengl {
-
 /**
  * @brief Class Framebuffer.
  */
-class Framebuffer final: public ::owl::renderer::Framebuffer {
+class Framebuffer final : public renderer::Framebuffer {
 public:
-	Framebuffer(const Framebuffer &) = default;
-	Framebuffer(Framebuffer &&) = default;
-	Framebuffer &operator=(const Framebuffer &) = default;
-	Framebuffer &operator=(Framebuffer &&) = default;
+	Framebuffer(const Framebuffer&) = default;
+	Framebuffer(Framebuffer&&) = default;
+	Framebuffer& operator=(const Framebuffer&) = default;
+	Framebuffer& operator=(Framebuffer&&) = default;
 
 	/**
 	 * @brief Default constructor.
-	 * @param spec The buffer specifications.
+	 * @param[in] iSpec The buffer specifications.
 	 */
-	explicit Framebuffer(FramebufferSpecification spec);
+	explicit Framebuffer(FramebufferSpecification iSpec);
 
 	/**
 	 * @brief Destructor.
@@ -50,42 +49,53 @@ public:
 
 	/**
 	 * @brief Change the size of the frame buffer.
-	 * @param width New width.
-	 * @param height New height.
+	 * @param[in] iWidth New width.
+	 * @param[in] iHeight New height.
 	 */
-	void resize(uint32_t width, uint32_t height) override;
+	void resize(uint32_t iWidth, uint32_t iHeight) override;
 
-	int readPixel(uint32_t attachmentIndex, int x, int y) override;
+	/**
+	 * @brief Get the value of given pixel.
+	 * @param[in] iAttachmentIndex Attachment's index.
+	 * @param[in] iX X coordinate.
+	 * @param[in] iY Y coordinate.
+	 * @return Pixel value.
+	 */
+	int readPixel(uint32_t iAttachmentIndex, int iX, int iY) override;
 
-	void clearAttachment(uint32_t attachmentIndex, int value) override;
+	/**
+	 * @brief Clear Attachment.
+	 * @param[in] iAttachmentIndex Attachment's index.
+	 * @param[in] iValue Clearing value.
+	 */
+	void clearAttachment(uint32_t iAttachmentIndex, int iValue) override;
 
 	/**
 	 * @brief Get renderer id.
-	 * @param index The color index.
+	 * @param[in] iIndex The color index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getColorAttachmentRendererID(uint32_t index = 0) const override {
-		OWL_CORE_ASSERT(index < colorAttachments.size(), "ColorAttachment out of bounds")
-		return colorAttachments[index];
+	[[nodiscard]] uint32_t getColorAttachmentRendererId(const uint32_t iIndex) const override {
+		OWL_CORE_ASSERT(iIndex < m_colorAttachments.size(), "ColorAttachment out of bounds")
+		return m_colorAttachments[iIndex];
 	}
 
 	/**
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] const FramebufferSpecification &getSpecification() const override { return specs; }
+	[[nodiscard]] const FramebufferSpecification& getSpecification() const override { return m_specs; }
 
 private:
 	/// The renderer ID.
-	uint32_t rendererID = 0;
+	uint32_t m_rendererId = 0;
 	/// The color attachment.
-	std::vector<uint32_t> colorAttachments;
+	std::vector<uint32_t> m_colorAttachments;
 	/// The depth attachment.
-	uint32_t depthAttachment = 0;
+	uint32_t m_depthAttachment = 0;
 	/// The specs.
-	FramebufferSpecification specs;
-	std::vector<FramebufferTextureSpecification> colorAttachmentSpecifications;
-	FramebufferTextureSpecification depthAttachmentSpecification = FramebufferTextureFormat::None;
+	FramebufferSpecification m_specs;
+	std::vector<FramebufferTextureSpecification> m_colorAttachmentSpecifications;
+	FramebufferTextureSpecification m_depthAttachmentSpecification = FramebufferTextureFormat::None;
 };
-
-}// namespace owl::renderer::opengl
+} // namespace owl::renderer::opengl

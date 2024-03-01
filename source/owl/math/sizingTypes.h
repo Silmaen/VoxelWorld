@@ -11,7 +11,6 @@
 #include "core/Core.h"
 
 namespace owl::math {
-
 /**
  * @brief Class to store a frame size.
  */
@@ -24,38 +23,38 @@ public:
 
 	/**
 	 * @brief Constructor with values.
-	 * @param w The width.
-	 * @param h The height.
+	 * @param[in] iWidth The width.
+	 * @param[in] iHeight The height.
 	 */
-	FrameSize(uint32_t w, uint32_t h) : _width{w}, _height{h} {}
+	FrameSize(const uint32_t iWidth, const uint32_t iHeight) : m_width{iWidth}, m_height{iHeight} {}
 
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~FrameSize();
+	~FrameSize() = default;
 
-	FrameSize(const FrameSize &) = default;
-	FrameSize(FrameSize &&) = default;
-	FrameSize &operator=(const FrameSize &) = default;
-	FrameSize &operator=(FrameSize &&) = default;
+	FrameSize(const FrameSize&) = default;
+	FrameSize(FrameSize&&) = default;
+	FrameSize& operator=(const FrameSize&) = default;
+	FrameSize& operator=(FrameSize&&) = default;
 
 	// ====== COMPARISON ======
 	/**
 	 * @brief Comparison operator.
-	 * @param other Other object to compare.
+	 * @param[in] iOther Other object to compare.
 	 * @return True if similar.
 	 */
-	[[nodiscard]] bool operator==(const FrameSize &other) const {
-		return (_width == other._width) && (_height == other._height);
+	[[nodiscard]] bool operator==(const FrameSize& iOther) const {
+		return (m_width == iOther.m_width) && (m_height == iOther.m_height);
 	}
 
 	/**
 	 * @brief Comparison operator.
-	 * @param other Other object to compare.
+	 * @param[in] iOther Other object to compare.
 	 * @return True if not similar.
 	 */
-	[[nodiscard]] bool operator!=(const FrameSize &other) const {
-		return (_width != other._width) || (_height != other._height);
+	[[nodiscard]] bool operator!=(const FrameSize& iOther) const {
+		return (m_width != iOther.m_width) || (m_height != iOther.m_height);
 	}
 
 	// ====== ACCESS ======
@@ -63,144 +62,139 @@ public:
 	 * @brief Access to the width for reading.
 	 * @return The width
 	 */
-	[[nodiscard]] const uint32_t &getWidth() const { return _width; }
+	[[nodiscard]] const uint32_t& getWidth() const { return m_width; }
 
 	/**
 	 * @brief Access to the height for reading.
 	 * @return The width
 	 */
-	[[nodiscard]] const uint32_t &getHeight() const { return _height; }
+	[[nodiscard]] const uint32_t& getHeight() const { return m_height; }
 
 	/**
 	 * @brief Direct access to the width.
 	 * @return The width
 	 */
-	[[nodiscard]] uint32_t &width() { return _width; }
+	[[nodiscard]] uint32_t& width() { return m_width; }
 
 	/**
 	 * @brief Direct access to the height.
 	 * @return The width
 	 */
-	[[nodiscard]] uint32_t &height() { return _height; }
+	[[nodiscard]] uint32_t& height() { return m_height; }
 
 	/**
 	 * @brief Direct access to coordinate.
-	 * @param id Coordinate id.
+	 * @param[in] iId Coordinate id.
 	 * @return The coordinate.
 	 */
-	[[nodiscard]] const uint32_t &at(uint8_t id) const { return id == 1 ? _height : _width; }
+	[[nodiscard]] const uint32_t& at(const uint8_t iId) const { return iId == 1 ? m_height : m_width; }
 	/**
 	 * @brief Direct access to coordinate.
-	 * @param id Coordinate id.
+	 * @param[in] iId Coordinate id.
 	 * @return The coordinate.
 	 */
-	[[nodiscard]] uint32_t &at(uint8_t id) { return id == 1 ? _height : _width; }
+	[[nodiscard]] uint32_t& at(const uint8_t iId) { return iId == 1 ? m_height : m_width; }
 
 	/**
 	 * @brief Direct access to coordinate.
-	 * @param id Coordinate id.
+	 * @param[in] iId Coordinate id.
 	 * @return The coordinate.
 	 */
-	[[nodiscard]] uint32_t &operator[](uint8_t id) { return at(id); }
+	[[nodiscard]] uint32_t& operator[](const uint8_t iId) { return at(iId); }
 
 	/**
 	 * @brief Direct access to coordinate.
-	 * @param id Coordinate id.
+	 * @param[in] iId Coordinate id.
 	 * @return The coordinate.
 	 */
-	[[nodiscard]] const uint32_t &operator[](uint8_t id) const { return at(id); }
+	[[nodiscard]] const uint32_t& operator[](const uint8_t iId) const { return at(iId); }
 
 	// ====== OPERATORS ======
 	/**
 	 * @brief Self addition.
-	 * @param other Other size to add.
+	 * @param[in] iOther Other size to add.
 	 * @return This object.
 	 */
-	FrameSize &operator+=(const FrameSize &other) {
-		_width += other._width;
-		_height += other._height;
+	FrameSize& operator+=(const FrameSize& iOther) {
+		m_width += iOther.m_width;
+		m_height += iOther.m_height;
 		return *this;
 	}
 
 	/**
 	 * @brief Self subtract.
-	 * @param other Other size to sub.
+	 * @param[in] iOther Other size to sub.
 	 * @return This object.
 	 */
-	FrameSize &operator-=(const FrameSize &other) {
-		_width -= other._width;
-		_height -= other._height;
+	FrameSize& operator-=(const FrameSize& iOther) {
+		m_width -= iOther.m_width;
+		m_height -= iOther.m_height;
 		return *this;
 	}
 
 	/**
 	 * @brief Self ratio product.
-	 * @param ratio The scaling ratio.
+	 * @param[in] iRatio The scaling ratio.
 	 * @return This object.
 	 */
-	FrameSize &operator*=(double ratio) {
-		ratio = std::abs(ratio);
-		_width = static_cast<uint32_t>(std::round(ratio * _width));
-		_height = static_cast<uint32_t>(std::round(ratio * _height));
+	FrameSize& operator*=(double iRatio) {
+		iRatio = std::abs(iRatio);
+		m_width = static_cast<uint32_t>(std::round(iRatio * m_width));
+		m_height = static_cast<uint32_t>(std::round(iRatio * m_height));
 		return *this;
 	}
 
 	/**
 	 * @brief Addition.
-	 * @param other Other size to add.
+	 * @param[in] iOther Other size to add.
 	 * @return Result.
 	 */
-	FrameSize operator+(const FrameSize &other) const {
+	FrameSize operator+(const FrameSize& iOther) const {
 		FrameSize result(*this);
-		result += other;
+		result += iOther;
 		return result;
 	}
 
 	/**
 	 * @brief Subtract.
-	 * @param other Other size to sub.
+	 * @param[in] iOther Other size to sub.
 	 * @return Result.
 	 */
-	FrameSize operator-(const FrameSize &other) const {
+	FrameSize operator-(const FrameSize& iOther) const {
 		FrameSize result(*this);
-		result -= other;
+		result -= iOther;
 		return result;
 	}
 
 	/**
 	 * @brief Ratio product.
-	 * @param ratio The scaling ratio.
+	 * @param[in] iRatio The scaling ratio.
 	 * @return Result.
 	 */
-	FrameSize operator*(double ratio) const {
+	FrameSize operator*(const double iRatio) const {
 		FrameSize result(*this);
-		result *= ratio;
+		result *= iRatio;
 		return result;
 	}
 
 	/**
 	 * @brief Ratio product
-	 * @param ratio The ratio.
-	 * @param other The Size object
+	 * @param[in] iRatio The ratio.
+	 * @param[in] iOther The Size object
 	 * @return Result.
 	 */
-	friend FrameSize operator*(double ratio, const FrameSize &other) {
-		return other * ratio;
-	}
+	friend FrameSize operator*(const double iRatio, const FrameSize& iOther) { return iOther * iRatio; }
 	// ===== COMPUTATIONS =====
 	/**
 	 * @brief Compute the surface.
 	 * @return The surface.
 	 */
-	uint32_t surface() const {
-		return _width * _height;
-	}
+	[[nodiscard]] uint32_t surface() const { return m_width * m_height; }
 
 private:
 	/// Frame width.
-	uint32_t _width = 0;
+	uint32_t m_width = 0;
 	/// Frame height.
-	uint32_t _height = 0;
+	uint32_t m_height = 0;
 };
-
-}// namespace owl::math
+} // namespace owl::math

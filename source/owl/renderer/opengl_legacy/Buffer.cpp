@@ -13,34 +13,34 @@
 
 namespace owl::renderer::opengl_legacy {
 
-VertexBuffer::VertexBuffer(uint32_t size) {
+VertexBuffer::VertexBuffer(const uint32_t iSize) {
 	OWL_PROFILE_FUNCTION()
 
-	glGenBuffers(1, &rendererId);
+	glGenBuffers(1, &m_rendererId);
 	bind();
-	glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, iSize, nullptr, GL_DYNAMIC_DRAW);
 	unbind();
 }
 
-VertexBuffer::VertexBuffer(float *vertices, uint32_t size) {
+VertexBuffer::VertexBuffer(const float *iVertices, const uint32_t iSize) {
 	OWL_PROFILE_FUNCTION()
 
-	glGenBuffers(1, &rendererId);
+	glGenBuffers(1, &m_rendererId);
 	bind();
-	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, iSize, iVertices, GL_STATIC_DRAW);
 	unbind();
 }
 
 VertexBuffer::~VertexBuffer() {
 	OWL_PROFILE_FUNCTION()
 
-	glDeleteBuffers(1, &rendererId);
+	glDeleteBuffers(1, &m_rendererId);
 }
 
 void VertexBuffer::bind() const {
 	OWL_PROFILE_FUNCTION()
 
-	glBindBuffer(GL_ARRAY_BUFFER, rendererId);
+	glBindBuffer(GL_ARRAY_BUFFER, m_rendererId);
 }
 
 void VertexBuffer::unbind() const {
@@ -49,32 +49,33 @@ void VertexBuffer::unbind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::setData(const void *data, uint32_t size) {
+void VertexBuffer::setData(const void *iData, const uint32_t iSize) {
 	bind();
-	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, iSize, iData);
 	unbind();
 }
 
 
-IndexBuffer::IndexBuffer(uint32_t *indices, uint32_t size) : count(size) {
+IndexBuffer::IndexBuffer(const uint32_t *iIndices, const uint32_t iCount) : m_count(iCount) {
 	OWL_PROFILE_FUNCTION()
 
-	glGenBuffers(1, &rendererId);
+	glGenBuffers(1, &m_rendererId);
 	bind();
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(m_count * sizeof(uint32_t)), iIndices,
+				 GL_STATIC_DRAW);
 	unbind();
 }
 
 IndexBuffer::~IndexBuffer() {
 	OWL_PROFILE_FUNCTION()
 
-	glDeleteBuffers(1, &rendererId);
+	glDeleteBuffers(1, &m_rendererId);
 }
 
 void IndexBuffer::bind() const {
 	OWL_PROFILE_FUNCTION()
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererId);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererId);
 }
 
 void IndexBuffer::unbind() const {

@@ -11,20 +11,19 @@
 #include "../Framebuffer.h"
 
 namespace owl::renderer::vulkan {
-
 /**
  * @brief Class Framebuffer.
  */
-class Framebuffer final: public ::owl::renderer::Framebuffer {
+class Framebuffer final : public ::owl::renderer::Framebuffer {
 public:
-	Framebuffer(const Framebuffer &) = default;
-	Framebuffer(Framebuffer &&) = default;
+	Framebuffer(const Framebuffer&) = default;
+	Framebuffer(Framebuffer&&) = default;
 
 	/**
 	 * @brief Default constructor.
-	 * @param spec The buffer specifications.
+	 * @param[in] iSpec The buffer specifications.
 	 */
-	explicit Framebuffer(FramebufferSpecification spec);
+	explicit Framebuffer(FramebufferSpecification iSpec);
 
 	/**
 	 * @brief Destructor.
@@ -48,21 +47,33 @@ public:
 
 	/**
 	 * @brief Change the size of the frame buffer.
-	 * @param width New width.
-	 * @param height New height.
+	 * @param[in] iWidth New width.
+	 * @param[in] iHeight New height.
 	 */
-	void resize(uint32_t width, uint32_t height) override;
+	void resize(uint32_t iWidth, uint32_t iHeight) override;
 
-	int readPixel(uint32_t attachmentIndex, int x, int y) override;
+	/**
+	 * @brief Get the value of given pixel.
+	 * @param[in] iAttachmentIndex Attachment's index.
+	 * @param[in] iX X coordinate.
+	 * @param[in] iY Y coordinate.
+	 * @return Pixel value.
+	 */
+	int readPixel(uint32_t iAttachmentIndex, int iX, int iY) override;
 
-	void clearAttachment(uint32_t attachmentIndex, int value) override;
+	/**
+	 * @brief Clear Attachment.
+	 * @param[in] iAttachmentIndex Attachment's index.
+	 * @param[in] iValue Clearing value.
+	 */
+	void clearAttachment(uint32_t iAttachmentIndex, int iValue) override;
 
 	/**
 	 * @brief Get renderer id.
-	 * @param index The color index.
+	 * @param[in] iIndex The color index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getColorAttachmentRendererID([[maybe_unused]] uint32_t index) const override {
+	[[nodiscard]] uint32_t getColorAttachmentRendererId([[maybe_unused]] uint32_t iIndex) const override {
 		return 0;
 	}
 
@@ -70,11 +81,10 @@ public:
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] const FramebufferSpecification &getSpecification() const override { return specs; }
+	[[nodiscard]] const FramebufferSpecification& getSpecification() const override { return m_specs; }
 
 private:
 	/// The specs.
-	FramebufferSpecification specs;
+	FramebufferSpecification m_specs;
 };
-
-}// namespace owl::renderer::vulkan
+} // namespace owl::renderer::vulkan

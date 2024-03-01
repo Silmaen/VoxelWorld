@@ -12,20 +12,25 @@
 namespace owl::renderer::opengl_legacy {
 
 
-const UniformBuffer *UniformBindingLibrary::getUniformBuffer(uint32_t binding) {
-	const auto result = std::ranges::find_if(uniforms.begin(), uniforms.end(), [&binding](auto &item) { return item->getBinding() == binding; });
-	if (result == uniforms.end())
+const UniformBuffer *UniformBindingLibrary::getUniformBuffer(uint32_t iBinding) {
+	const auto result = std::ranges::find_if(m_uniforms.begin(), m_uniforms.end(),
+											 [&iBinding](auto &iItem) { return iItem->getBinding() == iBinding; });
+	if (result == m_uniforms.end())
 		return nullptr;
 	return *result;
 }
 
-void UniformBindingLibrary::addUniformBuffer(const UniformBuffer *buffer) {
-	removeUniformBuffer(buffer->getBinding());
-	uniforms.push_back(buffer);
+void UniformBindingLibrary::addUniformBuffer(const UniformBuffer *iBuffer) {
+	removeUniformBuffer(iBuffer->getBinding());
+	m_uniforms.push_back(iBuffer);
 }
 
-void UniformBindingLibrary::removeUniformBuffer(uint32_t binding) {
-	std::remove_if(uniforms.begin(), uniforms.end(), [&binding](auto &item) { return item->getBinding() == binding; });
+void UniformBindingLibrary::removeUniformBuffer(uint32_t iBinding) {
+	if (const auto result = std::remove_if(m_uniforms.begin(), m_uniforms.end(),
+										   [&iBinding](auto &iItem) {
+											   return iItem->getBinding() == iBinding;
+										   }); result == m_uniforms.end())
+		OWL_CORE_TRACE("Nothing to remove.")
 }
 
 }// namespace owl::renderer::opengl_legacy

@@ -42,6 +42,30 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       }
+    },
+    {
+      "name": "clang-tidy",
+      "inherits": "clang-debug-shared",
+      "cacheVariables": {
+        "OWL_ENABLE_CLANG_TIDY": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "clang-tidy_mingw",
+      "inherits": "mingw-clang-debug-shared",
+      "cacheVariables": {
+        "OWL_ENABLE_CLANG_TIDY": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
     }
   ]
 }

@@ -16,78 +16,77 @@ namespace owl::renderer::vulkan {
 
 DrawData::~DrawData() = default;
 
-void DrawData::init(const BufferLayout &layout, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) {
-	shaderName_ = shaderName;
-	renderer_ = renderer;
-	setShader(shaderName, renderer);
-	if (layout.getStride() != 0) {
-		vertexBuffer = mk_shared<VertexBuffer>(layout.getStride() * indices.size());
-		vertexBuffer->setLayout(layout);
-		indexBuffer = mk_shared<IndexBuffer>(indices.data(), indices.size());
+void DrawData::init(const BufferLayout &iLayout, const std::string &iRenderer, std::vector<uint32_t> &iIndices,
+					const std::string &iShaderName) {
+	m_shaderName = iShaderName;
+	m_renderer = iRenderer;
+	setShader(iShaderName, iRenderer);
+	if (iLayout.getStride() != 0) {
+		mp_vertexBuffer = mkShared<VertexBuffer>(iLayout.getStride() * iIndices.size());
+		mp_vertexBuffer->setLayout(iLayout);
+		mp_indexBuffer = mkShared<IndexBuffer>(iIndices.data(), iIndices.size());
 	}
 	auto &vkh = internal::VulkanHandler::get();
-	std::vector<VkPipelineShaderStageCreateInfo> shaderStages = shader->getStagesInfo();
+	std::vector<VkPipelineShaderStageCreateInfo> shaderStages = mp_shader->getStagesInfo();
 
 	VkVertexInputBindingDescription bindingDescription;
 	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-	if (vertexBuffer) {
-		attributeDescriptions = vertexBuffer->getAttributeDescriptions();
-		bindingDescription = vertexBuffer->getBindingDescription();
+	if (mp_vertexBuffer) {
+		attributeDescriptions = mp_vertexBuffer->getAttributeDescriptions();
+		bindingDescription = mp_vertexBuffer->getBindingDescription();
 	}
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
-			.vertexBindingDescriptionCount = vertexBuffer ? 1u : 0u,
-			.pVertexBindingDescriptions = vertexBuffer ? &bindingDescription : nullptr,
-			.vertexAttributeDescriptionCount = vertexBuffer ? static_cast<uint32_t>(attributeDescriptions.size()) : 0,
-			.pVertexAttributeDescriptions = vertexBuffer ? attributeDescriptions.data() : nullptr,
+			.vertexBindingDescriptionCount = mp_vertexBuffer ? 1u : 0u,
+			.pVertexBindingDescriptions = mp_vertexBuffer ? &bindingDescription : nullptr,
+			.vertexAttributeDescriptionCount =
+			mp_vertexBuffer ? static_cast<uint32_t>(attributeDescriptions.size()) : 0,
+			.pVertexAttributeDescriptions = mp_vertexBuffer ? attributeDescriptions.data() : nullptr,
 	};
-	if (pipelineId >= 0)
-		vkh.popPipeline(pipelineId);
-	pipelineId = vkh.pushPipeline(shader->getName(), shaderStages, vertexInputInfo);
+	if (m_pipelineId >= 0)
+		vkh.popPipeline(m_pipelineId);
+	m_pipelineId = vkh.pushPipeline(mp_shader->getName(), shaderStages, vertexInputInfo);
 	const auto &vkc = internal::VulkanCore::get();
 
-	for (const auto &stage: shaderStages) {
+	for (const auto &stage: shaderStages)
 		vkDestroyShaderModule(vkc.getLogicalDevice(), stage.module, nullptr);
-	}
-	if (pipelineId < 0) {
-		OWL_CORE_WARN("Vulkan shader: Failed to register pipeline {}.", shader->getName())
-	}
+	if (m_pipelineId < 0) { OWL_CORE_WARN("Vulkan shader: Failed to register pipeline {}.", mp_shader->getName()) }
 }
-void DrawData::setShader(const std::string &shaderName, const std::string &renderer) {
+
+void DrawData::setShader(const std::string &iShaderName, const std::string &iRenderer) {
 	auto &shLib = Renderer::getShaderLibrary();
-	if (!shLib.exists(shaderName, renderer))
-		shLib.addFromStandardPath(shaderName, renderer);
-	shader = static_pointer_cast<Shader>(shLib.get(shaderName, renderer));
+	if (!shLib.exists(iShaderName, iRenderer))
+		shLib.addFromStandardPath(iShaderName, iRenderer);
+	mp_shader = static_pointer_cast<Shader>(shLib.get(iShaderName, iRenderer));
 }
 
 void DrawData::bind() const {
-	if (pipelineId < 0)
+	if (m_pipelineId < 0)
 		return;
 	auto &vkh = internal::VulkanHandler::get();
-	vkh.bindPipeline(pipelineId);
-	if (vertexBuffer)
-		vertexBuffer->bind();
-	if (indexBuffer)
-		indexBuffer->bind();
+	vkh.bindPipeline(m_pipelineId);
+	if (mp_vertexBuffer)
+		mp_vertexBuffer->bind();
+	if (mp_indexBuffer)
+		mp_indexBuffer->bind();
 }
 
-void DrawData::unbind() const {
-}
+void DrawData::unbind() const {}
 
-void DrawData::setVertexData(const void *data, uint32_t size) {
-	if (pipelineId < 0)
+void DrawData::setVertexData(const void *iData, const uint32_t iSize) {
+	if (m_pipelineId < 0)
 		return;
-	if (vertexBuffer)
-		vertexBuffer->setData(data, size);
+	if (mp_vertexBuffer)
+		mp_vertexBuffer->setData(iData, iSize);
 }
 
 uint32_t DrawData::getIndexCount() const {
-	if (pipelineId < 0)
+	if (m_pipelineId < 0)
 		return 0;
-	if (indexBuffer)
-		return indexBuffer->getCount();
+	if (mp_indexBuffer)
+		return mp_indexBuffer->getCount();
 	return 0;
 }
 

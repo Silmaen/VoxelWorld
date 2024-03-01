@@ -14,53 +14,51 @@
 
 namespace owl::core::utils {
 
-static std::vector<std::string_view> split(const std::string_view str, const char delimiter = '\n') {
+static std::vector<std::string_view> split(const std::string_view iString, const char iDelimiter = '\n') {
 	std::vector<std::string_view> result;
 	int indexCommaToRightOfColumn = -1;
-	for (uint32_t i = 0; i < str.size(); i++) {
-		if (str[i] == delimiter) {
+	for (uint32_t i = 0; i < iString.size(); i++) {
+		if (iString[i] == iDelimiter) {
 			const int indexCommaToLeftOfColumn = indexCommaToRightOfColumn;
 			indexCommaToRightOfColumn = static_cast<int>(i);
 			const int32_t index = indexCommaToLeftOfColumn + 1;
 			const auto length = static_cast<uint32_t>(indexCommaToRightOfColumn - index);
-			std::string_view column(str.data() + index, length);
+			std::string_view column(iString.data() + index, length);
 			result.push_back(column);
 		}
 	}
-	const std::string_view finalColumn(str.data() + indexCommaToRightOfColumn + 1, str.size() - static_cast<size_t>(indexCommaToRightOfColumn - 1));
+	const std::string_view finalColumn(iString.data() + indexCommaToRightOfColumn + 1,
+	                                   iString.size() - static_cast<size_t>(indexCommaToRightOfColumn - 1));
 	result.push_back(finalColumn);
 	return result;
 }
 
-static std::vector<nfdu8filteritem_t> parseFilter(std::string &filter) {
+static std::vector<nfdu8filteritem_t> parseFilter(const std::string &iFilter) {
 	std::vector<nfdu8filteritem_t> filters;
-	auto filterStr = split(filter);
-	for (auto str: filterStr) {
-		if (str.empty()) continue;
+	for (const auto filterStr = split(iFilter); auto str: filterStr) {
+		if (str.empty())
+			continue;
 		auto items = split(str, '|');
-		if (items.size() != 2) continue;
-		if (items[0].empty() || items[1].empty()) continue;
+		if (items.size() != 2)
+			continue;
+		if (items[0].empty() || items[1].empty())
+			continue;
 		filters.push_back({items[0].data(), items[1].data()});
-	}
-	for (auto &c: filter) {
-		if (c == '|') c = '\0';
-		if (c == '\n') c = '\0';
 	}
 	return filters;
 }
 
-std::filesystem::path FileDialog::openFile(const std::string &filter) {
+std::filesystem::path FileDialog::openFile(const std::string &iFilter) {
 	NFD::Init();
 	nfdu8char_t *outPath;
 	std::filesystem::path resultPath;
-	std::string filters{filter};
+	const std::string &filters{iFilter};
 	const auto ff = parseFilter(filters);
 	const auto initialDir = Application::get().getAssetDirectory();
 	const std::string tmp = initialDir.string();
-	const auto result = NFD::OpenDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()), tmp.c_str());
-	if (result == NFD_CANCEL) {
-		resultPath = std::filesystem::path{};
-	} else if (result == NFD_OKAY) {
+
+	if (const auto result = NFD::OpenDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()), tmp.c_str());
+		result == NFD_CANCEL) { resultPath = std::filesystem::path{}; } else if (result == NFD_OKAY) {
 		resultPath = std::filesystem::path{outPath};
 		NFD_FreePath(outPath);
 	} else {
@@ -71,19 +69,17 @@ std::filesystem::path FileDialog::openFile(const std::string &filter) {
 	return resultPath;
 }
 
-std::filesystem::path FileDialog::saveFile([[maybe_unused]] const std::string &filter) {
+std::filesystem::path FileDialog::saveFile([[maybe_unused]] const std::string &iFilter) {
 	NFD::Init();
 	nfdu8char_t *outPath;
 	std::filesystem::path resultPath;
-	std::string filters{filter};
+	const std::string &filters{iFilter};
 	const auto ff = parseFilter(filters);
 	const auto initialDir = Application::get().getAssetDirectory();
-	const auto result = NFD::SaveDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()), initialDir.string().c_str(), nullptr);
-	if (result == NFD_CANCEL) {
+	if (const auto result = NFD::SaveDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()),
+	                                        initialDir.string().c_str(), nullptr); result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
-	} else if (result == NFD_OKAY) {
-		resultPath = std::filesystem::path{outPath};
-	} else {
+	} else if (result == NFD_OKAY) { resultPath = std::filesystem::path{outPath}; } else {
 		OWL_CORE_ERROR("while opening file: {}", NFD::GetError())
 		OWL_ASSERT(false, "Error Opening file")
 	}

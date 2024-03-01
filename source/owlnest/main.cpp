@@ -18,12 +18,12 @@ public:
 	OwlNest() = delete;
 	explicit OwlNest(const core::AppParams &param) : core::Application(param) {
 		if (getState() == core::Application::State::Running)
-			pushLayer(mk_shared<EditorLayer>());
+			pushLayer(mkShared<EditorLayer>());
 	}
 };
 
 shared<core::Application> core::createApplication(int argc, char **argv) {
-	return mk_shared<OwlNest>(core::AppParams{
+	return mkShared<OwlNest>(core::AppParams{
 			.name = "Owl Nest - Owl Engine Editor",
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,

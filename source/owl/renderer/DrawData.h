@@ -10,16 +10,15 @@
 #include "Buffer.h"
 
 namespace owl::renderer {
-
 /**
  * @brief Abstract class representing what is required for a draw.
  */
 class OWL_API DrawData {
 public:
-	DrawData(const DrawData &) = default;
-	DrawData(DrawData &&) = default;
-	DrawData &operator=(const DrawData &) = default;
-	DrawData &operator=(DrawData &&) = default;
+	DrawData(const DrawData&) = default;
+	DrawData(DrawData&&) = default;
+	DrawData& operator=(const DrawData&) = default;
+	DrawData& operator=(DrawData&&) = default;
 	DrawData() = default;
 	/**
 	 * @brief Destructor.
@@ -28,12 +27,13 @@ public:
 
 	/**
 	 * @brief Initialize the draw data.
-	 * @param layout_ Layout of the vertex attributes.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param indices List of vertex indices.
-	 * @param shaderName The shader name.
+	 * @param[in] iLayout Layout of the vertex attributes.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iIndices List of vertex indices.
+	 * @param[in] iShaderName The shader name.
 	 */
-	virtual void init(const BufferLayout &layout_, const std::string &renderer, std::vector<uint32_t> &indices, const std::string &shaderName) = 0;
+	virtual void init(const BufferLayout& iLayout, const std::string& iRenderer, std::vector<uint32_t>& iIndices,
+	                  const std::string& iShaderName) = 0;
 
 	/**
 	 * @brief Bind this draw data.
@@ -47,10 +47,10 @@ public:
 
 	/**
 	 * @brief Push Vertices data  to the draw buffer.
-	 * @param data The raw vertices data
-	 * @param size The size of the raw data.
+	 * @param[in] iData The raw vertices data
+	 * @param[in] iSize The size of the raw data.
 	 */
-	virtual void setVertexData(const void *data, uint32_t size) = 0;
+	virtual void setVertexData(const void* iData, uint32_t iSize) = 0;
 
 	/**
 	 * @brief Get the number of vertex to draw.
@@ -66,10 +66,9 @@ public:
 
 	/**
 	 * @brief Define the shader for this object.
-	 * @param shaderName The shader name.
-	 * @param renderer Name of the shader's related renderer.
+	 * @param[in] iShaderName The shader name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
 	 */
-	virtual void setShader(const std::string &shaderName, const std::string &renderer) = 0;
+	virtual void setShader(const std::string& iShaderName, const std::string& iRenderer) = 0;
 };
-
-}// namespace owl::renderer
+} // namespace owl::renderer

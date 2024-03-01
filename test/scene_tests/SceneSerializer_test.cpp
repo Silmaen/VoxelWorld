@@ -12,15 +12,15 @@
 
 using namespace owl::scene;
 
-class myTexture2D final : public owl::renderer::Texture2D {
+class MyTexture2D final : public owl::renderer::Texture2D {
 public:
-	myTexture2D() : owl::renderer::Texture2D() {}
-	[[nodiscard]] bool operator==(const owl::renderer::Texture &other) const override { return p == other.getPath(); }
+	MyTexture2D() : Texture2D() {}
+	[[nodiscard]] bool operator==(const Texture &iOther) const override { return p == iOther.getPath(); }
 	[[nodiscard]] uint32_t getWidth() const override { return 0; }
 	[[nodiscard]] uint32_t getHeight() const override { return 0; }
 	[[nodiscard]] owl::math::FrameSize getSize() const override { return {0, 0}; }
 	[[nodiscard]] bool isLoaded() const override { return true; }
-	[[nodiscard]] uint32_t getRendererID() const override { return 0; }
+	[[nodiscard]] uint32_t getRendererId() const override { return 0; }
 	void bind(uint32_t) const override {}
 	[[nodiscard]] const std::filesystem::path &getPath() const override { return p; }
 	void setData(void *, uint32_t) override {}
@@ -31,16 +31,16 @@ private:
 
 TEST(SceneSerializer, SaveLoad) {
 	owl::core::Log::init(spdlog::level::off);
-	const auto sc = owl::mk_shared<Scene>();
+	const auto sc = owl::mkShared<Scene>();
 	sc->createEntityWithUUID(5, "bobObject");
-	SceneSerializer saver(sc);
+	const SceneSerializer saver(sc);
 	const auto fs = std::filesystem::temp_directory_path() / "tempSave.yml";
 	saver.serialize(fs);
 
 	ASSERT_TRUE(exists(fs));
-	const auto sc2 = owl::mk_shared<Scene>();
-	SceneSerializer loader(sc2);
-	loader.deserialize(fs);
+	const auto sc2 = owl::mkShared<Scene>();
+	const SceneSerializer loader(sc2);
+	EXPECT_TRUE(loader.deserialize(fs));
 
 	EXPECT_EQ(sc2->registry.storage<owl::scene::Entity>().size(), sc->registry.storage<owl::scene::Entity>().size());
 	remove(fs);
@@ -50,23 +50,23 @@ TEST(SceneSerializer, SaveLoad) {
 
 TEST(SceneSerializer, SaveLoadFULL) {
 	owl::core::Log::init(spdlog::level::off);
-	const auto sc = owl::mk_shared<Scene>();
+	const auto sc = owl::mkShared<Scene>();
 	auto ent = sc->createEntityWithUUID(5, "bobObject");
 	ent.addOrReplaceComponent<component::Camera>();
 	ent.addOrReplaceComponent<component::CircleRenderer>();
 	ent.addOrReplaceComponent<component::SpriteRenderer>();
 	auto ent2 = sc->createEntityWithUUID(7, "bobObject2");
-	auto spr = ent.addOrReplaceComponent<component::SpriteRenderer>();
-	spr.texture = owl::mk_shared<myTexture2D>();
+	auto spr = ent2.addOrReplaceComponent<component::SpriteRenderer>();
+	spr.texture = owl::mkShared<MyTexture2D>();
 
-	SceneSerializer saver(sc);
+	const SceneSerializer saver(sc);
 	const auto fs = std::filesystem::temp_directory_path() / "tempSave.yml";
 	saver.serialize(fs);
 
 	ASSERT_TRUE(exists(fs));
-	const auto sc2 = owl::mk_shared<Scene>();
-	SceneSerializer loader(sc2);
-	loader.deserialize(fs);
+	const auto sc2 = owl::mkShared<Scene>();
+	const SceneSerializer loader(sc2);
+	EXPECT_TRUE(loader.deserialize(fs));
 
 	EXPECT_EQ(sc2->registry.storage<owl::scene::Entity>().size(), sc->registry.storage<owl::scene::Entity>().size());
 	remove(fs);

@@ -14,66 +14,62 @@
 
 namespace owl::input {
 
-Type Input::type = Type::GLFW;
-uniq<Input> Input::instance = nullptr;
+Type Input::ms_type = Type::GLFW;
+uniq<Input> Input::mus_instance = nullptr;
 
-void Input::init(const Type &type_) {
-	if (instance)
-		instance.reset();
-	type = type_;
-	switch (type) {
+void Input::init(const Type &iType) {
+	if (mus_instance)
+		mus_instance.reset();
+	ms_type = iType;
+	switch (ms_type) {
 		case Type::GLFW:
-			instance = mk_uniq<glfw::Input>();
+			mus_instance = mkUniq<glfw::Input>();
 			return;
 		case Type::Null:
-			instance = mk_uniq<null::Input>();
+			mus_instance = mkUniq<null::Input>();
 	}
 }
 
 void Input::invalidate() {
-	if (instance)
-		instance.reset();
+	if (mus_instance)
+		mus_instance.reset();
 }
 
-bool Input::isKeyPressed(KeyCode keycode) {
-	if (instance)
-		return instance->isKeyPressed_impl(keycode);
+bool Input::isKeyPressed(const KeyCode iKeycode) {
+	if (mus_instance)
+		return mus_instance->isKeyPressed_impl(iKeycode);
 	return false;
 }
 
-bool Input::isMouseButtonPressed(MouseCode mouseCode) {
-	if (instance)
-		return instance->isMouseButtonPressed_impl(mouseCode);
+bool Input::isMouseButtonPressed(const MouseCode iMouseCode) {
+	if (mus_instance)
+		return mus_instance->isMouseButtonPressed_impl(iMouseCode);
 	return false;
 }
 
-float Input::getMouseX() {
-	return getMousePos().x;
-}
+float Input::getMouseX() { return getMousePos().x; }
 
-float Input::getMouseY() {
-	return getMousePos().y;
-}
+float Input::getMouseY() { return getMousePos().y; }
 
 glm::vec2 Input::getMousePos() {
-	if (instance)
-		return instance->getMousePos_impl();
+	if (mus_instance)
+		return mus_instance->getMousePos_impl();
 	return {};
 }
 
-void Input::injectKey(KeyCode keycode) {
-	if (instance)
-		instance->injectKey_impl(keycode);
+void Input::injectKey(const KeyCode iKeycode) {
+	if (mus_instance)
+		mus_instance->injectKey_impl(iKeycode);
 }
 
-void Input::injectMouseButton(MouseCode mouseCode) {
-	if (instance)
-		instance->injectMouseButton_impl(mouseCode);
+void Input::injectMouseButton(const MouseCode iMouseCode) {
+	if (mus_instance)
+		mus_instance->injectMouseButton_impl(iMouseCode);
 }
 
-void Input::injectMousePos(const glm::vec2 &mousePos) {
-	if (instance)
-		instance->injectMousePos_impl(mousePos);
+void Input::injectMousePos(const glm::vec2 &iMousePos) {
+	if (mus_instance)
+		mus_instance->injectMousePos_impl(iMousePos);
 }
 
 }// namespace owl::input

@@ -59,11 +59,13 @@ void base2D::onUpdate(const core::Timestep &ts) {
 		OWL_PROFILE_SCOPE("Render Draws 2")
 		renderer::Renderer2D::beginScene(cameraController.getCamera());
 		int32_t id = 0;
-		constexpr float scaley = 1.f;
-		for (float y = -5.0f; y < 5.0f; y += scaley) {
-			constexpr float scalex = 1.f;
-			for (float x = -5.0f; x < 5.0f; x += scalex) {
+		for (uint8_t idy = 0; idy < 11; ++idy) {
+			for (uint8_t idx = 0; idx < 11; ++idx) {
 				constexpr float marg = 0.9f;
+				constexpr float scaley = 1.f;
+				constexpr float scalex = 1.f;
+				const float x = -5.0f + static_cast<float>(idx) * scalex;
+				const float y = -5.0f + static_cast<float>(idy) * scaley;
 				const glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f};
 				renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{
 														.position = {x, y, -0.05},
@@ -104,9 +106,7 @@ void base2D::onUpdate(const core::Timestep &ts) {
 	}
 }
 
-void base2D::onEvent(event::Event &event) {
-	cameraController.onEvent(event);
-}
+void base2D::onEvent(event::Event &event) { cameraController.onEvent(event); }
 
 void base2D::onImGuiRender(const core::Timestep &ts) {
 	{
@@ -125,15 +125,15 @@ void base2D::onImGuiRender(const core::Timestep &ts) {
 		ImGui::Text("%s", fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
 		ImGui::Text("%s", fmt::format("Current used memory: {}",
 									  tracker.globals().allocatedMemory)
-								  .c_str());
+					.c_str());
 		ImGui::Text("%s", fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
-								  .c_str());
+					.c_str());
 		ImGui::Text(
 				"%s", fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
-							  .c_str());
+				.c_str());
 		ImGui::Text("%s", fmt::format("Deallocation calls: {}",
 									  tracker.globals().deallocationCalls)
-								  .c_str());
+					.c_str());
 
 		const auto stats = renderer::Renderer2D::getStats();
 		ImGui::Text("Renderer2D Stats:");

@@ -20,7 +20,7 @@ public:
 	/**
 	 * @brief Default Constructor.
 	 */
-	explicit Device(std::string name);
+	explicit Device(std::string iName);
 	Device(const Device &) = delete;
 	Device(Device &&) = delete;
 	Device &operator=(const Device &) = delete;
@@ -35,7 +35,7 @@ public:
 	 * @brief Get the name of the device.
 	 * @return The name of the device.
 	 */
-	[[nodiscard]] const std::string &getName() const { return name; }
+	[[nodiscard]] const std::string &getName() const { return m_name; }
 
 	/**
 	 * @brief Open this device.
@@ -61,9 +61,9 @@ public:
 
 	/**
 	 * @brief Retrieve a frame.
-	 * @param frame The frame to update.
+	 * @param[in] iFrame The frame to update.
 	 */
-	virtual void fillFrame(shared<renderer::Texture> &frame) = 0;
+	virtual void fillFrame(shared<renderer::Texture> &iFrame) = 0;
 
 	/**
 	 * @brief Get the unique bus information.
@@ -71,16 +71,16 @@ public:
 	 *
 	 * @note This bus information identifies the device as unique.
 	 */
-	[[nodiscard]] const std::string &getBusInfo() const { return busInfo; }
+	[[nodiscard]] const std::string &getBusInfo() const { return m_busInfo; }
 
 	/**
 	 * @brief list of PixelFormat
 	 */
 	enum struct PixelFormat {
-		RGB24,  ///< R8G8B8 format
-		NV12,   ///< NV12 pixel format.
-		YUYV,   ///< YUYV pixel format.
-		MJPEG,  ///< MJPG pixel format.
+		Rgb24,///< R8G8B8 format
+		Nv12,///< NV12 pixel format.
+		YuYv,///< YUYV pixel format.
+		MJpeg,///< MJPG pixel format.
 		Unknwon,///< unknown or unsupported pixel format.
 	};
 
@@ -88,32 +88,32 @@ public:
 	 * @brief Get the pixel format of the device.
 	 * @return The pixel format for this device.
 	 */
-	[[nodiscard]] const PixelFormat &getPixelFormat() const { return pixFormat; }
+	[[nodiscard]] const PixelFormat &getPixelFormat() const { return m_pixFormat; }
 
 	/**
 	 * @brief Check the support for the pixel format.
-	 * @param pixFormat The pixel format to test.
+	 * @param[in] iPixFormat The pixel format to test.
 	 * @return True if supported.
 	 */
-	[[nodiscard]] static bool isPixelFormatSupported(const PixelFormat &pixFormat);
+	[[nodiscard]] static bool isPixelFormatSupported(const PixelFormat &iPixFormat);
 
 protected:
 	/// Bus info of the device, this is unique.
-	std::string busInfo;
+	std::string m_busInfo;
 	/// Name of the device.
-	std::string name;
+	std::string m_name;
 	/// The pixel format.
-	PixelFormat pixFormat = PixelFormat::Unknwon;
+	PixelFormat m_pixFormat = PixelFormat::Unknwon;
 	/// The size of the frame.
-	math::FrameSize size;
+	math::FrameSize m_size;
 
 	/**
 	 * @brief Convert a raw buffer of pixel to RGB24 format.
-	 * @param inputBuffer The input buffer.
-	 * @param bufferSize The size of the buffer
+	 * @param[in] iInputBuffer The input buffer.
+	 * @param[in] iBufferSize The size of the buffer
 	 * @return A converted RGB24 buffer.
 	 */
-	[[nodiscard]] std::vector<uint8_t> getRGBBuffer(const uint8_t *inputBuffer, const int32_t bufferSize) const;
+	[[nodiscard]] std::vector<uint8_t> getRgbBuffer(const uint8_t *iInputBuffer, int32_t iBufferSize) const;
 };
 
 }// namespace owl::input::video

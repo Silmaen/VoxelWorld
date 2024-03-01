@@ -12,24 +12,24 @@
 #include "core/external/glfw3.h"
 
 namespace owl::renderer::null {
-
 /**
  * @brief Class GraphContext.
  */
 class OWL_API GraphContext final : public ::owl::renderer::GraphContext {
 public:
-	GraphContext(const GraphContext &) = delete;
-	GraphContext(GraphContext &&) = delete;
+	GraphContext(const GraphContext&) = delete;
+	GraphContext(GraphContext&&) = delete;
 
 	/**
 	 * @brief Default constructor.
+	 * @param[in,out] ioWindow The window into render context.
 	 */
-	explicit GraphContext(GLFWwindow *window);
+	explicit GraphContext(GLFWwindow* ioWindow);
 
 	/**
 	 * @brief Destructor.
 	 */
-	~GraphContext() override = default;//---UNCOVER---
+	~GraphContext() override = default;
 
 	/**
 	 * @brief Initialize the context.
@@ -44,7 +44,6 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	Version getVersion() const override { return {0, 0}; }
+	[[nodiscard]] Version getVersion() const override { return {0, 0}; }
 };
-
-}// namespace owl::renderer::null
+} // namespace owl::renderer::null

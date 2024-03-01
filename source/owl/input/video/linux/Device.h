@@ -19,9 +19,9 @@ namespace owl::input::video::linux64 {
 
 /**
  * @brief Search for devices and them to the given list.
- * @param list The device list to update.
+ * @param[in] ioList The device list to update.
  */
-void updateList(std::vector<shared<owl::input::video::Device>> &list);
+void updateList(std::vector<shared<Device>> &ioList);
 
 /**
  * @brief Class Device.
@@ -30,9 +30,9 @@ class Device final : public video::Device {
 public:
 	/**
 	 * @brief Consructor using only a file.
-	 * @param file The file to read.
+	 * @param[in] iFile The file to read.
 	 */
-	explicit Device(std::string file);
+	explicit Device(std::string iFile);
 
 	/**
 	 * @brief Destructor.
@@ -59,13 +59,13 @@ public:
 	 * @brief Get the file.
 	 * @return File name.
 	 */
-	[[nodiscard]] const std::string &getFile() const { return file; }
+	[[nodiscard]] const std::string &getFile() const { return m_file; }
 
 	/**
 	 * @brief Retrieve a frame.
-	 * @param frame The frame to update.
+	 * @param[in,out] ioFrame The frame to update.
 	 */
-	void fillFrame(shared<renderer::Texture> &frame) override;
+	void fillFrame(shared<renderer::Texture> &ioFrame) override;
 
 	/**
 	 * @brief Check if this device is valid.
@@ -75,24 +75,24 @@ public:
 
 private:
 	/// The file representation of the device.
-	std::string file;
+	std::string m_file;
 	/// The file handler.
-	int fileHandler = 0;
+	int m_fileHandler = 0;
 	/// buffer map to the device.
-	void *buffer = nullptr;
+	void *mp_buffer = nullptr;
 	/// Buffer info.
-	v4l2_buffer bufferInfo{};
+	v4l2_buffer m_bufferInfo{};
 	/// if the streaming is started.
-	bool streaming = false;
+	bool m_streaming = false;
 
 	void printSupportedFormat() const;
 
 	/**
 	 * \brief fist suitable pixel format.
-	 * \param fd File desciptor, use fileHander if -1. File must already be opened.
+	 * \param iFd File desciptor, use fileHander if -1. File must already be opened.
 	 * \return The first pixel format supported by both device and present code.
 	 */
-	[[nodiscard]] PixelFormat getFirstSupportedPixelFormat(int32_t fd = -1) const;
+	[[nodiscard]] PixelFormat getFirstSupportedPixelFormat(int32_t iFd = -1) const;
 };
 
 }// namespace owl::input::video::linux64

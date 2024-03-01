@@ -37,7 +37,7 @@ TEST(Scene, camera) {
 }
 
 TEST(Scene, Copy) {
-	const owl::shared<Scene> sc = owl::mk_shared<Scene>();
+	const owl::shared<Scene> sc = owl::mkShared<Scene>();
 	auto ent = sc->createEntityWithUUID(0, "Camera");
 	ent.addOrReplaceComponent<component::Camera>();
 	auto ent2 = sc->duplicateEntity(ent);
@@ -50,14 +50,14 @@ TEST(Scene, Copy) {
 	auto ent3 = sc->createEntityWithUUID(88, "circle");
 	ent3.addOrReplaceComponent<component::Transform>();
 	ent3.addOrReplaceComponent<component::CircleRenderer>();
-	owl::shared<Scene> sc2 = owl::mk_shared<Scene>();
+	owl::shared<Scene> sc2 = owl::mkShared<Scene>();
 	sc2->onViewportResize(800, 600);
 	sc2 = Scene::copy(sc);
 	EXPECT_TRUE(sc2->registry.storage<owl::scene::Entity>().size() == sc->registry.storage<owl::scene::Entity>().size());
 }
 
 TEST(Scene, RenderEmpty) {
-	const owl::shared<Scene> sc = owl::mk_shared<Scene>();
+	const owl::shared<Scene> sc = owl::mkShared<Scene>();
 	sc->onViewportResize(800, 600);
 	owl::core::Timestep ts;
 	ts.update();

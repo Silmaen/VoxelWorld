@@ -14,60 +14,59 @@
 #include "event/MouseEvent.h"
 
 namespace owl::renderer {
-
 /**
  * @brief Class CameraEditor.
  */
-class OWL_API CameraEditor : public Camera {
+class OWL_API CameraEditor final : public Camera {
 public:
 	CameraEditor() = default;
 	~CameraEditor() override;
-	CameraEditor(const CameraEditor &) = default;
-	CameraEditor(CameraEditor &&) = default;
-	CameraEditor &operator=(const CameraEditor &) = default;
-	CameraEditor &operator=(CameraEditor &&) = default;
+	CameraEditor(const CameraEditor&) = default;
+	CameraEditor(CameraEditor&&) = default;
+	CameraEditor& operator=(const CameraEditor&) = default;
+	CameraEditor& operator=(CameraEditor&&) = default;
 
 	/**
 	 * @brief Constructor
-	 * @param fov Field of view.
-	 * @param aspectRatio Aspect rtio.
-	 * @param nearClip Near clip distance.
-	 * @param farClip Far clip distance.
+	 * @param[in] iFov Field of view.
+	 * @param[in] iAspectRatio Aspect rtio.
+	 * @param[in] iNearClip Near clip distance.
+	 * @param[in] iFarClip Far clip distance.
 	 */
-	CameraEditor(float fov, float aspectRatio, float nearClip, float farClip);
+	CameraEditor(float iFov, float iAspectRatio, float iNearClip, float iFarClip);
 
 	/**
 	 * @brief Update the camera (Need input setup).
-	 * @param ts The timestamp.
+	 * @param[in] iTimeStep The timestamp.
 	 */
-	void onUpdate(core::Timestep ts);
+	void onUpdate(const core::Timestep& iTimeStep);
 
 	/**
 	 * @brief Treat an event.
-	 * @param event Teh event to treat.
+	 * @param[in,out] ioEvent Teh event to treat.
 	 */
-	void onEvent(event::Event &event);
+	void onEvent(event::Event& ioEvent);
 
 	/**
 	 * @brief Get the camera distance to the focal point.
 	 * @return Camera distance to the focal point.
 	 */
-	[[nodiscard]] float getDistance() const { return distance; }
+	[[nodiscard]] float getDistance() const { return m_distance; }
 
 	/**
 	 * @brief Set the camera distance to the focal point.
-	 * @param distance_ The new distance to the focal point.
+	 * @param[in] iDistance The new distance to the focal point.
 	 */
-	void setDistance(float distance_) { distance = distance_; }
+	void setDistance(const float iDistance) { m_distance = iDistance; }
 
 	/**
 	 * @brief Set the camera viewport size.
-	 * @param width New width.
-	 * @param height New height.
+	 * @param[in] iWidth New width.
+	 * @param[in] iHeight New height.
 	 */
-	inline void setViewportSize(float width, float height) {
-		viewportWidth = width;
-		viewportHeight = height;
+	void setViewportSize(const float iWidth, const float iHeight) {
+		m_viewportWidth = iWidth;
+		m_viewportHeight = iHeight;
 		updateProjection();
 	}
 
@@ -75,13 +74,13 @@ public:
 	 * @brief Get the camera view matrix.
 	 * @return Camera view matrix.
 	 */
-	[[nodiscard]] const glm::mat4 &getViewMatrix() const { return viewMatrix; }
+	[[nodiscard]] const glm::mat4& getViewMatrix() const { return m_viewMatrix; }
 
 	/**
 	 * @brief Get the camera view projection matrix.
 	 * @return Camera view projection matrix.
 	 */
-	[[nodiscard]] glm::mat4 getViewProjection() const { return projection * viewMatrix; }
+	[[nodiscard]] glm::mat4 getViewProjection() const { return m_projection * m_viewMatrix; }
 
 	/**
 	 * @brief Get the camera up vector.
@@ -104,7 +103,7 @@ public:
 	 * @brief Get the camera position.
 	 * @return Camera position.
 	 */
-	[[nodiscard]] const glm::vec3 &getPosition() const { return position; }
+	[[nodiscard]] const glm::vec3& getPosition() const { return m_position; }
 
 	/**
 	 * @brief Get the camera orientation quaternion.
@@ -116,13 +115,13 @@ public:
 	 * @brief Get the camera pitch.
 	 * @return Camera pitch.
 	 */
-	[[nodiscard]] float getPitch() const { return pitch; }
+	[[nodiscard]] float getPitch() const { return m_pitch; }
 
 	/**
 	 * @brief Get the camera yaw.
 	 * @return Camera yaw.
 	 */
-	[[nodiscard]] float getYaw() const { return yaw; }
+	[[nodiscard]] float getYaw() const { return m_yaw; }
 
 private:
 	/**
@@ -137,28 +136,28 @@ private:
 
 	/**
 	 * @brief Event when mouse is scrolled.
-	 * @param e Mouse scroll event.
+	 * @param[in] iEvent Mouse scroll event.
 	 * @return If treated.
 	 */
-	bool onMouseScroll(event::MouseScrolledEvent &e);
+	bool onMouseScroll(const event::MouseScrolledEvent& iEvent);
 
 	/**
 	 * @brief Mouse panoramic move.
-	 * @param delta The X Y deltas.
+	 * @param[in] iDelta The X Y deltas.
 	 */
-	void mousePan(const glm::vec2 &delta);
+	void mousePan(const glm::vec2& iDelta);
 
 	/**
 	 * @brief Mouse rotation.
-	 * @param delta The X Y deltas.
+	 * @param[in] iDelta The X Y deltas.
 	 */
-	void mouseRotate(const glm::vec2 &delta);
+	void mouseRotate(const glm::vec2& iDelta);
 
 	/**
 	 * @brief Mouse zoom.
-	 * @param delta The delta.
+	 * @param[in] iDelta The delta.
 	 */
-	void mouseZoom(float delta);
+	void mouseZoom(float iDelta);
 
 	/**
 	 * @brief Calculate the camera position.
@@ -185,35 +184,34 @@ private:
 	[[nodiscard]] float zoomSpeed() const;
 
 	/// Field of View.
-	float FOV = 45.0f;
+	float m_fov = 45.0f;
 	/// Aspect ratio.
-	float aspectRatio = 1.778f;
+	float m_aspectRatio = 1.778f;
 	/// Near clipping distance.
-	float nearClip = 0.1f;
+	float m_nearClip = 0.1f;
 	/// Far clipping distance.
-	float farClip = 1000.0f;
+	float m_farClip = 1000.0f;
 
 	/// Internal view matrix.
-	glm::mat4 viewMatrix{};
+	glm::mat4 m_viewMatrix{};
 	/// Camera position.
-	glm::vec3 position = {0.0f, 0.0f, 0.0f};
+	glm::vec3 m_position = {0.0f, 0.0f, 0.0f};
 	/// Camera Focal point.
-	glm::vec3 focalPoint = {0.0f, 0.0f, 0.0f};
+	glm::vec3 m_focalPoint = {0.0f, 0.0f, 0.0f};
 
 	/// Save mouse position for drag.
-	glm::vec2 initialMousePosition = {0.0f, 0.0f};
+	glm::vec2 m_initialMousePosition = {0.0f, 0.0f};
 
 	/// Camera distance.
-	float distance = 10.0f;
+	float m_distance = 10.0f;
 	/// Camera's pitch.
-	float pitch = 0.0f;
+	float m_pitch = 0.0f;
 	/// Camera's yaw.
-	float yaw = 0.0f;
+	float m_yaw = 0.0f;
 
 	/// Viewport width.
-	float viewportWidth = 1280;
+	float m_viewportWidth = 1280;
 	/// Viewport height.
-	float viewportHeight = 720;
+	float m_viewportHeight = 720;
 };
-
-}// namespace owl::renderer
+} // namespace owl::renderer

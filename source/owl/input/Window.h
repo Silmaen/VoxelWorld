@@ -19,7 +19,7 @@ namespace owl::input {
  */
 enum struct Type {
 	Null,/// Windows null
-	GLFW /// Windows managed by Glfw library.
+	GLFW/// Windows managed by Glfw library.
 };
 
 /**
@@ -88,15 +88,15 @@ public:
 
 	/**
 	 * @brief Define the Event Callback function.
-	 * @param callback The new callback function.
+	 * @param[in] iCallback The new callback function.
 	 */
-	virtual void setEventCallback(const EventCallback &callback) = 0;
+	virtual void setEventCallback(const EventCallback &iCallback) = 0;
 
 	/**
 	 * @brief St the VSync.
-	 * @param enabled Should VSync enabled.
+	 * @param[in] iEnabled Should VSync enabled.
 	 */
-	virtual void setVSync(bool enabled) = 0;
+	virtual void setVSync(bool iEnabled) = 0;
 
 	/**
 	 * @brief Check for VSync.
@@ -112,18 +112,16 @@ public:
 
 	/**
 	 * @brief Helper for Window creation.
-	 * @param props The window properties.
+	 * @param[in] iProps The window properties.
 	 * @return Pointer to the window.
 	 */
-	static uniq<Window> create(const Properties &props = Properties());
+	static uniq<Window> create(const Properties &iProps = Properties());
 
 	/**
 	 * @brief Access to the graph context.
 	 * @return Graph context.
 	 */
-	[[nodiscard]] renderer::GraphContext *getGraphContext() const {
-		return context.get();
-	}
+	[[nodiscard]] renderer::GraphContext *getGraphContext() const { return mu_context.get(); }
 
 	/**
 	 * @brief Terminate the window.
@@ -132,7 +130,7 @@ public:
 
 protected:
 	/// Pointer to the Graphic Context.
-	uniq<renderer::GraphContext> context;
+	uniq<renderer::GraphContext> mu_context;
 };
 
 }// namespace owl::input

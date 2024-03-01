@@ -13,16 +13,16 @@
 
 namespace owl::renderer::vulkan {
 
-UniformBuffer::UniformBuffer(uint32_t size, uint32_t, const std::string &) {
+UniformBuffer::UniformBuffer(const uint32_t iSize, uint32_t, const std::string &) {
 	auto &vkh = internal::VulkanHandler::get();
-	vkh.createUniformBuffers(size);
+	vkh.createUniformBuffers(iSize);
 }
 
 UniformBuffer::~UniformBuffer() = default;
 
-void UniformBuffer::setData(const void *data, uint32_t size, uint32_t) {
+void UniformBuffer::setData(const void *iData, const uint32_t iSize, uint32_t) {
 	const auto &vkh = internal::VulkanHandler::get();
-	vkh.setUniformData(data, size);
+	vkh.setUniformData(iData, iSize);
 }
 
 

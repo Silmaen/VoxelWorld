@@ -13,43 +13,41 @@
 namespace owl::scene {
 
 
-SceneCamera::SceneCamera() {
+SceneCamera::SceneCamera() { recalculateProjection(); }
+
+void SceneCamera::setOrthographic(const float iSize, const float iNearClip, const float iFarClip) {
+	m_projectionType = ProjectionType::Orthographic;
+	m_orthographicSize = iSize;
+	m_orthographicNear = iNearClip;
+	m_orthographicFar = iFarClip;
 	recalculateProjection();
 }
 
-void SceneCamera::setOrthographic(float size, float nearClip, float farClip) {
-	projectionType = ProjectionType::Orthographic;
-	orthographicSize = size;
-	orthographicNear = nearClip;
-	orthographicFar = farClip;
+void SceneCamera::setPerspective(const float iVerticalFov, const float iNearClip, const float iFarClip) {
+	m_projectionType = ProjectionType::Perspective;
+	m_perspectiveFOV = iVerticalFov;
+	m_perspectiveNear = iNearClip;
+	m_perspectiveFar = iFarClip;
 	recalculateProjection();
 }
 
-void SceneCamera::setPerspective(float verticalFOV, float nearClip, float farClip) {
-	projectionType = ProjectionType::Perspective;
-	perspectiveFOV = verticalFOV;
-	perspectiveNear = nearClip;
-	perspectiveFar = farClip;
-	recalculateProjection();
-}
-
-void SceneCamera::setViewportSize(uint32_t width, uint32_t height) {
-	OWL_CORE_ASSERT(width > 0 && height > 0, "Null viewport size")
-	aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+void SceneCamera::setViewportSize(const uint32_t iWidth, const uint32_t iHeight) {
+	OWL_CORE_ASSERT(iWidth > 0 && iHeight > 0, "Null viewport size")
+	m_aspectRatio = static_cast<float>(iWidth) / static_cast<float>(iHeight);
 	recalculateProjection();
 }
 
 
 void SceneCamera::recalculateProjection() {
-	if (projectionType == ProjectionType::Perspective) {
-		projection = glm::perspective(perspectiveFOV, aspectRatio, perspectiveNear, perspectiveFar);
+	if (m_projectionType == ProjectionType::Perspective) {
+		m_projection = glm::perspective(m_perspectiveFOV, m_aspectRatio, m_perspectiveNear, m_perspectiveFar);
 	} else {
-		const float orthoLeft = -orthographicSize * aspectRatio * 0.5f;
-		const float orthoRight = orthographicSize * aspectRatio * 0.5f;
-		const float orthoBottom = -orthographicSize * 0.5f;
-		const float orthoTop = orthographicSize * 0.5f;
-		projection = glm::ortho(orthoLeft, orthoRight,
-								orthoBottom, orthoTop, orthographicNear, orthographicFar);
+		const float orthoLeft = -m_orthographicSize * m_aspectRatio * 0.5f;
+		const float orthoRight = m_orthographicSize * m_aspectRatio * 0.5f;
+		const float orthoBottom = -m_orthographicSize * 0.5f;
+		const float orthoTop = m_orthographicSize * 0.5f;
+		m_projection = glm::ortho(orthoLeft, orthoRight,
+								  orthoBottom, orthoTop, m_orthographicNear, m_orthographicFar);
 	}
 }
 

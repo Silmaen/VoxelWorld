@@ -13,6 +13,4 @@ namespace owl::math {
 
 FrameSize::FrameSize() = default;
 
-FrameSize::~FrameSize() = default;
-
 }// namespace owl::math

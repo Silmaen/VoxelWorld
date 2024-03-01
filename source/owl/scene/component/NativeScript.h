@@ -11,35 +11,35 @@
 #include "../ScriptableEntity.h"
 
 namespace owl::scene::component {
-
 /**
  * @brief Class NativeScript.
  */
 struct OWL_API NativeScript {
-public:
 	/// Script instance.
-	ScriptableEntity *instance = nullptr;
+	ScriptableEntity* instance = nullptr;
 
 	/**
 	 * @brief Run the script.
 	 * @return the script instance.
 	 */
-	ScriptableEntity *(*instantiateScript)();
+	ScriptableEntity*(*instantiateScript)(){};
 
 	/**
 	 * @brief Run destroy script.
 	 */
-	[[maybe_unused]] void (*destroyScript)(NativeScript *);
+	[[maybe_unused]] void (*destroyScript)(NativeScript*){};
 
 	/**
 	 * @brief Bind the script.
 	 * @tparam T New script.
 	 */
-	template<typename T>
+	template <typename T>
 	void bind() {
-		instantiateScript = []() { return static_cast<ScriptableEntity *>(new T()); };
-		destroyScript = [](NativeScript *nsc) {delete nsc->instance; nsc->instance=nullptr; };
+		instantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+		destroyScript = [](NativeScript* nsc) {
+			delete nsc->instance;
+			nsc->instance = nullptr;
+		};
 	}
 };
-
-}// namespace owl::scene::component
+} // namespace owl::scene::component

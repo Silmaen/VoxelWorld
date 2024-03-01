@@ -15,18 +15,17 @@ namespace owl::renderer {
 
 Camera::~Camera() = default;
 
-CameraEditor::CameraEditor(float fov, float aspectRatio_, float nearClip_, float farClip_) : Camera(glm::perspective(glm::radians(fov), aspectRatio_, nearClip_, farClip_)),
-																							 FOV(fov), aspectRatio(aspectRatio_), nearClip(nearClip_), farClip(farClip_) {
-	updateView();
-}
+CameraEditor::CameraEditor(const float iFov, const float iAspectRatio, const float iNearClip, const float iFarClip) :
+	Camera(glm::perspective(glm::radians(iFov), iAspectRatio, iNearClip, iFarClip)),
+	m_fov(iFov), m_aspectRatio(iAspectRatio), m_nearClip(iNearClip), m_farClip(iFarClip) { updateView(); }
 
 CameraEditor::~CameraEditor() = default;
 
-void CameraEditor::onUpdate([[maybe_unused]] core::Timestep ts) {
+void CameraEditor::onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) {
 	if (input::Input::isKeyPressed(input::key::LeftAlt)) {
 		const glm::vec2 &mouse{input::Input::getMouseX(), input::Input::getMouseY()};
-		const glm::vec2 delta = (mouse - initialMousePosition) * 0.003f;
-		initialMousePosition = mouse;
+		const glm::vec2 delta = (mouse - m_initialMousePosition) * 0.003f;
+		m_initialMousePosition = mouse;
 		if (input::Input::isMouseButtonPressed(input::mouse::ButtonMiddle))
 			mousePan(delta);
 		else if (input::Input::isMouseButtonPressed(input::mouse::ButtonLeft))
@@ -37,93 +36,80 @@ void CameraEditor::onUpdate([[maybe_unused]] core::Timestep ts) {
 	updateView();
 }
 
-void CameraEditor::onEvent(event::Event &event) {
-	event::EventDispatcher dispatcher(event);
+void CameraEditor::onEvent(event::Event &ioEvent) {
+	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::MouseScrolledEvent>(
 			[&](auto &&TZ1) { return onMouseScroll(std::forward<decltype(TZ1)>(TZ1)); });
 }
 
-glm::vec3 CameraEditor::getUpDirection() const {
-	return glm::rotate(getOrientation(), glm::vec3(0.0f, 1.0f, 0.0f));
-}
+glm::vec3 CameraEditor::getUpDirection() const { return glm::rotate(getOrientation(), glm::vec3(0.0f, 1.0f, 0.0f)); }
 
-glm::vec3 CameraEditor::getRightDirection() const {
-	return glm::rotate(getOrientation(), glm::vec3(1.0f, 0.0f, 0.0f));
-}
+glm::vec3 CameraEditor::getRightDirection() const { return glm::rotate(getOrientation(), glm::vec3(1.0f, 0.0f, 0.0f)); }
 
 glm::vec3 CameraEditor::getForwardDirection() const {
 	return glm::rotate(getOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
 }
 
-glm::quat CameraEditor::getOrientation() const {
-	return {glm::vec3(-pitch, -yaw, 0.0f)};
-}
+glm::quat CameraEditor::getOrientation() const { return {glm::vec3(-m_pitch, -m_yaw, 0.0f)}; }
 
 void CameraEditor::updateProjection() {
-	aspectRatio = viewportWidth / viewportHeight;
-	projection = glm::perspective(glm::radians(FOV), aspectRatio, nearClip, farClip);
+	m_aspectRatio = m_viewportWidth / m_viewportHeight;
+	m_projection = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearClip, m_farClip);
 }
 
 void CameraEditor::updateView() {
 	// yaw = pitch = 0.0f; // Lock the camera's rotation
-	position = calculatePosition();
+	m_position = calculatePosition();
 
 	const glm::quat orientation = getOrientation();
-	viewMatrix = glm::translate(glm::mat4(1.0f), position) * glm::toMat4(orientation);
-	viewMatrix = glm::inverse(viewMatrix);
+	m_viewMatrix = glm::translate(glm::mat4(1.0f), m_position) * glm::toMat4(orientation);
+	m_viewMatrix = glm::inverse(m_viewMatrix);
 }
 
-bool CameraEditor::onMouseScroll(event::MouseScrolledEvent &e) {
-	const float delta = e.getYOff() * 0.1f;
+bool CameraEditor::onMouseScroll(const event::MouseScrolledEvent &iEvent) {
+	const float delta = iEvent.getYOff() * 0.1f;
 	mouseZoom(delta);
 	updateView();
 	return false;
 }
 
-void CameraEditor::mousePan(const glm::vec2 &delta) {
+void CameraEditor::mousePan(const glm::vec2 &iDelta) {
 	auto [xSpeed, ySpeed] = panSpeed();
-	focalPoint += -getRightDirection() * delta.x * xSpeed * distance;
-	focalPoint += getUpDirection() * delta.y * ySpeed * distance;
+	m_focalPoint += -getRightDirection() * iDelta.x * xSpeed * m_distance;
+	m_focalPoint += getUpDirection() * iDelta.y * ySpeed * m_distance;
 }
 
-void CameraEditor::mouseRotate(const glm::vec2 &delta) {
+void CameraEditor::mouseRotate(const glm::vec2 &iDelta) {
 	const float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
-	yaw += yawSign * delta.x * rotationSpeed();
-	pitch += delta.y * rotationSpeed();
+	m_yaw += yawSign * iDelta.x * rotationSpeed();
+	m_pitch += iDelta.y * rotationSpeed();
 }
 
-void CameraEditor::mouseZoom(float delta) {
-	distance -= delta * zoomSpeed();
-	if (distance < 1.0f) {
-		focalPoint += getForwardDirection();
-		distance = 1.0f;
+void CameraEditor::mouseZoom(const float iDelta) {
+	m_distance -= iDelta * zoomSpeed();
+	if (m_distance < 1.0f) {
+		m_focalPoint += getForwardDirection();
+		m_distance = 1.0f;
 	}
 }
 
-glm::vec3 CameraEditor::calculatePosition() const {
-	return focalPoint - getForwardDirection() * distance;
-}
+glm::vec3 CameraEditor::calculatePosition() const { return m_focalPoint - getForwardDirection() * m_distance; }
 
 std::pair<float, float> CameraEditor::panSpeed() const {
-	const float x = std::min(viewportWidth / 1000.0f, 2.4f);// max = 2.4f
+	const float x = std::min(m_viewportWidth / 1000.0f, 2.4f);// max = 2.4f
 	float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 
-	const float y = std::min(viewportHeight / 1000.0f, 2.4f);// max = 2.4f
+	const float y = std::min(m_viewportHeight / 1000.0f, 2.4f);// max = 2.4f
 	float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
 
 	return {xFactor, yFactor};
 }
 
-float CameraEditor::rotationSpeed() const {
-	return 0.8f;
-}
+float CameraEditor::rotationSpeed() const { return 0.8f; }
 
 float CameraEditor::zoomSpeed() const {
-	float distance_ = distance * 0.2f;
-	distance_ = std::max(distance_, 0.0f);
-	float speed = distance_ * distance_;
-	speed = std::min(speed, 100.0f);// max speed = 100
-	return speed;
+	const float distance = std::max(m_distance * 0.2f, 0.0f);
+	return std::min(distance * distance, 100.0f);// max speed = 100
 }
 
 }// namespace owl::renderer

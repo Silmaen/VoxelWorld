@@ -10,7 +10,6 @@
 #include "BasePanel.h"
 
 namespace drone::panels {
-
 /**
  * @brief Class Viewport
  */
@@ -29,28 +28,28 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Viewport(const Viewport &) = default;
+	Viewport(const Viewport&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Viewport(Viewport &&) = default;
+	Viewport(Viewport&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Viewport &operator=(const Viewport &) = default;
+	Viewport& operator=(const Viewport&) = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Viewport &operator=(Viewport &&) = default;
+	Viewport& operator=(Viewport&&) = default;
 
 	/**
 	 * @brief Update panel Status.
-	 * @param ts The Time delta of the frame.
+	 * @param iTimeStep The Time delta of the frame.
 	 */
-	void onUpdate(const owl::core::Timestep &ts) override;
+	void onUpdate(const owl::core::Timestep& iTimeStep) override;
 
 	/**
 	 * @brief Do the rendering.
@@ -59,16 +58,15 @@ public:
 
 private:
 	/// the frame buffer for this panel.
-	owl::shared<owl::renderer::Framebuffer> framebuffer;
+	owl::shared<owl::renderer::Framebuffer> mp_framebuffer;
 	/// Size of the viewport
-	glm::vec2 viewportSize = {0.0f, 0.0f};
+	glm::vec2 m_viewportSize = {0.0f, 0.0f};
 	/// View port bounds
-	glm::vec2 viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
+	glm::vec2 m_viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
 
-	bool viewportFocused = false;
-	bool viewportHovered = false;
+	bool m_viewportFocused = false;
+	bool m_viewportHovered = false;
 	/// The camera
-	owl::shared<owl::renderer::CameraOrtho> camera;
+	owl::shared<owl::renderer::CameraOrtho> m_camera;
 };
-
-}// namespace drone::panels
+} // namespace drone::panels

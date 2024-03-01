@@ -7,7 +7,9 @@
  */
 
 #pragma once
+
 #include "core/Macros.h"
+
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 
@@ -33,8 +35,8 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <utility>
 #include <vector>
 
-#include "core/Log.h"
 #include "debug/Profiler.h"
+#include "debug/Tracker.h"
 
 // third party
 #include <entt/entt.hpp>
@@ -43,3 +45,4 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <magic_enum.hpp>
 
 OWL_DIAG_POP
+

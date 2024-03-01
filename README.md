@@ -34,6 +34,10 @@ These platform requires a graphic card that supports one of the following render
     * Some features will not be available with this renderer
 * `Vulkan` - Use Vulkan 1.3 (you must have Graphics device that supports it)
 
+## Coding Style
+
+The section [coding style](doc/CodingStyle.md) describes the guidelines to follow in the development.
+
 ## Dependencies
 
 ### Dependencies manager

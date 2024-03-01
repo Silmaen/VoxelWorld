@@ -13,17 +13,17 @@
 
 /**
  * @brief Main entry point for the program.
- * @param argc Number of argument.
- * @param argv List of arguments.
+ * @param[in] iArgc Number of argument.
+ * @param[in] iArgv List of arguments.
  * @return Execution code.
  */
-int main(int argc, char *argv[]) {
+int main(int iArgc, char *iArgv[]) {
 	OWL_SCOPE_TRACE
 	owl::core::Log::init();
 	{
 		// Startup
 		OWL_PROFILE_BEGIN_SESSION("Startup", "OwlProfile-startup.json")
-		auto app = owl::core::createApplication(argc, argv);
+		auto app = owl::core::createApplication(iArgc, iArgv);
 		OWL_PROFILE_END_SESSION()
 		// runtime
 		OWL_PROFILE_BEGIN_SESSION("Runtime", "OwlProfile-runtime.json")

@@ -30,8 +30,9 @@ public:
 
 	/**
 	 * @brief Default constructor.
+	 * @param[in] iDebugName Name of the layer for debugging purpose.
 	 */
-	explicit Layer(std::string name = "Layer") : debugName(std::move(name)) {}
+	explicit Layer(std::string iDebugName = "Layer") : m_debugName(std::move(iDebugName)) {}
 
 	/**
 	 * @brief Destructor.
@@ -50,31 +51,31 @@ public:
 
 	/**
 	 * @brief Action on update.
-	 * @param ts The time step since last frame.
+	 * @param[in] iTimeStep The time step since last frame.
 	 */
-	virtual void onUpdate([[maybe_unused]] const Timestep &ts) {}
+	virtual void onUpdate([[maybe_unused]] const Timestep &iTimeStep) {}
 
 	/**
 	 * @brief Action for that layer when gui is rendered.
-	 * @param ts The time step since last frame.
+	 * @param[in] iTimeStep The time step since last frame.
 	 */
-	virtual void onImGuiRender([[maybe_unused]] const Timestep &ts) {}
+	virtual void onImGuiRender([[maybe_unused]] const Timestep &iTimeStep) {}
 
 	/**
 	 * @brief Action on event.
-	 * @param event The Event to react.
+	 * @param[in,out] ioEvent The Event to react.
 	 */
-	virtual void onEvent([[maybe_unused]] event::Event &event) {}
+	virtual void onEvent([[maybe_unused]] event::Event &ioEvent) {}
 
 	/**
 	 * @brief Get the debug name of the layer.
 	 * @return Debug Name of the layer.
 	 */
-	[[nodiscard]] const std::string &getName() const { return debugName; }
+	[[nodiscard]] const std::string &getName() const { return m_debugName; }
 
 protected:
 	/// Debug name for this layer.
-	std::string debugName;
+	std::string m_debugName;
 };
 
 }// namespace owl::core::layer

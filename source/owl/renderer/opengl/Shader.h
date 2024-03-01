@@ -11,41 +11,43 @@
 #include "../Shader.h"
 
 namespace owl::renderer::opengl {
-
 /**
  * @brief Class Shader.
  */
-class OWL_API Shader : public owl::renderer::Shader {
+class OWL_API Shader final : public renderer::Shader {
 public:
-	Shader(const Shader &) = delete;
-	Shader(Shader &&) = delete;
-	Shader &operator=(const Shader &) = delete;
-	Shader &operator=(Shader &&) = delete;
+	Shader(const Shader&) = delete;
+	Shader(Shader&&) = delete;
+	Shader& operator=(const Shader&) = delete;
+	Shader& operator=(Shader&&) = delete;
 
 	/**
 	 * @brief Constructor.
-	 * @param shaderName Shader's name.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param vertexSrc Source of the vertex shader.
-	 * @param fragmentSrc Source of fragment shader.
+	 * @param[in] iShaderName Shader's name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iVertexSrc Source of the vertex shader.
+	 * @param[in] iFragmentSrc Source of fragment shader.
 	 */
-	Shader(const std::string &shaderName, const std::string &renderer, const std::string &vertexSrc, const std::string &fragmentSrc);
+	Shader(const std::string& iShaderName, const std::string& iRenderer, const std::string& iVertexSrc,
+		   const std::string& iFragmentSrc);
 
 	/**
 	 * @brief Constructor.
-	 * @param shaderName Shader's name.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param sources The shader's sources with type.
+	 * @param[in] iShaderName Shader's name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iSources The shader's sources with type.
 	 */
-	Shader(const std::string &shaderName, const std::string &renderer, const std::unordered_map<ShaderType, std::string> &sources);
+	Shader(const std::string& iShaderName, const std::string& iRenderer,
+		   const std::unordered_map<ShaderType, std::string>& iSources);
 
 	/**
 	 * @brief Constructor.
-	 * @param shaderName Shader's name.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param sources The shader source's path with type.
+	 * @param[in] iShaderName Shader's name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iSources The shader source's path with type.
 	 */
-	Shader(const std::string &shaderName, const std::string &renderer, const std::vector<std::filesystem::path> &sources);
+	Shader(const std::string& iShaderName, const std::string& iRenderer,
+		   const std::vector<std::filesystem::path>& iSources);
 
 	/**
 	 * @brief Destructor.
@@ -64,128 +66,127 @@ public:
 
 	/**
 	 * @brief Set shader's internal int variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setInt(const std::string &name, int value) override;
+	void setInt(const std::string& iName, int iValue) override;
 
 	/**
 	 * @brief Set shader's internal int variable array.
-	 * @param name Shader's variable's name.
-	 * @param values Shader's variable's raw values.
-	 * @param count Amount values.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValues Shader's variable's raw values.
+	 * @param[in] iCount Amount values.
 	 */
-	void setIntArray(const std::string &name, int *values, uint32_t count) override;
+	void setIntArray(const std::string& iName, int* iValues, uint32_t iCount) override;
 
 	/**
 	 * @brief Set shader's internal int variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setFloat(const std::string &name, float value) override;
+	void setFloat(const std::string& iName, float iValue) override;
 
 	/**
 	 * @brief Set shader's internal vector 2 variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setFloat2(const std::string &name, const glm::vec2 &value) override;
+	void setFloat2(const std::string& iName, const glm::vec2& iValue) override;
 
 	/**
 	 * @brief Set shader's internal vector 3 variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setFloat3(const std::string &name, const glm::vec3 &value) override;
+	void setFloat3(const std::string& iName, const glm::vec3& iValue) override;
 
 	/**
 	 * @brief Set shader's internal vector 4 variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setFloat4(const std::string &name, const glm::vec4 &value) override;
+	void setFloat4(const std::string& iName, const glm::vec4& iValue) override;
 
 	/**
 	 * @brief Set shader's internal Matrix 4 variable.
-	 * @param name Shader's variable's name.
-	 * @param value Shader's variable's value.
+	 * @param[in] iName Shader's variable's name.
+	 * @param[in] iValue Shader's variable's value.
 	 */
-	void setMat4(const std::string &name, const glm::mat4 &value) override;
+	void setMat4(const std::string& iName, const glm::mat4& iValue) override;
 
 	/**
 	 * @brief Push a matrix to the GPU.
-	 * @param name Variable's name.
-	 * @param matrix The matrix data.
+	 * @param[in] iName Variable's name.
+	 * @param[in] iMatrix The matrix data.
 	 */
-	void uploadUniformMat3(const std::string &name, const glm::mat3 &matrix);
+	void uploadUniformMat3(const std::string& iName, const glm::mat3& iMatrix)const ;
 
 	/**
 	 * @brief Push a matrix to the GPU.
-	 * @param name Variable's name.
-	 * @param matrix The matrix data.
+	 * @param[in] iName Variable's name.
+	 * @param[in] iMatrix The matrix data.
 	 */
-	void uploadUniformMat4(const std::string &name, const glm::mat4 &matrix);
+	void uploadUniformMat4(const std::string& iName, const glm::mat4& iMatrix)const;
 
 	/**
 	 * @brief Push an int to the GPU.
-	 * @param name Variable's name.
-	 * @param data The int to push.
+	 * @param[in] iName Variable's name.
+	 * @param[in] iData The int to push.
 	 */
-	void uploadUniformInt(const std::string &name, int data);
+	void uploadUniformInt(const std::string& iName, int iData) const;
 
 	/**
 	 * @brief Push an int variable array to the GPU.
-	 * @param name Variable's name.
-	 * @param values Variable's raw values.
-	 * @param count Amount values.
+	 * @param[in] iName Variable's name.
+	 * @param[in] iValues Variable's raw values.
+	 * @param[in] iCount Amount values.
 	 */
-	void uploadUniformIntArray(const std::string &name, int *values, uint32_t count);
+	void uploadUniformIntArray(const std::string& iName, const int* iValues, uint32_t iCount) const;
 
 	/**
 	 * @brief Push a float to the GPU.
-	 * @param name Variable's name.
-	 * @param value The float to push.
+	 * @param[in] iName Variable's name.
+	 * @param[in] iValue The float to push.
 	 */
-	void uploadUniformFloat(const std::string &name, float value);
+	void uploadUniformFloat(const std::string& iName, float iValue) const;
 
 	/**
 	 * @brief Push a 2-vector to the GPU.
-	 * @param name Variable's name.
-	 * @param value The vector to push.
+	 * @param[in] iName Variable's name.
+	 * @param[in] iValue The vector to push.
 	 */
-	void uploadUniformFloat2(const std::string &name, const glm::vec2 &value);
+	void uploadUniformFloat2(const std::string& iName, const glm::vec2& iValue) const;
 
 	/**
 	 * @brief Push a 3-vector to the GPU.
-	 * @param name Variable's name.
-	 * @param value The vector to push.
+	 * @param[in] iName Variable's name.
+	 * @param[in] iValue The vector to push.
 	 */
-	void uploadUniformFloat3(const std::string &name, const glm::vec3 &value);
+	void uploadUniformFloat3(const std::string& iName, const glm::vec3& iValue) const;
 
 	/**
 	 * @brief Push a 4-vector to the GPU.
-	 * @param name Variable's name.
-	 * @param value The vector to push.
+	 * @param[in] iName Variable's name.
+	 * @param[in] iValue The vector to push.
 	 */
-	void uploadUniformFloat4(const std::string &name, const glm::vec4 &value);
+	void uploadUniformFloat4(const std::string& iName, const glm::vec4& iValue) const;
 
 private:
 	/// Id of the shader in the GPU.
-	uint32_t programID = 0;
+	uint32_t m_programId = 0;
 
 	/**
 	 * @brief Compile the given shader source code.
-	 * @param sources The shader's sources with type.
+	 * @param[in] iSources The shader's sources with type.
 	 */
-	void compile(const std::unordered_map<ShaderType, std::string> &sources);
+	void compile(const std::unordered_map<ShaderType, std::string>& iSources);
 
-	void compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string> &sources);
-	void compileOrGetOpenGLBinaries();
+	void compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string>& iSources);
+	void compileOrGetOpenGlBinaries();
 	void createProgram();
 
-	std::unordered_map<ShaderType, std::vector<uint32_t>> vulkanSPIRV;
-	std::unordered_map<ShaderType, std::vector<uint32_t>> openGLSPIRV;
-	std::unordered_map<ShaderType, std::string> openGLSource;
+	std::unordered_map<ShaderType, std::vector<uint32_t>> m_vulkanSpirv;
+	std::unordered_map<ShaderType, std::vector<uint32_t>> m_openGlSpirv;
+	std::unordered_map<ShaderType, std::string> m_openGlSource;
 };
-
-}// namespace owl::renderer::opengl
+} // namespace owl::renderer::opengl

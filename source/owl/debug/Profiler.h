@@ -12,16 +12,16 @@
 namespace owl::debug {
 
 /// The type for microseconds.
-using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
+using floatingPointMicroseconds = std::chrono::duration<double, std::micro>;
 
 /**
  * @brief Data for profiling result.
  */
 struct ProfileResult {
-	std::string name;                     /// Result's name.
-	FloatingPointMicroseconds start;      /// Data's starting time point.
-	std::chrono::microseconds elapsedTime;/// Data's elapsed time.
-	std::thread::id threadID;             /// Data's thread ID.
+	std::string name;///< Result's name.
+	floatingPointMicroseconds start;///< Data's starting time point.
+	std::chrono::microseconds elapsedTime;///< Data's elapsed time.
+	std::thread::id threadId;///< Data's thread ID.
 };
 
 /**
@@ -43,11 +43,11 @@ public:
 
 	/**
 	 * @brief Begins a new profiling session.
-	 * @param name_ Session's name.
-	 * @param filepath Session File path to store information.
+	 * @param[in] iName Session's name.
+	 * @param[in] iFilepath Session File path to store information.
 	 */
-	void beginSession(const std::string &name_,
-					  const std::string &filepath = "results.json");
+	void beginSession(const std::string &iName,
+	                  const std::string &iFilepath = "results.json");
 
 	/**
 	 * @brief Terminate profile session.
@@ -56,9 +56,9 @@ public:
 
 	/**
 	 * @brief Write profiling result into json file.
-	 * @param result The Result to write.
+	 * @param[in] iResult The Result to write.
 	 */
-	void writeProfile(const ProfileResult &result);
+	void writeProfile(const ProfileResult &iResult);
 
 	/**
 	 * @brief Singleton accessor.
@@ -97,9 +97,9 @@ private:
 	 */
 	void internalEndSession();
 
-	std::mutex profilerMutex;      /// Mutex.
-	ProfileSession *currentSession;/// actual running session.
-	std::ofstream outputStream;    /// output file stream.
+	std::mutex m_profilerMutex;/// Mutex.
+	ProfileSession *m_currentSession;/// actual running session.
+	std::ofstream m_outputStream;/// output file stream.
 };
 
 /**
@@ -109,9 +109,9 @@ class ProfileTimer {
 public:
 	/**
 	 * @brief Constructor.
-	 * @param name_ Scope's name.
+	 * @param[in] iName Scope's name.
 	 */
-	explicit ProfileTimer(const char *name_);
+	explicit ProfileTimer(const char *iName);
 
 	/**
 	 * @brief Destructor.
@@ -125,11 +125,11 @@ public:
 
 private:
 	/// Scope's name.
-	const char *name;
+	const char *m_name;
 	/// Timer starting point.
-	std::chrono::time_point<std::chrono::steady_clock> startTimePoint;
+	std::chrono::time_point<std::chrono::steady_clock> m_startTimePoint;
 	/// Timer state, true if not running.
-	bool stopped;
+	bool m_stopped;
 };
 
 /**
@@ -143,20 +143,20 @@ namespace utils {
  */
 template<size_t N>
 struct ChangeResult {
-	char Data[N];
+	char data[N];
 };
 
 /**
  * @brief Simple String cleaner.
  * @tparam N Size of the string.
  * @tparam K Size of pattern to remove.
- * @param expr The string.
- * @param remove Pattern to remove.
+ * @param[in] iExpr The string.
+ * @param[in] iRemove Pattern to remove.
  * @return The corrected string.
  */
 template<size_t N, size_t K>
-constexpr auto cleanupOutputString(const char (&expr)[N],
-								   const char (&remove)[K]) {
+constexpr auto cleanupOutputString(const char (&iExpr)[N],
+                                   const char (&iRemove)[K]) {
 	ChangeResult<N> result = {};
 
 	size_t srcIndex = 0;
@@ -164,11 +164,11 @@ constexpr auto cleanupOutputString(const char (&expr)[N],
 	while (srcIndex < N) {
 		size_t matchIndex = 0;
 		while (matchIndex < K - 1 && srcIndex + matchIndex < N - 1 &&
-			   expr[srcIndex + matchIndex] == remove[matchIndex])
+		       iExpr[srcIndex + matchIndex] == iRemove[matchIndex])
 			matchIndex++;
 		if (matchIndex == K - 1)
 			srcIndex += matchIndex;
-		result.Data[dstIndex++] = expr[srcIndex] == '"' ? '\'' : expr[srcIndex];
+		result.Data[dstIndex++] = iExpr[srcIndex] == '"' ? '\'' : iExpr[srcIndex];
 		srcIndex++;
 	}
 	return result;

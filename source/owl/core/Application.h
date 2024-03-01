@@ -10,15 +10,14 @@
 
 #include "Timestep.h"
 #include "event/AppEvent.h"
-#include "gui/UILayer.h"
+#include "gui/UiLayer.h"
 #include "input/Window.h"
 #include "layer/LayerStack.h"
 #include "renderer/RenderAPI.h"
 
-int main(int argc, char *argv[]);
+int main(int iArgc, char* iArgv[]);
 
 namespace owl::core {
-
 /**
  * @brief Parameters to give to the application.
  */
@@ -28,7 +27,7 @@ struct OWL_API AppParams {
 	/// Application's assets pattern.
 	std::string assetsPattern = "assets";
 	/// Application's icon.
-	std::string icon = "";
+	std::string icon;
 	/// Windows width.
 	uint32_t width = 1600;
 	/// Windows height.
@@ -40,7 +39,7 @@ struct OWL_API AppParams {
 	/// Number of command line arguments.
 	int argCount = 0;
 	/// List of command line argument.
-	char **args = nullptr;
+	char** args = nullptr;
 	/// If extra debugging symbols should be loaded.
 	bool useDebugging = false;
 	/// The frequency for the frame debugging
@@ -48,45 +47,48 @@ struct OWL_API AppParams {
 
 	/**
 	 * @brief Access to the given command line argument.
-	 * @param index Index of the argument.
+	 * @param[in] iIndex Index of the argument.
 	 * @return The argument.
 	 */
-	const char *operator[](int index) const {
-		OWL_CORE_ASSERT(index < argCount, "Bad command line index.")
-		return args[index];
+	const char* operator[](const int iIndex) const {
+		OWL_CORE_ASSERT(iIndex < argCount, "Bad command line index.")
+		return args[iIndex];
 	}
+
 	/**
 	 * @brief Load from a yaml config file.
-	 * @param file The file to load.
+	 * @param[in] iFile The file to load.
 	 */
-	void loadFromFile(const std::filesystem::path &file);
+	void loadFromFile(const std::filesystem::path& iFile);
 	/**
 	 * @brief Save To a yaml file.
-	 * @param file The file to save.
+	 * @param[in] iFile The file to save.
 	 */
-	void saveToFile(const std::filesystem::path &file) const;
+	void saveToFile(const std::filesystem::path& iFile) const;
 };
+
 /**
  * @brief Root class defining the application to run.
  */
 class OWL_API Application {
 public:
 	Application() = delete;
-	Application(const Application &) = delete;
-	Application(Application &&) = delete;
-	Application &operator=(const Application &) = delete;
-	Application &operator=(Application &&) = delete;
+	Application(const Application&) = delete;
+	Application(Application&&) = delete;
+	Application& operator=(const Application&) = delete;
+	Application& operator=(Application&&) = delete;
 
 	/**
 	 * @brief Default constructor.
+	 * @param[in] iAppParams Application parameters.
 	 */
-	explicit Application(AppParams appParams);
+	explicit Application(AppParams iAppParams);
 
 	/**
 	 * @brief Access to Application instance.
 	 * @return Single instance of application.
 	 */
-	static Application &get() { return *instance; }
+	static Application& get() { return *s_instance; }
 
 	/**
 	 * @brief Destructor.
@@ -95,35 +97,33 @@ public:
 
 	/**
 	 * @brief Event Callback function.
-	 * @param e Event received.
+	 * @param[in,out] ioEvent Event received.
 	 */
-	void onEvent(event::Event &e);
+	void onEvent(event::Event& ioEvent);
 
 	/**
 	 * @brief Adding a layer on top of the layers.
-	 * @param layer The new layer to add.
+	 * @param[in] iLayer The new layer to add.
 	 */
-	void pushLayer(shared<layer::Layer> &&layer);
+	void pushLayer(shared<layer::Layer>&& iLayer);
 
 	/**
 	* @brief Adding an overlay on top of everything.
-	* @param overlay The new overlay.
+	* @param[in] iOverlay The new overlay.
 	*/
-	void pushOverlay(shared<layer::Layer> &&overlay);
+	void pushOverlay(shared<layer::Layer>&& iOverlay);
 
 	/**
 	 * @brief Access to the window.
 	 * @return The Window.
 	 */
-	[[nodiscard]] const input::Window &getWindow() const {
-		return *appWindow.get();
-	}
+	[[nodiscard]] const input::Window& getWindow() const { return *mu_appWindow.get(); }
 
 	/**
 	 * @brief Access to the Gui layer.
 	 * @return The gui layer.
 	 */
-	shared<gui::UILayer> getImGuiLayer() { return imGuiLayer; }
+	shared<gui::UiLayer> getImGuiLayer() { return mp_imGuiLayer; }
 
 	/**
 	 * @brief Request the application to terminate.
@@ -138,24 +138,20 @@ public:
 	 * @brief Get the working directory.
 	 * @return The current working directory.
 	 */
-	[[nodiscard]] const std::filesystem::path &getWorkingDirectory() const {
-		return workingDirectory;
-	}
+	[[nodiscard]] const std::filesystem::path& getWorkingDirectory() const { return m_workingDirectory; }
 
 	/**
 	 * @brief Get the working directory.
 	 * @return The current working directory.
 	 */
-	[[nodiscard]] const std::filesystem::path &getAssetDirectory() const {
-		return assetDirectory;
-	}
+	[[nodiscard]] const std::filesystem::path& getAssetDirectory() const { return m_assetDirectory; }
 
 	/**
 	 * @brief Helper function used to redefine assets location.
-	 * @param pattern The pattern to search for.
+	 * @param[in] iPattern The pattern to search for.
 	 * @return True if found the assets.
 	 */
-	bool searchAssets(const std::string &pattern);
+	bool searchAssets(const std::string& iPattern);
 
 	/**
 	 * @brief Enable the docking environment.
@@ -171,22 +167,22 @@ public:
 	 * @brief Access to init parameters.
 	 * @return Init parameters.
 	 */
-	[[nodiscard]] const AppParams &getInitParams() const { return initParams; }
+	[[nodiscard]] const AppParams& getInitParams() const { return m_initParams; }
 
 	/**
-	 * @brief state of the application.
+	 * @brief State of the application.
 	 */
 	enum struct State {
-		Running,/// Application is running.
-		Stopped,/// Application Stopped.
-		Error   /// Application in error.
+		Running, /// Application is running.
+		Stopped, /// Application Stopped.
+		Error /// Application in error.
 	};
 
 	/**
 	 * @brief Get the application's state.
 	 * @return The current application's state.
 	 */
-	[[nodiscard]] const State &getState() const { return state; }
+	[[nodiscard]] const State& getState() const { return m_state; }
 
 private:
 	/**
@@ -196,48 +192,47 @@ private:
 
 	/**
 	* @brief Action on window close.
-	* @param e The close event.
+	* @param[in,out] ioEvent The close event.
 	* @return True if succeeded.
 	*/
-	bool onWindowClosed(event::WindowCloseEvent &e);
+	bool onWindowClosed(event::WindowCloseEvent& ioEvent);
 
 	/**
 	* @brief Action on window resize.
-	* @param e the resize event.
+	* @param[in,out] iEvent the resize event.
 	* @return True if succeeded.
 	*/
-	bool onWindowResized(event::WindowResizeEvent &e);
+	bool onWindowResized(const event::WindowResizeEvent& iEvent);
 
 	/// Pointer to the window.
-	uniq<input::Window> appWindow;
+	uniq<input::Window> mu_appWindow;
 	/// Pointer to the GUI Layer.
-	shared<gui::UILayer> imGuiLayer = nullptr;
+	shared<gui::UiLayer> mp_imGuiLayer = nullptr;
 	/// Running state.
-	State state = State::Running;
+	State m_state = State::Running;
 	/// If Window minimized.
-	bool minimized = false;
+	bool m_minimized = false;
 	/// The stack of layers.
-	layer::LayerStack layerStack;
+	layer::LayerStack m_layerStack;
 	/// Base Path to the working Directory.
-	std::filesystem::path workingDirectory;
+	std::filesystem::path m_workingDirectory;
 	/// Base Path to the asset Directory.
-	std::filesystem::path assetDirectory;
+	std::filesystem::path m_assetDirectory;
 	/// Time steps management.
-	Timestep stepper;
+	Timestep m_stepper;
 	/// Initialization parameters.
-	AppParams initParams;
+	AppParams m_initParams;
 	/// The application Instance.
-	static Application *instance;
+	static Application* s_instance;
 	/// Mark the main entrypoint function as friend.
-	friend int ::main(int argc, char **argv);
+	friend int ::main(int iArgc, char** iArgv);
 };
 
 /**
  * @brief Create an application (Must be defined in the client).
- * @param argc Number of arguments.
- * @param argv List of argument.
+ * @param[in] iArgc Number of arguments.
+ * @param[in] iArgv List of argument.
  * @return The application.
  */
-extern shared<Application> createApplication(int argc, char **argv);
-
-}// namespace owl::core
+extern shared<Application> createApplication(int iArgc, char** iArgv);
+} // namespace owl::core

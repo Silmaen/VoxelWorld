@@ -12,37 +12,34 @@
 #include "core/Core.h"
 
 namespace owl::renderer {
-
 /**
  * @brief Class RenderCommand
  */
-class OWL_API RenderCommand {
+class OWL_API RenderCommand final {
 public:
 	RenderCommand() = default;
-	RenderCommand(const RenderCommand &) = delete;
-	RenderCommand(RenderCommand &&) = delete;
-	RenderCommand &operator=(const RenderCommand &) = delete;
-	RenderCommand &operator=(RenderCommand &&) = delete;
+	RenderCommand(const RenderCommand&) = delete;
+	RenderCommand(RenderCommand&&) = delete;
+	RenderCommand& operator=(const RenderCommand&) = delete;
+	RenderCommand& operator=(RenderCommand&&) = delete;
 
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~RenderCommand();
+	~RenderCommand() = default;
 
 	/**
 	 * @brief Initialize the renderer.
 	 */
 	static void init() {
-		if (renderAPI)
-			renderAPI->init();
+		if (mu_renderAPI)
+			mu_renderAPI->init();
 	}
 
 	/**
 	 * @brief Reset RenderAPI.
 	 */
-	static void invalidate() {
-		renderAPI.reset();
-	}
+	static void invalidate() { mu_renderAPI.reset(); }
 
 	/**
 	 * @brief Get the state of the API.
@@ -52,86 +49,79 @@ public:
 
 	/**
 	 * @brief Define the view port for this API.
-	 * @param x Starting X coordinate.
-	 * @param y Starting Y coordinate.
-	 * @param width Viewport's width.
-	 * @param height Viewport Height.
+	 * @param[in] iX Starting X coordinate.
+	 * @param[in] iY Starting Y coordinate.
+	 * @param[in] iWidth Viewport's width.
+	 * @param[in] iHeight Viewport Height.
 	 */
-	static void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
-		renderAPI->setViewport(x, y, width, height);
+	static void setViewport(const uint32_t iX, const uint32_t iY, const uint32_t iWidth, const uint32_t iHeight) {
+		mu_renderAPI->setViewport(iX, iY, iWidth, iHeight);
 	}
 
 	/**
 	 * @brief Binding to the definition of background color.
-	 * @param color The new background color.
+	 * @param[in] iColor The new background color.
 	 */
-	static void setClearColor(const glm::vec4 &color) {
-		renderAPI->setClearColor(color);
-	}
+	static void setClearColor(const glm::vec4& iColor) { mu_renderAPI->setClearColor(iColor); }
 
 	/**
 	 * @brief Binding to clear screen.
 	 */
-	static void clear() {
-		renderAPI->clear();
-	}
+	static void clear() { mu_renderAPI->clear(); }
 
 	/**
 	 * @brief Binding the draw of vertex array.
-	 * @param data Draw data to render.
-	 * @param indexCount Number of vertex to draw (=0 all).
+	 * @param[in] iData Draw data to render.
+	 * @param[in] iIndexCount Number of vertex to draw (=0 all).
 	 */
-	static void drawData(const shared<DrawData> &data, uint32_t indexCount = 0) {
-		renderAPI->drawData(data, indexCount);
+	static void drawData(const shared<DrawData>& iData, const uint32_t iIndexCount = 0) {
+		mu_renderAPI->drawData(iData, iIndexCount);
 	}
 
 	/**
 	 * @brief Define the line width.
-	 * @param width New line width.
+	 * @param[in] iWidth New line width.
 	 */
-	static void setLineWidth(float width) {
-		renderAPI->setLineWidth(width);
-	}
+	static void setLineWidth(const float iWidth) { mu_renderAPI->setLineWidth(iWidth); }
 
 	/**
 	 * @brief Create or replace the API base on it type.
-	 * @param type The type of the new render API.
+	 * @param[in] iType The type of the new render API.
 	 */
-	static void create(const RenderAPI::Type &type);
+	static void create(const RenderAPI::Type& iType);
 
 	/**
 	 * @brief Get the actual API type.
 	 * @return API Type.
 	 */
-	static RenderAPI::Type getAPI() { return renderAPI->getAPI(); }
+	static RenderAPI::Type getAPI() { return mu_renderAPI->getAPI(); }
 
 	/**
 	 * @brief Get the maximum number of texture slots.
 	 * @return Number of texture slots.
 	 */
-	static uint32_t getMaxTextureSlots() { return renderAPI->getMaxTextureSlots(); }
+	static uint32_t getMaxTextureSlots() { return mu_renderAPI->getMaxTextureSlots(); }
 
 	/**
 	 * @brief Reset value for the frame to render.
 	 */
-	static void beginFrame() { renderAPI->beginFrame(); }
+	static void beginFrame() { mu_renderAPI->beginFrame(); }
 	/**
 	 * @brief Reset value for the batch to render.
 	 */
-	static void beginBatch() { renderAPI->beginBatch(); }
+	static void beginBatch() { mu_renderAPI->beginBatch(); }
 
 	/**
 	 * @brief Ends draw call for the current batch.
 	 */
-	static void endBatch() { renderAPI->endBatch(); }
+	static void endBatch() { mu_renderAPI->endBatch(); }
 	/**
 	 * @brief Ends draw call for the current frame.
 	 */
-	static void endFrame() { renderAPI->endFrame(); }
+	static void endFrame() { mu_renderAPI->endFrame(); }
 
 private:
 	/// Pointer to the render API
-	static uniq<RenderAPI> renderAPI;
+	static uniq<RenderAPI> mu_renderAPI;
 };
-
-}// namespace owl::renderer
+} // namespace owl::renderer

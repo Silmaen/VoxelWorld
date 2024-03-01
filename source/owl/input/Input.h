@@ -37,9 +37,9 @@ public:
 
 	/**
 	 * @brief Initialize the input;
-	 * @param type the type of input
+	 * @param[in] iType the type of input
 	 */
-	static void init(const Type &type = Type::GLFW);
+	static void init(const Type &iType = Type::GLFW);
 
 	/**
 	 * @brief Destroy the inout instance.
@@ -48,17 +48,17 @@ public:
 
 	/**
 	 * @brief Keyboard pressed check.
-	 * @param keycode The Key to check.
+	 * @param[in] iKeycode The Key to check.
 	 * @return True if pressed.
 	 */
-	static bool isKeyPressed(KeyCode keycode);
+	static bool isKeyPressed(KeyCode iKeycode);
 
 	/**
 	 * @brief Mouse button pressed check.
-	 * @param mouseCode Mouse button to check.
+	 * @param[in] iMouseCode Mouse button to check.
 	 * @return True if pressed.
 	 */
-	static bool isMouseButtonPressed(MouseCode mouseCode);
+	static bool isMouseButtonPressed(MouseCode iMouseCode);
 
 	/**
 	 * @brief Get mouse X position.
@@ -80,40 +80,40 @@ public:
 
 	/**
 	 * @brief Simulate key toggle.
-	 * @param keycode the key to press/release.
+	 * @param[in] iKeycode the key to press/release.
 	 */
-	static void injectKey(KeyCode keycode);
+	static void injectKey(KeyCode iKeycode);
 
 	/**
 	 * @brief Simulate mouse key toggle.
-	 * @param mouseCode the key to press/release.
+	 * @param[in] iMouseCode the key to press/release.
 	 */
-	static void injectMouseButton(MouseCode mouseCode);
+	static void injectMouseButton(MouseCode iMouseCode);
 
 	/**
 	 * @brief Simulate mouse movement.
-	 * @param mousePos The new mouse pos.
+	 * @param[in] iMousePos The new mouse pos.
 	 */
-	static void injectMousePos(const glm::vec2 &mousePos);
+	static void injectMousePos(const glm::vec2 &iMousePos);
 
 private:
 	/// The Input type.
-	static Type type;
+	static Type ms_type;
 	/// The input instance.
-	static uniq<Input> instance;
+	static uniq<Input> mus_instance;
 
 	/**
 	 * @brief Keyboard pressed check, private implementation.
-	 * @param keycode The Key to check.
+	 * @param[in] iKeycode The Key to check.
 	 * @return True if pressed.
 	 */
-	virtual bool isKeyPressed_impl(KeyCode keycode) = 0;
+	virtual bool isKeyPressed_impl(KeyCode iKeycode) = 0;
 	/**
 	 * @brief Mouse button pressed check, private implementation.
-	 * @param mouseCode Mouse button to check.
+	 * @param[in] iMouseCode Mouse button to check.
 	 * @return True if pressed.
 	 */
-	virtual bool isMouseButtonPressed_impl(MouseCode mouseCode) = 0;
+	virtual bool isMouseButtonPressed_impl(MouseCode iMouseCode) = 0;
 	/**
 	 * @brief Get mouse position, private implementation.
 	 * @return Mouse Position.
@@ -121,20 +121,20 @@ private:
 	virtual glm::vec2 getMousePos_impl() = 0;
 	/**
 	 * @brief Simulate key toggle, private implementation.
-	 * @param keycode the key to press/release.
+	 * @param[in] iKeycode the key to press/release.
 	 */
-	virtual void injectKey_impl(KeyCode keycode) = 0;
+	virtual void injectKey_impl(KeyCode iKeycode) = 0;
 
 	/**
 	 * @brief Simulate mouse key toggle, private implementation.
-	 * @param mouseCode the key to press/release.
+	 * @param[in] iMouseCode the key to press/release.
 	 */
-	virtual void injectMouseButton_impl(MouseCode mouseCode) = 0;
+	virtual void injectMouseButton_impl(MouseCode iMouseCode) = 0;
 	/**
 	 * @brief Simulate mouse movement, private implementation.
-	 * @param mousePos The new mouse pos.
+	 * @param[in] iMousePos The new mouse pos.
 	 */
-	virtual void injectMousePos_impl(const glm::vec2 &mousePos) = 0;
+	virtual void injectMousePos_impl(const glm::vec2 &iMousePos) = 0;
 };
 
 

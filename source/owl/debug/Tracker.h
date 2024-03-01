@@ -89,25 +89,25 @@ public:
 
 	/**
 	 * @brief Function called at each allocation.
-	 * @param memoryPtr Memory pointer where allocation is done.
-	 * @param size The Allocated size.
+	 * @param[in] iMemoryPtr Memory pointer where allocation is done.
+	 * @param[in] iSize The Allocated size.
 	 */
-	void allocate(void *memoryPtr, size_t size);
+	void allocate(void *iMemoryPtr, size_t iSize);
 
 	/**
 	 * @brief Function called each de-allocation.
-	 * @param memoryPtr Memory pointer to deallocate.
-	 * @param size De-allocation size.
+	 * @param[in] iMemoryPtr Memory pointer to deallocate.
+	 * @param[in] iSize De-allocation size.
 	 */
-	void deallocate(void *memoryPtr, size_t size = 0);
+	void deallocate(void *iMemoryPtr, size_t iSize = 0);
 
 	/**
 	 * @brief Information about memory chunk.
 	 */
 	struct AllocationInfo {
-		AllocationInfo(void *bob, size_t bobette) : location{bob}, size{bobette} {}
+		AllocationInfo(void *iLocation, const size_t iSize) : location{iLocation}, size{iSize} {}
 		void *location = nullptr;///< location in memory.
-		size_t size = 0;         ///< size of the memory chunk.
+		size_t size = 0;///< size of the memory chunk.
 #ifdef OWL_STACKTRACE
 		cpptrace::stacktrace_frame traceAlloc;///< Stack trace of the allocation.
 #endif
@@ -122,23 +122,23 @@ public:
 	 * @brief Result structure of allocation state.
 	 */
 	struct AllocationState {
-		size_t allocatedMemory = 0;      ///< Amount of allocated memory.
-		size_t allocationCalls = 0;      ///< Amount of memory allocation calls.
-		size_t deallocationCalls = 0;    ///< Amount of de-allocation calls.
-		size_t memoryPeek = 0;           ///< Max seen amount of memory.
+		size_t allocatedMemory = 0;///< Amount of allocated memory.
+		size_t allocationCalls = 0;///< Amount of memory allocation calls.
+		size_t deallocationCalls = 0;///< Amount of de-allocation calls.
+		size_t memoryPeek = 0;///< Max seen amount of memory.
 		std::list<AllocationInfo> allocs;///< list of allocated chunks of memory.
 		/**
 		 * @brief Add a chunk of memory to the database.
-		 * @param nemPtr Pointer to the allocated memory
-		 * @param size Amount of allocated memory.
+		 * @param[in] iLocation Pointer to the allocated memory
+		 * @param[in] iSize Amount of allocated memory.
 		 */
-		void pushMemory(void *nemPtr, size_t size);
+		void pushMemory(void *iLocation, size_t iSize);
 		/**
 		 * @brief Free the chunk of memory at the given location.
-		 * @param nemPtr Memory location.
-		 * @param size Amount of memory.
+		 * @param[in] iLocation Memory location.
+		 * @param[in] iSize Amount of memory.
 		 */
-		void freeMemory(void *nemPtr, size_t size);
+		void freeMemory(void *iLocation, size_t iSize);
 		/**
 		 * @brief Reset the database.
 		 */
@@ -164,11 +164,11 @@ private:
 	Tracker();
 
 	/// Global Memory allocation state's info.
-	AllocationState globalAllocationState;
+	AllocationState m_globalAllocationState;
 	/// Current Memory allocation state's info.
-	AllocationState currentAllocationState;
+	AllocationState m_currentAllocationState;
 	/// Last Memory allocation state's info.
-	AllocationState lastAllocationState;
+	AllocationState m_lastAllocationState;
 };
 
 }// namespace owl::debug

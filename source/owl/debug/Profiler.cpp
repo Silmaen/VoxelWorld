@@ -11,14 +11,14 @@
 
 namespace owl::debug {
 
-Profiler::Profiler() : currentSession(nullptr) {}
+Profiler::Profiler() : m_currentSession(nullptr) {}
 
 Profiler::~Profiler() { endSession(); }
 
-void Profiler::beginSession(const std::string &name_,
-							const std::string &filepath) {
-	std::lock_guard<std::mutex> lock(profilerMutex);
-	if (currentSession) {
+void Profiler::beginSession(const std::string &iName,
+                            const std::string &iFilepath) {
+	std::lock_guard<std::mutex> lock(m_profilerMutex);
+	if (m_currentSession) {
 		// If there is already a current session, then close it before beginning
 		// new one. Subsequent profiling output meant for the original session
 		// will end up in the newly opened session instead.	That's better than
@@ -27,96 +27,91 @@ void Profiler::beginSession(const std::string &name_,
 		// Edge case: BeginSession() might be
 		// before Log::Init()
 		if (core::Log::getCoreLogger()) {
-			OWL_CORE_ERROR("Profiler::BeginSession('{0}') when session '{1}' "
-						   "already open.",
-						   name_, currentSession->name)
+			OWL_CORE_ERROR("Profiler::BeginSession('{}') when session '{}' already open.", iName,
+			               m_currentSession->name)
 		}
 		internalEndSession();
 	}
-	outputStream.open(filepath);
+	m_outputStream.open(iFilepath);
 
-	if (outputStream.is_open()) {
-		currentSession = new ProfileSession({name_});
+	if (m_outputStream.is_open()) {
+		m_currentSession = new ProfileSession({iName});
 		writeHeader();
 	} else {
-		if (core::Log::getCoreLogger())// Edge case: BeginSession() might be
-									   // before Log::Init()
-		{
-			OWL_CORE_ERROR("Instrumentor could not open results file '{0}'.",
-						   filepath)
+		if (core::Log::getCoreLogger()) {// Edge case: BeginSession() might be  before Log::Init()
+			OWL_CORE_ERROR("Instrumentor could not open results file '{}'.", iFilepath)
 		}
 	}
 }
 
 void Profiler::endSession() {
-	std::lock_guard<std::mutex> lock(profilerMutex);
+	std::lock_guard<std::mutex> lock(m_profilerMutex);
 	internalEndSession();
 }
 
-void Profiler::writeProfile(const ProfileResult &result) {
+void Profiler::writeProfile(const ProfileResult &iResult) {
 	std::stringstream json;
 
 	json << std::setprecision(3) << std::fixed;
 	json << ",{";
 	json << R"("cat":"function",)";
-	json << "\"dur\":" << (result.elapsedTime.count()) << ',';
-	json << R"("name":")" << result.name << "\",";
+	json << "\"dur\":" << (iResult.elapsedTime.count()) << ',';
+	json << R"("name":")" << iResult.name << "\",";
 	json << R"("ph":"X",)";
 	json << "\"pid\":0,";
-	json << "\"tid\":" << result.threadID << ",";
-	json << "\"ts\":" << result.start.count();
+	json << "\"tid\":" << iResult.threadId << ",";
+	json << "\"ts\":" << iResult.start.count();
 	json << "}";
 
-	std::lock_guard<std::mutex> lock(profilerMutex);
-	if (currentSession) {
-		outputStream << json.str();
-		outputStream.flush();
+	std::lock_guard<std::mutex> lock(m_profilerMutex);
+	if (m_currentSession) {
+		m_outputStream << json.str();
+		m_outputStream.flush();
 	}
 }
 
 void Profiler::writeHeader() {
-	outputStream << R"({"otherData": {},"traceEvents":[{})";
-	outputStream.flush();
+	m_outputStream << R"({"otherData": {},"traceEvents":[{})";
+	m_outputStream.flush();
 }
 
 void Profiler::writeFooter() {
-	outputStream << "]}";
-	outputStream.flush();
+	m_outputStream << "]}";
+	m_outputStream.flush();
 }
 
 void Profiler::internalEndSession() {
-	if (currentSession) {
+	if (m_currentSession) {
 		writeFooter();
-		outputStream.close();
-		delete currentSession;
-		currentSession = nullptr;
+		m_outputStream.close();
+		delete m_currentSession;
+		m_currentSession = nullptr;
 	}
 }
 
-ProfileTimer::ProfileTimer(const char *name_) : name(name_), startTimePoint{std::chrono::steady_clock::now()},
-												stopped(false) {
-}
+ProfileTimer::ProfileTimer(const char *iName) : m_name(iName), m_startTimePoint{std::chrono::steady_clock::now()},
+                                                m_stopped(false) {}
 
 ProfileTimer::~ProfileTimer() {
-	if (!stopped)
+	if (!m_stopped)
 		stop();
 }
 
 void ProfileTimer::stop() {
 	const auto endTimePoint = std::chrono::steady_clock::now();
 	const auto highResStart =
-			FloatingPointMicroseconds{startTimePoint.time_since_epoch()};
+			floatingPointMicroseconds{m_startTimePoint.time_since_epoch()};
 	const auto elapsedTime =
 			std::chrono::time_point_cast<std::chrono::microseconds>(endTimePoint)
-					.time_since_epoch() -
+			.time_since_epoch() -
 			std::chrono::time_point_cast<std::chrono::microseconds>(
-					startTimePoint)
-					.time_since_epoch();
+					m_startTimePoint)
+			.time_since_epoch();
 
 	Profiler::get().writeProfile(
-			{name, highResStart, elapsedTime, std::this_thread::get_id()});
+			{m_name, highResStart, elapsedTime, std::this_thread::get_id()});
 
-	stopped = true;
+	m_stopped = true;
 }
 
 }// namespace owl::debug

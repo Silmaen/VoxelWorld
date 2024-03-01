@@ -9,67 +9,68 @@
 #include "owlpch.h"
 
 #include "Application.h"
+
+#include <ranges>
 #include "Environment.h"
 #include "core/external/yaml.h"
-#include "debug/Tracker.h"
 #include "input/Input.h"
 #include "renderer/Renderer.h"
 
 namespace owl::core {
 
 
-Application *Application::instance = nullptr;
+Application *Application::s_instance = nullptr;
 
-Application::Application(AppParams appParams) : initParams{std::move(appParams)} {
+Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppParams)} {
 	OWL_PROFILE_FUNCTION()
 
-	OWL_CORE_ASSERT(!instance, "Application already exists!")
-	instance = this;
+	OWL_CORE_ASSERT(!s_instance, "Application already exists!")
+	s_instance = this;
 
 	// Look for things on the storages
 	{
 		// Set up a working directory
 		// Assuming present of a folder 'res' containing the data
-		workingDirectory = absolute(std::filesystem::current_path());
-		OWL_CORE_INFO("Working directory: {}", workingDirectory.string())
+		m_workingDirectory = absolute(std::filesystem::current_path());
+		OWL_CORE_INFO("Working directory: {}", m_workingDirectory.string())
 
 		// load config file if any
-		const auto configPath = workingDirectory / "config.yml";
+		const auto configPath = m_workingDirectory / "config.yml";
 		if (exists(configPath))
-			initParams.loadFromFile(configPath);
+			m_initParams.loadFromFile(configPath);
 		// save config
-		initParams.saveToFile(configPath);
+		m_initParams.saveToFile(configPath);
 
-		if (initParams.useDebugging) {
-			appendEnv("VK_ADD_LAYER_PATH", workingDirectory.string());
+		if (m_initParams.useDebugging) {
+			appendEnv("VK_ADD_LAYER_PATH", m_workingDirectory.string());
 #ifdef OWL_VULKAN_LAYER_PATH
 			appendEnv("VK_ADD_LAYER_PATH", OWL_VULKAN_LAYER_PATH);
 #endif
 		}
 
-		Log::setFrameFrequency(initParams.frameLogFrequency);
-		[[maybe_unused]] const bool assetFound = searchAssets(initParams.assetsPattern);
+		Log::setFrameFrequency(m_initParams.frameLogFrequency);
+		[[maybe_unused]] const bool assetFound = searchAssets(m_initParams.assetsPattern);
 		OWL_CORE_ASSERT(assetFound, "Unable to find assets")
 	}
 
 	// Create the renderer
 	{
-		renderer::RenderCommand::create(initParams.renderer);
+		renderer::RenderCommand::create(m_initParams.renderer);
 		// check renderer creation
 		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Created) {
 			OWL_CORE_ERROR("ERROR while Creating Renderer")
-			state = State::Error;
+			m_state = State::Error;
 			return;
 		}
 	}
 
 	// create main window
 	{
-		appWindow = input::Window::create({
-				.title = initParams.name,
-				.iconPath = initParams.icon.empty() ? "" : (assetDirectory / initParams.icon).string(),
-				.width = initParams.width,
-				.height = initParams.height,
+		mu_appWindow = input::Window::create({
+				.title = m_initParams.name,
+				.iconPath = m_initParams.icon.empty() ? "" : (m_assetDirectory / m_initParams.icon).string(),
+				.width = m_initParams.width,
+				.height = m_initParams.height,
 		});
 		input::Input::init();
 		OWL_CORE_INFO("Window Created.")
@@ -81,20 +82,20 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 		// check renderer initialization
 		if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
 			OWL_CORE_ERROR("ERROR while Initializing Renderer")
-			state = State::Error;
+			m_state = State::Error;
 			return;
 		}
 		OWL_CORE_INFO("Renderer initiated.")
 	}
 
 	// set up the callbacks
-	appWindow->setEventCallback(
+	mu_appWindow->setEventCallback(
 			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 
 	// create the GUI layer
-	if (initParams.hasGui) {
-		imGuiLayer = mk_shared<gui::UILayer>();
-		pushOverlay(imGuiLayer);
+	if (m_initParams.hasGui) {
+		mp_imGuiLayer = mkShared<gui::UiLayer>();
+		pushOverlay(mp_imGuiLayer);
 		OWL_CORE_TRACE("GUI Layer created.")
 	}
 
@@ -102,39 +103,35 @@ Application::Application(AppParams appParams) : initParams{std::move(appParams)}
 }
 
 void Application::enableDocking() {
-	if (imGuiLayer)
-		imGuiLayer->enableDocking();
+	if (mp_imGuiLayer)
+		mp_imGuiLayer->enableDocking();
 }
 
 void Application::disableDocking() {
-	if (imGuiLayer)
-		imGuiLayer->disableDocking();
+	if (mp_imGuiLayer)
+		mp_imGuiLayer->disableDocking();
 }
 
 Application::~Application() {
 	OWL_PROFILE_FUNCTION()
 
 	if (renderer::RenderAPI::getState() != renderer::RenderAPI::State::Error) {
-		for (auto &layer: layerStack) {
-			layerStack.popLayer(layer);
-			layerStack.popOverlay(layer);
+		for (auto &layer: m_layerStack) {
+			m_layerStack.popLayer(layer);
+			m_layerStack.popOverlay(layer);
 		}
 		input::Input::invalidate();
-		appWindow->shutdown();
+		mu_appWindow->shutdown();
 		renderer::Renderer::shutdown();
 		renderer::RenderCommand::invalidate();
-		appWindow.reset();
+		mu_appWindow.reset();
 	}
 	invalidate();
 }
 
-void Application::close() {
-	state = State::Stopped;
-}
+void Application::close() { m_state = State::Stopped; }
 
-void Application::invalidate() {
-	instance = nullptr;
-}
+void Application::invalidate() { s_instance = nullptr; }
 
 void Application::run() {
 	OWL_PROFILE_FUNCTION()
@@ -142,33 +139,33 @@ void Application::run() {
 #if OWL_TRACKER_VERBOSITY >= 3
 	uint64_t frameCount = 0;
 #endif
-	while (state == State::Running) {
+	while (m_state == State::Running) {
 		OWL_PROFILE_SCOPE("RunLoop")
 		OWL_CORE_FRAME_ADVANCE
 
-		stepper.update();
-		if (!minimized) {
+		m_stepper.update();
+		if (!m_minimized) {
 			renderer::RenderCommand::beginFrame();
 			if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
-				state = State::Error;
+				m_state = State::Error;
 				continue;
 			}
 			{
 				OWL_PROFILE_SCOPE("LayerStack onUpdate")
 
-				for (const auto &layer: layerStack)
-					layer->onUpdate(stepper);
+				for (const auto &layer: m_layerStack)
+					layer->onUpdate(m_stepper);
 			}
-			if (imGuiLayer) {
+			if (mp_imGuiLayer) {
 				OWL_PROFILE_SCOPE("LayerStack onImUpdate")
-				imGuiLayer->begin();
-				for (const auto &layer: layerStack)
-					layer->onImGuiRender(stepper);
-				imGuiLayer->end();
+				mp_imGuiLayer->begin();
+				for (const auto &layer: m_layerStack)
+					layer->onImGuiRender(m_stepper);
+				mp_imGuiLayer->end();
 			}
 			renderer::RenderCommand::endFrame();
 		}
-		appWindow->onUpdate();
+		mu_appWindow->onUpdate();
 
 #if OWL_TRACKER_VERBOSITY >= 3
 		{
@@ -191,10 +188,10 @@ void Application::run() {
 	}
 }
 
-void Application::onEvent(event::Event &e) {
+void Application::onEvent(event::Event &ioEvent) {
 	OWL_PROFILE_FUNCTION()
 
-	event::EventDispatcher dispatcher(e);
+	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::WindowCloseEvent>([this](auto &&PH1) {
 		return onWindowClosed(std::forward<decltype(PH1)>(PH1));
 	});
@@ -202,11 +199,10 @@ void Application::onEvent(event::Event &e) {
 		return onWindowResized(std::forward<decltype(PH1)>(PH1));
 	});
 
-	//for (auto &it: std::ranges::reverse_view(layerStack)) {
-	for (auto it = layerStack.rbegin(); it != layerStack.rend(); ++it) {
-		if (e.handled)
+	for (const auto &it: std::ranges::reverse_view(m_layerStack)) {
+		if (ioEvent.handled)
 			break;
-		(*it)->onEvent(e);
+		it->onEvent(ioEvent);
 	}
 }
 
@@ -217,65 +213,73 @@ bool Application::onWindowClosed(event::WindowCloseEvent &) {
 	return true;
 }
 
-bool Application::onWindowResized(event::WindowResizeEvent &e) {
+bool Application::onWindowResized(const event::WindowResizeEvent &iEvent) {
 	OWL_PROFILE_FUNCTION()
 
-	if (e.getWidth() == 0 || e.getHeight() == 0) {
-		minimized = true;
+	if (iEvent.getWidth() == 0 || iEvent.getHeight() == 0) {
+		m_minimized = true;
 		return false;
 	}
-	minimized = false;
-	renderer::Renderer::onWindowResized(e.getWidth(), e.getHeight());
+	m_minimized = false;
+	renderer::Renderer::onWindowResized(iEvent.getWidth(), iEvent.getHeight());
 	return false;
 }
 
-void Application::pushLayer(shared<layer::Layer> &&layer) {
+void Application::pushLayer(shared<layer::Layer> &&iLayer) {
 	OWL_PROFILE_FUNCTION()
-	if (renderer::RenderCommand::getState() == renderer::RenderAPI::State::Error) return;
-	layerStack.pushLayer(std::move(layer));
+	if (renderer::RenderCommand::getState() == renderer::RenderAPI::State::Error)
+		return;
+	m_layerStack.pushLayer(std::move(iLayer));
 }
 
-void Application::pushOverlay(shared<layer::Layer> &&overlay) {
+void Application::pushOverlay(shared<layer::Layer> &&iOverlay) {
 	OWL_PROFILE_FUNCTION()
-	if (renderer::RenderCommand::getState() == renderer::RenderAPI::State::Error) return;
-	layerStack.pushOverlay(std::move(overlay));
+	if (renderer::RenderCommand::getState() == renderer::RenderAPI::State::Error)
+		return;
+	m_layerStack.pushOverlay(std::move(iOverlay));
 }
 
-bool Application::searchAssets(const std::string &pattern) {
+bool Application::searchAssets(const std::string &iPattern) {
 	OWL_PROFILE_FUNCTION()
 
-	std::filesystem::path parent = workingDirectory;
-	std::filesystem::path assets = parent / pattern;
+	std::filesystem::path parent = m_workingDirectory;
+	std::filesystem::path assets = parent / iPattern;
 	while (parent != parent.root_path()) {
 		if (exists(assets)) {
-			assetDirectory = std::move(assets);
+			m_assetDirectory = std::move(assets);
 			return true;
 		}
 		assets.clear();
 		parent = parent.parent_path();
 		assets = parent;
-		assets /= pattern;
+		assets /= iPattern;
 	}
-	assetDirectory = workingDirectory;
+	m_assetDirectory = m_workingDirectory;
 	return false;
 }
 
-void AppParams::loadFromFile(const std::filesystem::path &file) {
-	YAML::Node data = YAML::LoadFile(file.string());
+void AppParams::loadFromFile(const std::filesystem::path &iFile) {
+	YAML::Node data = YAML::LoadFile(iFile.string());
 	if (auto appConfig = data["AppConfig"]; appConfig) {
-		if (appConfig["width"]) width = appConfig["width"].as<uint32_t>();
-		if (appConfig["height"]) height = appConfig["height"].as<uint32_t>();
+		if (appConfig["width"])
+			width = appConfig["width"].as<uint32_t>();
+		if (appConfig["height"])
+			height = appConfig["height"].as<uint32_t>();
 		if (appConfig["renderer"]) {
-			if (const auto dRenderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(appConfig["renderer"].as<std::string>()); dRenderer.has_value())
+			if (const auto dRenderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(
+					appConfig["renderer"].as<std::string>()); dRenderer.has_value())
 				renderer = dRenderer.value();
 		}
-		if (appConfig["hasGui"]) hasGui = appConfig["hasGui"].as<bool>();
-		if (appConfig["useDebugging"]) useDebugging = appConfig["useDebugging"].as<bool>();
-		if (appConfig["frameLogFrequency"]) frameLogFrequency = appConfig["frameLogFrequency"].as<uint64_t>();
+		if (appConfig["hasGui"])
+			hasGui = appConfig["hasGui"].as<bool>();
+		if (appConfig["useDebugging"])
+			useDebugging = appConfig["useDebugging"].as<bool>();
+		if (appConfig["frameLogFrequency"])
+			frameLogFrequency = appConfig["frameLogFrequency"].as<uint64_t>();
 	}
 }
 
-void AppParams::saveToFile(const std::filesystem::path &file) const {
+void AppParams::saveToFile(const std::filesystem::path &iFile) const {
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 	out << YAML::Key << "AppConfig" << YAML::Value << YAML::BeginMap;
@@ -289,7 +293,7 @@ void AppParams::saveToFile(const std::filesystem::path &file) const {
 
 	out << YAML::EndMap;
 	out << YAML::EndMap;
-	std::ofstream fileOut(file);
+	std::ofstream fileOut(iFile);
 	fileOut << out.c_str();
 	fileOut.close();
 }

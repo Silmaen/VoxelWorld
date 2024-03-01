@@ -16,12 +16,10 @@
 
 
 namespace owl::renderer {
-
 /**
  * @brief Utility functions.
  */
 namespace utils {
-
 /**
  * @brief Structure holding Position Rotation Scale.
  */
@@ -36,10 +34,10 @@ struct PRS {
 
 /**
  * @brief Convert PRS structure int transformation matrix.
- * @param transform The input PRS Structure.
+ * @param[in] iTransform The input PRS Structure.
  * @return The corresponding Transformation matrix.
  */
-OWL_API glm::mat4 toTransform(const PRS &transform);
+OWL_API glm::mat4 toTransform(const PRS& iTransform);
 
 /**
  * @brief 2D transformation structure.
@@ -47,23 +45,24 @@ OWL_API glm::mat4 toTransform(const PRS &transform);
 struct Transform2D {
 	Transform2D() = delete;
 
+	// NOLINTBEGIN(google-explicit-constructor)
 	/**
 	 * @brief Constructor by transformation matrix.
-	 * @param matrix Input transformation matrix.
+	 * @param[in] iMatrix Input transformation matrix.
 	 */
-	Transform2D(const glm::mat4 &matrix) : transform{matrix} {}
+	Transform2D(const glm::mat4& iMatrix) : transform{iMatrix} {}
 
 	/**
 	 * @brief Constructor by PRS.
-	 * @param transform_ Input PRS.
+	 * @param[in] iTransform Input PRS.
 	 */
-	Transform2D(const PRS &transform_) : transform{toTransform(transform_)} {}
+	Transform2D(const PRS& iTransform) : transform{toTransform(iTransform)} {}
+	// NOLINTEND(google-explicit-constructor)
 
 	/// The transformation matrix.
 	glm::mat4 transform;
 };
-
-}// namespace utils
+} // namespace utils
 
 /**
  * @brief Data for drawing a quad.
@@ -145,10 +144,10 @@ struct OWL_API PolyLineData {
 class OWL_API Renderer2D {
 public:
 	Renderer2D() = default;
-	Renderer2D(const Renderer2D &) = delete;
-	Renderer2D(Renderer2D &&) = delete;
-	Renderer2D &operator=(const Renderer2D &) = delete;
-	Renderer2D &operator=(Renderer2D &&) = delete;
+	Renderer2D(const Renderer2D&) = delete;
+	Renderer2D(Renderer2D&&) = delete;
+	Renderer2D& operator=(const Renderer2D&) = delete;
+	Renderer2D& operator=(Renderer2D&&) = delete;
 
 	/**
 	 * @brief Destructor.
@@ -167,18 +166,22 @@ public:
 
 	/**
 	 * @brief Begins a scene.
+	 * @param[in] iCamera The camera.
 	 */
-	static void beginScene(const CameraOrtho &camera);
+	static void beginScene(const CameraOrtho& iCamera);
 
 	/**
 	 * @brief Begins a scene.
+	 * @param[in] iCamera The camera.
 	 */
-	static void beginScene(const CameraEditor &camera);
+	static void beginScene(const CameraEditor& iCamera);
 
 	/**
 	 * @brief Begins a scene.
+	 * @param[in] iCamera The camera.
+	 * @param[in] iTransform The transformation.
 	 */
-	static void beginScene(const Camera &camera, const glm::mat4 &transform);
+	static void beginScene(const Camera& iCamera, const glm::mat4& iTransform);
 
 	/**
 	 * @brief Ends a scene.
@@ -199,39 +202,39 @@ public:
 
 	/**
 	 * @brief Define the line width.
-	 * @param width New line width.
+	 * @param[in] iWidth New line width.
 	 */
-	static void setLineWidth(float width);
+	static void setLineWidth(float iWidth);
 
 	/**
 	 * @brief Draw a line on the screen.
-	 * @param lineData The data to draw the line.
+	 * @param[in] iLineData The data to draw the line.
 	 */
-	static void drawLine(const LineData &lineData);
+	static void drawLine(const LineData& iLineData);
 
 	/**
 	 * @brief Draw a rectangle.
-	 * @param rectData The data to draw the rectangle.
+	 * @param[in] iRectData The data to draw the rectangle.
 	 */
-	static void drawRect(const RectData &rectData);
+	static void drawRect(const RectData& iRectData);
 
 	/**
 	 * @brief Draw a polyline on the screen.
-	 * @param lineData The data to draw the polyline
+	 * @param[in] iLineData The data to draw the polyline
 	 */
-	static void drawPolyLine(const PolyLineData &lineData);
+	static void drawPolyLine(const PolyLineData& iLineData);
 
 	/**
 	 * @brief Draws a circle on the screen.
-	 * @param circleData Circle's properties.
+	 * @param[in] iCircleData Circle's properties.
 	 */
-	static void drawCircle(const CircleData &circleData);
+	static void drawCircle(const CircleData& iCircleData);
 
 	/**
 	 * @brief Draws a Quad on the screen.
-	 * @param quadData Quad's properties.
+	 * @param[in] iQuadData Quad's properties.
 	 */
-	static void drawQuad(const Quad2DData &quadData);
+	static void drawQuad(const Quad2DData& iQuadData);
 
 	/**
 	 * @brief Draws a Debug triangle on the screen.
@@ -239,11 +242,11 @@ public:
 	static void drawDebugTriangle();
 	/**
 	 * @brief Draw a sprite entity on the screen.
-	 * @param transform Sprite transformations.
-	 * @param src The sprite to render.
-	 * @param entityID The entity ID.
+	 * @param[in] iTransform Sprite transformations.
+	 * @param[in] iSrc The sprite to render.
+	 * @param[in] iEntityID The entity ID.
 	 */
-	static void drawSprite(const glm::mat4 &transform, const scene::component::SpriteRenderer &src, int entityID);
+	static void drawSprite(const glm::mat4& iTransform, const scene::component::SpriteRenderer& iSrc, int iEntityID);
 
 	/**
 	 * @brief Statistics.
@@ -281,5 +284,4 @@ private:
 	 */
 	static void startBatch();
 };
-
-}// namespace owl::renderer
+} // namespace owl::renderer

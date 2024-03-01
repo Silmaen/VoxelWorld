@@ -21,11 +21,13 @@ void RenderAPI::init() {
 
 	if (const bool goodVersion = vers.major > 2 || (vers.major == 2 && vers.minor >= 1); !goodVersion) {
 		setState(State::Error);
-		OWL_CORE_ERROR("Owl Engine legacy OpenGL Renderer requires at least OpenGL version 2.1 but version {}.{} found", vers.major, vers.minor)
+		OWL_CORE_ERROR("Owl Engine legacy OpenGL Renderer requires at least OpenGL version 2.1 but version {}.{} found",
+		               vers.major, vers.minor)
 	}
 
 
-	if (getState() != State::Created) return;
+	if (getState() != State::Created)
+		return;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -37,27 +39,28 @@ void RenderAPI::init() {
 	setState(State::Ready);
 }
 
-void RenderAPI::setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
-	glViewport(static_cast<int32_t>(x), static_cast<int32_t>(y), static_cast<int32_t>(width), static_cast<int32_t>(height));
+void RenderAPI::setViewport(const uint32_t iX, const uint32_t iY, const uint32_t iWidth, const uint32_t iHeight) {
+	glViewport(static_cast<int32_t>(iX), static_cast<int32_t>(iY), static_cast<int32_t>(iWidth),
+	           static_cast<int32_t>(iHeight));
 }
 
-void RenderAPI::setClearColor(const glm::vec4 &color) {
-	glClearColor(color.r, color.g, color.b, color.a);
+void RenderAPI::setClearColor(const glm::vec4 &iColor) {
+	glClearColor(iColor.r, iColor.g, iColor.b, iColor.a);
 }
 
 void RenderAPI::clear() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderAPI::drawData(const shared<DrawData> &data, uint32_t indexCount) {
-	data->bind();
-	const uint32_t count = indexCount ? indexCount : data->getIndexCount();
+void RenderAPI::drawData(const shared<DrawData> &iData, const uint32_t iIndexCount) {
+	iData->bind();
+	const uint32_t count = iIndexCount ? iIndexCount : iData->getIndexCount();
 	glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
-	data->unbind();
+	iData->unbind();
 }
 
-void RenderAPI::setLineWidth(float width) {
-	glLineWidth(width);
+void RenderAPI::setLineWidth(const float iWidth) {
+	glLineWidth(iWidth);
 }
 
 uint32_t RenderAPI::getMaxTextureSlots() const {

@@ -20,15 +20,16 @@
 
 namespace owl::input::glfw {
 
-static uint8_t s_GLFWWindowCount = 0;
+static uint8_t s_glfwWindowCount = 0;
 
-static void GLFWErrorCallback(int error, const char *description){
-		OWL_CORE_ERROR("GLFW Error ({}): {}", error, description)}
+static void glfwErrorCallback(int iError, const char *iDescription) {
+	OWL_CORE_ERROR("GLFW Error ({}): {}", iError, iDescription)
+}
 
-Window::Window(const Properties &props) : ::owl::input::Window() {
+Window::Window(const Properties &iProps) : input::Window() {
 	OWL_PROFILE_FUNCTION()
 
-	init(props);
+	init(iProps);
 }
 
 Window::~Window() {
@@ -37,27 +38,27 @@ Window::~Window() {
 	shutdown();
 }
 
-void Window::init(const Properties &props) {
+void Window::init(const Properties &iProps) {
 	OWL_PROFILE_FUNCTION()
 
-	windowData.title = props.title;
-	windowData.width = props.width;
-	windowData.height = props.height;
+	m_windowData.title = iProps.title;
+	m_windowData.width = iProps.width;
+	m_windowData.height = iProps.height;
 
-	OWL_CORE_INFO("Creating window {} ({}, {})", props.title, props.width,
-				  props.height)
+	OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width,
+	              iProps.height)
 
-	if (s_GLFWWindowCount == 0) {
+	if (s_glfwWindowCount == 0) {
 		OWL_PROFILE_SCOPE("glfwInit")
 		[[maybe_unused]] int success = glfwInit();
 		OWL_CORE_ASSERT(success, "Could not initialize GLFW!")
-		glfwSetErrorCallback(GLFWErrorCallback);
+		glfwSetErrorCallback(glfwErrorCallback);
 	}
 
-	auto api = renderer::RenderAPI::getAPI();
 	// window creation.
 	{
 		OWL_PROFILE_SCOPE("glfwCreateWindow")
+		auto api = renderer::RenderAPI::getAPI();
 		if (api == renderer::RenderAPI::Type::Vulkan) {
 			if (!glfwVulkanSupported()) {
 				OWL_CORE_CRITICAL("No Vulkan support for glfw.")
@@ -70,66 +71,64 @@ void Window::init(const Properties &props) {
 #endif
 		if (api == renderer::RenderAPI::Type::Vulkan)
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindow = glfwCreateWindow(static_cast<int>(props.width),
-									  static_cast<int>(props.height),
-									  windowData.title.c_str(), nullptr, nullptr);
-		++s_GLFWWindowCount;
+		mp_glfwWindow = glfwCreateWindow(static_cast<int>(iProps.width),
+		                                 static_cast<int>(iProps.height),
+		                                 m_windowData.title.c_str(), nullptr, nullptr);
+		++s_glfwWindowCount;
 	}
 	// Set icon
 	GLFWimage icon;
 	int channels;
-	if (!props.iconPath.empty()) {
-		icon.pixels = stbi_load(props.iconPath.c_str(), &icon.width, &icon.height, &channels, 4);
-		glfwSetWindowIcon(glfwWindow, 1, &icon);
+	if (!iProps.iconPath.empty()) {
+		icon.pixels = stbi_load(iProps.iconPath.c_str(), &icon.width, &icon.height, &channels, 4);
+		glfwSetWindowIcon(mp_glfwWindow, 1, &icon);
 		stbi_image_free(icon.pixels);
 	}
 
-	context = renderer::GraphContext::create(glfwWindow);
-	context->init();
+	mu_context = renderer::GraphContext::create(mp_glfwWindow);
+	mu_context->init();
 
-	glfwSetWindowUserPointer(glfwWindow, &windowData);
+	glfwSetWindowUserPointer(mp_glfwWindow, &m_windowData);
 	setVSync(true);
 
 	// Set GLFW callbacks
 	{
 		glfwSetWindowSizeCallback(
-				glfwWindow, [](GLFWwindow *window, int width, int height) {
-					WindowData &data =
-							*static_cast<WindowData *>(glfwGetWindowUserPointer(window));
-					data.width = static_cast<uint32_t>(width);
-					data.height = static_cast<uint32_t>(height);
+				mp_glfwWindow, [](GLFWwindow *iWindow, const int iWidth, const int iHeight) {
+					const auto data = static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow));
+					data->width = static_cast<uint32_t>(iWidth);
+					data->height = static_cast<uint32_t>(iHeight);
 
-					event::WindowResizeEvent event(data.width, data.height);
-					data.eventCallback(event);
+					event::WindowResizeEvent event(data->width, data->height);
+					data->eventCallback(event);
 				});
 
-		glfwSetWindowCloseCallback(glfwWindow, [](GLFWwindow *window) {
-			WindowData &data =
-					*static_cast<WindowData *>(glfwGetWindowUserPointer(window));
+		glfwSetWindowCloseCallback(mp_glfwWindow, [](GLFWwindow *iWindow) {
 			event::WindowCloseEvent event;
-			data.eventCallback(event);
+			static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(
+					event);
 		});
-		glfwSetKeyCallback(glfwWindow, [](GLFWwindow *window, int key,
-										  [[maybe_unused]] int scancode, int action,
-										  [[maybe_unused]] int mods) {
-			WindowData &data =
-					*static_cast<WindowData *>(glfwGetWindowUserPointer(window));
-
-			const auto cKey = static_cast<input::KeyCode>(key);
-			switch (action) {
+		glfwSetKeyCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const int iKey,
+		                                     [[maybe_unused]] int iScancode, const int iAction,
+		                                     [[maybe_unused]] int iMods) {
+			const auto cKey = static_cast<KeyCode>(iKey);
+			switch (iAction) {
 				case GLFW_PRESS: {
 					event::KeyPressedEvent event(cKey, false);
-					data.eventCallback(event);
+					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(
+							event);
 					break;
 				}
 				case GLFW_RELEASE: {
 					event::KeyReleasedEvent event(cKey);
-					data.eventCallback(event);
+					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(
+							event);
 					break;
 				}
 				case GLFW_REPEAT: {
 					event::KeyPressedEvent event(cKey, true);
-					data.eventCallback(event);
+					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(
+							event);
 					break;
 				}
 				default:
@@ -137,31 +136,27 @@ void Window::init(const Properties &props) {
 			}
 		});
 
-		glfwSetCharCallback(glfwWindow, [](GLFWwindow *window, unsigned int keycode) {
-			WindowData &data =
-					*static_cast<WindowData *>(glfwGetWindowUserPointer(window));
-
-			event::KeyTypedEvent event(static_cast<input::KeyCode>(keycode));
-			data.eventCallback(event);
+		glfwSetCharCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const unsigned int iKeycode) {
+			event::KeyTypedEvent event(static_cast<KeyCode>(iKeycode));
+			static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 		});
 
-		glfwSetMouseButtonCallback(glfwWindow, [](GLFWwindow *window, int button,
-												  int action,
-												  [[maybe_unused]] int mods) {
-			WindowData &data =
-					*static_cast<WindowData *>(glfwGetWindowUserPointer(window));
-
-			switch (action) {
+		glfwSetMouseButtonCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const int iButton,
+		                                             const int iAction,
+		                                             [[maybe_unused]] const int iMods) {
+			switch (iAction) {
 				case GLFW_PRESS: {
 					event::MouseButtonPressedEvent event(
-							static_cast<input::MouseCode>(button));
-					data.eventCallback(event);
+							static_cast<MouseCode>(iButton));
+					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->
+							eventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE: {
 					event::MouseButtonReleasedEvent event(
-							static_cast<input::MouseCode>(button));
-					data.eventCallback(event);
+							static_cast<MouseCode>(iButton));
+					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->
+							eventCallback(event);
 					break;
 				}
 				default:
@@ -170,22 +165,17 @@ void Window::init(const Properties &props) {
 		});
 
 		glfwSetScrollCallback(
-				glfwWindow, [](GLFWwindow *window, double xOffset, double yOffset) {
-					WindowData &data =
-							*static_cast<WindowData *>(glfwGetWindowUserPointer(window));
-
-					event::MouseScrolledEvent event(static_cast<float>(xOffset),
-													static_cast<float>(yOffset));
-					data.eventCallback(event);
+				mp_glfwWindow, [](GLFWwindow *iWindow, const double iXOffset, const double iYOffset) {
+					event::MouseScrolledEvent event(static_cast<float>(iXOffset),
+					                                static_cast<float>(iYOffset));
+					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 				});
 
 		glfwSetCursorPosCallback(
-				glfwWindow, [](GLFWwindow *window, double xPos, double yPos) {
-					WindowData &data =
-							*static_cast<WindowData *>(glfwGetWindowUserPointer(window));
-					event::MouseMovedEvent event(static_cast<float>(xPos),
-												 static_cast<float>(yPos));
-					data.eventCallback(event);
+				mp_glfwWindow, [](GLFWwindow *iWindow, const double iX, const double iY) {
+					event::MouseMovedEvent event(static_cast<float>(iX),
+					                             static_cast<float>(iY));
+					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 				});
 	}
 }
@@ -193,16 +183,14 @@ void Window::init(const Properties &props) {
 void Window::shutdown() {
 	OWL_PROFILE_FUNCTION()
 
-	if (glfwWindow == nullptr)
+	if (mp_glfwWindow == nullptr)
 		return;
-	context->waitIdle();
-	glfwDestroyWindow(glfwWindow);
-	--s_GLFWWindowCount;
-	glfwWindow = nullptr;
+	mu_context->waitIdle();
+	glfwDestroyWindow(mp_glfwWindow);
+	--s_glfwWindowCount;
+	mp_glfwWindow = nullptr;
 
-	if (s_GLFWWindowCount == 0) {
-		glfwTerminate();
-	}
+	if (s_glfwWindowCount == 0) { glfwTerminate(); }
 }
 
 
@@ -210,23 +198,23 @@ void Window::onUpdate() {
 	OWL_PROFILE_FUNCTION()
 
 	glfwPollEvents();
-	context->swapBuffers();
+	mu_context->swapBuffers();
 }
 
-void Window::setVSync(bool enabled) {
+void Window::setVSync(const bool iEnabled) {
 	OWL_PROFILE_FUNCTION()
 
-	auto api = renderer::RenderAPI::getAPI();
-	if (api == renderer::RenderAPI::Type::OpenGL || api == renderer::RenderAPI::Type::OpenglLegacy) {
-		if (enabled)
+	if (const auto api = renderer::RenderAPI::getAPI();
+		api == renderer::RenderAPI::Type::OpenGL || api == renderer::RenderAPI::Type::OpenglLegacy) {
+		if (iEnabled)
 			glfwSwapInterval(1);
 		else
 			glfwSwapInterval(0);
 	}
 
-	windowData.VSync = enabled;
+	m_windowData.vSync = iEnabled;
 }
 
-bool Window::isVSync() const { return windowData.VSync; }
+bool Window::isVSync() const { return m_windowData.vSync; }
 
 }// namespace owl::input::glfw

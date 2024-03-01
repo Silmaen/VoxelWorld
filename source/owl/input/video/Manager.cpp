@@ -17,19 +17,15 @@
 
 namespace owl::input::video {
 
-Manager::Manager() {
-	updateDeviceList();
-}
+Manager::Manager() { updateDeviceList(); }
 
-Manager::~Manager() {
-	close();
-}
+Manager::~Manager() { close(); }
 
-void Manager::updateDeviceList(const bool reset) {
-	if (reset)
-		devices.clear();
+void Manager::updateDeviceList(const bool iReset) {
+	if (iReset)
+		m_devices.clear();
 #if defined(OWL_PLATFORM_WINDOWS)
-	windows::updateList(devices);
+	windows::updateList(m_devices);
 #elif defined(OWL_PLATFORM_LINUX)
 	linux64::updateList(devices);
 #else
@@ -39,23 +35,24 @@ void Manager::updateDeviceList(const bool reset) {
 
 std::vector<std::string> Manager::getDevicesNames() const {
 	std::vector<std::string> res;
-	res.reserve(devices.size());
-	for (const auto &dev: devices)
+	res.reserve(m_devices.size());
+	for (const auto &dev: m_devices)
 		res.emplace_back(dev->getName());
 	return res;
 }
+
 shared<Device> Manager::getCurrentDevice() const {
-	if (currentDevice >= maxDevices)
+	if (m_currentDevice >= g_maxDevices)
 		return nullptr;
-	return devices[currentDevice];
+	return m_devices[m_currentDevice];
 }
 
-void Manager::open(size_t id) {
-	if (id >= devices.size() || id == currentDevice)
+void Manager::open(const size_t iId) {
+	if (iId >= m_devices.size() || iId == m_currentDevice)
 		return;
-	devices[id]->open();
-	if (devices[id]->isOpened())
-		currentDevice = id;
+	m_devices[iId]->open();
+	if (m_devices[iId]->isOpened())
+		m_currentDevice = iId;
 }
 
 void Manager::close() const {
@@ -64,16 +61,16 @@ void Manager::close() const {
 	getCurrentDevice()->close();
 }
 
-void Manager::fillFrame(shared<renderer::Texture> &frame) const {
+void Manager::fillFrame(shared<renderer::Texture> &iFrame) const {
 	if (!isOpened())
 		return;
-	getCurrentDevice()->fillFrame(frame);
+	getCurrentDevice()->fillFrame(iFrame);
 }
 
 int8_t Manager::getCurrentDeviceId() const {
 	if (!isOpened())
 		return -1;
-	return static_cast<int8_t>(currentDevice);
+	return static_cast<int8_t>(m_currentDevice);
 }
 
 

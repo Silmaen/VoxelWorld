@@ -19,7 +19,7 @@ OWL_DIAG_POP
 namespace owl {
 
 
-EditorLayer::EditorLayer() : core::layer::Layer("EditorLayer"), cameraController{1280.0f / 720.0f} {}
+EditorLayer::EditorLayer() : Layer("EditorLayer"), cameraController{1280.0f / 720.0f} {}
 
 void EditorLayer::onAttach() {
 	OWL_PROFILE_FUNCTION()
@@ -28,14 +28,14 @@ void EditorLayer::onAttach() {
 
 	renderer::FramebufferSpecification specs;
 	specs.attachments = {
-			renderer::FramebufferTextureFormat::RGBA8,
-			renderer::FramebufferTextureFormat::RED_INTEGER,
+			renderer::FramebufferTextureFormat::Rgba8,
+			renderer::FramebufferTextureFormat::RedInteger,
 			renderer::FramebufferTextureFormat::Depth};
 	specs.width = 1280;
 	specs.height = 720;
 	framebuffer = renderer::Framebuffer::create(specs);
 
-	activeScene = mk_shared<scene::Scene>();
+	activeScene = mkShared<scene::Scene>();
 	editorCamera = renderer::CameraEditor(30.0f, 1.778f, 0.1f, 1000.0f);
 
 	auto iconPath = core::Application::get().getAssetDirectory() / "icons";
@@ -52,13 +52,13 @@ void EditorLayer::onDetach() {
 	activeScene.reset();
 }
 
-void EditorLayer::onUpdate(const core::Timestep &ts) {
+void EditorLayer::onUpdate(const core::Timestep &iTimeStep) {
 	OWL_PROFILE_FUNCTION()
 
 	// resize
 	auto spec = framebuffer->getSpecification();
-	auto width = static_cast<uint32_t>(viewportSize.x);
-	auto height = static_cast<uint32_t>(viewportSize.y);
+	const auto width = static_cast<uint32_t>(viewportSize.x);
+	const auto height = static_cast<uint32_t>(viewportSize.y);
 	if (width > 0 && height > 0 && (width != spec.width || height != spec.height)) {
 		framebuffer->resize(width, height);
 		cameraController.onResize(viewportSize.x, viewportSize.y);
@@ -78,14 +78,14 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 	switch (state) {
 		case State::Edit: {
 			if (viewportFocused)
-				cameraController.onUpdate(ts);
+				cameraController.onUpdate(iTimeStep);
 			if (viewportHovered)
-				editorCamera.onUpdate(ts);
-			activeScene->onUpdateEditor(ts, editorCamera);
+				editorCamera.onUpdate(iTimeStep);
+			activeScene->onUpdateEditor(iTimeStep, editorCamera);
 			break;
 		}
 		case State::Play: {
-			activeScene->onUpdateRuntime(ts);
+			activeScene->onUpdateRuntime(iTimeStep);
 			break;
 		}
 	}
@@ -93,24 +93,27 @@ void EditorLayer::onUpdate(const core::Timestep &ts) {
 	auto [mx, my] = ImGui::GetMousePos();
 	mx -= viewportBounds[0].x;
 	my -= viewportBounds[0].y;
-	glm::vec2 viewportSize_ = viewportBounds[1] - viewportBounds[0];
-	my = viewportSize_.y - my;
-	int mouseX = static_cast<int>(mx);
-	int mouseY = static_cast<int>(my);
+	const glm::vec2 viewportSizeInternal = viewportBounds[1] - viewportBounds[0];
+	my = viewportSizeInternal.y - my;
+	const int mouseX = static_cast<int>(mx);
+	const int mouseY = static_cast<int>(my);
 
-	if (mouseX >= 0 && mouseY >= 0 && mouseX < static_cast<int>(viewportSize_.x) && mouseY < static_cast<int>(viewportSize_.y)) {
+	if (mouseX >= 0 && mouseY >= 0 && mouseX < static_cast<int>(viewportSizeInternal.x) && mouseY < static_cast<int>(
+			viewportSizeInternal.y)) {
 		int pixelData = framebuffer->readPixel(1, mouseX, mouseY);
-		hoveredEntity = pixelData == -1 ? scene::Entity() : scene::Entity(static_cast<entt::entity>(pixelData), activeScene.get());
+		hoveredEntity = pixelData == -1
+							? scene::Entity()
+							: scene::Entity(static_cast<entt::entity>(pixelData), activeScene.get());
 	}
 
 	framebuffer->unbind();
 }
 
-void EditorLayer::onEvent(event::Event &event) {
-	cameraController.onEvent(event);
-	editorCamera.onEvent(event);
+void EditorLayer::onEvent(event::Event &ioEvent) {
+	cameraController.onEvent(ioEvent);
+	editorCamera.onEvent(ioEvent);
 
-	event::EventDispatcher dispatcher(event);
+	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::KeyPressedEvent>([this](auto &&PH1) {
 		return onKeyPressed(std::forward<decltype(PH1)>(PH1));
 	});
@@ -119,11 +122,11 @@ void EditorLayer::onEvent(event::Event &event) {
 	});
 }
 
-void EditorLayer::onImGuiRender(const core::Timestep &ts) {
+void EditorLayer::onImGuiRender(const core::Timestep &iTimeStep) {
 	OWL_PROFILE_FUNCTION()
 
 	// ==================================================================
-	renderStats(ts);
+	renderStats(iTimeStep);
 	//=============================================================
 	renderMenu();
 	//=============================================================
@@ -135,22 +138,22 @@ void EditorLayer::onImGuiRender(const core::Timestep &ts) {
 	renderToolbar();
 }
 
-void EditorLayer::renderStats(const core::Timestep &ts) {
+void EditorLayer::renderStats(const core::Timestep &iTimeStep) {
 	auto &tracker = debug::Tracker::get();
 	ImGui::Begin("Stats");
-	ImGui::Text("%s", fmt::format("FPS: {:.2f}", ts.getFps()).c_str());
+	ImGui::Text("%s", fmt::format("FPS: {:.2f}", iTimeStep.getFps()).c_str());
 	ImGui::Separator();
 	ImGui::Text("%s", fmt::format("Current used memory: {}",
 								  tracker.globals().allocatedMemory)
-							  .c_str());
+				.c_str());
 	ImGui::Text("%s", fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
-							  .c_str());
+				.c_str());
 	ImGui::Text(
 			"%s", fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
-						  .c_str());
+			.c_str());
 	ImGui::Text("%s", fmt::format("Deallocation calls: {}",
 								  tracker.globals().deallocationCalls)
-							  .c_str());
+				.c_str());
 	ImGui::Separator();
 	std::string name = "None";
 	if (hoveredEntity)
@@ -184,7 +187,7 @@ void EditorLayer::renderViewport() {
 
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
-	uint64_t textureID = framebuffer->getColorAttachmentRendererID();
+	uint64_t textureID = framebuffer->getColorAttachmentRendererId(0);
 	if (textureID != 0)
 		ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
 
@@ -192,9 +195,7 @@ void EditorLayer::renderViewport() {
 		if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 			const char *path = reinterpret_cast<const char *>(payload->Data);
 			std::filesystem::path scenePath = core::Application::get().getAssetDirectory() / path;
-			if (scenePath.extension() == ".owl") {
-				openScene(scenePath);
-			} else {
+			if (scenePath.extension() == ".owl") { openScene(scenePath); } else {
 				OWL_CORE_WARN("Could not load {}: not a scene file", scenePath.string())
 			}
 		}
@@ -209,12 +210,13 @@ void EditorLayer::renderViewport() {
 
 void EditorLayer::renderGizmo() {
 	// Gizmos
-	scene::Entity selectedEntity = sceneHierarchy.getSelectedEntity();
-	if (selectedEntity && gizmoType != -1) {
+
+	if (const scene::Entity selectedEntity = sceneHierarchy.getSelectedEntity(); selectedEntity && gizmoType != -1) {
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
 
-		ImGuizmo::SetRect(viewportBounds[0].x, viewportBounds[0].y, viewportBounds[1].x - viewportBounds[0].x, viewportBounds[1].y - viewportBounds[0].y);
+		ImGuizmo::SetRect(viewportBounds[0].x, viewportBounds[0].y, viewportBounds[1].x - viewportBounds[0].x,
+						  viewportBounds[1].y - viewportBounds[0].y);
 
 		// Runtime camera from entity
 		// auto cameraEntity = activeScene->getPrimaryCamera();
@@ -231,13 +233,13 @@ void EditorLayer::renderGizmo() {
 		glm::mat4 transform = tc.getTransform();
 
 		// Snapping
-		bool snap = input::Input::isKeyPressed(input::key::LeftControl);
+		const bool snap = input::Input::isKeyPressed(input::key::LeftControl);
 		float snapValue = 0.5f;// Snap to 0.5m for translation/scale
 		// Snap to 45 degrees for rotation
 		if (gizmoType == ImGuizmo::OPERATION::ROTATE)
 			snapValue = 45.0f;
 
-		float snapValues[3] = {snapValue, snapValue, snapValue};
+		const float snapValues[3] = {snapValue, snapValue, snapValue};
 
 		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
 							 static_cast<ImGuizmo::OPERATION>(gizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform),
@@ -268,7 +270,8 @@ void EditorLayer::renderMenu() {
 			if (ImGui::MenuItem("Save Scene as..", "Ctrl+Shift+S"))
 				saveSceneAs();
 			ImGui::Separator();
-			if (ImGui::MenuItem("Exit")) owl::core::Application::get().close();
+			if (ImGui::MenuItem("Exit"))
+				owl::core::Application::get().close();
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
@@ -279,18 +282,20 @@ void EditorLayer::renderToolbar() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-	auto &colors = ImGui::GetStyle().Colors;
+	const auto &colors = ImGui::GetStyle().Colors;
 	const auto &buttonHovered = colors[ImGuiCol_ButtonHovered];
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
 	const auto &buttonActive = colors[ImGuiCol_ButtonActive];
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-	ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::Begin("##toolbar", nullptr,
+				 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-	float size = ImGui::GetWindowHeight() - 4.0f;
-	shared<renderer::Texture2D> icon = state == State::Edit ? iconPlay : iconStop;
+	const float size = ImGui::GetWindowHeight() - 4.0f;
+	const shared<renderer::Texture2D> icon = state == State::Edit ? iconPlay : iconStop;
 	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(icon->getRendererID()), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0)) {
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(icon->getRendererId()), ImVec2(size, size), ImVec2(0, 0),
+						   ImVec2(1, 1), 0)) {
 		if (state == State::Edit)
 			onScenePlay();
 		else if (state == State::Play)
@@ -302,47 +307,45 @@ void EditorLayer::renderToolbar() {
 }
 
 void EditorLayer::newScene() {
-	activeScene = mk_shared<scene::Scene>();
+	activeScene = mkShared<scene::Scene>();
 	activeScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 	sceneHierarchy.setContext(activeScene);
 }
 
 void EditorLayer::openScene() {
-	auto filepath = core::utils::FileDialog::openFile("Owl Scene (*.owl)|owl\n");
-	if (!filepath.empty()) {
+	if (const auto filepath = core::utils::FileDialog::openFile("Owl Scene (*.owl)|owl\n"); !filepath.empty()) {
 		openScene(filepath);
 	}
 }
 
-void EditorLayer::openScene(const std::filesystem::path &scene) {
-	if (scene.extension().string() != ".owl") {
-		OWL_CORE_WARN("Cannot Open file {}: not a scene", scene.string())
+void EditorLayer::openScene(const std::filesystem::path &iScenePath) {
+	if (iScenePath.extension().string() != ".owl") {
+		OWL_CORE_WARN("Cannot Open file {}: not a scene", iScenePath.string())
 		return;
 	}
 	if (state != State::Edit)
 		onSceneStop();
-	auto newScene = mk_shared<scene::Scene>();
-	scene::SceneSerializer serializer(newScene);
-	if (serializer.deserialize(scene)) {
+	const auto newScene = mkShared<scene::Scene>();
+
+	if (const scene::SceneSerializer serializer(newScene); serializer.deserialize(iScenePath)) {
 		editorScene = newScene;
 		editorScene->onViewportResize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 		sceneHierarchy.setContext(editorScene);
 		activeScene = editorScene;
-		currentScenePath = scene;
+		currentScenePath = iScenePath;
 	}
 }
 
 void EditorLayer::saveSceneAs() {
-	auto filepath = core::utils::FileDialog::saveFile("Owl Scene (*.owl)|owl\n");
-	if (!filepath.empty()) {
+	if (const auto filepath = core::utils::FileDialog::saveFile("Owl Scene (*.owl)|owl\n"); !filepath.empty()) {
 		saveSceneAs(filepath);
 	}
 }
 
-void EditorLayer::saveSceneAs(const std::filesystem::path &scene) {
-	scene::SceneSerializer serializer(activeScene);
-	serializer.serialize(scene);
-	currentScenePath = scene;
+void EditorLayer::saveSceneAs(const std::filesystem::path &iScenePath) {
+	const scene::SceneSerializer serializer(activeScene);
+	serializer.serialize(iScenePath);
+	currentScenePath = iScenePath;
 }
 
 void EditorLayer::saveCurrentScene() {
@@ -352,14 +355,16 @@ void EditorLayer::saveCurrentScene() {
 		saveSceneAs(currentScenePath);
 }
 
-bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
+bool EditorLayer::onKeyPressed(const event::KeyPressedEvent &ioEvent) {
 	// Shortcuts
-	if (e.getRepeatCount() > 0)
+	if (ioEvent.getRepeatCount() > 0)
 		return false;
 
-	bool control = input::Input::isKeyPressed(input::key::LeftControl) || input::Input::isKeyPressed(input::key::RightControl);
-	bool shift = input::Input::isKeyPressed(input::key::LeftShift) || input::Input::isKeyPressed(input::key::RightShift);
-	switch (e.getKeyCode()) {
+	const bool control = input::Input::isKeyPressed(input::key::LeftControl) || input::Input::isKeyPressed(
+								 input::key::RightControl);
+	const bool shift = input::Input::isKeyPressed(input::key::LeftShift) ||
+					   input::Input::isKeyPressed(input::key::RightShift);
+	switch (ioEvent.getKeyCode()) {
 		case input::key::N: {
 			if (control)
 				newScene();
@@ -379,7 +384,7 @@ bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
 			}
 			break;
 		}
-			// Scene Commands
+		// Scene Commands
 		case input::key::D: {
 			if (control)
 				onDuplicateEntity();
@@ -410,8 +415,8 @@ bool EditorLayer::onKeyPressed(event::KeyPressedEvent &e) {
 	return false;
 }
 
-bool EditorLayer::onMouseButtonPressed(event::MouseButtonPressedEvent &e) {
-	if (e.GetMouseButton() == input::mouse::ButtonLeft) {
+bool EditorLayer::onMouseButtonPressed(const event::MouseButtonPressedEvent &ioEvent) {
+	if (ioEvent.getMouseButton() == input::mouse::ButtonLeft) {
 		if (viewportHovered && !ImGuizmo::IsOver() && !input::Input::isKeyPressed(input::key::LeftAlt))
 			sceneHierarchy.setSelectedEntity(hoveredEntity);
 	}
@@ -433,12 +438,11 @@ void EditorLayer::onSceneStop() {
 	sceneHierarchy.setContext(activeScene);
 }
 
-void EditorLayer::onDuplicateEntity() {
+void EditorLayer::onDuplicateEntity() const {
 	if (state != State::Edit)
 		return;
 
-	scene::Entity selectedEntity = sceneHierarchy.getSelectedEntity();
-	if (selectedEntity)
+	if (const scene::Entity selectedEntity = sceneHierarchy.getSelectedEntity(); selectedEntity)
 		editorScene->duplicateEntity(selectedEntity);
 }
 

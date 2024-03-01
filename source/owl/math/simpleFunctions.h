@@ -12,58 +12,50 @@
  * @brief Namespace for mathematical functions.
  */
 namespace owl::math {
-
 /**
  * @brief Simple clamp function with no checks.
- * @tparam data Data's type to clamp (must be order-able).
- * @param input Input value.
- * @param minValue min value.
- * @param maxValue max value.
+ * @tparam Data Data's type to clamp (must be order-able).
+ * @param[in] iValue Input value.
+ * @param[in] iMinValue min value.
+ * @param[in] iMaxValue max value.
  * @return Clamped value.
  */
-template<typename data>
-constexpr data clamp(const data &input, const data &minValue,
-					 const data &maxValue) {
-	return input < minValue ? minValue : input > maxValue ? maxValue
-														  : input;
+template <typename Data>
+constexpr Data clamp(const Data& iValue, const Data& iMinValue,
+                     const Data& iMaxValue) {
+ return iValue < iMinValue ? iMinValue : iValue > iMaxValue ? iMaxValue : iValue;
 }
 
 /**
  * @brief Clamp function with mix/max ordering.
- * @tparam data Data's type to clamp (must be order-able).
- * @param input Input value.
- * @param minValue min value.
- * @param maxValue max value.
+ * @tparam Data Data's type to clamp (must be order-able).
+ * @param[in] iValue Input value.
+ * @param[in] iMinValue min value.
+ * @param[in] iMaxValue max value.
  * @return Clamped value.
  */
-template<typename data>
-constexpr data clampSafe(const data &input, data minValue, data maxValue) {
-	if (maxValue < minValue)
-		std::swap(minValue, maxValue);
-	return input < minValue ? minValue : input > maxValue ? maxValue
-														  : input;
+template <typename Data>
+constexpr Data clampSafe(const Data& iValue, Data iMinValue, Data iMaxValue) {
+ if (iMaxValue < iMinValue)
+  std::swap(iMinValue, iMaxValue);
+ return iValue < iMinValue ? iMinValue : iValue > iMaxValue ? iMaxValue : iValue;
 }
 
 /**
  * @brief Heaviside function.
- * @tparam data Data's type.
- * @param input Value to check.
+ * @tparam Data Data's type.
+ * @param[in] iValue Value to check.
  * @return 1 if input positive, else return 0.
  */
-template<typename data>
-constexpr data heaviside(const data &input) {
-	return input > 0 ? data{1} : data{};
-}
+template <typename Data>
+constexpr Data heaviside(const Data& iValue) { return iValue > 0 ? Data{1} : Data{}; }
 
 /**
  * @brief Sign function.
- * @tparam data Data's type.
- * @param input Value to check.
+ * @tparam Data Data's type.
+ * @param[in] iValue Value to check.
  * @return 0 if input is 0 1 if input positive, else return -1.
  */
-template<typename data>
-constexpr data sign(const data &input) {
-	return input > 0 ? data{1} : (input < 0 ? data{-1} : 0);
-}
-
-}// namespace owl::math
+template <typename Data>
+constexpr Data sign(const Data& iValue) { return iValue > 0 ? Data{1} : (iValue < 0 ? Data{-1} : 0); }
+} // namespace owl::math

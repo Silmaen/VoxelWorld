@@ -11,18 +11,14 @@
 
 namespace owl::renderer {
 
-uniq<RenderAPI> RenderCommand::renderAPI = nullptr;
+uniq<RenderAPI> RenderCommand::mu_renderAPI = nullptr;
 
-void RenderCommand::create(const RenderAPI::Type &type) {
-	renderAPI = RenderAPI::create(type);
-}
+void RenderCommand::create(const RenderAPI::Type &iType) { mu_renderAPI = RenderAPI::create(iType); }
 
 RenderAPI::State RenderCommand::getState() {
-	if (renderAPI)
-		return renderAPI->getState();
+	if (mu_renderAPI)
+		return mu_renderAPI->getState();
 	return RenderAPI::State::Error;
 }
-
-RenderCommand::~RenderCommand() = default;
 
 }// namespace owl::renderer

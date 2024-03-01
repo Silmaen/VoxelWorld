@@ -48,7 +48,7 @@ public:
 
 	/**
 	 * @brief Set the camera by its ID.
-	 * @param id Id of the camera.
+	 * @param[in] id Id of the camera.
 	 *
 	 * @note If the Camera does not match an id of the list, id will be set to 0.
 	 */

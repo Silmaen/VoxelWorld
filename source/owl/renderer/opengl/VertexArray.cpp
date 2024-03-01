@@ -13,8 +13,8 @@
 namespace owl::renderer::opengl {
 
 namespace utils {
-static GLenum toGLBaseType(owl::renderer::ShaderDataType type) {
-	switch (type) {
+static GLenum toGlBaseType(const ShaderDataType &iType) {
+	switch (iType) {
 		case ShaderDataType::Float:
 		case ShaderDataType::Float2:
 		case ShaderDataType::Float3:
@@ -41,19 +41,19 @@ static GLenum toGLBaseType(owl::renderer::ShaderDataType type) {
 VertexArray::VertexArray() {
 	OWL_PROFILE_FUNCTION()
 
-	glCreateVertexArrays(1, &rendererID);
+	glCreateVertexArrays(1, &m_rendererId);
 }
 
 VertexArray::~VertexArray() {
 	OWL_PROFILE_FUNCTION()
 
-	glDeleteVertexArrays(1, &rendererID);
+	glDeleteVertexArrays(1, &m_rendererId);
 }
 
 void VertexArray::bind() const {
 	OWL_PROFILE_FUNCTION()
 
-	glBindVertexArray(rendererID);
+	glBindVertexArray(m_rendererId);
 }
 
 void VertexArray::unbind() const {
@@ -62,31 +62,31 @@ void VertexArray::unbind() const {
 	glBindVertexArray(0);
 }
 
-void VertexArray::addVertexBuffer(const VertexArray::vertexBuf &vertexBuffer) {
+void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
 	OWL_PROFILE_FUNCTION()
 
-	OWL_CORE_ASSERT(!vertexBuffer->getLayout().getElements().empty(), "Vertex Buffer has no layout!")
+	OWL_CORE_ASSERT(!iVertexBuffer->getLayout().getElements().empty(), "Vertex Buffer has no layout!")
 
-	glBindVertexArray(rendererID);
-	vertexBuffer->bind();
+	glBindVertexArray(m_rendererId);
+	iVertexBuffer->bind();
 
-	const auto &layout = vertexBuffer->getLayout();
+	const auto &layout = iVertexBuffer->getLayout();
 	for (const auto &element: layout) {
 		const auto count = static_cast<int32_t>(element.getComponentCount());
-		const auto type = utils::toGLBaseType(element.type);
+		const auto type = utils::toGlBaseType(element.type);
 		const auto stride = static_cast<int>(layout.getStride());
 		switch (element.type) {
 			case ShaderDataType::Float:
 			case ShaderDataType::Float2:
 			case ShaderDataType::Float3:
 			case ShaderDataType::Float4: {
-				glEnableVertexAttribArray(vertexBufferIndex);
-				glVertexAttribPointer(vertexBufferIndex,
+				glEnableVertexAttribArray(m_vertexBufferIndex);
+				glVertexAttribPointer(m_vertexBufferIndex,
 									  count, type,
 									  element.normalized ? GL_TRUE : GL_FALSE,
 									  stride,
 									  reinterpret_cast<const void *>(element.offset));
-				vertexBufferIndex++;
+				m_vertexBufferIndex++;
 				break;
 			}
 			case ShaderDataType::Int:
@@ -94,42 +94,43 @@ void VertexArray::addVertexBuffer(const VertexArray::vertexBuf &vertexBuffer) {
 			case ShaderDataType::Int3:
 			case ShaderDataType::Int4:
 			case ShaderDataType::Bool: {
-				glEnableVertexAttribArray(vertexBufferIndex);
-				glVertexAttribIPointer(vertexBufferIndex,
+				glEnableVertexAttribArray(m_vertexBufferIndex);
+				glVertexAttribIPointer(m_vertexBufferIndex,
 									   count, type, stride,
 									   reinterpret_cast<const void *>(element.offset));
-				vertexBufferIndex++;
+				m_vertexBufferIndex++;
 				break;
 			}
 			case ShaderDataType::Mat3:
 			case ShaderDataType::Mat4: {
 				for (int32_t i = 0; i < count; i++) {
-					glEnableVertexAttribArray(vertexBufferIndex);
-					glVertexAttribPointer(vertexBufferIndex,
+					glEnableVertexAttribArray(m_vertexBufferIndex);
+					glVertexAttribPointer(m_vertexBufferIndex,
 										  count, type,
 										  element.normalized ? GL_TRUE : GL_FALSE,
 										  stride,
-										  reinterpret_cast<const void *>(element.offset + sizeof(float) * static_cast<uint32_t>(count * i)));
-					glVertexAttribDivisor(vertexBufferIndex, 1);
-					vertexBufferIndex++;
+										  reinterpret_cast<const void *>(
+											  element.offset + sizeof(float) * static_cast<uint32_t>(count * i)));
+					glVertexAttribDivisor(m_vertexBufferIndex, 1);
+					m_vertexBufferIndex++;
 				}
 				break;
 			}
 			case ShaderDataType::None:
 				OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
-				break;
+			break;
 		}
 	}
-	vertexBuffers.push_back(vertexBuffer);
+	m_vertexBuffers.push_back(iVertexBuffer);
 }
 
-void VertexArray::setIndexBuffer(const VertexArray::indexBuf &indexBuffer_) {
+void VertexArray::setIndexBuffer(const indexBuf &iIndexBuffer) {
 	OWL_PROFILE_FUNCTION()
 
-	glBindVertexArray(rendererID);
-	indexBuffer_->bind();
+	glBindVertexArray(m_rendererId);
+	iIndexBuffer->bind();
 
-	indexBuffer = indexBuffer_;
+	m_indexBuffer = iIndexBuffer;
 }
 
 

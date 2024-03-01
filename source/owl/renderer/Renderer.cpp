@@ -12,51 +12,50 @@
 
 namespace owl::renderer {
 
-Renderer::State Renderer::internalState = Renderer::State::Created;
-shared<Renderer::SceneData> Renderer::sceneData = nullptr;
-shared<ShaderLibrary> Renderer::shaderLibrary = nullptr;
-shared<TextureLibrary> Renderer::textureLibrary = nullptr;
+Renderer::State Renderer::m_internalState = Renderer::State::Created;
+shared<Renderer::SceneData> Renderer::m_sceneData = nullptr;
+shared<ShaderLibrary> Renderer::m_shaderLibrary = nullptr;
+shared<TextureLibrary> Renderer::m_textureLibrary = nullptr;
 
 void Renderer::init() {
 	OWL_PROFILE_FUNCTION()
 
-	sceneData = mk_shared<SceneData>();
-	shaderLibrary = mk_shared<ShaderLibrary>();
-	textureLibrary = mk_shared<TextureLibrary>();
+	m_sceneData = mkShared<SceneData>();
+	m_shaderLibrary = mkShared<ShaderLibrary>();
+	m_textureLibrary = mkShared<TextureLibrary>();
 
 	RenderCommand::init();
 	if (RenderCommand::getState() != RenderAPI::State::Ready) {
-		internalState = State::Error;
+		m_internalState = State::Error;
 		return;
 	}
 
 	Renderer2D::init();
 
-	internalState = State::Running;
+	m_internalState = State::Running;
 }
 
 void Renderer::shutdown() {
 	Renderer2D::shutdown();
 	reset();
-	internalState = State::Stopped;
+	m_internalState = State::Stopped;
 }
 
 void Renderer::reset() {
-	internalState = Renderer::State::Created;
-	sceneData.reset();
-	shaderLibrary.reset();
-	textureLibrary.reset();
+	m_internalState = State::Created;
+	m_sceneData.reset();
+	m_shaderLibrary.reset();
+	m_textureLibrary.reset();
 }
 
-void Renderer::beginScene(const CameraOrtho &camera) {
-	sceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
+void Renderer::beginScene(const CameraOrtho &iCamera) {
+	m_sceneData->viewProjectionMatrix = iCamera.getViewProjectionMatrix();
 }
 
-void Renderer::endScene() {
-}
+void Renderer::endScene() {}
 
-void Renderer::onWindowResized(uint32_t width, uint32_t height) {
-	RenderCommand::setViewport(0, 0, width, height);
+void Renderer::onWindowResized(const uint32_t iWidth, const uint32_t iHeight) {
+	RenderCommand::setViewport(0, 0, iWidth, iHeight);
 }
 
 }// namespace owl::renderer

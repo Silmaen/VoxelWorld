@@ -12,32 +12,26 @@
 
 namespace owl::renderer::opengl_legacy {
 
-Framebuffer::Framebuffer(FramebufferSpecification spec) : specs{std::move(spec)} {
+Framebuffer::Framebuffer(FramebufferSpecification iSpec) : m_specs{std::move(iSpec)} {
 	OWL_CORE_ERROR("Legacy OpenGL has no frame buffer support.")
-	rendererID = 0;
+	m_rendererId = 0;
 }
 
 Framebuffer::~Framebuffer() = default;
 
-void Framebuffer::invalidate() {
+void Framebuffer::invalidate() {}
+
+void Framebuffer::bind() {}
+
+void Framebuffer::unbind() {}
+
+void Framebuffer::resize(const uint32_t iWidth, const uint32_t iHeight) {
+	m_specs.width = iWidth;
+	m_specs.height = iHeight;
 }
 
-void Framebuffer::bind() {
-}
+int Framebuffer::readPixel(uint32_t, int, int) { return 0; }
 
-void Framebuffer::unbind() {
-}
-
-void Framebuffer::resize(uint32_t width, uint32_t height) {
-	specs.width = width;
-	specs.height = height;
-}
-
-int Framebuffer::readPixel(uint32_t, int, int) {
-	return 0;
-}
-
-void Framebuffer::clearAttachment(uint32_t, int) {
-}
+void Framebuffer::clearAttachment(uint32_t, int) {}
 
 }// namespace owl::renderer::opengl_legacy

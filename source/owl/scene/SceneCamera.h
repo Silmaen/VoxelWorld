@@ -16,7 +16,7 @@ namespace owl::scene {
 /**
  * @brief Class SceneCamera.
  */
-class OWL_API SceneCamera : public renderer::Camera {
+class OWL_API SceneCamera final : public renderer::Camera {
 public:
 	/**
 	 * @brief Default constructor.
@@ -34,39 +34,39 @@ public:
 
 	/**
 	 * @brief Defines otho-graphic limits.
-	 * @param size Size of the view.
-	 * @param nearClip Near clip distance.
-	 * @param farClip Far clip distance.
+	 * @param[in] iSize Size of the view.
+	 * @param[in] iNearClip Near clip distance.
+	 * @param[in] iFarClip Far clip distance.
 	 */
-	void setOrthographic(float size, float nearClip, float farClip);
+	void setOrthographic(float iSize, float iNearClip, float iFarClip);
 
 	/**
 	 * @brief Defines perspective parameters.
-	 * @param verticalFOV vertical Field of view.
-	 * @param nearClip Near distance clipping.
-	 * @param farClip Far distance clipping.
+	 * @param[in] iVerticalFov vertical Field of view.
+	 * @param[in] iNearClip Near distance clipping.
+	 * @param[in] iFarClip Far distance clipping.
 	 */
-	void setPerspective(float verticalFOV, float nearClip, float farClip);
+	void setPerspective(float iVerticalFov, float iNearClip, float iFarClip);
 
 	/**
 	 * @brief Defines the viewport.
-	 * @param width Viewport's width.
-	 * @param height Viewport's height.
+	 * @param[in] iWidth Viewport's width.
+	 * @param[in] iHeight Viewport's height.
 	 */
-	void setViewportSize(uint32_t width, uint32_t height);
+	void setViewportSize(uint32_t iWidth, uint32_t iHeight);
 
 	/**
 	 * @brief Get actual orthographic size.
 	 * @return The orthographic size.
 	 */
-	[[nodiscard]] float getOrthographicSize() const { return orthographicSize; }
+	[[nodiscard]] float getOrthographicSize() const { return m_orthographicSize; }
 
 	/**
 	 * @brief Define the orthographic size.
-	 * @param size The new size.
+	 * @param[in] iSize The new size.
 	 */
-	void setOrthographicSize(float size) {
-		orthographicSize = size;
+	void setOrthographicSize(const float iSize) {
+		m_orthographicSize = iSize;
 		recalculateProjection();
 	}
 
@@ -82,14 +82,14 @@ public:
 	 * @brief Get the projection's type.
 	 * @return The projection's type.
 	 */
-	[[nodiscard]] ProjectionType getProjectionType() const { return projectionType; }
+	[[nodiscard]] ProjectionType getProjectionType() const { return m_projectionType; }
 
 	/**
 	 * @brief Defines the projection's type.
-	 * @param type New projection's type.
+	 * @param[in] iType New projection's type.
 	 */
-	void setProjectionType(ProjectionType type) {
-		projectionType = type;
+	void setProjectionType(const ProjectionType iType) {
+		m_projectionType = iType;
 		recalculateProjection();
 	}
 
@@ -97,14 +97,14 @@ public:
 	 * @brief Get the orthographic near clip distance.
 	 * @return The orthographic near clip distance.
 	 */
-	[[nodiscard]] float getOrthographicNearClip() const { return orthographicNear; }
+	[[nodiscard]] float getOrthographicNearClip() const { return m_orthographicNear; }
 
 	/**
 	 * @brief Defines orthographic near clip distance.
-	 * @param nearClip New distance for near clipping.
+	 * @param[in] iNearClip New distance for near clipping.
 	 */
-	void setOrthographicNearClip(float nearClip) {
-		orthographicNear = nearClip;
+	void setOrthographicNearClip(const float iNearClip) {
+		m_orthographicNear = iNearClip;
 		recalculateProjection();
 	}
 
@@ -112,14 +112,14 @@ public:
 	 * @brief Get the orthographic far clip distance.
 	 * @return The orthographic far clip distance.
 	 */
-	[[nodiscard]] float getOrthographicFarClip() const { return orthographicFar; }
+	[[nodiscard]] float getOrthographicFarClip() const { return m_orthographicFar; }
 
 	/**
 	 * @brief Defines orthographic far clip distance.
-	 * @param farClip New distance for far clipping.
+	 * @param[in] iFarClip New distance for far clipping.
 	 */
-	void setOrthographicFarClip(float farClip) {
-		orthographicFar = farClip;
+	void setOrthographicFarClip(const float iFarClip) {
+		m_orthographicFar = iFarClip;
 		recalculateProjection();
 	}
 
@@ -127,14 +127,14 @@ public:
 	 * @brief Get the perspective vertical field of vew.
 	 * @return The perspective vertical field of view.
 	 */
-	[[nodiscard]] float getPerspectiveVerticalFOV() const { return perspectiveFOV; }
+	[[nodiscard]] float getPerspectiveVerticalFOV() const { return m_perspectiveFOV; }
 
 	/**
 	 * @brief Defines perspective vertical field of view.
-	 * @param verticalFov New vertical field of view.
+	 * @param[in] iVerticalFov New vertical field of view.
 	 */
-	void setPerspectiveVerticalFOV(float verticalFov) {
-		perspectiveFOV = verticalFov;
+	void setPerspectiveVerticalFOV(const float iVerticalFov) {
+		m_perspectiveFOV = iVerticalFov;
 		recalculateProjection();
 	}
 
@@ -142,14 +142,14 @@ public:
 	 * @brief Get the perspective near clip distance.
 	 * @return The perspective near clip distance.
 	 */
-	[[nodiscard]] float getPerspectiveNearClip() const { return perspectiveNear; }
+	[[nodiscard]] float getPerspectiveNearClip() const { return m_perspectiveNear; }
 
 	/**
 	 * @brief Defines perspective near clip distance.
-	 * @param nearClip New distance for near clipping.
+	 * @param[in] iNearClip New distance for near clipping.
 	 */
-	void setPerspectiveNearClip(float nearClip) {
-		perspectiveNear = nearClip;
+	void setPerspectiveNearClip(const float iNearClip) {
+		m_perspectiveNear = iNearClip;
 		recalculateProjection();
 	}
 
@@ -157,14 +157,14 @@ public:
 	 * @brief Get the perspective far clip distance.
 	 * @return The perspective far clip distance.
 	 */
-	[[nodiscard]] float getPerspectiveFarClip() const { return perspectiveFar; }
+	[[nodiscard]] float getPerspectiveFarClip() const { return m_perspectiveFar; }
 
 	/**
 	 * @brief Defines perspective far clip distance.
-	 * @param farClip New distance for far clipping.
+	 * @param[in] iFarClip New distance for far clipping.
 	 */
-	void setPerspectiveFarClip(float farClip) {
-		perspectiveFar = farClip;
+	void setPerspectiveFarClip(const float iFarClip) {
+		m_perspectiveFar = iFarClip;
 		recalculateProjection();
 	}
 
@@ -174,22 +174,22 @@ private:
 	 */
 	void recalculateProjection();
 	/// Actual projection's type.
-	ProjectionType projectionType = ProjectionType::Orthographic;
+	ProjectionType m_projectionType = ProjectionType::Orthographic;
 
 	/// Perspective field of view.
-	float perspectiveFOV = glm::radians(45.0f);
+	float m_perspectiveFOV = glm::radians(45.0f);
 	/// Perspective near clip distance.
-	float perspectiveNear = 0.01f;
+	float m_perspectiveNear = 0.01f;
 	/// Perspective far clip distance.
-	float perspectiveFar = 1000.0f;
+	float m_perspectiveFar = 1000.0f;
 	/// Orthographic size.
-	float orthographicSize = 10.0f;
+	float m_orthographicSize = 10.0f;
 	/// Orthographic near clip distance.
-	float orthographicNear = -1.0f;
+	float m_orthographicNear = -1.0f;
 	/// Orthographic far clip distance.
-	float orthographicFar = 1.0f;
+	float m_orthographicFar = 1.0f;
 	/// Aspect ratio.
-	float aspectRatio = 0.0f;
+	float m_aspectRatio = 0.0f;
 };
 
 }// namespace owl::scene

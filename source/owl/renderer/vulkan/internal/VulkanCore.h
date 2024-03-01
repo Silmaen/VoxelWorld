@@ -27,31 +27,31 @@ struct VulkanConfiguraton {
 
 struct InstanceInformations {
 	InstanceInformations();
-	[[nodiscard]] bool hasMinimalVersion(uint8_t major, uint8_t minor, uint8_t patch = 0) const;
+	[[nodiscard]] bool hasMinimalVersion(uint8_t iMajor, uint8_t iMinor, uint8_t iPatch = 0) const;
 	/**
 	 * @brief Check if a layer is available on this device.
-	 * @param layer The layer name to test.
+	 * @param[in] iLayer The layer name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasLayer(const std::string &layer) const;
+	[[nodiscard]] bool hasLayer(const std::string &iLayer) const;
 	/**
 	 * @brief Check if an extension is available on this device.
-	 * @param extension The extension name to test.
+	 * @param[in] iExtension The extension name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasExtension(const std::string &extension) const;
+	[[nodiscard]] bool hasExtension(const std::string &iExtension) const;
 	/**
 	 * @brief Check if some layers are available on this device.
-	 * @param layers The layer's names to test.
+	 * @param[in] iLayers The layer's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasLayers(const std::vector<std::string> &layers) const;
+	[[nodiscard]] bool hasLayers(const std::vector<std::string> &iLayers) const;
 	/**
 	 * @brief Check if some extensions are available on this device.
-	 * @param extensions The extension's names to test.
+	 * @param[in] iExtensions The extension's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasExtensions(const std::vector<std::string> &extensions) const;
+	[[nodiscard]] bool hasExtensions(const std::vector<std::string> &iExtensions) const;
 	uint32_t version = 0;
 	std::vector<std::string> supportedExtensions{};
 	std::vector<std::string> supportedLayers{};
@@ -83,9 +83,9 @@ public:
 
 	/**
 	 * @brief Initialize the vulkan core.
-	 * @param configuration The Given configuratio.
+	 * @param[in] iConfiguration The Given configuratio.
 	 */
-	void init(const VulkanConfiguraton &configuration);
+	void init(const VulkanConfiguraton &iConfiguration);
 
 	/**
 	 * @brief Release the vulkan core.
@@ -102,19 +102,19 @@ public:
 	 * @brief Access to the vulkan instance.
 	 * @return The vulkan instance.
 	 */
-	[[nodiscard]] VkInstance getInstance() const { return instance; }
+	[[nodiscard]] VkInstance getInstance() const { return m_instance; }
 
 	/**
 	 * @brief Access to the physical device.
 	 * @return The physical device.
 	 */
-	[[nodiscard]] VkPhysicalDevice getPhysicalDevice() const { return physicalDevice; }
+	[[nodiscard]] VkPhysicalDevice getPhysicalDevice() const { return m_physicalDevice; }
 
 	/**
 	 * @brief Access to the logical device.
 	 * @return The logical device.
 	 */
-	[[nodiscard]] VkDevice getLogicalDevice() const { return logicalDevice; }
+	[[nodiscard]] VkDevice getLogicalDevice() const { return m_logicalDevice; }
 
 	/**
 	 * @brief The different core states
@@ -132,24 +132,24 @@ public:
 	 * @brief Access to the actual state of the core.
 	 * @return The state of the core.
 	 */
-	[[nodiscard]] const State &getState() const { return state; }
+	[[nodiscard]] const State &getState() const { return m_state; }
 
 	/**
 	 * @brief Get the graphic queue index.
 	 * @return The graph queue index.
 	 */
-	[[nodiscard]] uint32_t getGraphQueueFamilyIndex() const { return phyProps.graphicQueueIndex; }
+	[[nodiscard]] uint32_t getGraphQueueFamilyIndex() const { return m_phyProps.graphicQueueIndex; }
 
 	/**
 	 * @brief Access to the graphic queue.
 	 * @return The graphic queue.
 	 */
-	[[nodiscard]] VkQueue getGraphicQueue() const { return graphicQueue; }
+	[[nodiscard]] VkQueue getGraphicQueue() const { return m_graphicQueue; }
 	/**
 	 * @brief Access to the present queue.
 	 * @return The present queue.
 	 */
-	[[nodiscard]] VkQueue getPresentQueue() const { return presentQueue; }
+	[[nodiscard]] VkQueue getPresentQueue() const { return m_presentQueue; }
 	/**
 	 * @brief Get the current Extent.
 	 * @return The current Extent.
@@ -193,11 +193,11 @@ public:
 
 	/**
 	 * @brief Search for a memory type index.
-	 * @param typeFilter Filter on type.
-	 * @param memProperties Memory properties.
+	 * @param[in] iTypeFilter Filter on type.
+	 * @param[in] iMemProperties Memory properties.
 	 * @return The memory type index.
 	 */
-	[[nodiscard]] uint32_t findMemoryTypeIndex(uint32_t typeFilter, VkMemoryPropertyFlags memProperties) const;
+	[[nodiscard]] uint32_t findMemoryTypeIndex(uint32_t iTypeFilter, VkMemoryPropertyFlags iMemProperties) const;
 
 private:
 	/**
@@ -206,30 +206,30 @@ private:
 	VulkanCore();
 
 	/// Vulkan requested configuation.
-	VulkanConfiguraton config{};
+	VulkanConfiguraton m_config{};
 
 	/// Vulkan instance.
-	VkInstance instance = nullptr;
+	VkInstance m_instance = nullptr;
 	/// Vulkan selected physical device.
-	VkPhysicalDevice physicalDevice = nullptr;
+	VkPhysicalDevice m_physicalDevice = nullptr;
 	/// Vulkan logical device.
-	VkDevice logicalDevice = nullptr;
+	VkDevice m_logicalDevice = nullptr;
 	/// Debug messenger.
-	VkDebugUtilsMessengerEXT debugUtilsMessenger{};
+	VkDebugUtilsMessengerEXT m_debugUtilsMessenger{};
 
 	/// Information about the instance.
-	InstanceInformations instanceInfo{};
+	InstanceInformations m_instanceInfo{};
 	/// If  validation layer are enabled.
-	bool hasValidation = false;
+	bool m_hasValidation = false;
 	/// The internal state.
-	State state = State::Created;
+	State m_state = State::Created;
 	/// Save of the current physical device properties.
-	PhysicalDeviceCapabilities phyProps;
+	PhysicalDeviceCapabilities m_phyProps;
 
 	/// The graphic queue.
-	VkQueue graphicQueue = nullptr;
+	VkQueue m_graphicQueue = nullptr;
 	/// The present queue.
-	VkQueue presentQueue = nullptr;
+	VkQueue m_presentQueue = nullptr;
 
 	void createInstance();
 	void selectPhysicalDevice();

@@ -10,24 +10,23 @@
 #include "../UniformBuffer.h"
 
 namespace owl::renderer::opengl_legacy {
-
 /**
  * @brief Class UniformBuffer.
  */
 class UniformBuffer final : public ::owl::renderer::UniformBuffer {
 public:
 	UniformBuffer() = delete;
-	UniformBuffer(const UniformBuffer &) = default;
-	UniformBuffer(UniformBuffer &&) = default;
-	UniformBuffer &operator=(const UniformBuffer &) = default;
-	UniformBuffer &operator=(UniformBuffer &&) = default;
+	UniformBuffer(const UniformBuffer&) = default;
+	UniformBuffer(UniformBuffer&&) = default;
+	UniformBuffer& operator=(const UniformBuffer&) = default;
+	UniformBuffer& operator=(UniformBuffer&&) = default;
 
 	/**
 	 * @brief Constructor.
-	 * @param size Buffer's size.
-	 * @param binding Buffer's binding.
+	 * @param[in] iSize Buffer's size.
+	 * @param[in] iBinding Buffer's binding.
 	 */
-	UniformBuffer(uint32_t size, uint32_t binding);
+	UniformBuffer(uint32_t iSize, uint32_t iBinding);
 	/**
 	 * @brief Destructor.
 	 */
@@ -40,20 +39,19 @@ public:
 
 	/**
 	 * @brief Push Data to GPU.
-	 * @param data The data.
-	 * @param size The data size.
-	 * @param offset The offset to start.
+	 * @param[in] iData The data.
+	 * @param[in] iSize The data size.
+	 * @param[in] iOffset The offset to start.
 	 */
-	void setData(const void *data, uint32_t size, uint32_t offset = 0) override;
+	void setData(const void* iData, uint32_t iSize, uint32_t iOffset) override;
 
-	[[nodiscard]] uint32_t getBinding() const { return internalBinding; }
+	[[nodiscard]] uint32_t getBinding() const { return m_internalBinding; }
 
-	[[nodiscard]] const char *getData() const { return internalData.data(); }
+	[[nodiscard]] const char* getData() const { return m_internalData.data(); }
 
 private:
 	/// The binding number.
-	uint32_t internalBinding = 0;
-	std::vector<char> internalData;
+	uint32_t m_internalBinding = 0;
+	std::vector<char> m_internalData;
 };
-
-}// namespace owl::renderer::opengl_legacy
+} // namespace owl::renderer::opengl_legacy

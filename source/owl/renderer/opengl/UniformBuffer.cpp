@@ -12,18 +12,18 @@
 
 namespace owl::renderer::opengl {
 
-UniformBuffer::UniformBuffer(uint32_t size, uint32_t binding) {
-	glCreateBuffers(1, &rendererId);
-	glNamedBufferData(rendererId, size, nullptr, GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_UNIFORM_BUFFER, binding, rendererId);
+UniformBuffer::UniformBuffer(const uint32_t iSize, const uint32_t iBinding) {
+	glCreateBuffers(1, &m_rendererId);
+	glNamedBufferData(m_rendererId, iSize, nullptr, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_UNIFORM_BUFFER, iBinding, m_rendererId);
 }
 
 UniformBuffer::~UniformBuffer() {
-	glDeleteBuffers(1, &rendererId);
+	glDeleteBuffers(1, &m_rendererId);
 }
 
-void UniformBuffer::setData(const void *data, uint32_t size, uint32_t offset) {
-	glNamedBufferSubData(rendererId, offset, size, data);
+void UniformBuffer::setData(const void *iData, const uint32_t iSize, const uint32_t iOffset) {
+	glNamedBufferSubData(m_rendererId, iOffset, iSize, iData);
 }
 
 

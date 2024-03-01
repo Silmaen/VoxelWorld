@@ -15,26 +15,27 @@
 
 namespace owl::renderer {
 
-RenderAPI::Type RenderAPI::type = RenderAPI::Type::Null;
-RenderAPI::State RenderAPI::state = RenderAPI::State::Created;
+RenderAPI::Type RenderAPI::m_type = Type::Null;
+RenderAPI::State RenderAPI::m_state = State::Created;
 
-uniq<RenderAPI> RenderAPI::create(const RenderAPI::Type &creationType) {
-	state = RenderAPI::State::Created;
-	type = creationType;
-	switch (type) {
-		case RenderAPI::Type::Null:
-			return mk_uniq<null::RenderAPI>();
-		case RenderAPI::Type::OpenGL:
-			return mk_uniq<opengl::RenderAPI>();
-		case RenderAPI::Type::OpenglLegacy:
-			return mk_uniq<opengl_legacy::RenderAPI>();
-		case RenderAPI::Type::Vulkan:
-			return mk_uniq<vulkan::RenderAPI>();
+uniq<RenderAPI> RenderAPI::create(const RenderAPI::Type &iType) {
+	m_state = State::Created;
+	m_type = iType;
+	switch (m_type) {
+		case Type::Null:
+			return mkUniq<null::RenderAPI>();
+		case Type::OpenGL:
+			return mkUniq<opengl::RenderAPI>();
+		case Type::OpenglLegacy:
+			return mkUniq<opengl_legacy::RenderAPI>();
+		case Type::Vulkan:
+			return mkUniq<vulkan::RenderAPI>();
 	}
 
 	OWL_CORE_ERROR("Unknown RendererAPI!")
 	return nullptr;
 }
+
 RenderAPI::~RenderAPI() = default;
 
 }// namespace owl::renderer
