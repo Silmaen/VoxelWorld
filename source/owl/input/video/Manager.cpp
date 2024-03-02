@@ -27,7 +27,7 @@ void Manager::updateDeviceList(const bool iReset) {
 #if defined(OWL_PLATFORM_WINDOWS)
 	windows::updateList(m_devices);
 #elif defined(OWL_PLATFORM_LINUX)
-	linux64::updateList(devices);
+	linux64::updateList(m_devices);
 #else
 #error "Unsupported platform"
 #endif
@@ -36,8 +36,7 @@ void Manager::updateDeviceList(const bool iReset) {
 std::vector<std::string> Manager::getDevicesNames() const {
 	std::vector<std::string> res;
 	res.reserve(m_devices.size());
-	for (const auto &dev: m_devices)
-		res.emplace_back(dev->getName());
+	for (const auto &dev: m_devices) res.emplace_back(dev->getName());
 	return res;
 }
 

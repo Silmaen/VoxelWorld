@@ -7,6 +7,9 @@
  */
 #pragma once
 
+/**
+ * @brief Windows-specific functions.
+ */
 namespace owl::input::video::windows {
 /**
  * @brief Class WPointer

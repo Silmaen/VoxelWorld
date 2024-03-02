@@ -23,7 +23,7 @@
       "name": "CodeCoverage",
       "inherits": "gcc-debug-static",
       "cacheVariables": {
-        "OWL_COVERAGE": "ON"
+        "OWL_ENABLE_COVERAGE": "ON"
       },
       "condition": {
         "type": "equals",
@@ -35,7 +35,7 @@
       "name": "CodeCoverage_mingw",
       "inherits": "mingw-gcc-debug-static",
       "cacheVariables": {
-        "OWL_COVERAGE": "ON"
+        "OWL_ENABLE_COVERAGE": "ON"
       },
       "condition": {
         "type": "equals",

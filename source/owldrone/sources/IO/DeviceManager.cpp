@@ -28,14 +28,14 @@ static void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
 
 
 		// Test the return value and error if any
-		if (QueryDosDevice(reinterpret_cast<LPCSTR>(ComName.c_str()), reinterpret_cast<LPSTR>(lpTargetPath), 5000) != 0) {//QueryDosDevice returns zero if it didn't find an object
+		if (QueryDosDevice(reinterpret_cast<LPCSTR>(ComName.c_str()), reinterpret_cast<LPSTR>(lpTargetPath), 5000) !=
+			0) {//QueryDosDevice returns zero if it didn't find an object
 			const std::string name{"usbserial"};
 			std::string path{lpTargetPath};
 			OWL_TRACE("Serial Found: ({}) [{}] ", ComName.c_str(), path.c_str())
 			listToUpdate.push_back({.port = "COM" + std::to_string(i), .name = name, .busInfo = path});
 		}
-		if (::GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-		}
+		if (::GetLastError() == ERROR_INSUFFICIENT_BUFFER) {}
 	}
 }
 
@@ -52,19 +52,17 @@ namespace drone::IO {
 
 /**
  * @brief List The serial Port Available
- * @param listToUpdate The device's list to update.
+ * @param ioListToUpdate The device's list to update.
  */
-static void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
-	std::filesystem::path base{"/dev/serial/by-id"};
-	if (exists(base)) {
-		for (auto devLink: std::filesystem::directory_iterator(base)) {
+static void enumerateSerialDevices(DeviceManager::DeviceList &ioListToUpdate) {
+	if (const std::filesystem::path base{"/dev/serial/by-id"}; exists(base)) {
+		for (const auto &devLink: std::filesystem::directory_iterator(base)) {
 			if (is_symlink(devLink.symlink_status())) {
 				std::string port = std::filesystem::canonical(base / read_symlink(devLink)).string();
 				// todo: get device informations
 				std::string name = "usbserial";
 				OWL_TRACE("Serial Found: ({}) [{}] ", port.c_str(), name.c_str())
-				listToUpdate.push_back({.port = std::move(port),
-										.name = std::move(name)});
+				ioListToUpdate.push_back({.port = std::move(port), .name = std::move(name)});
 			}
 		}
 	} else {
@@ -85,28 +83,30 @@ DeviceManager::DeviceManager() = default;
 DeviceManager::~DeviceManager() = default;
 
 void DeviceManager::updateList() {
-	devices.clear();
+	m_devices.clear();
 	// list COM Ports
-	enumerateSerialDevices(devices);
-	if (currentDevice)
-		setCurrentDevice(currentDevice->port);
+	enumerateSerialDevices(m_devices);
+	if (m_currentDevice)
+		setCurrentDevice(m_currentDevice->port);
 }
 
-owl::shared<Device> DeviceManager::getDeviceByName(const std::string &name) const {
-	const auto it = std::ranges::find_if(devices.begin(), devices.end(), [&name](const Device &T) { return T.name == name; });
-	if (it == devices.end()) return nullptr;
+owl::shared<Device> DeviceManager::getDeviceByName(const std::string &iName) const {
+	const auto it = std::ranges::find_if(m_devices.begin(), m_devices.end(),
+										 [&iName](const Device &T) { return T.name == iName; });
+	if (it == m_devices.end())
+		return nullptr;
 	return owl::mkShared<Device>(*it);
 }
 
-owl::shared<Device> DeviceManager::getDeviceByPort(const std::string &port) const {
-	const auto it = std::ranges::find_if(devices.begin(), devices.end(), [&port](const Device &T) { return T.port == port; });
-	if (it == devices.end()) return nullptr;
+owl::shared<Device> DeviceManager::getDeviceByPort(const std::string &iPort) const {
+	const auto it = std::ranges::find_if(m_devices.begin(), m_devices.end(),
+										 [&iPort](const Device &T) { return T.port == iPort; });
+	if (it == m_devices.end())
+		return nullptr;
 	return owl::mkShared<Device>(*it);
 }
 
-void DeviceManager::setCurrentDevice(const std::string &port) {
-	currentDevice = getDeviceByPort(port);
-}
+void DeviceManager::setCurrentDevice(const std::string &iPort) { m_currentDevice = getDeviceByPort(iPort); }
 
 
 }// namespace drone::IO

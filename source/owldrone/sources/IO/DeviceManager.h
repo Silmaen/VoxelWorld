@@ -36,9 +36,7 @@ struct Device {
 	 * @brief Hashing function.
 	 * @return Device's hash.
 	 */
-	[[nodiscard]] size_t hash() const {
-		return std::hash<std::string>{}(port) ^ (std::hash<std::string>{}(name) << 1);
-	}
+	[[nodiscard]] size_t hash() const { return std::hash<std::string>{}(port) ^ (std::hash<std::string>{}(name) << 1); }
 };
 
 /**
@@ -76,45 +74,45 @@ public:
 	 * @brief Get all the devices.
 	 * @return List of all devices.
 	 */
-	[[nodiscard]] const DeviceList &getAllDevices() const { return devices; }
+	[[nodiscard]] const DeviceList &getAllDevices() const { return m_devices; }
 
 	/**
 	 * @brief Get the number of device by type.
 	 * @return The number of devices.
 	 */
-	[[nodiscard]] size_t getDeviceCount() const { return devices.size(); }
+	[[nodiscard]] size_t getDeviceCount() const { return m_devices.size(); }
 
 	/**
 	 * @brief Get device by its name.
-	 * @param name Name of device.
+	 * @param iName Name of device.
 	 * @return Pointer to the device of nullptr if not exists.
 	 */
-	[[nodiscard]] owl::shared<Device> getDeviceByName(const std::string &name) const;
+	[[nodiscard]] owl::shared<Device> getDeviceByName(const std::string &iName) const;
 
 	/**
 	* @brief Get device by its port.
-	* @param port Port of device.
+	* @param iPort Port of device.
 	* @return Pointer to the device of nullptr if not exists.
 	*/
-	[[nodiscard]] owl::shared<Device> getDeviceByPort(const std::string &port) const;
+	[[nodiscard]] owl::shared<Device> getDeviceByPort(const std::string &iPort) const;
 
 	/**
 	 * @brief Define the new current device.
-	 * @param port The port of the new current device.
+	 * @param iPort The port of the new current device.
 	 */
-	void setCurrentDevice(const std::string &port);
+	void setCurrentDevice(const std::string &iPort);
 
 	/**
 	 * @brief Get a pointer to the current Device.
 	 * @return Pointer to the current device.
 	 */
-	[[nodiscard]] const owl::shared<Device> &getCurrentDevice() const { return currentDevice; }
+	[[nodiscard]] const owl::shared<Device> &getCurrentDevice() const { return m_currentDevice; }
 
 private:
 	/// List of devices.
-	DeviceList devices;
+	DeviceList m_devices;
 	/// Pointer to the current device.
-	owl::shared<Device> currentDevice = nullptr;
+	owl::shared<Device> m_currentDevice = nullptr;
 	/**
 	 * @brief Constructor.
 	 */
