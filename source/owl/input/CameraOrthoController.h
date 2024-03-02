@@ -18,7 +18,7 @@ namespace owl::input {
 /**
  * @brief Class CameraOrthoController.
  */
-class OWL_API CameraOrthoController {
+class OWL_API CameraOrthoController final {
 public:
 	CameraOrthoController(const CameraOrthoController &) = default;
 	CameraOrthoController(CameraOrthoController &&) = default;
@@ -27,90 +27,90 @@ public:
 
 	/**
 	 * @brief Constructor.
-	 * @param aspectRatio Camera's aspect ratio.
-	 * @param rotation Camera's rotation.
+	 * @param[in] iAspectRatio Camera's aspect ratio.
+	 * @param[in] iRotation Camera's rotation.
 	 */
-	explicit CameraOrthoController(float aspectRatio, bool rotation = false);
+	explicit CameraOrthoController(float iAspectRatio, bool iRotation = false);
 
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~CameraOrthoController() = default;
+	~CameraOrthoController() = default;
 
 	/**
 	 * @brief Frame function.
-	 * @param ts Time step.
+	 * @param[in] iTimeStep Time step.
 	 */
-	void onUpdate(core::Timestep ts);
+	void onUpdate(const core::Timestep &iTimeStep);
 
 	/**
 	 * @brief Event Management.
-	 * @param e The received event.
+	 * @param[in,out] ioEvent The received event.
 	 */
-	void onEvent(event::Event &e);
+	void onEvent(event::Event &ioEvent);
 
 	/**
 	 * @brief Action when view port is resized.
-	 * @param width New width.
-	 * @param height New height.
+	 * @param[in] iWidth New width.
+	 * @param[in] iHeight New height.
 	 */
-	void onResize(float width, float height);
+	void onResize(float iWidth, float iHeight);
 
 	/**
 	 * @brief Access to the camera.
 	 * @return The camera.
 	 */
-	renderer::CameraOrtho &getCamera() { return camera; }
+	renderer::CameraOrtho &getCamera() { return m_camera; }
 
 	/**
 	 * @brief Access to the camera.
 	 * @return The camera.
 	 */
-	[[nodiscard]] const renderer::CameraOrtho &getCamera() const { return camera; }
+	[[nodiscard]] const renderer::CameraOrtho &getCamera() const { return m_camera; }
 
 	/**
 	 * @brief Access to the zoom level.
 	 * @return Teh Zoom level.
 	 */
-	[[nodiscard]] float getZoomLevel() const { return zoomLevel; }
+	[[nodiscard]] float getZoomLevel() const { return m_zoomLevel; }
 
 	/**
 	 * @brief Define the new zoom level.
-	 * @param level The new level.
+	 * @param[in] iLevel The new level.
 	 */
-	void setZoomLevel(float level) { zoomLevel = level; }
+	void setZoomLevel(const float iLevel) { m_zoomLevel = iLevel; }
 
 private:
 	/**
 	 * @brief Action on mouse scroll.
-	 * @param e The Mouse event.
+	 * @param[in] iEvent The Mouse event.
 	 * @return True if treated.
 	 */
-	bool onMouseScrolled(event::MouseScrolledEvent &e);
+	bool onMouseScrolled(const event::MouseScrolledEvent &iEvent);
 
 	/**
 	 * @brief Action on window resize.
-	 * @param e The Window resize event.
+	 * @param[in] iEvent The Window resize event.
 	 * @return True if treated.
 	 */
-	bool onWindowResized(event::WindowResizeEvent &e);
+	bool onWindowResized(const event::WindowResizeEvent &iEvent);
 
 	/// Aspect ratio of the camera.
-	float aspectRatio;
+	float m_aspectRatio;
 	/// Camera's zoom level.
-	float zoomLevel = 1.0f;
+	float m_zoomLevel = 1.0f;
 	/// The camera.
-	renderer::CameraOrtho camera;
+	renderer::CameraOrtho m_camera;
 	/// if camera's rotation allowed.
-	bool rotation;
+	bool m_rotation;
 	/// Camera's position in the world.
-	glm::vec3 cameraPosition = {0.0f, 0.0f, 0.0f};
+	glm::vec3 m_cameraPosition = {0.0f, 0.0f, 0.0f};
 	/// Camera's rotation in degrees, in the anti-clockwise direction.
-	float cameraRotation = 0.0f;
+	float m_cameraRotation = 0.0f;
 	/// Camera's Translation speed.
-	float cameraTranslationSpeed = 5.0f;
+	float m_cameraTranslationSpeed = 5.0f;
 	/// Camera's Rotation Speed.
-	float cameraRotationSpeed = 180.0f;
+	float m_cameraRotationSpeed = 180.0f;
 };
 
 }// namespace owl::input

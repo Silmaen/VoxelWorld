@@ -11,7 +11,6 @@
 #include <vulkan/vulkan.h>
 
 namespace owl::renderer::vulkan::internal {
-
 /**
  * @brief Class PhysicalDeviceCapabilities.
  */
@@ -19,25 +18,25 @@ class PhysicalDeviceCapabilities final {
 public:
 	/**
 	 * @brief Default Constructor.
-	 * @param dev The physical device to analyse.
+	 * @param[in] iDev The physical device to analyse.
 	 */
-	explicit PhysicalDeviceCapabilities(VkPhysicalDevice dev = nullptr);
+	explicit PhysicalDeviceCapabilities(const VkPhysicalDevice& iDev = nullptr);
 	/**
 	 * @brief Copy Constructor.
 	 */
-	PhysicalDeviceCapabilities(const PhysicalDeviceCapabilities &) = default;
+	PhysicalDeviceCapabilities(const PhysicalDeviceCapabilities&) = default;
 	/**
 	 * @brief Move Constructor.
 	 */
-	PhysicalDeviceCapabilities(PhysicalDeviceCapabilities &&) = default;
+	PhysicalDeviceCapabilities(PhysicalDeviceCapabilities&&) = default;
 	/**
 	 * @brief Copy assignation.
 	 */
-	PhysicalDeviceCapabilities &operator=(const PhysicalDeviceCapabilities &) = default;
+	PhysicalDeviceCapabilities& operator=(const PhysicalDeviceCapabilities&) = default;
 	/**
 	 * @brief Move assignation.
 	 */
-	PhysicalDeviceCapabilities &operator=(PhysicalDeviceCapabilities &&) = default;
+	PhysicalDeviceCapabilities& operator=(PhysicalDeviceCapabilities&&) = default;
 
 	/**
 	 * @brief Destructor.
@@ -51,28 +50,28 @@ public:
 
 	/**
 	 * @brief Check if a layer is available on this device.
-	 * @param layer The layer name to test.
+	 * @param[in] iLayer The layer name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasLayer(const std::string &layer) const;
+	[[nodiscard]] bool hasLayer(const std::string& iLayer) const;
 	/**
 	 * @brief Check if an extension is available on this device.
-	 * @param extension The extension name to test.
+	 * @param[in] iExtension The extension name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasExtension(const std::string &extension) const;
+	[[nodiscard]] bool hasExtension(const std::string& iExtension) const;
 	/**
 	 * @brief Check if some layers are available on this device.
-	 * @param layers The layer's names to test.
+	 * @param[in] iLayers The layer's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasLayers(const std::vector<std::string> &layers) const;
+	[[nodiscard]] bool hasLayers(const std::vector<std::string>& iLayers) const;
 	/**
 	 * @brief Check if some extensions are available on this device.
-	 * @param extensions The extension's names to test.
+	 * @param[in] iExtensions The extension's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasExtensions(const std::vector<std::string> &extensions) const;
+	[[nodiscard]] bool hasExtensions(const std::vector<std::string>& iExtensions) const;
 
 
 	/**
@@ -109,8 +108,8 @@ public:
 
 /**
  * @brief Enumerate the physical devices.
+ * @param[in] iInstance The vulkan instance.
  * @return List of physical devices sorted by decreasing score.
  */
-std::vector<PhysicalDeviceCapabilities> enumerateDevices(VkInstance instance);
-
-}// namespace owl::renderer::vulkan::internal
+std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance& iInstance);
+} // namespace owl::renderer::vulkan::internal

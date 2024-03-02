@@ -11,17 +11,16 @@
 #include "core/Core.h"
 
 namespace owl::renderer {
-
 /**
  * @brief General class for the GraphicContext.
  */
 class OWL_API GraphContext {
 public:
 	GraphContext() = default;
-	GraphContext(const GraphContext &) = delete;
-	GraphContext(GraphContext &&) = delete;
-	GraphContext &operator=(const GraphContext &) = delete;
-	GraphContext &operator=(GraphContext &&) = delete;
+	GraphContext(const GraphContext&) = delete;
+	GraphContext(GraphContext&&) = delete;
+	GraphContext& operator=(const GraphContext&) = delete;
+	GraphContext& operator=(GraphContext&&) = delete;
 
 	/**
 	 * @brief Destructor.
@@ -43,47 +42,49 @@ public:
 	virtual void waitIdle() {}
 	/**
 	 * @brief Create a Graphics context.
-	 * @param window The window into render context.
+	 * @param[in,out] ioWindow The window into render context.
 	 * @return The created context.
 	 */
-	static uniq<GraphContext> create(void *window);
+	static uniq<GraphContext> create(void* ioWindow);
 
 	/**
 	 * @brief Structure for holding version number.
 	 */
 	struct Version {
-		int major;///< major version number.
-		int minor;///< minor version number.
+		int major; ///< major version number.
+		int minor; ///< minor version number.
 		/**
 		 * @brief Check version order
-		 * @param other Version to compare
+		 * @param[in] iOther Version to compare
 		 * @return True if this is equal.
 		 */
-		[[nodiscard]] bool operator==(const Version &other) const {
-			return major == other.major && minor == other.minor;
+		[[nodiscard]] bool operator==(const Version& iOther) const {
+			return major == iOther.major && minor == iOther.minor;
 		}
+
 		/**
 		 * @brief Check version order
-		 * @param other Version to compare
+		 * @param[in] iOther Version to compare
 		 * @return True if this is lower.
 		 */
-		[[nodiscard]] bool operator<(const Version &other) const {
-			return major < other.major || (major == other.major && minor < other.minor);
+		[[nodiscard]] bool operator<(const Version& iOther) const {
+			return major < iOther.major || (major == iOther.major && minor < iOther.minor);
 		}
+
 		/**
 		 * @brief Check version order
-		 * @param other Version to compare
+		 * @param[in] iOther Version to compare
 		 * @return True if this is lower.
 		 */
-		[[nodiscard]] bool operator<=(const Version &other) const {
-			return major <= other.major || (major == other.major && minor <= other.minor);
+		[[nodiscard]] bool operator<=(const Version& iOther) const {
+			return major <= iOther.major || (major == iOther.major && minor <= iOther.minor);
 		}
 	};
+
 	/**
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
 	[[nodiscard]] virtual Version getVersion() const = 0;
 };
-
-}// namespace owl::renderer
+} // namespace owl::renderer

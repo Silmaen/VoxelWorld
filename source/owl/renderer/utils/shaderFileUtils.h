@@ -12,27 +12,29 @@
 #include "renderer/Shader.h"
 
 namespace owl::renderer::utils {
+std::filesystem::path getCacheDirectory(const std::string& iRenderer, const std::string& iRendererApi);
 
-std::filesystem::path getCacheDirectory(const std::string &renderer, const std::string &rendererAPI);
+void createCacheDirectoryIfNeeded(const std::string& iRenderer, const std::string& iRendererApi);
 
-void createCacheDirectoryIfNeeded(const std::string &renderer, const std::string &rendererAPI);
+std::filesystem::path getShaderCachedPath(const std::string& iShaderName, const std::string& iRenderer,
+                                          const std::string& iRendererApi, const ShaderType& iType);
 
-std::filesystem::path getShaderCachedPath(const std::string &shaderName, const std::string &renderer, const std::string &rendererAPI, const ShaderType &type);
+std::filesystem::path getShaderPath(const std::string& iShaderName, const std::string& iRenderer,
+                                    const std::string& iRendererApi, const ShaderType& iType);
 
-std::filesystem::path getShaderPath(const std::string &shaderName, const std::string &renderer, const std::string &rendererAPI, const ShaderType &type);
+std::filesystem::path getRelativeShaderPath(const std::string& iShaderName, const std::string& iRenderer,
+                                            const std::string& iRendererApi, const ShaderType& iType);
 
-std::filesystem::path getRelativeShaderPath(const std::string &shaderName, const std::string &renderer, const std::string &rendererAPI, const ShaderType &type);
+std::string getExtension(const ShaderType& iStage);
 
-std::string getExtension(const ShaderType &stage);
+std::string getCacheExtension(const ShaderType& iStage);
 
-std::string getCacheExtension(const ShaderType &stage);
+shaderc_shader_kind shaderStageToShaderC(const ShaderType& iStage);
 
-shaderc_shader_kind shaderStageToShaderC(const ShaderType &stage);
+std::vector<uint32_t> readCachedShader(const std::filesystem::path& iFile);
 
-std::vector<uint32_t> readCachedShader(const std::filesystem::path &file);
+bool writeCachedShader(const std::filesystem::path& iFile, const std::vector<uint32_t>& iData);
 
-bool writeCachedShader(const std::filesystem::path &file, const std::vector<uint32_t> &data);
-
-void shaderReflect(const std::string &shaderName, const std::string &renderer, const std::string &rendererAPI, ShaderType stage, const std::vector<uint32_t> &shaderData);
-
-}// namespace owl::renderer::utils
+void shaderReflect(const std::string& iShaderName, const std::string& iRenderer, const std::string& iRendererApi,
+                   ShaderType iStage, const std::vector<uint32_t>& iShaderData);
+} // namespace owl::renderer::utils

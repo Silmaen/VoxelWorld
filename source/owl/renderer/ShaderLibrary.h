@@ -15,7 +15,7 @@ namespace owl::renderer {
 /**
  * @brief Class ShaderLibrary;
  */
-class OWL_API ShaderLibrary {
+class OWL_API ShaderLibrary final {
 public:
 	ShaderLibrary() = default;
 	ShaderLibrary(const ShaderLibrary &) = default;
@@ -26,59 +26,59 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~ShaderLibrary();
+	~ShaderLibrary();
 
 	/**
 	 * @brief Add the shader to the library.
-	 * @param shader Shader to add.
+	 * @param[in] iShader Shader to add.
 	 */
-	void add(const shared<Shader> &shader);
+	void add(const shared<Shader> &iShader);
 
 	/**
 	 * @brief Add the shader to the library and rename it.
-	 * @param name Name of the shader.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param shader The Shader to add.
+	 * @param[in] iName Name of the shader.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iShader The Shader to add.
 	 */
-	void addNRename(const std::string &name, const std::string &renderer, const shared<Shader> &shader);
+	void addNRename(const std::string &iName, const std::string &iRenderer, const shared<Shader> &iShader);
 
 	/**
 	 * @brief Add the shader to the library from the standard path.
-	 * @param name Name of the shader.
-	 * @param renderer Name of the shader's related renderer.
+	 * @param[in] iName Name of the shader.
+	 * @param[in] iRenderer Name of the shader's related renderer.
 	 */
-	void addFromStandardPath(const std::string &name, const std::string &renderer);
+	void addFromStandardPath(const std::string &iName, const std::string &iRenderer);
 
 	/**
 	 * @brief Load a shader from a file.
-	 * @param name Name of the shader.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param file The file to read for shader.
+	 * @param[in] iName Name of the shader.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iFile The file to read for shader.
 	 * @return The shader.
 	 *
 	 * The shader's name is determined by the file base name.
 	 */
-	shared<Shader> load(const std::string &name, const std::string &renderer, const std::filesystem::path &file);
+	shared<Shader> load(const std::string &iName, const std::string &iRenderer, const std::filesystem::path &iFile);
 
 	/**
 	 * @brief Access to the shader of the given name.
-	 * @param name Shader's name.
-	 * @param renderer Name of the shader's related renderer.
+	 * @param[in] iName Shader's name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
 	 * @return Shader's pointer or nullptr if not exists.
 	 */
-	shared<Shader> get(const std::string &name, const std::string &renderer);
+	shared<Shader> get(const std::string &iName, const std::string &iRenderer);
 
 	/**
 	 * @brief Verify if a shader exists.
-	 * @param name Shader's name.
-	 * @param renderer Name of the shader's related renderer.
+	 * @param[in] iName Shader's name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
 	 * @return True if the shader exists.
 	 */
-	bool exists(const std::string &name, const std::string &renderer) const;
+	bool exists(const std::string &iName, const std::string &iRenderer) const;
 
 private:
 	/// List of shaders.
-	std::unordered_map<std::string, shared<Shader>> shaders;
+	std::unordered_map<std::string, shared<Shader>> m_shaders;
 };
 
 }// namespace owl::renderer

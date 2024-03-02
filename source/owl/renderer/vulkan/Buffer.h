@@ -12,26 +12,27 @@
 #include <vulkan/vulkan.h>
 
 namespace owl::renderer::vulkan {
-
 /**
  * @brief Class VertexBuffer.
  */
 class VertexBuffer final : public ::owl::renderer::VertexBuffer {
 public:
-	VertexBuffer(const VertexBuffer &) = delete;
-	VertexBuffer(VertexBuffer &&) = delete;
-	VertexBuffer &operator=(const VertexBuffer &) = delete;
-	VertexBuffer &operator=(VertexBuffer &&) = delete;
+	VertexBuffer(const VertexBuffer&) = delete;
+	VertexBuffer(VertexBuffer&&) = delete;
+	VertexBuffer& operator=(const VertexBuffer&) = delete;
+	VertexBuffer& operator=(VertexBuffer&&) = delete;
 	/**
 	 * @brief Constructor.
-	 * @param size The buffer size.
+	 * @param[in] iSize The buffer size.
 	 */
-	explicit VertexBuffer(uint32_t size);
+	explicit VertexBuffer(uint32_t iSize);
 
 	/**
 	 * @brief Default constructor.
+	 * @param[in] iVertices The vertices.
+	 * @param[in] iSize Number of data.
 	 */
-	VertexBuffer(const float *vertices, const uint32_t size);
+	VertexBuffer(const float* iVertices, uint32_t iSize);
 
 	/**
 	 * @brief Destructor.
@@ -55,10 +56,10 @@ public:
 
 	/**
 	 * @brief Defines the data of the vertex buffer.
-	 * @param data The raw data.
-	 * @param size Number of data.
+	 * @param[in] iData The raw data.
+	 * @param[in] iSize Number of data.
 	 */
-	void setData(const void *data, const uint32_t size) override;
+	void setData(const void* iData, uint32_t iSize) override;
 
 	/**
 	 * @brief Get the binding description.
@@ -74,28 +75,28 @@ public:
 
 private:
 	/// The vulkan vertex buffer.
-	VkBuffer vertexBuffer{nullptr};
+	VkBuffer m_vertexBuffer{nullptr};
 	/// The vulkan vertex buffer memory.
-	VkDeviceMemory vertexBufferMemory{nullptr};
+	VkDeviceMemory m_vertexBufferMemory{nullptr};
 
-	void createBuffer(const float *data, const uint32_t size);
+	void createBuffer(const float* iData, uint32_t iSize);
 };
 
 /**
  * @brief Class IndexBuffer.
  */
-class IndexBuffer final : public ::owl::renderer::IndexBuffer {
+class IndexBuffer final : public renderer::IndexBuffer {
 public:
-	IndexBuffer(const IndexBuffer &) = delete;
-	IndexBuffer(IndexBuffer &&) = delete;
-	IndexBuffer &operator=(const IndexBuffer &) = delete;
-	IndexBuffer &operator=(IndexBuffer &&) = delete;
+	IndexBuffer(const IndexBuffer&) = delete;
+	IndexBuffer(IndexBuffer&&) = delete;
+	IndexBuffer& operator=(const IndexBuffer&) = delete;
+	IndexBuffer& operator=(IndexBuffer&&) = delete;
 	/**
 	 * @brief Default constructor.
-	 * @param indices Array of indices.
-	 * @param size Number of indices in the array.
+	 * @param[in] iIndices Array of indices.
+	 * @param[in] iSize Number of indices in the array.
 	 */
-	IndexBuffer(uint32_t *indices, uint32_t size);
+	IndexBuffer(const uint32_t* iIndices, uint32_t iSize);
 
 	/**
 	 * @brief Destructor.
@@ -121,15 +122,14 @@ public:
 	 * @brief Get the number of element in the buffer.
 	 * @return Number of element in the buffer.
 	 */
-	[[nodiscard]] uint32_t getCount() const override { return count; }
+	[[nodiscard]] uint32_t getCount() const override { return m_count; }
 
 private:
 	/// Number of elements.
-	uint32_t count = 0;
+	uint32_t m_count = 0;
 	/// Vulkan index buffer.
-	VkBuffer indexBuffer{nullptr};
+	VkBuffer m_indexBuffer{nullptr};
 	/// Vulkan memory buffer.
-	VkDeviceMemory indexBufferMemory{nullptr};
+	VkDeviceMemory m_indexBufferMemory{nullptr};
 };
-
-}// namespace owl::renderer::vulkan
+} // namespace owl::renderer::vulkan

@@ -10,9 +10,7 @@
 
 namespace drone::IO {
 
-CameraSystem::CameraSystem() {
-	resize({1, 1});
-}
+CameraSystem::CameraSystem() { resize({1, 1}); }
 
 CameraSystem::~CameraSystem() = default;
 
@@ -23,12 +21,8 @@ void CameraSystem::onUpdate(const owl::core::Timestep &ts) {
 
 	// read image from camera
 	if (frameCount % frameCheck == 0) {
-		if (const size_t nbCam = cameraManager.getDeviceCount(); nbCam == 0) {
-			settings.useCamera = false;
-		} else {
-			if (settings.cameraId > static_cast<int32_t>(nbCam)) {
-				settings.cameraId = 0;
-			}
+		if (const size_t nbCam = cameraManager.getDeviceCount(); nbCam == 0) { settings.useCamera = false; } else {
+			if (settings.cameraId > static_cast<int32_t>(nbCam)) { settings.cameraId = 0; }
 		}
 		if (!cameraManager.isOpened()) {
 			// open the right one
@@ -38,9 +32,7 @@ void CameraSystem::onUpdate(const owl::core::Timestep &ts) {
 			}
 		}
 		if (cameraManager.isOpened()) {
-			if (!settings.useCamera) {
-				cameraManager.close();
-			}
+			if (!settings.useCamera) { cameraManager.close(); }
 			// Define the frameSkip
 			if (const float frameRateTs = ts.getStabilizedFps(); frameRateTs > 0) {
 				frameSkip = static_cast<int32_t>(240.f / frameRateTs);
@@ -49,9 +41,7 @@ void CameraSystem::onUpdate(const owl::core::Timestep &ts) {
 	}
 
 	if (frameSkip <= 0 || frameCount % frameSkip == 0) {
-		if (cameraManager.isOpened()) {
-			cameraManager.fillFrame(frame);
-		} else {
+		if (cameraManager.isOpened()) { cameraManager.fillFrame(frame); } else {
 			resize({1, 1});
 			uint8_t color[] = {45, 87, 96};
 			frame->setData(&color, 3);
@@ -67,15 +57,15 @@ void CameraSystem::resize(const owl::math::FrameSize &_size) {
 	frame = owl::renderer::Texture2D::create(size, false);
 }
 
-void CameraSystem::setCamera(int32_t id) {
+void CameraSystem::setCamera(int32_t iId) {
 	auto &settings = DroneSettings::get();
 	auto &videoInputManager = owl::input::video::Manager::get();
-	id = owl::math::clamp(id, 0, static_cast<int32_t>(videoInputManager.getDeviceCount() - 1));
-	settings.cameraId = id;
-	if (id == videoInputManager.getCurrentDeviceId())
+	iId = owl::math::clamp(iId, 0, static_cast<int32_t>(videoInputManager.getDeviceCount() - 1));
+	settings.cameraId = iId;
+	if (iId == videoInputManager.getCurrentDeviceId())
 		return;
-	OWL_TRACE("Opening camera {}", id)
-	videoInputManager.open(static_cast<size_t>(id));
+	OWL_TRACE("Opening camera {}", iId)
+	videoInputManager.open(static_cast<size_t>(iId));
 }
 
 void CameraSystem::actualiseList() {
@@ -88,9 +78,9 @@ void CameraSystem::actualiseList() {
 std::vector<std::string> CameraSystem::getListOfCameraNames() const {
 	return owl::input::video::Manager::get().getDevicesNames();
 }
-int32_t CameraSystem::getCurrentCameraId() const {
-	return owl::input::video::Manager::get().getCurrentDeviceId();
-}
+
+int32_t CameraSystem::getCurrentCameraId() const { return owl::input::video::Manager::get().getCurrentDeviceId(); }
+
 std::string CameraSystem::getCurrentCameraName() const {
 	const auto &sys = owl::input::video::Manager::get();
 	if (!sys.isOpened())

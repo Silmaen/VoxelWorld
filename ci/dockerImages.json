@@ -2,6 +2,7 @@
   "images": {
     "CodeCoverage": "builder-gcc12-ubuntu2204",
     "Documentation": "builder-clang15-ubuntu2204",
+    "clang-tidy": "builder-clang15-ubuntu2204",
     "linux-gcc-release-static": "builder-gcc12-ubuntu2204",
     "linux-gcc-debug-static": "builder-gcc12-ubuntu2204",
     "linux-gcc-release-shared": "builder-gcc12-ubuntu2204",

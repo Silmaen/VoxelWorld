@@ -10,11 +10,10 @@
 #include "BaseGauge.h"
 
 namespace drone::panels::gauge {
-
 /**
  * @brief Class VerticalSpeed
  */
-class VerticalSpeed final: public BaseGauge {
+class VerticalSpeed final : public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.
@@ -29,22 +28,22 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	VerticalSpeed(const VerticalSpeed &) = default;
+	VerticalSpeed(const VerticalSpeed&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	VerticalSpeed(VerticalSpeed &&) = default;
+	VerticalSpeed(VerticalSpeed&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	VerticalSpeed &operator=(const VerticalSpeed &) = default;
+	VerticalSpeed& operator=(const VerticalSpeed&) = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	VerticalSpeed &operator=(VerticalSpeed &&) = default;
+	VerticalSpeed& operator=(VerticalSpeed&&) = default;
 
 	/**
 	 * @brief Draw the  gauge back ground.
@@ -65,10 +64,9 @@ public:
 private:
 	float verticalVelocity = 0.f;
 
-	float velocityToAngle() const;
+	[[nodiscard]] float velocityToAngle() const;
 
 	owl::shared<owl::renderer::Texture> background = nullptr;
 	owl::shared<owl::renderer::Texture> cursor = nullptr;
 };
-
-}// namespace drone::panels::gauge
+} // namespace drone::panels::gauge

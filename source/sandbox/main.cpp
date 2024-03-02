@@ -13,11 +13,11 @@
 
 class Sandbox final : public owl::core::Application {
 public:
-	explicit Sandbox(const owl::core::AppParams &param) : Application(param) { pushLayer(owl::mk_shared<owl::base2D>()); }
+	explicit Sandbox(const owl::core::AppParams &param) : Application(param) { pushLayer(owl::mkShared<owl::base2D>()); }
 };
 
 owl::shared<owl::core::Application> owl::core::createApplication(int argc, char **argv) {
-	return owl::mk_shared<Sandbox>(core::AppParams{
+	return owl::mkShared<Sandbox>(core::AppParams{
 			.name = "Sandbox",
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,

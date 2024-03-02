@@ -28,26 +28,28 @@ class OWL_API Log {
 public:
 	/**
 	 * @brief initialize the logging system.
+	 * @param[in] iLevel Verbosity level of the logger.
+	 * @param[in] iFrequency Frequence of frame outputput (number of frames).
 	 */
-	static void init(const spdlog::level::level_enum &level = spdlog::level::trace, uint64_t freq = 100);
+	static void init(const spdlog::level::level_enum &iLevel = spdlog::level::trace, uint64_t iFrequency = 100);
 
 	/**
 	 * @brief Access to the logger for the core system.
 	 * @return The Core logger.
 	 */
-	static shared<spdlog::logger> getCoreLogger() { return coreLogger; }
+	static shared<spdlog::logger> getCoreLogger() { return s_coreLogger; }
 
 	/**
 	 * @brief Access to the logger for the application system.
 	 * @return The application logger.
 	 */
-	static shared<spdlog::logger> getClientLogger() { return clientLogger; }
+	static shared<spdlog::logger> getClientLogger() { return s_clientLogger; }
 
 	/**
 	 * @brief Defines the Verbosity level
-	 * @param level Verbosity level.
+	 * @param[in] iLevel Verbosity level.
 	 */
-	static void setVerbosityLevel(const spdlog::level::level_enum &level);
+	static void setVerbosityLevel(const spdlog::level::level_enum &iLevel);
 
 	/**
 	 * @brief Destroy the logger.
@@ -58,13 +60,13 @@ public:
 	 * @brief Check if logger is initiated.
 	 * @return True if initiated.
 	 */
-	static bool initiated() { return coreLogger != nullptr; }
+	static bool initiated() { return s_coreLogger != nullptr; }
 
 	/**
 	 * @brief To know if in logging frame.
 	 * @return True if in logging frame.
 	 */
-	static bool frameLog() { return frequency > 0 && frameCounter % frequency == 0; }
+	static bool frameLog() { return s_frequency > 0 && s_frameCounter % s_frequency == 0; }
 
 	/**
 	 * @brief Start a new logging frame.
@@ -73,21 +75,21 @@ public:
 
 	/**
 	 * @brief define a new frame log frequncy.
-	 * @param freq New frequency.
+	 * @param[in] iFrequency New frequency.
 	 */
-	static void setFrameFrequency(const uint64_t freq) { frequency = freq; }
+	static void setFrameFrequency(const uint64_t iFrequency) { s_frequency = iFrequency; }
 
 private:
 	/// The core logger.
-	static shared<spdlog::logger> coreLogger;
+	static shared<spdlog::logger> s_coreLogger;
 	/// The application logger.
-	static shared<spdlog::logger> clientLogger;
+	static shared<spdlog::logger> s_clientLogger;
 	/// The level of verbosity.
-	static spdlog::level::level_enum verbosity;
+	static spdlog::level::level_enum s_verbosity;
 	/// Counter for the frames.
-	static uint64_t frameCounter;
+	static uint64_t s_frameCounter;
 	/// Frequency of frame trace.
-	static uint64_t frequency;
+	static uint64_t s_frequency;
 };
 }// namespace owl::core
 
@@ -97,14 +99,12 @@ private:
  * @tparam L The vector's length type.
  * @tparam T The vector's component type.
  * @tparam Q The vector's qualifier type.
- * @param os The stream to write onto.
- * @param vector The vector to write.
+ * @param[out] oStream The stream to write onto.
+ * @param[in] iVector The vector to write.
  * @return The actualized stream.
  */
 template<typename OStream, glm::length_t L, typename T, glm::qualifier Q>
-inline OStream &operator<<(OStream &os, const glm::vec<L, T, Q> &vector) {
-	return os << glm::to_string(vector);
-}
+OStream &operator<<(OStream &oStream, const glm::vec<L, T, Q> &iVector) { return oStream << glm::to_string(iVector); }
 
 /**
  * @brief Overload stream operator for matrices.
@@ -113,13 +113,13 @@ inline OStream &operator<<(OStream &os, const glm::vec<L, T, Q> &vector) {
  * @tparam R The matrix's Row length type.
  * @tparam T The matrix's component type.
  * @tparam Q The matrix's qualifier type.
- * @param os The stream to write onto.
- * @param matrix The matrix to write.
+ * @param[out] oStream The stream to write onto.
+ * @param[in] iMatrix The matrix to write.
  * @return The actualized stream.
  */
 template<typename OStream, glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
-inline OStream &operator<<(OStream &os, const glm::mat<C, R, T, Q> &matrix) {
-	return os << glm::to_string(matrix);
+OStream &operator<<(OStream &oStream, const glm::mat<C, R, T, Q> &iMatrix) {
+	return oStream << glm::to_string(iMatrix);
 }
 
 /**
@@ -127,14 +127,12 @@ inline OStream &operator<<(OStream &os, const glm::mat<C, R, T, Q> &matrix) {
  * @tparam OStream The stream type.
  * @tparam T The quaternion's component type.
  * @tparam Q The quaternion's qualifier type.
- * @param os The stream to write onto.
- * @param quaternion The quaternion to write.
+ * @param[out] oStream The stream to write onto.
+ * @param[in] iQuaternion The quaternion to write.
  * @return The actualized stream.
  */
 template<typename OStream, typename T, glm::qualifier Q>
-inline OStream &operator<<(OStream &os, glm::qua<T, Q> quaternion) {
-	return os << glm::to_string(quaternion);
-}
+OStream &operator<<(OStream &oStream, glm::qua<T, Q> iQuaternion) { return oStream << glm::to_string(iQuaternion); }
 
 // Core log macros;
 #define OWL_CORE_FRAME_TRACE(...) \

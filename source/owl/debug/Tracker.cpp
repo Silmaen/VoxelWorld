@@ -10,71 +10,69 @@
 
 #include "Tracker.h"
 
+// NOLINTBEGIN(misc-no-recursion)
+
 #define OWL_DEALLOC_EXCEPT noexcept
 
-static bool doTrack = true;
+static bool s_doTrack = true;
 #ifdef OWL_STACKTRACE
-static bool doTrace = false;
+static bool s_doTrace = false;
 #endif
 
 #if !defined(__cpp_sized_deallocation) || __cpp_sized_deallocation == 0
-void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT;
+void operator delete(void *iMemory, size_t size) OWL_DEALLOC_EXCEPT;
 #endif
 
-void *operator new(size_t size) {
-	void *mem = malloc(size);
-	owl::debug::Tracker::get().allocate(mem, size);
+void *operator new(size_t iSize) {
+	void *mem = malloc(iSize);
+	owl::debug::Tracker::get().allocate(mem, iSize);
 	return mem;
 }
 
-void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT {
-	owl::debug::Tracker::get().deallocate(memory, size);
-	free(memory);
+void operator delete(void *iMemory, size_t iSize) OWL_DEALLOC_EXCEPT {
+	owl::debug::Tracker::get().deallocate(iMemory, iSize);
+	free(iMemory);
 }
 
-void operator delete(void *memory) OWL_DEALLOC_EXCEPT {
-	owl::debug::Tracker::get().deallocate(memory);
-	free(memory);
+void operator delete(void *iMemory) OWL_DEALLOC_EXCEPT {
+	owl::debug::Tracker::get().deallocate(iMemory);
+	free(iMemory);
 }
 
 namespace owl::debug {
 
-Tracker::Tracker() {
-	doTrack = true;
-}
+Tracker::Tracker() { s_doTrack = true; }
 
-Tracker::~Tracker() {
-	doTrack = false;
-}
+Tracker::~Tracker() { s_doTrack = false; }
 
 Tracker &Tracker::get() {
 	static Tracker instance;
 	return instance;
 }
 
-void Tracker::allocate(void *memoryPtr, size_t size) {
-	if (!doTrack) return;
-	currentAllocationState.pushMemory(memoryPtr, size);
-	globalAllocationState.pushMemory(memoryPtr, size);
+void Tracker::allocate(void *iMemoryPtr, const size_t iSize) {
+	if (!s_doTrack)
+		return;
+	m_currentAllocationState.pushMemory(iMemoryPtr, iSize);
+	m_globalAllocationState.pushMemory(iMemoryPtr, iSize);
 }
 
-void Tracker::deallocate(void *memoryPtr, size_t size) {
-	if (!doTrack) return;
-	currentAllocationState.freeMemory(memoryPtr, size);
-	globalAllocationState.freeMemory(memoryPtr, size);
+void Tracker::deallocate(void *iMemoryPtr, const size_t iSize) {
+	if (!s_doTrack)
+		return;
+	m_currentAllocationState.freeMemory(iMemoryPtr, iSize);
+	m_globalAllocationState.freeMemory(iMemoryPtr, iSize);
 }
 
 const Tracker::AllocationState &Tracker::checkState() {
-	doTrack = false;
-	lastAllocationState.reset();
-	std::swap(currentAllocationState, lastAllocationState);
-	doTrack = true;
-	return lastAllocationState;
+	s_doTrack = false;
+	m_lastAllocationState.reset();
+	std::swap(m_currentAllocationState, m_lastAllocationState);
+	s_doTrack = true;
+	return m_lastAllocationState;
 }
 
-const Tracker::AllocationState &Tracker::globals() const {
-	return globalAllocationState;
-}
+const Tracker::AllocationState &Tracker::globals() const { return m_globalAllocationState; }
 
 std::string Tracker::AllocationInfo::toStr() const {
 #ifdef OWL_STACKTRACE
@@ -85,36 +83,40 @@ std::string Tracker::AllocationInfo::toStr() const {
 #endif
 }
 
-void Tracker::AllocationState::pushMemory(void *memPtr, size_t size) {
-	doTrack = false;
+void Tracker::AllocationState::pushMemory(void *iLocation, size_t iSize) {
+	s_doTrack = false;
 	allocationCalls++;
-	allocatedMemory += size;
+	allocatedMemory += iSize;
 	memoryPeek = std::max(memoryPeek, allocatedMemory);
-	allocs.emplace_back(memPtr, size);
+	allocs.emplace_back(iLocation, iSize);
 #ifdef OWL_STACKTRACE
-	if (doTrace) {
+	if (s_doTrace) {
 		auto trace = cpptrace::generate_trace(3);
-		auto bob = std::find_if(trace.begin(), trace.end(),
-								[](const cpptrace::stacktrace_frame itrace) { return itrace.symbol.starts_with("owl::") || itrace.symbol.contains("main"); });
-		if (bob != trace.end())
-			allocs.back().traceAlloc = *bob;
+
+		if (auto chunk = std::find_if(trace.begin(), trace.end(),
+								[](const cpptrace::stacktrace_frame itrace) {
+									return itrace.symbol.starts_with("owl::") || itrace.symbol.contains("main");
+								});
+								chunk != trace.end())
+			allocs.back().traceAlloc = *chunk;
 	}
 #endif
-	doTrack = true;
+	s_doTrack = true;
 }
 
-void Tracker::AllocationState::freeMemory(void *memPtr, size_t size) {
-	doTrack = false;
-	auto chunk = std::ranges::find_if(allocs.begin(), allocs.end(), [&memPtr](const AllocationInfo &cc) { return cc.location == memPtr; });
-	if (chunk != allocs.end()) {
-		if (size == 0) {
-			size = chunk->size;
-		}
+void Tracker::AllocationState::freeMemory(void *iLocation, size_t iSize) {
+	s_doTrack = false;
+	if (const auto chunk = std::ranges::find_if(allocs.begin(), allocs.end(),
+												[&iLocation](const AllocationInfo &iAllocInfo) {
+													return iAllocInfo.location == iLocation;
+												});
+		chunk != allocs.end()) {
+		if (iSize == 0) { iSize = chunk->size; }
 		allocs.erase(chunk);
 		deallocationCalls++;
-		allocatedMemory -= size;
+		allocatedMemory -= iSize;
 	}
-	doTrack = true;
+	s_doTrack = true;
 }
 
 void Tracker::AllocationState::reset() {
@@ -127,19 +129,18 @@ void Tracker::AllocationState::reset() {
 
 #ifdef OWL_STACKTRACE
 ScopeTrace::ScopeTrace() {
-	doTrace = true;
+	s_doTrace = true;
 }
 ScopeTrace::~ScopeTrace() {
-	doTrace = false;
+	s_doTrace = false;
 }
 #endif
 
-ScopeUntrack::ScopeUntrack() {
-	doTrack = false;
-}
+ScopeUntrack::ScopeUntrack() { s_doTrack = false; }
 
-ScopeUntrack::~ScopeUntrack() {
-	doTrack = true;
-}
+ScopeUntrack::~ScopeUntrack() { s_doTrack = true; }
 
 }// namespace owl::debug
+
+
+// NOLINTEND(misc-no-recursion)

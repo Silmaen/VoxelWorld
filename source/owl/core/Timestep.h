@@ -27,8 +27,8 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	Timestep() : lastCall{clock::now()} {
-		statFps.resize(maxIndex, 0.0);
+	Timestep() : m_lastCall{clock::now()} {
+		m_statFps.resize(c_maxIndex, 0.0);
 		update();
 	}
 
@@ -36,12 +36,12 @@ public:
 	 * @brief Time step update.
 	 */
 	void update() {
-		time_point tp = clock::now();
-		delta = tp - lastCall;
-		lastCall = tp;
-		if (delta.count() > 0) {
-			statFps[index] = getFps();
-			index = (index + 1) % maxIndex;
+		const time_point tp = clock::now();
+		m_delta = tp - m_lastCall;
+		m_lastCall = tp;
+		if (m_delta.count() > 0) {
+			m_statFps[m_index] = getFps();
+			m_index = (m_index + 1) % c_maxIndex;
 		}
 	}
 
@@ -49,13 +49,17 @@ public:
 	 * @brief Get the seconds elapsed since last update.
 	 * @return Seconds elapsed.
 	 */
-	[[nodiscard]] float getSeconds() const { return static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(delta).count()) / 1000.0f; }
+	[[nodiscard]] float getSeconds() const {
+		return static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(m_delta).count()) / 1000.0f;
+	}
 
 	/**
 	 * @brief Get the milliseconds elapsed since last update.
 	 * @return Milliseconds elapsed.
 	 */
-	[[nodiscard]] float getMilliseconds() const { return static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(delta).count()) / 1000.0f; }
+	[[nodiscard]] float getMilliseconds() const {
+		return static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(m_delta).count()) / 1000.0f;
+	}
 
 	/**
 	 * @brief Get the mean number of update call in one second.
@@ -71,15 +75,15 @@ public:
 
 private:
 	/// Last update call point.
-	time_point lastCall{};
+	time_point m_lastCall{};
 	/// The delta with the previous update call.
-	duration delta{};
+	duration m_delta{};
 	/// Stabilized fps counters.
-	std::vector<float> statFps;
+	std::vector<float> m_statFps;
 	/// index in the stats.
-	size_t index = 0;
+	size_t m_index = 0;
 	/// Max va in stats.
-	static constexpr size_t maxIndex = 20;
+	static constexpr size_t c_maxIndex = 20;
 };
 
 }// namespace owl::core

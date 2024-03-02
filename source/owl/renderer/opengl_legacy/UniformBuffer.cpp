@@ -13,18 +13,16 @@
 
 namespace owl::renderer::opengl_legacy {
 
-UniformBuffer::UniformBuffer(uint32_t size, uint32_t binding) {
-	internalBinding = binding;
-	internalData.resize(size);
+UniformBuffer::UniformBuffer(const uint32_t iSize, const uint32_t iBinding) {
+	m_internalBinding = iBinding;
+	m_internalData.resize(iSize);
 	UniformBindingLibrary::get().addUniformBuffer(this);
 }
 
-UniformBuffer::~UniformBuffer() {
-	UniformBindingLibrary::get().removeUniformBuffer(internalBinding);
-}
+UniformBuffer::~UniformBuffer() { UniformBindingLibrary::get().removeUniformBuffer(m_internalBinding); }
 
-void UniformBuffer::setData(const void *data, uint32_t size, uint32_t offset) {
-	memcpy(internalData.data() + offset, data, size);
+void UniformBuffer::setData(const void *iData, const uint32_t iSize, const uint32_t iOffset) {
+	memcpy(m_internalData.data() + iOffset, iData, iSize);
 }
 
 }// namespace owl::renderer::opengl_legacy

@@ -16,12 +16,12 @@ public:
 	OwlNest() = delete;
 	explicit OwlNest(const owl::core::AppParams &param) : owl::core::Application(param) {
 		if (getState() == owl::core::Application::State::Running)
-			pushLayer(owl::mk_shared<drone::droneLayer>());
+			pushLayer(owl::mkShared<drone::droneLayer>());
 	}
 };
 
 owl::shared<owl::core::Application> owl::core::createApplication(int argc, char **argv) {
-	return mk_shared<OwlNest>(core::AppParams{
+	return mkShared<OwlNest>(core::AppParams{
 			.name = "Owl Drone - Navigator for drone",
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,

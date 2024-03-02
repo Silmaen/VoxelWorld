@@ -17,17 +17,16 @@
 
 namespace owl::renderer {
 
-shared<Framebuffer> Framebuffer::create(const FramebufferSpecification &spec) {
-	auto type = Renderer::getAPI();
-	switch (type) {
+shared<Framebuffer> Framebuffer::create(const FramebufferSpecification &iSpec) {
+	switch (RenderCommand::getAPI()) {
 		case RenderAPI::Type::Null:
-			return mk_shared<null::Framebuffer>(spec);
+			return mkShared<null::Framebuffer>(iSpec);
 		case RenderAPI::Type::OpenGL:
-			return mk_shared<opengl::Framebuffer>(spec);
+			return mkShared<opengl::Framebuffer>(iSpec);
 		case RenderAPI::Type::OpenglLegacy:
-			return mk_shared<opengl_legacy::Framebuffer>(spec);
+			return mkShared<opengl_legacy::Framebuffer>(iSpec);
 		case RenderAPI::Type::Vulkan:
-			return mk_shared<vulkan::Framebuffer>(spec);
+			return mkShared<vulkan::Framebuffer>(iSpec);
 	}
 	OWL_CORE_ERROR("Unknown API Type!")
 	return nullptr;

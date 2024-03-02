@@ -15,46 +15,46 @@ using namespace owl::event;
 TEST(KeyEvent, Pressed) {
 	const KeyPressedEvent event(owl::input::key::A, 12);
 	EXPECT_STREQ(event.getName().c_str(), "KeyPressedEvent");
-	EXPECT_EQ(event.getType(), type::KeyPressed);
-	EXPECT_EQ(event.getStaticType(), type::KeyPressed);
+	EXPECT_EQ(event.getType(), Type::KeyPressed);
+	EXPECT_EQ(event.getStaticType(), Type::KeyPressed);
 	EXPECT_TRUE(event.getRepeatCount());
-	EXPECT_EQ(event.getCategoryFlags(), category::Input | category::Keyboard);
+	EXPECT_EQ(event.getCategoryFlags(), Category::Input | Category::Keyboard);
 	EXPECT_STREQ(event.toString().c_str(),
-				 "KeyPressedEvent: 65 (repeat = 12)");
-	EXPECT_TRUE(event.isInCategory(category::Input));
-	EXPECT_TRUE(event.isInCategory(category::Keyboard));
-	EXPECT_FALSE(event.isInCategory(category::Application));
-	EXPECT_FALSE(event.isInCategory(category::Mouse));
-	EXPECT_FALSE(event.isInCategory(category::MouseButton));
-	EXPECT_FALSE(event.isInCategory(category::None));
+	             "KeyPressedEvent: 65 (repeat = 12)");
+	EXPECT_TRUE(event.isInCategory(Category::Input));
+	EXPECT_TRUE(event.isInCategory(Category::Keyboard));
+	EXPECT_FALSE(event.isInCategory(Category::Application));
+	EXPECT_FALSE(event.isInCategory(Category::Mouse));
+	EXPECT_FALSE(event.isInCategory(Category::MouseButton));
+	EXPECT_FALSE(event.isInCategory(Category::None));
 }
 
 TEST(KeyEvent, Typed) {
 	const KeyTypedEvent event(12);
 	EXPECT_STREQ(event.getName().c_str(), "KeyTypedEvent");
-	EXPECT_EQ(event.getType(), type::KeyTyped);
-	EXPECT_EQ(event.getStaticType(), type::KeyTyped);
-	EXPECT_EQ(event.getCategoryFlags(), category::Input | category::Keyboard);
+	EXPECT_EQ(event.getType(), Type::KeyTyped);
+	EXPECT_EQ(event.getStaticType(), Type::KeyTyped);
+	EXPECT_EQ(event.getCategoryFlags(), Category::Input | Category::Keyboard);
 	EXPECT_STREQ(event.toString().c_str(), "KeyTypedEvent: 12");
-	EXPECT_TRUE(event.isInCategory(category::Input));
-	EXPECT_TRUE(event.isInCategory(category::Keyboard));
-	EXPECT_FALSE(event.isInCategory(category::Application));
-	EXPECT_FALSE(event.isInCategory(category::Mouse));
-	EXPECT_FALSE(event.isInCategory(category::MouseButton));
-	EXPECT_FALSE(event.isInCategory(category::None));
+	EXPECT_TRUE(event.isInCategory(Category::Input));
+	EXPECT_TRUE(event.isInCategory(Category::Keyboard));
+	EXPECT_FALSE(event.isInCategory(Category::Application));
+	EXPECT_FALSE(event.isInCategory(Category::Mouse));
+	EXPECT_FALSE(event.isInCategory(Category::MouseButton));
+	EXPECT_FALSE(event.isInCategory(Category::None));
 }
 
 TEST(KeyEvent, Released) {
 	const KeyReleasedEvent event(12);
 	EXPECT_STREQ(event.getName().c_str(), "KeyReleasedEvent");
-	EXPECT_EQ(event.getType(), type::KeyReleased);
-	EXPECT_EQ(event.getStaticType(), type::KeyReleased);
-	EXPECT_EQ(event.getCategoryFlags(), category::Input | category::Keyboard);
+	EXPECT_EQ(event.getType(), Type::KeyReleased);
+	EXPECT_EQ(event.getStaticType(), Type::KeyReleased);
+	EXPECT_EQ(event.getCategoryFlags(), Category::Input | Category::Keyboard);
 	EXPECT_STREQ(event.toString().c_str(), "KeyReleasedEvent: 12");
-	EXPECT_TRUE(event.isInCategory(category::Input));
-	EXPECT_TRUE(event.isInCategory(category::Keyboard));
-	EXPECT_FALSE(event.isInCategory(category::Application));
-	EXPECT_FALSE(event.isInCategory(category::Mouse));
-	EXPECT_FALSE(event.isInCategory(category::MouseButton));
-	EXPECT_FALSE(event.isInCategory(category::None));
+	EXPECT_TRUE(event.isInCategory(Category::Input));
+	EXPECT_TRUE(event.isInCategory(Category::Keyboard));
+	EXPECT_FALSE(event.isInCategory(Category::Application));
+	EXPECT_FALSE(event.isInCategory(Category::Mouse));
+	EXPECT_FALSE(event.isInCategory(Category::MouseButton));
+	EXPECT_FALSE(event.isInCategory(Category::None));
 }

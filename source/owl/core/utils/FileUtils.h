@@ -13,9 +13,9 @@ namespace owl::core::utils {
 
 /**
  * @brief Reads a text file and return its content as a string.
- * @param file The file to read.
+ * @param[in] iFile The file to read.
  * @return The content of the file.
  */
-std::string OWL_API fileToString(const std::filesystem::path &file);
+std::string OWL_API fileToString(const std::filesystem::path &iFile);
 
 }// namespace owl::core::utils

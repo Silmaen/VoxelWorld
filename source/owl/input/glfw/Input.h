@@ -15,7 +15,7 @@ namespace owl::input::glfw {
 /**
  * @brief Class Input
  */
-class OWL_API Input final: public ::owl::input::Input {
+class OWL_API Input final : public input::Input {
 public:
 	Input(const Input &) = delete;
 	Input(Input &&) = delete;
@@ -32,16 +32,16 @@ public:
 
 	/**
 	 * @brief Keyboard pressed check, private implementation.
-	 * @param keycode The Key to check.
+	 * @param[in] iKeycode The Key to check.
 	 * @return True if pressed.
 	 */
-	bool isKeyPressed_impl(KeyCode keycode) override;
+	bool isKeyPressed_impl(KeyCode iKeycode) override;
 	/**
 	 * @brief Mouse button pressed check, private implementation.
-	 * @param mouseCode Mouse button to check.
+	 * @param[in] iMouseCode Mouse button to check.
 	 * @return True if pressed.
 	 */
-	bool isMouseButtonPressed_impl(MouseCode mouseCode) override;
+	bool isMouseButtonPressed_impl(MouseCode iMouseCode) override;
 	/**
 	 * @brief Get mouse position, private implementation.
 	 * @return Mouse Position.
@@ -49,20 +49,20 @@ public:
 	glm::vec2 getMousePos_impl() override;
 	/**
 	 * @brief Simulate key toggle, private implementation.
-	 * @param keycode the key to press/release.
+	 * @param[in] iKeycode the key to press/release.
 	 */
-	void injectKey_impl([[maybe_unused]] KeyCode keycode) override {}
+	void injectKey_impl([[maybe_unused]] KeyCode iKeycode) override {}
 
 	/**
 	 * @brief Simulate mouse key toggle, private implementation.
-	 * @param mouseCode the key to press/release.
+	 * @param[in] iMouseCode the key to press/release.
 	 */
-	void injectMouseButton_impl([[maybe_unused]] MouseCode mouseCode) override {}
+	void injectMouseButton_impl([[maybe_unused]] MouseCode iMouseCode) override {}
 	/**
 	 * @brief Simulate mouse movement, private implementation.
-	 * @param mousePos The new mouse pos.
+	 * @param[in] iMousePos The new mouse pos.
 	 */
-	void injectMousePos_impl([[maybe_unused]] const glm::vec2 &mousePos) override {}
+	void injectMousePos_impl([[maybe_unused]] const glm::vec2 &iMousePos) override {}
 };
 
 

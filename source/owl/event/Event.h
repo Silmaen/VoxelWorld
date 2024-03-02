@@ -18,38 +18,38 @@ namespace owl::event {
 /**
  * @brief Type of events.
  */
-enum class type {
+enum class Type {
 	None = 0,/// No type.
 
-	WindowClose,    /// Window close.
-	WindowResize,   /// Window resize.
-	WindowFocus,    /// Window Focus.
+	WindowClose,/// Window close.
+	WindowResize,/// Window resize.
+	WindowFocus,/// Window Focus.
 	WindowLostFocus,/// Window lost focus.
-	WindowMoved,    /// Window moved.
+	WindowMoved,/// Window moved.
 
-	AppTick,  /// Application tick.
+	AppTick,/// Application tick.
 	AppUpdate,/// Application update.
 	AppRender,/// Application render.
 
-	KeyPressed, /// Keyboard's key pressed.
+	KeyPressed,/// Keyboard's key pressed.
 	KeyReleased,/// Keyboard's key released.
-	KeyTyped,   /// Keyboard's key typed.
+	KeyTyped,/// Keyboard's key typed.
 
-	MouseButtonPressed, /// Mouse's button pressed.
+	MouseButtonPressed,/// Mouse's button pressed.
 	MouseButtonReleased,/// Mouse's button released.
-	MouseMoved,         /// Mouse moved.
-	MouseScrolled       /// Mouse wheel scrolled.
+	MouseMoved,/// Mouse moved.
+	MouseScrolled/// Mouse wheel scrolled.
 };
 
 /**
  * @brief Event categories.
  */
-enum category {
-	None = 0,       /// No category.
+enum Category {
+	None = 0,/// No category.
 	Application = 1,/// Application event.
-	Input = 2,      /// Input event.
-	Keyboard = 4,   /// Keyboard event.
-	Mouse = 8,      /// Mouse event.
+	Input = 2,/// Input event.
+	Keyboard = 4,/// Keyboard event.
+	Mouse = 8,/// Mouse event.
 	MouseButton = 16/// Mouse button.
 };
 
@@ -73,7 +73,7 @@ public:
 	 * @brief Get the Event type.
 	 * @return Event Type.
 	 */
-	[[nodiscard]] virtual type getType() const = 0;
+	[[nodiscard]] virtual Type getType() const = 0;
 
 	/**
 	 * @brief Get the category flags for the Event.
@@ -95,12 +95,10 @@ public:
 
 	/**
 	 * @brief Check if the event belongs to category.
-	 * @param cat Category to check.
+	 * @param[in] iCategory Category to check.
 	 * @return True if belongs to category.
 	 */
-	[[nodiscard]] bool isInCategory(const category &cat) const {
-		return (getCategoryFlags() & cat) != 0;
-	}
+	[[nodiscard]] bool isInCategory(const Category &iCategory) const { return (getCategoryFlags() & iCategory) != 0; }
 
 	/// If event already handled.
 	bool handled = false;
@@ -113,21 +111,21 @@ class EventDispatcher {
 public:
 	/**
 	 * @brief Constructor.
-	 * @param dispatchEvent Event to dispatch.
+	 * @param[in,out] ioDispatchEvent Event to dispatch.
 	 */
-	explicit EventDispatcher(Event &dispatchEvent) : event(dispatchEvent) {}
+	explicit EventDispatcher(Event &ioDispatchEvent) : m_event(ioDispatchEvent) {}
 
 	/**
 	 * @brief Dispatching function.
 	 * @tparam T EventType.
 	 * @tparam F Function type (will be deduced by the compiler).
-	 * @param func The Function.
+	 * @param[in] iFunc The Function.
 	 * @return True if succeeded.
 	 */
 	template<typename T, typename F>
-	bool dispatch(const F &func) {
-		if (event.getType() == T::getStaticType()) {
-			event.handled |= func(static_cast<T &>(event));
+	bool dispatch(const F &iFunc) {
+		if (m_event.getType() == T::getStaticType()) {
+			m_event.handled |= iFunc(static_cast<T &>(m_event));
 			return true;
 		}
 		return false;
@@ -135,7 +133,7 @@ public:
 
 private:
 	/// The event.
-	Event &event;
+	Event &m_event;
 };
 
 }// namespace owl::event

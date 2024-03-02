@@ -22,33 +22,33 @@ Gauges::Gauges() {
 
 	renderer::FramebufferSpecification specs;
 	specs.attachments = {
-			renderer::FramebufferTextureFormat::RGBA8,
-			renderer::FramebufferTextureFormat::RED_INTEGER,
+			renderer::FramebufferTextureFormat::Rgba8,
+			renderer::FramebufferTextureFormat::RedInteger,
 			renderer::FramebufferTextureFormat::Depth};
 	specs.width = 1280;
 	specs.height = 720;
 	framebuffer = renderer::Framebuffer::create(specs);
 
 	// camera
-	camera = mk_shared<owl::renderer::CameraOrtho>(0, 1280, 0, 720);
+	camera = mkShared<renderer::CameraOrtho>(0, 1280, 0, 720);
 
 	// gauge for speed
-	gauges.emplace_back(mk_shared<gauge::AirSpeed>());
+	gauges.emplace_back(mkShared<gauge::AirSpeed>());
 	// gauge for vertical speed
-	gauges.emplace_back(mk_shared<gauge::VerticalSpeed>());
+	gauges.emplace_back(mkShared<gauge::VerticalSpeed>());
 	// gauge for altitude
-	gauges.emplace_back(mk_shared<gauge::Altitude>());
+	gauges.emplace_back(mkShared<gauge::Altitude>());
 	// gauge for compass
-	gauges.emplace_back(mk_shared<gauge::Compas>());
+	gauges.emplace_back(mkShared<gauge::Compas>());
 	// gauge for motor rates
-	gauges.emplace_back(mk_shared<gauge::MotorRate>());
+	gauges.emplace_back(mkShared<gauge::MotorRate>());
 	// gauge for artificial horizon
-	gauges.emplace_back(mk_shared<gauge::ArtificialHorizon>());
+	gauges.emplace_back(mkShared<gauge::ArtificialHorizon>());
 }
 
 Gauges::~Gauges() = default;
 
-void Gauges::onUpdate(const owl::core::Timestep &) {
+void Gauges::onUpdate(const core::Timestep &) {
 	OWL_PROFILE_FUNCTION()
 
 	// Updatte data from flight controller
@@ -57,7 +57,7 @@ void Gauges::onUpdate(const owl::core::Timestep &) {
 		static_pointer_cast<gauge::AirSpeed>(gauges[0])->setVelocity(rc->getHorizontalVelocity());
 		static_pointer_cast<gauge::VerticalSpeed>(gauges[1])->setVerticalVelocity(rc->getVerticalVelocity());
 		static_pointer_cast<gauge::Altitude>(gauges[2])->setAltitude(rc->getAltitude());
-		auto angles = rc->getRotations();
+		const auto angles = rc->getRotations();
 		static_pointer_cast<gauge::Compas>(gauges[3])->setHeading(angles.z);
 		static_pointer_cast<gauge::MotorRate>(gauges[4])->setMotorRates(rc->getMotorRates());
 		static_pointer_cast<gauge::ArtificialHorizon>(gauges[5])->setPitchRoll(angles.y, angles.x);
@@ -97,18 +97,12 @@ void Gauges::onUpdate(const owl::core::Timestep &) {
 	renderer::Renderer2D::beginScene(*camera);
 
 	// draw all backgrounds
-	for (const auto &gauge: gauges) {
-		gauge->drawBack();
-	}
+	for (const auto &gauge: gauges) { gauge->drawBack(); }
 	// draw all cursors
 
-	for (const auto &gauge: gauges) {
-		gauge->drawCursors();
-	}
+	for (const auto &gauge: gauges) { gauge->drawCursors(); }
 	// draw all covers
-	for (const auto &gauge: gauges) {
-		gauge->drawCover();
-	}
+	for (const auto &gauge: gauges) { gauge->drawCover(); }
 
 	renderer::Renderer2D::endScene();
 	// ===============================================================
@@ -133,8 +127,7 @@ void Gauges::onRender() {
 
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
-	uint64_t textureID = framebuffer->getColorAttachmentRendererID();
-	if (textureID != 0)
+	if (const uint64_t textureID = framebuffer->getColorAttachmentRendererId(0); textureID != 0)
 		ImGui::Image(reinterpret_cast<void *>(textureID), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
 	else
 		OWL_WARN("No frameBuffer to render...")

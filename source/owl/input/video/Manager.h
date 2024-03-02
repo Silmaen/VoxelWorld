@@ -15,12 +15,12 @@
  */
 namespace owl::input::video {
 
-constexpr size_t maxDevices = 10;
+constexpr size_t g_maxDevices = 10;
 
 /**
  * @brief Class Manager.
  */
-class OWL_API Manager {
+class OWL_API Manager final {
 public:
 	Manager(const Manager &) = delete;
 	Manager(Manager &&) = delete;
@@ -30,7 +30,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Manager();
+	~Manager();
 
 	/**
 	 * @brief Singleton accessor.
@@ -40,17 +40,18 @@ public:
 		static Manager instance;
 		return instance;
 	}
+
 	/**
 	 * @brief Get the number of found devices.
 	 * @return The number of found devices.
 	 */
-	[[nodiscard]] size_t getDeviceCount() const { return devices.size(); }
+	[[nodiscard]] size_t getDeviceCount() const { return m_devices.size(); }
 
 	/**
 	 * @brief Request a refresh of the devices list.
-	 * @param reset the list will be reset before search, closing all the devices.
+	 * @param[in] iReset the list will be reset before search, closing all the devices.
 	 */
-	void updateDeviceList(bool reset = false);
+	void updateDeviceList(bool iReset = false);
 
 	/**
 	 * @brief Get an ordered list of device names.
@@ -73,19 +74,19 @@ public:
 	 * @brief Check if a device is open.
 	 * @return True if a device is open.
 	 */
-	[[nodiscard]] bool isOpened() const { return currentDevice < maxDevices; }
+	[[nodiscard]] bool isOpened() const { return m_currentDevice < g_maxDevices; }
 
 	/**
 	 * @brief Check if some devices exist in the list.
 	 * @return True if a device exist.
 	 */
-	[[nodiscard]] bool hasDevice() const { return !devices.empty(); }
+	[[nodiscard]] bool hasDevice() const { return !m_devices.empty(); }
 
 	/**
 	 * @brief Open the device with the selected id.
-	 * @param id The id in the list of devices.
+	 * @param[in] iId The id in the list of devices.
 	 */
-	void open(size_t id);
+	void open(size_t iId);
 
 	/**
 	 * @brief Close the current device.
@@ -94,9 +95,9 @@ public:
 
 	/**
 	 * @brief Grab a frame and put it into the Texture.
-	 * @param frame The texture to update.
+	 * @param[in] iFrame The texture to update.
 	 */
-	void fillFrame(shared<renderer::Texture> &frame) const;
+	void fillFrame(shared<renderer::Texture> &iFrame) const;
 
 private:
 	/**
@@ -104,9 +105,9 @@ private:
 	 */
 	Manager();
 	/// List of devices.
-	std::vector<shared<Device>> devices;
+	std::vector<shared<Device>> m_devices;
 	/// index of the current device in the list.
-	size_t currentDevice = maxDevices;
+	size_t m_currentDevice = g_maxDevices;
 };
 
 }// namespace owl::input::video

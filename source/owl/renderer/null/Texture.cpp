@@ -9,13 +9,15 @@
 
 #include "Texture.h"
 
+#include <utility>
+
 namespace owl::renderer::null {
 
-Texture2D::Texture2D(const math::FrameSize &size_) : size{size_} {}
+Texture2D::Texture2D(const math::FrameSize iSize) : m_size{iSize} {}
 
-Texture2D::Texture2D(uint32_t width_, uint32_t height_) : size{width_, height_} {}
+Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight) : m_size{iWidth, iHeight} {}
 
-Texture2D::Texture2D(std::filesystem::path path_) : path{std::move(path_)} {}
+Texture2D::Texture2D(std::filesystem::path iPath) : m_path{std::move(iPath)} {}
 
 Texture2D::~Texture2D() = default;
 

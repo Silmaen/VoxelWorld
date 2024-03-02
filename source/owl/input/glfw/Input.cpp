@@ -13,23 +13,23 @@
 
 namespace owl::input::glfw {
 
-bool Input::isKeyPressed_impl(KeyCode keycode) {
+bool Input::isKeyPressed_impl(const KeyCode iKeycode) {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
-	const auto state = glfwGetKey(windows, keycode);
+	const auto state = glfwGetKey(windows, iKeycode);
 	return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-bool Input::isMouseButtonPressed_impl(MouseCode mouseCode) {
+bool Input::isMouseButtonPressed_impl(const MouseCode iMouseCode) {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
-	const auto state = glfwGetMouseButton(windows, mouseCode);
+	const auto state = glfwGetMouseButton(windows, iMouseCode);
 	return state == GLFW_PRESS;
 }
 
 glm::vec2 Input::getMousePos_impl() {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
-	double X, Y;
-	glfwGetCursorPos(windows, &X, &Y);
-	return {X, Y};
+	double x, y;
+	glfwGetCursorPos(windows, &x, &y);
+	return {x, y};
 }
 
 }// namespace owl::input::glfw

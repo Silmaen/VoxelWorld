@@ -22,19 +22,20 @@ namespace owl::input::video::windows {
 
 /**
  * @brief Search for devices and them to the given list.
- * @param list The device list to update.
+ * @param[in,out] ioList The device list to update.
  */
-void updateList(std::vector<shared<owl::input::video::Device>> &list);
+void updateList(std::vector<shared<Device>> &ioList);
 
 /**
  * @brief Class Device.
  */
-class Device final : public owl::input::video::Device {
+class Device final : public video::Device {
 public:
 	/**
 	 * @brief Default Constructor.
+	 * @param[in] iMfa Poiter to windows device.
 	 */
-	explicit Device(WPointer<IMFActivate> &mfa);
+	explicit Device(WPointer<IMFActivate> &iMfa);
 	/**
 	 * @brief Destructor.
 	 */
@@ -58,23 +59,23 @@ public:
 
 	/**
 	 * @brief Retrieve a frame.
-	 * @param frame The frame to update.
+	 * @param[in] iFrame The frame to update.
 	 */
-	void fillFrame(shared<renderer::Texture> &frame) override;
+	void fillFrame(shared<renderer::Texture> &iFrame) override;
 
 	/**
 	 * @brief Check the validity of the device.
 	 * @return True if valid.
 	 */
-	[[nodiscard]] virtual bool isValid() const override;
+	[[nodiscard]] bool isValid() const override;
 
 private:
 	/// Pointer to a media source
-	WPointer<IMFMediaSource> mediaSource;
+	WPointer<IMFMediaSource> m_mediaSource;
 	/// Pointer to a media source
-	WPointer<IMFActivate> devActive;
+	WPointer<IMFActivate> m_devActive;
 	/// Pointer to the source reader.
-	WPointer<IMFSourceReader> sourceReader;
+	WPointer<IMFSourceReader> m_sourceReader;
 };
 
 }// namespace owl::input::video::windows

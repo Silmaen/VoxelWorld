@@ -14,9 +14,11 @@
 #include "renderer/vulkan/GraphContext.h"
 #include "utils.h"
 
+#include <vulkan/vulkan.h>
+
 namespace owl::renderer::vulkan::internal {
 
-PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice dev) : device(dev) {
+PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice &iDev) : device(iDev) {
 	if (device == nullptr)
 		return;
 	vkGetPhysicalDeviceProperties(device, &properties);
@@ -45,14 +47,10 @@ PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice de
 		uint32_t index = 0;
 		const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
 		for (const auto &qFam: queueFamilies) {
-			if (qFam.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-				graphicQueueIndex = index;
-			}
+			if (qFam.queueFlags & VK_QUEUE_GRAPHICS_BIT) { graphicQueueIndex = index; }
 			VkBool32 support;
 			vkGetPhysicalDeviceSurfaceSupportKHR(device, index, gc->getSurface(), &support);
-			if (support) {
-				presentQueueIndex = index;
-			}
+			if (support) { presentQueueIndex = index; }
 			index++;
 		}
 	}
@@ -60,26 +58,28 @@ PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice de
 
 PhysicalDeviceCapabilities::~PhysicalDeviceCapabilities() = default;
 
-bool PhysicalDeviceCapabilities::hasLayer(const std::string &layer) const {
+bool PhysicalDeviceCapabilities::hasLayer(const std::string &iLayer) const {
 	return std::ranges::find_if(supportedLayers.begin(), supportedLayers.end(),
-								[&layer](const VkLayerProperties &layerProp) {
-									return layerProp.layerName == layer;
+								[&iLayer](const VkLayerProperties &iLayerProp) {
+									return iLayerProp.layerName == iLayer;
 								}) != supportedLayers.end();
 }
 
-bool PhysicalDeviceCapabilities::hasExtension(const std::string &extension) const {
+bool PhysicalDeviceCapabilities::hasExtension(const std::string &iExtension) const {
 	return std::ranges::find_if(supportedExtensions.begin(), supportedExtensions.end(),
-								[&extension](const VkExtensionProperties &ext) {
-									return ext.extensionName == extension;
+								[&iExtension](const VkExtensionProperties &iExtensionProp) {
+									return iExtensionProp.extensionName == iExtension;
 								}) != supportedExtensions.end();
 }
 
-bool PhysicalDeviceCapabilities::hasLayers(const std::vector<std::string> &layers) const {
-	return std::ranges::all_of(layers.begin(), layers.end(), [&](const auto &layer) { return this->hasLayer(layer); });
+bool PhysicalDeviceCapabilities::hasLayers(const std::vector<std::string> &iLayers) const {
+	return std::ranges::all_of(iLayers.begin(), iLayers.end(),
+							   [&](const auto &iLayer) { return this->hasLayer(iLayer); });
 }
 
-bool PhysicalDeviceCapabilities::hasExtensions(const std::vector<std::string> &extensions) const {
-	return std::ranges::all_of(extensions.begin(), extensions.end(), [&](const auto &extension) { return this->hasExtension(extension); });
+bool PhysicalDeviceCapabilities::hasExtensions(const std::vector<std::string> &iExtensions) const {
+	return std::ranges::all_of(iExtensions.begin(), iExtensions.end(),
+							   [&](const auto &extension) { return this->hasExtension(extension); });
 }
 
 uint32_t PhysicalDeviceCapabilities::getScore() const {
@@ -97,11 +97,12 @@ uint32_t PhysicalDeviceCapabilities::getScore() const {
 	return score;
 }
 
-std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance instance) {
+std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance &iInstance) {
 	std::vector<PhysicalDeviceCapabilities> resultVec;
 	uint32_t deviceCount = 0;
 	{
-		if (const VkResult result = vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr); result != VK_SUCCESS) {
+		if (const VkResult result = vkEnumeratePhysicalDevices(iInstance, &deviceCount, nullptr);
+			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan: Error while enumerating physical devices ({}).", resultString(result))
 			return {};
 		}
@@ -111,14 +112,13 @@ std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance instan
 		}
 	}
 	std::vector<VkPhysicalDevice> devices(deviceCount);
-	if (const VkResult result = vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data()); result != VK_SUCCESS) {
+	if (const VkResult result = vkEnumeratePhysicalDevices(iInstance, &deviceCount, devices.data());
+		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: Error while enumerating physical devices ({}).", resultString(result))
 		return {};
 	}
 	resultVec.reserve(devices.size());
-	for (const auto &device: devices) {
-		resultVec.emplace_back(device);
-	}
+	for (const auto &device: devices) { resultVec.emplace_back(device); }
 	// sort by decreasing score...
 	if (!resultVec.empty())
 		std::ranges::sort(resultVec.begin(), resultVec.cend(),

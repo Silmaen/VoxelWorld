@@ -30,6 +30,7 @@ struct convert<glm::vec3> {
 		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
+
 	static bool decode(const Node &node, glm::vec3 &rhs) {
 		if (!node.IsSequence() || node.size() != 3)
 			return false;
@@ -51,6 +52,7 @@ struct convert<glm::vec4> {
 		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
+
 	static bool decode(const Node &node, glm::vec4 &rhs) {
 		if (!node.IsSequence() || node.size() != 4)
 			return false;
@@ -78,39 +80,39 @@ static Emitter &operator<<(Emitter &out, const glm::vec4 &v) {
 
 namespace owl::scene {
 
-SceneSerializer::SceneSerializer(const shared<Scene> &scene_) : scene(scene_) {
-}
+SceneSerializer::SceneSerializer(const shared<Scene> &iScene) : mp_scene(iScene) {}
 
-[[maybe_unused]] static void serializeEntity(YAML::Emitter &out, Entity entity) {
+static void serializeEntity(YAML::Emitter &out, const Entity &iEntity) {
 	out << YAML::BeginMap;// Entity
-	out << YAML::Key << "Entity" << YAML::Value << entity.getUUID();
+	out << YAML::Key << "Entity" << YAML::Value << iEntity.getUUID();
 
-	if (entity.hasComponent<component::Tag>()) {
+	if (iEntity.hasComponent<component::Tag>()) {
 		out << YAML::Key << "Tag";
 		out << YAML::BeginMap;// Tag
-		const auto &tag = entity.getComponent<component::Tag>().tag;
+		const auto &tag = iEntity.getComponent<component::Tag>().tag;
 		out << YAML::Key << "tag" << YAML::Value << tag;
 		out << YAML::EndMap;// Tag
 	}
 
-	if (entity.hasComponent<component::Transform>()) {
+	if (iEntity.hasComponent<component::Transform>()) {
 		out << YAML::Key << "Transform";
 		out << YAML::BeginMap;// Transform
-		auto &tc = entity.getComponent<component::Transform>();
+		auto &tc = iEntity.getComponent<component::Transform>();
 		out << YAML::Key << "translation" << YAML::Value << tc.translation;
 		out << YAML::Key << "rotation" << YAML::Value << tc.rotation;
 		out << YAML::Key << "scale" << YAML::Value << tc.scale;
 		out << YAML::EndMap;// Transform
 	}
 
-	if (entity.hasComponent<component::Camera>()) {
+	if (iEntity.hasComponent<component::Camera>()) {
 		out << YAML::Key << "Camera";
 		out << YAML::BeginMap;// CameraComponent
-		const auto &cameraComponent = entity.getComponent<component::Camera>();
+		const auto &cameraComponent = iEntity.getComponent<component::Camera>();
 		const auto &camera = cameraComponent.camera;
 		out << YAML::Key << "camera" << YAML::Value;
 		out << YAML::BeginMap;// Camera
-		out << YAML::Key << "projectionType" << YAML::Value << std::string(magic_enum::enum_name(camera.getProjectionType()));
+		out << YAML::Key << "projectionType" << YAML::Value << std::string(
+				magic_enum::enum_name(camera.getProjectionType()));
 		out << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
 		out << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
 		out << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
@@ -123,10 +125,10 @@ SceneSerializer::SceneSerializer(const shared<Scene> &scene_) : scene(scene_) {
 		out << YAML::EndMap;// Camera
 	}
 
-	if (entity.hasComponent<component::SpriteRenderer>()) {
+	if (iEntity.hasComponent<component::SpriteRenderer>()) {
 		out << YAML::Key << "SpriteRenderer";
 		out << YAML::BeginMap;// SpriteRenderer
-		auto &spriteRendererComponent = entity.getComponent<component::SpriteRenderer>();
+		auto &spriteRendererComponent = iEntity.getComponent<component::SpriteRenderer>();
 		out << YAML::Key << "color" << YAML::Value << spriteRendererComponent.color;
 		if (spriteRendererComponent.texture) {
 			out << YAML::Key << "tilingFactor" << YAML::Value << spriteRendererComponent.tilingFactor;
@@ -134,10 +136,10 @@ SceneSerializer::SceneSerializer(const shared<Scene> &scene_) : scene(scene_) {
 		}
 		out << YAML::EndMap;// SpriteRenderer
 	}
-	if (entity.hasComponent<component::CircleRenderer>()) {
+	if (iEntity.hasComponent<component::CircleRenderer>()) {
 		out << YAML::Key << "CircleRenderer";
 		out << YAML::BeginMap;// CircleRenderer
-		auto &circleRendererComponent = entity.getComponent<component::CircleRenderer>();
+		auto &circleRendererComponent = iEntity.getComponent<component::CircleRenderer>();
 		out << YAML::Key << "color" << YAML::Value << circleRendererComponent.color;
 		out << YAML::Key << "thickness" << YAML::Value << circleRendererComponent.thickness;
 		out << YAML::Key << "fade" << YAML::Value << circleRendererComponent.fade;
@@ -147,44 +149,44 @@ SceneSerializer::SceneSerializer(const shared<Scene> &scene_) : scene(scene_) {
 	out << YAML::EndMap;// Entity
 }
 
-void SceneSerializer::serialize(const std::filesystem::path &filepath) {
+void SceneSerializer::serialize(const std::filesystem::path &iFilepath) const {
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 	out << YAML::Key << "Scene" << YAML::Value << "untitled";
 	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-	for (auto &&[e]: scene->registry.storage<entt::entity>().each()) {
-		const Entity entity{e, scene.get()};
-		if (!entity) continue;
+	for (auto &&[e]: mp_scene->registry.storage<entt::entity>().each()) {
+		const Entity entity{e, mp_scene.get()};
+		if (!entity)
+			continue;
 		serializeEntity(out, entity);
 	}
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
-	std::ofstream fileOut(filepath);
+	std::ofstream fileOut(iFilepath);
 	fileOut << out.c_str();
 	fileOut.close();
 }
 
-bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
-	YAML::Node data = YAML::LoadFile(filepath.string());
+bool SceneSerializer::deserialize(const std::filesystem::path &iFilepath) const {
+	YAML::Node data = YAML::LoadFile(iFilepath.string());
 	if (!data["Scene"])
 		return false;
 	auto sceneName = data["Scene"].as<std::string>();
 	OWL_CORE_TRACE("Deserializing scene '{0}'", sceneName)
-	auto entities = data["Entities"];
-	if (entities) {
+	if (auto entities = data["Entities"]; entities) {
 		for (auto entity: entities) {
 			auto uuid = entity["Entity"].as<uint64_t>();
 			std::string name;
-			auto tagComponent = entity["Tag"];
-			if (tagComponent)
+
+			if (auto tagComponent = entity["Tag"]; tagComponent)
 				name = tagComponent["tag"].as<std::string>();
 
 			OWL_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name)
 
-			Entity deserializedEntity = scene->createEntityWithUUID(core::UUID{uuid}, name);
+			Entity deserializedEntity = mp_scene->createEntityWithUUID(core::UUID{uuid}, name);
 
-			auto transformComponent = entity["Transform"];
-			if (transformComponent) {
+
+			if (auto transformComponent = entity["Transform"]; transformComponent) {
 				// Entities always have transforms
 				auto &tc = deserializedEntity.getComponent<component::Transform>();
 				tc.translation = transformComponent["translation"].as<glm::vec3>();
@@ -192,11 +194,12 @@ bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
 				tc.scale = transformComponent["scale"].as<glm::vec3>();
 			}
 
-			auto cameraComponent = entity["Camera"];
-			if (cameraComponent) {
+
+			if (auto cameraComponent = entity["Camera"]; cameraComponent) {
 				auto &cc = deserializedEntity.addComponent<component::Camera>();
 				auto cameraProps = cameraComponent["camera"];
-				auto projType = magic_enum::enum_cast<SceneCamera::ProjectionType>(cameraProps["projectionType"].as<std::string>());
+				auto projType = magic_enum::enum_cast<SceneCamera::ProjectionType>(
+						cameraProps["projectionType"].as<std::string>());
 				if (projType.has_value())
 					cc.camera.setProjectionType(projType.value());
 				cc.camera.setPerspectiveVerticalFOV(cameraProps["perspectiveFOV"].as<float>());
@@ -211,8 +214,8 @@ bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
 				cc.fixedAspectRatio = cameraComponent["fixedAspectRatio"].as<bool>();
 			}
 
-			auto spriteRendererComponent = entity["SpriteRenderer"];
-			if (spriteRendererComponent) {
+
+			if (auto spriteRendererComponent = entity["SpriteRenderer"]; spriteRendererComponent) {
 				auto &src = deserializedEntity.addComponent<component::SpriteRenderer>();
 				src.color = spriteRendererComponent["color"].as<glm::vec4>();
 				if (spriteRendererComponent["tilingFactor"])
@@ -221,8 +224,8 @@ bool SceneSerializer::deserialize(const std::filesystem::path &filepath) {
 					src.texture = renderer::Texture2D::create(spriteRendererComponent["texture"].as<std::string>());
 			}
 
-			auto circleRendererComponent = entity["CircleRenderer"];
-			if (circleRendererComponent) {
+
+			if (auto circleRendererComponent = entity["CircleRenderer"]; circleRendererComponent) {
 				auto &src = deserializedEntity.addComponent<component::CircleRenderer>();
 				src.color = circleRendererComponent["color"].as<glm::vec4>();
 				src.thickness = circleRendererComponent["thickness"].as<float>();

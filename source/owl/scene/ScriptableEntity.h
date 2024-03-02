@@ -11,7 +11,6 @@
 #include "Entity.h"
 
 namespace owl::scene {
-
 /**
  * @brief Class ScriptableEntity.
  */
@@ -22,10 +21,9 @@ public:
 	 * @tparam T Type of component.
 	 * @return The component.
 	 */
-	template<typename T>
-	T &getComponent() {
-		return entity.getComponent<T>();
-	}
+	template <typename T>
+	T& getComponent() { return entity.getComponent<T>(); }
+
 	/// The actual entity.
 	Entity entity;
 	/**
@@ -42,13 +40,12 @@ public:
 	virtual void onDestroy() {}
 	/**
 	 * @brief Function called on script update.
-	 * @param ts Timestamp.
+	 * @param[in] iTimeStep Timestamp.
 	 */
-	virtual void onUpdate([[maybe_unused]] core::Timestep ts) {}
+	virtual void onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) {}
 
 private:
 	/// To access the scene privates.
 	friend class scene;
 };
-
-}// namespace owl::scene
+} // namespace owl::scene

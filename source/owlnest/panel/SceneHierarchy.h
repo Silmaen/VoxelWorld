@@ -11,7 +11,6 @@
 #include <owl.h>
 
 namespace owl::panel {
-
 /**
  * @brief Class SceneHierarchy
  */
@@ -20,21 +19,21 @@ public:
 	/**
 	 * @brief Default copy constructor
 	 */
-	SceneHierarchy(const SceneHierarchy &) = default;
+	SceneHierarchy(const SceneHierarchy&) = default;
 	/**
 	 * @brief Default move constructor
 	 */
-	SceneHierarchy(SceneHierarchy &&) = default;
+	SceneHierarchy(SceneHierarchy&&) = default;
 	/**
 	 * @brief Default copy assignation
 	 * @return this
 	 */
-	SceneHierarchy &operator=(const SceneHierarchy &) = default;
+	SceneHierarchy& operator=(const SceneHierarchy&) = default;
 	/**
 	 * @brief Default move assignation
 	 * @return this
 	 */
-	SceneHierarchy &operator=(SceneHierarchy &&) = default;
+	SceneHierarchy& operator=(SceneHierarchy&&) = default;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -46,14 +45,14 @@ public:
 
 	/**
 	 * @brief Constructor
-	 * @param scene The base scene
+	 * @param[in] iScene The base scene
 	 */
-	[[maybe_unused]] explicit SceneHierarchy(const shared<scene::Scene> &scene);
+	[[maybe_unused]] explicit SceneHierarchy(const shared<scene::Scene>& iScene);
 	/**
 	 * @brief Define the Scene context
-	 * @param scene The Scene
+	 * @param[in] iContext The Scene
 	 */
-	void setContext(const shared<scene::Scene> &scene);
+	void setContext(const shared<scene::Scene>& iContext);
 	/**
 	 * @brief Action on Gui Render
 	 */
@@ -62,24 +61,23 @@ public:
 	 * @brief Access to the selected entity
 	 * @return The selected entity
 	 */
-	[[nodiscard]] scene::Entity getSelectedEntity() const { return selection; }
-	void setSelectedEntity(scene::Entity entity) { selection = std::move(entity); }
+	[[nodiscard]] scene::Entity getSelectedEntity() const { return m_selection; }
+	void setSelectedEntity(const scene::Entity& iEntity) { m_selection = iEntity; }
 
 private:
 	/**
 	 * @brief Draw one entity node
-	 * @param entity The node to draw
+	 * @param[in,out] ioEntity The node to draw
 	 */
-	void drawEntityNode(scene::Entity entity);
+	void drawEntityNode(scene::Entity& ioEntity);
 	/**
 	 * @brief Draw the properties of a component
-	 * @param entity The entity
+	 * @param[in,out] ioEntity The entity
 	 */
-	void drawComponents(scene::Entity entity);
+	void drawComponents(scene::Entity& ioEntity);
 	/// The scene
-	shared<scene::Scene> context;
+	shared<scene::Scene> m_context;
 	/// The selected item
-	scene::Entity selection;
+	scene::Entity m_selection;
 };
-
-}// namespace owl::panel
+} // namespace owl::panel

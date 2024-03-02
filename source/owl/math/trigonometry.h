@@ -14,10 +14,10 @@ namespace owl::math {
 
 /**
  * @brief Arc tangent 2, safe atan(y/(x + |x,y|)).
- * @param y Numerator.
- * @param x Denominator.
+ * @param[in] iY Numerator.
+ * @param[in] iX Denominator.
  * @return Arc tangent with the right quadrant.
  */
-OWL_API float atan2(float y, float x);
+OWL_API float atan2(float iY, float iX);
 
 }// namespace owl::math

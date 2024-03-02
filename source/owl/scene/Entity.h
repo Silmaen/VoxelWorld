@@ -12,30 +12,31 @@
 #include "component/ID.h"
 #include "component/Tag.h"
 
-namespace owl::scene {
+#include <entt/entity/entity.hpp>
 
+namespace owl::scene {
 /**
  * @brief Class Entity.
  */
 class OWL_API Entity final {
 public:
 	Entity() = default;
-	Entity(const Entity &) = default;
-	Entity(Entity &&) = default;
-	Entity &operator=(const Entity &) = default;
-	Entity &operator=(Entity &&) = default;
+	Entity(const Entity&) = default;
+	Entity(Entity&&) = default;
+	Entity& operator=(const Entity&) = default;
+	Entity& operator=(Entity&&) = default;
 
 	/**
 	 * @brief Destructor.
 	 */
-	~Entity();
+	~Entity() = default;
 
 	/**
 	 * @brief Constructor.
-	 * @param handle Entity handle.
-	 * @param scene Parent scene.
+	 * @param[in] iHandle Entity handle.
+	 * @param[in] iScene Parent scene.
 	 */
-	Entity(entt::entity handle, Scene *scene);
+	Entity(entt::entity iHandle, Scene* iScene);
 
 
 	OWL_DIAG_PUSH
@@ -44,14 +45,14 @@ public:
 	 * @brief Add component to this entity.
 	 * @tparam T Type of the component.
 	 * @tparam Args Type of the component's constructor arguments.
-	 * @param args Arguments for the component's constructor
+	 * @param[in] iArgs Arguments for the component's constructor
 	 * @return The entity's new component.
 	 */
-	template<typename T, typename... Args>
-	T &addComponent(Args &&...args) {
+	template <typename T, typename... Args>
+	T& addComponent(Args&&... iArgs) {
 		OWL_CORE_ASSERT(!hasComponent<T>(), "Entity already has component!")
-		T &component = scene->registry.emplace<T>(entityHandle, std::forward<Args>(args)...);
-		scene->onComponentAdded<T>(*this, component);
+		T& component = mp_scene->registry.emplace<T>(m_entityHandle, std::forward<Args>(iArgs)...);
+		mp_scene->onComponentAdded<T>(*this, component);
 		return component;
 	}
 
@@ -59,15 +60,16 @@ public:
 	 * @brief Add or replace component to this entity.
 	 * @tparam T Type of the component.
 	 * @tparam Args Type of the component's constructor arguments.
-	 * @param args Arguments for the component's constructor
+	 * @param[in] iArgs Arguments for the component's constructor
 	 * @return The entity's new or updated component.
 	 */
-	template<typename T, typename... Args>
-	T &addOrReplaceComponent(Args &&...args) {
-		T &component = scene->registry.emplace_or_replace<T>(entityHandle, std::forward<Args>(args)...);
-		scene->onComponentAdded<T>(*this, component);
+	template <typename T, typename... Args>
+	T& addOrReplaceComponent(Args&&... iArgs) {
+		T& component = mp_scene->registry.emplace_or_replace<T>(m_entityHandle, std::forward<Args>(iArgs)...);
+		mp_scene->onComponentAdded<T>(*this, component);
 		return component;
 	}
+
 	OWL_DIAG_POP
 
 	/**
@@ -75,10 +77,10 @@ public:
 	 * @tparam T The type of component.
 	 * @return The entity's component.
 	 */
-	template<typename T>
-	[[nodiscard]] T &getComponent() const {
+	template <typename T>
+	[[nodiscard]] T& getComponent() const {
 		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!")
-		return scene->registry.get<T>(entityHandle);
+		return mp_scene->registry.get<T>(m_entityHandle);
 	}
 
 	/**
@@ -86,38 +88,36 @@ public:
 	 * @tparam T The type of component.
 	 * @return true if the entity has the component.
 	 */
-	template<typename T>
-	[[nodiscard]] bool hasComponent() const {
-		return scene->registry.all_of<T>(entityHandle);
-	}
+	template <typename T>
+	[[nodiscard]] bool hasComponent() const { return mp_scene->registry.all_of<T>(m_entityHandle); }
 
 	/**
 	 * @brief Remove the component from entity.
 	 * @tparam T The type of component.
 	 */
-	template<typename T>
+	template <typename T>
 	void removeComponent() const {
 		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!")
-		scene->registry.remove<T>(entityHandle);
+		mp_scene->registry.remove<T>(m_entityHandle);
 	}
 
 	/**
 	 * @brief Get entity as boolean.
 	 * @return True if handle exists.
 	 */
-	explicit operator bool() const { return entityHandle != entt::null; }
+	explicit operator bool() const { return m_entityHandle != entt::null; }
 
 	/**
 	 * @brief Get entity as handle.
 	 * @return The entity's handle.
 	 */
-	explicit operator entt::entity() const { return entityHandle; }
+	explicit operator entt::entity() const { return m_entityHandle; }
 
 	/**
 	 * @brief Get the entity as unsigned int.
 	 * @return The entity's handle code.
 	 */
-	explicit operator uint32_t() const { return static_cast<uint32_t>(entityHandle); }
+	explicit operator uint32_t() const { return static_cast<uint32_t>(m_entityHandle); }
 
 	/**
 	 * @brief Get entity's UUID.
@@ -133,28 +133,25 @@ public:
 
 	/**
 	 * @brief Comparison operator.
-	 * @param other Other entity to compare
+	 * @param[in] iOther Other entity to compare
 	 * @return true if entities are the same.
 	 */
-	bool operator==(const Entity &other) const {
-		return entityHandle == other.entityHandle && scene == other.scene;
+	bool operator==(const Entity& iOther) const {
+		return m_entityHandle == iOther.m_entityHandle && mp_scene == iOther.mp_scene;
 	}
 
 	/**
 	 * @brief Comparison operator.
-	 * @param other Other entity to compare
+	 * @param[in] iOther Other entity to compare
 	 * @return true if entities are not the same.
 	 */
-	bool operator!=(const Entity &other) const {
-		return !(*this == other);
-	}
+	bool operator!=(const Entity& iOther) const { return !(*this == iOther); }
 
 private:
 	/// Entity's handle.
-	entt::entity entityHandle{entt::null};
+	entt::entity m_entityHandle{entt::null};
 	/// Parent scene.
-	Scene *scene = nullptr;
+	Scene* mp_scene = nullptr;
 	friend class Scene;
 };
-
-}// namespace owl::scene
+} // namespace owl::scene

@@ -23,7 +23,7 @@ void VertexBuffer::unbind() const {}
 
 void VertexBuffer::setData(const void *, uint32_t) {}
 
-IndexBuffer::IndexBuffer(uint32_t *, uint32_t size) : count(size) {}
+IndexBuffer::IndexBuffer(uint32_t *, const uint32_t iCount) : m_count(iCount) {}
 
 IndexBuffer::~IndexBuffer() = default;
 

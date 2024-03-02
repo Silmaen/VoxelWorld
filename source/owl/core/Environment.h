@@ -11,49 +11,49 @@
 namespace owl::core {
 
 #ifdef OWL_PLATFORM_WINDOWS
-constexpr char sep[] = ";";
+constexpr char g_sep[] = ";";
 #else
-constexpr char sep[] = ":";
+constexpr char g_sep[] = ":";
 #endif
 
 /**
  * @brief Get an anvironment variable value.
- * @param key The Environment vaiable's name.
+ * @param[in] iKey The Environment vaiable's name.
  * @return Value or empty string.
  */
-std::string getEnv(const std::string &key);
+std::string getEnv(const std::string &iKey);
 
 /**
  * @brief Define (overwrite) an environment variable.
- * @param key The Environment vaiable's name.
- * @param value The new value.
+ * @param[in] iKey The Environment vaiable's name.
+ * @param[in] iValue The new value.
  */
-void setEnv(const std::string &key, const std::string &value);
+void setEnv(const std::string &iKey, const std::string &iValue);
 
 /**
  * @brief Append a value to existing environment variable.
- * @param key The Environment vaiable's name.
- * @param value The value to add.
- * @param sepparator The sepparator between values.
+ * @param[in] iKey The Environment vaiable's name.
+ * @param[in] iValue The value to add.
+ * @param[in] iSepparator The sepparator between values.
  */
-void appendEnv(const std::string &key, const std::string &value, const std::string &sepparator = sep);
+void appendEnv(const std::string &iKey, const std::string &iValue, const std::string &iSepparator = g_sep);
 
 /**
  * @brief Define (overwrite) an environment variable.
  * @tparam T The type of value.
- * @param key The Environment vaiable's name.
- * @param value The new value.
+ * @param[in] iKey The Environment vaiable's name.
+ * @param[in] iValue The new value.
  */
 template<typename T>
-void setEnvValue(const std::string &key, const T &value);
+void setEnvValue(const std::string &iKey, const T &iValue);
 
 /**
  * @brief Append a value to existing environment variable.
  * @tparam T The type of value.
- * @param key The Environment vaiable's name.
- * @param value The value to add.
+ * @param[in] iKey The Environment vaiable's name.
+ * @param[in] iValue The value to add.
  */
 template<typename T>
-void appendEnvValue(const std::string &key, const T &value);
+void appendEnvValue(const std::string &iKey, const T &iValue);
 
 }// namespace owl::core

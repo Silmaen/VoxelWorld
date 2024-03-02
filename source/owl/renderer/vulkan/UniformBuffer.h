@@ -10,23 +10,22 @@
 #include "../UniformBuffer.h"
 
 namespace owl::renderer::vulkan {
-
 /**
  * @brief Class UniformBuffer.
  */
-class UniformBuffer final: public ::owl::renderer::UniformBuffer {
+class UniformBuffer final : public renderer::UniformBuffer {
 public:
 	UniformBuffer() = delete;
-	UniformBuffer(const UniformBuffer &) = default;
-	UniformBuffer(UniformBuffer &&) = default;
+	UniformBuffer(const UniformBuffer&) = default;
+	UniformBuffer(UniformBuffer&&) = default;
 
 	/**
 	 * @brief Constructor.
-	 * @param size Buffer's size.
-	 * @param binding Buffer's binding.
-	 * @param renderer Name of the shader's related renderer.
+	 * @param[in] iSize Buffer's size.
+	 * @param[in] iBinding Buffer's binding.
+	 * @param[in] iRenderer Name of the shader's related renderer.
 	 */
-	UniformBuffer(uint32_t size, uint32_t binding, const std::string &renderer);
+	UniformBuffer(uint32_t iSize, uint32_t iBinding, const std::string& iRenderer);
 
 	/**
 	 * @brief Destructor.
@@ -40,15 +39,14 @@ public:
 
 	/**
 	 * @brief Push Data to GPU.
-	 * @param data The data.
-	 * @param size The data size.
-	 * @param offset The offset to start.
+	 * @param[in] iData The data.
+	 * @param[in] iSize The data size.
+	 * @param[in] iOffset The offset to start.
 	 */
-	void setData(const void *data, uint32_t size, uint32_t offset) override;
+	void setData(const void* iData, uint32_t iSize, uint32_t iOffset) override;
 
 private:
 	/// The renderer name.
-	std::string renderer;
+	std::string m_renderer;
 };
-
-}// namespace owl::renderer::vulkan
+} // namespace owl::renderer::vulkan

@@ -11,18 +11,18 @@
 
 namespace owl::core::utils {
 
-std::string fileToString(const std::filesystem::path &file) {
-	if (!exists(file)) {
-		OWL_CORE_WARN("Shader file '{}' does not exists", file.string())
+std::string fileToString(const std::filesystem::path &iFile) {
+	if (!exists(iFile)) {
+		OWL_CORE_WARN("Shader file '{}' does not exists", iFile.string())
 		return "";
 	}
-	std::ifstream t(file);
+	std::ifstream t(iFile);
 	std::string str;
 	t.seekg(0, std::ios::end);
 	str.reserve(static_cast<size_t>(t.tellg()));
 	t.seekg(0, std::ios::beg);
 	str.assign((std::istreambuf_iterator<char>(t)),
-			   std::istreambuf_iterator<char>());
+	           std::istreambuf_iterator<char>());
 	return str;
 }
 

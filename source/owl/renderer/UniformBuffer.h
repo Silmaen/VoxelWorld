@@ -28,11 +28,11 @@ public:
 
 	/**
 	 * @brief Push Data to GPU.
-	 * @param data The data.
-	 * @param size The data size.
-	 * @param offset The offset to start.
+	 * @param[in] iData The data.
+	 * @param[in] iSize The data size.
+	 * @param[in] iOffset The offset to start.
 	 */
-	virtual void setData(const void *data, uint32_t size, uint32_t offset) = 0;
+	virtual void setData(const void *iData, uint32_t iSize, uint32_t iOffset) = 0;
 
 	/**
 	 * @brief bind this uniform buffer.
@@ -41,12 +41,12 @@ public:
 
 	/**
 	 * @brief Create a new instance of UniformBuffer.
-	 * @param size The buffer size.
-	 * @param binding The binding.
-	 * @param renderer Name of the shader's related renderer.
+	 * @param[in] iSize The buffer size.
+	 * @param[in] iBinding The binding.
+	 * @param[in] iRenderer Name of the shader's related renderer.
 	 * @return New instance of UniformBuffer.
 	 */
-	static shared<UniformBuffer> create(uint32_t size, uint32_t binding, const std::string &renderer);
+	static shared<UniformBuffer> create(uint32_t iSize, uint32_t iBinding, const std::string &iRenderer);
 };
 
 }// namespace owl::renderer

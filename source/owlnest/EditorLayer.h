@@ -14,16 +14,15 @@
 #include "panel/SceneHierarchy.h"
 
 namespace owl {
-
 /**
  * @brief Class EditorLayer
  */
 class EditorLayer final : public core::layer::Layer {
 public:
-	EditorLayer(const EditorLayer &) = delete;
-	EditorLayer(EditorLayer &&) = delete;
-	EditorLayer &operator=(const EditorLayer &) = delete;
-	EditorLayer &operator=(EditorLayer &&) = delete;
+	EditorLayer(const EditorLayer&) = delete;
+	EditorLayer(EditorLayer&&) = delete;
+	EditorLayer& operator=(const EditorLayer&) = delete;
+	EditorLayer& operator=(EditorLayer&&) = delete;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -35,30 +34,30 @@ public:
 
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const core::Timestep &ts) override;
-	void onEvent(event::Event &event) override;
-	void onImGuiRender(const core::Timestep &ts) override;
+	void onUpdate(const core::Timestep& iTimeStep) override;
+	void onEvent(event::Event& ioEvent) override;
+	void onImGuiRender(const core::Timestep& iTimeStep) override;
 
 private:
 	void renderViewport();
 
-	void renderStats(const core::Timestep &ts);
+	void renderStats(const core::Timestep& iTimeStep);
 	void renderMenu();
 	void renderGizmo();
 	void renderToolbar();
 
 	void newScene();
 	void openScene();
-	void openScene(const std::filesystem::path &scene);
+	void openScene(const std::filesystem::path& iScenePath);
 	void saveSceneAs();
-	void saveSceneAs(const std::filesystem::path &scene);
+	void saveSceneAs(const std::filesystem::path& iScenePath);
 	void saveCurrentScene();
 
-	bool onKeyPressed(event::KeyPressedEvent &e);
-	bool onMouseButtonPressed(event::MouseButtonPressedEvent &e);
+	bool onKeyPressed(const event::KeyPressedEvent& ioEvent);
+	bool onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent);
 	void onScenePlay();
 	void onSceneStop();
-	void onDuplicateEntity();
+	void onDuplicateEntity()const;
 
 	input::CameraOrthoController cameraController;
 
@@ -66,6 +65,7 @@ private:
 		Edit,
 		Play
 	};
+
 	State state = State::Edit;
 
 	scene::Entity hoveredEntity;
@@ -91,5 +91,4 @@ private:
 	shared<renderer::Texture2D> iconPlay;
 	shared<renderer::Texture2D> iconStop;
 };
-
-}// namespace owl
+} // namespace owl

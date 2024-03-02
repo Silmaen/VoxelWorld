@@ -10,11 +10,10 @@
 #include "BaseGauge.h"
 
 namespace drone::panels::gauge {
-
 /**
  * @brief Class Altitude
  */
-class Altitude final: public BaseGauge {
+class Altitude final : public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.
@@ -29,22 +28,22 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Altitude(const Altitude &) = default;
+	Altitude(const Altitude&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Altitude(Altitude &&) = default;
+	Altitude(Altitude&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Altitude &operator=(const Altitude &) = default;
+	Altitude& operator=(const Altitude&) = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Altitude &operator=(Altitude &&) = default;
+	Altitude& operator=(Altitude&&) = default;
 
 	/**
 	 * @brief Draw the  gauge back ground.
@@ -65,12 +64,11 @@ public:
 private:
 	float altitude = 0.f;
 
-	float altitudeToAngle(float divider = 1.0) const;
+	[[nodiscard]] float altitudeToAngle(float divider = 1.0) const;
 
 	owl::shared<owl::renderer::Texture> background = nullptr;
 	owl::shared<owl::renderer::Texture> cursor = nullptr;
 	owl::shared<owl::renderer::Texture> cursor10 = nullptr;
 	owl::shared<owl::renderer::Texture> cursor100 = nullptr;
 };
-
-}// namespace drone::panels::gauge
+} // namespace drone::panels::gauge

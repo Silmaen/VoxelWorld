@@ -12,49 +12,48 @@
 #include "core/external/glm.h"
 
 namespace owl::renderer {
-
 /**
  * @brief Orthographic camera.
  */
 class OWL_API CameraOrtho {
 public:
-	CameraOrtho(const CameraOrtho &) = default;
-	CameraOrtho(CameraOrtho &&) = default;
-	CameraOrtho &operator=(const CameraOrtho &) = default;
-	CameraOrtho &operator=(CameraOrtho &&) = default;
+	CameraOrtho(const CameraOrtho&) = default;
+	CameraOrtho(CameraOrtho&&) = default;
+	CameraOrtho& operator=(const CameraOrtho&) = default;
+	CameraOrtho& operator=(CameraOrtho&&) = default;
 
 	/**
 	 * @brief Create the camera giving coordinates of corners.
-	 * @param left Left of the screen's coordinate.
-	 * @param right Right of the screen's coordinate.
-	 * @param bottom Bottom of the screen's coordinate.
-	 * @param top Top of the screen's coordinate.
+	 * @param[in] iLeft Left of the screen's coordinate.
+	 * @param[in] iRight Right of the screen's coordinate.
+	 * @param[in] iBottom Bottom of the screen's coordinate.
+	 * @param[in] iTop Top of the screen's coordinate.
 	 */
-	CameraOrtho(float left, float right, float bottom, float top);
+	CameraOrtho(float iLeft, float iRight, float iBottom, float iTop);
 
 	/**
 	 * @brief Set projection giving the camera coordinates of corners.
-	 * @param left Left of the screen's coordinate.
-	 * @param right Right of the screen's coordinate.
-	 * @param bottom Bottom of the screen's coordinate.
-	 * @param top Top of the screen's coordinate.
-	 * @param near The near distance.
-	 * @param far The far distance.
+	 * @param[in] iLeft Left of the screen's coordinate.
+	 * @param[in] iRight Right of the screen's coordinate.
+	 * @param[in] iBottom Bottom of the screen's coordinate.
+	 * @param[in] iTop Top of the screen's coordinate.
+	 * @param[in] iNear The near distance.
+	 * @param[in] iFar The far distance.
 	 */
-	void setProjection(float left, float right, float bottom, float top, float near = -1.0f, float far = 1.0f);
+	void setProjection(float iLeft, float iRight, float iBottom, float iTop, float iNear = -1.0f, float iFar = 1.0f);
 
 	/**
 	 * @brief Access to camera's position.
 	 * @return Camera's position.
 	 */
-	[[nodiscard]] const glm::vec3 &getPosition() const { return m_Position; }
+	[[nodiscard]] const glm::vec3& getPosition() const { return m_position; }
 
 	/**
 	 * @brief Define camera's position.
-	 * @param position New camera position.
+	 * @param[in] iPosition New camera position.
 	 */
-	void setPosition(const glm::vec3 &position) {
-		m_Position = position;
+	void setPosition(const glm::vec3& iPosition) {
+		m_position = iPosition;
 		recalculateViewMatrix();
 	}
 
@@ -62,14 +61,14 @@ public:
 	 * @brief Access to camera's rotation.
 	 * @return Camera's rotation.
 	 */
-	[[nodiscard]] float getRotation() const { return m_Rotation; }
+	[[nodiscard]] float getRotation() const { return m_rotation; }
 
 	/**
 	 * @brief Defines camera's rotation.
-	 * @param rotation New camera rotation.
+	 * @param[in] iRotation New camera rotation.
 	 */
-	void setRotation(float rotation) {
-		m_Rotation = rotation;
+	void setRotation(const float iRotation) {
+		m_rotation = iRotation;
 		recalculateViewMatrix();
 	}
 
@@ -77,19 +76,19 @@ public:
 	 * @brief Access to projection matrix.
 	 * @return The projection matrix.
 	 */
-	[[nodiscard]] const glm::mat4 &getProjectionMatrix() const { return projectionMatrix; }
+	[[nodiscard]] const glm::mat4& getProjectionMatrix() const { return m_projectionMatrix; }
 
 	/**
 	 * @brief Access to view matrix.
 	 * @return The view matrix.
 	 */
-	[[nodiscard]] const glm::mat4 &getViewMatrix() const { return viewMatrix; }
+	[[nodiscard]] const glm::mat4& getViewMatrix() const { return m_viewMatrix; }
 
 	/**
 	 * @brief Access to view projection matrix.
 	 * @return The view position matrix.
 	 */
-	[[nodiscard]] const glm::mat4 &getViewProjectionMatrix() const { return viewProjectionMatrix; }
+	[[nodiscard]] const glm::mat4& getViewProjectionMatrix() const { return m_viewProjectionMatrix; }
 
 private:
 	/**
@@ -98,15 +97,14 @@ private:
 	void recalculateViewMatrix();
 
 	/// The projection matrix.
-	glm::mat4 projectionMatrix{};
+	glm::mat4 m_projectionMatrix{};
 	/// The view matrix.
-	glm::mat4 viewMatrix{};
+	glm::mat4 m_viewMatrix{};
 	/// The view projection matrix.
-	glm::mat4 viewProjectionMatrix{};
+	glm::mat4 m_viewProjectionMatrix{};
 	/// Camera's position.
-	glm::vec3 m_Position = {0.0f, 0.0f, 0.0f};
+	glm::vec3 m_position = {0.0f, 0.0f, 0.0f};
 	/// Camera's rotation.
-	float m_Rotation = 0.0f;
+	float m_rotation = 0.0f;
 };
-
-}// namespace owl::renderer
+} // namespace owl::renderer

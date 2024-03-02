@@ -18,7 +18,7 @@ namespace owl::renderer::vulkan::internal {
 
 namespace {
 
-constexpr VkApplicationInfo appInfo = {
+constexpr VkApplicationInfo g_appInfo = {
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
 		.pNext = nullptr,
 		.pApplicationName = "Owl",
@@ -27,27 +27,32 @@ constexpr VkApplicationInfo appInfo = {
 		.engineVersion = {},
 		.apiVersion = VK_API_VERSION_1_3};
 
-VkBool32 debugUtilsMessageCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+VkBool32 debugUtilsMessageCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT iMessageSeverity,
 								   VkDebugUtilsMessageTypeFlagsEXT,
-								   const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+								   const VkDebugUtilsMessengerCallbackDataEXT *iPCallbackData,
 								   void *) {
 
-	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
-		OWL_CORE_TRACE("Vulkan: [{}][{}]: {}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage)
-	} else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-		OWL_CORE_INFO("Vulkan: [{}][{}]: {}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage)
-	} else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-		OWL_CORE_WARN("Vulkan: [{}][{}]: {}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage)
-	} else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-		OWL_CORE_ERROR("Vulkan: [{}][{}]: {}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage)
+	if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+		OWL_CORE_TRACE("Vulkan: [{}][{}]: {}", iPCallbackData->messageIdNumber, iPCallbackData->pMessageIdName,
+					   iPCallbackData->pMessage)
+	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+		OWL_CORE_INFO("Vulkan: [{}][{}]: {}", iPCallbackData->messageIdNumber, iPCallbackData->pMessageIdName,
+					  iPCallbackData->pMessage)
+	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+		OWL_CORE_WARN("Vulkan: [{}][{}]: {}", iPCallbackData->messageIdNumber, iPCallbackData->pMessageIdName,
+					  iPCallbackData->pMessage)
+	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+		OWL_CORE_ERROR("Vulkan: [{}][{}]: {}", iPCallbackData->messageIdNumber, iPCallbackData->pMessageIdName,
+					   iPCallbackData->pMessage)
 	}
-	// The return value of this callback controls whether the Vulkan call that caused the validation message will be aborted or not
-	// We return VK_FALSE as we DON'T want Vulkan calls that cause a validation message to abort
-	// If you instead want to have calls abort, pass in VK_TRUE and the function will return VK_ERROR_VALIDATION_FAILED_EXT
+	// The return value of this callback controls whether the Vulkan call that caused the validation message will
+	// be aborted or not. We return VK_FALSE as we DON'T want Vulkan calls that cause a validation message to abort
+	// If you instead want to have calls abort, pass in VK_TRUE and the function will
+	// return VK_ERROR_VALIDATION_FAILED_EXT
 	return false;
 }
 
-VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessagerCI{
+VkDebugUtilsMessengerCreateInfoEXT s_debugUtilsMessagerCi{
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 		.pNext = nullptr,
 		.flags = {},
@@ -60,8 +65,8 @@ VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessagerCI{
 		.pfnUserCallback = debugUtilsMessageCallback,
 		.pUserData = nullptr};
 
-PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
-PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
+PFN_vkCreateDebugUtilsMessengerEXT g_vkCreateDebugUtilsMessengerEXT;
+PFN_vkDestroyDebugUtilsMessengerEXT g_vkDestroyDebugUtilsMessengerEXT;
 
 }// namespace
 
@@ -71,71 +76,71 @@ VulkanCore::VulkanCore() = default;
 
 VulkanCore::~VulkanCore() = default;
 
-void VulkanCore::init(const VulkanConfiguraton &configuration) {
-	config = configuration;
-	if (!instanceInfo.hasMinimalVersion(1, 3)) {
+void VulkanCore::init(const VulkanConfiguraton &iConfiguration) {
+	m_config = iConfiguration;
+	if (!m_instanceInfo.hasMinimalVersion(1, 3)) {
 		OWL_CORE_ERROR("Vulkan: cannot initialize du to insuficient instance version. Require 1.3")
-		state = State::Error;
+		m_state = State::Error;
 		return;
 	}
 	createInstance();
-	if (state == State::Error)
+	if (m_state == State::Error)
 		return;
-	if (hasValidation) {
+	if (m_hasValidation) {
 		setupDebugging();
-		if (state == State::Error)
+		if (m_state == State::Error)
 			return;
 	}
 	const auto gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
-	if (const VkResult result = gc->createSurface(instance); result != VK_SUCCESS) {
+	if (const VkResult result = gc->createSurface(m_instance); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create window surface ({})", resultString(result))
-		state = State::Error;
+		m_state = State::Error;
 		return;
 	}
 	selectPhysicalDevice();
-	if (state == State::Error)
+	if (m_state == State::Error)
 		return;
 	createLogicalDevice();
 	createQueues();
 	if (isHealthy())
-		state = State::Initialized;
+		m_state = State::Initialized;
 }
 
 void VulkanCore::release() {
-	if (logicalDevice != nullptr) {
-		vkDestroyDevice(logicalDevice, nullptr);
-		logicalDevice = nullptr;
+	if (m_logicalDevice != nullptr) {
+		vkDestroyDevice(m_logicalDevice, nullptr);
+		m_logicalDevice = nullptr;
 		OWL_CORE_TRACE("Vulkan: logicalDevice destroyed.")
 	}
 	{
 		const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
-		gc->destroySurface(instance);
+		gc->destroySurface(m_instance);
 		OWL_CORE_TRACE("Vulkan: Surface destroyed.")
 	}
-	if (debugUtilsMessenger != nullptr) {
-		vkDestroyDebugUtilsMessengerEXT(instance, debugUtilsMessenger, nullptr);
-		debugUtilsMessenger = nullptr;
+	if (m_debugUtilsMessenger != nullptr) {
+		g_vkDestroyDebugUtilsMessengerEXT(m_instance, m_debugUtilsMessenger, nullptr);
+		m_debugUtilsMessenger = nullptr;
 		OWL_CORE_TRACE("Vulkan: debugUtilsMessenger destroyed.")
 	}
-	vkDestroyInstance(instance, nullptr);
-	instance = nullptr;
+	vkDestroyInstance(m_instance, nullptr);
+	m_instance = nullptr;
 	OWL_CORE_TRACE("Vulkan: instance destroyed.")
 }
 
 void VulkanCore::createInstance() {
 	// first check for requested Layers
 	std::vector<std::string> requestedLayers;
-	if (config.activeValidation) {
-		if (!instanceInfo.hasLayer("VK_LAYER_KHRONOS_validation")) {
+	if (m_config.activeValidation) {
+		if (!m_instanceInfo.hasLayer("VK_LAYER_KHRONOS_validation")) {
 			OWL_CORE_WARN("Vulkan: Missing validation layers, go one without it.")
 		} else {
 			requestedLayers.emplace_back("VK_LAYER_KHRONOS_validation");
-			hasValidation = true;
+			m_hasValidation = true;
 		}
 	}
-	if (!instanceInfo.hasLayers(requestedLayers)) {
+	if (!m_instanceInfo.hasLayers(requestedLayers)) {
 		OWL_CORE_ERROR("Vulkan: Missing mandatory instance layers.")
-		state = State::Error;
+		m_state = State::Error;
 		return;
 	}
 	// second check for requested Extensions.
@@ -146,103 +151,106 @@ void VulkanCore::createInstance() {
 		const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 		uniqueExtensions.insert(glfwExtensions, glfwExtensions + glfwExtensionCount);
 		uniqueExtensions.emplace(VK_KHR_SURFACE_EXTENSION_NAME);
-		if (hasValidation) {
-			uniqueExtensions.emplace(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-		}
+		if (m_hasValidation) { uniqueExtensions.emplace(VK_EXT_DEBUG_UTILS_EXTENSION_NAME); }
 		requestedExtensions.assign(uniqueExtensions.begin(), uniqueExtensions.end());
 	}
-	if (!instanceInfo.hasExtensions(requestedExtensions)) {
+	if (!m_instanceInfo.hasExtensions(requestedExtensions)) {
 		OWL_CORE_ERROR("Vulkan: Missing mandatory instance extensions.")
-		state = State::Error;
+		m_state = State::Error;
 		return;
 	}
 	// now creation.
 	std::vector<const char *> layers;
+	layers.reserve(requestedLayers.size());
 	for (const auto &layer: requestedLayers)
 		layers.emplace_back(layer.c_str());
 	std::vector<const char *> extensions;
+	extensions.reserve(requestedExtensions.size());
 	for (const auto &extension: requestedExtensions)
 		extensions.emplace_back(extension.c_str());
 
-	VkInstanceCreateInfo instanceCI{
+	VkInstanceCreateInfo instanceCi{
 			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-			.pNext = hasValidation ? &debugUtilsMessagerCI : nullptr,
+			.pNext = m_hasValidation ? &s_debugUtilsMessagerCi : nullptr,
 			.flags = {},
-			.pApplicationInfo = &appInfo,
+			.pApplicationInfo = &g_appInfo,
 			.enabledLayerCount = static_cast<uint32_t>(layers.size()),
 			.ppEnabledLayerNames = layers.data(),
 			.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
 			.ppEnabledExtensionNames = extensions.data()};
-	VkResult result = vkCreateInstance(&instanceCI, nullptr, &instance);
+	VkResult result = vkCreateInstance(&instanceCi, nullptr, &m_instance);
 	bool second = false;
 	if (result == VK_ERROR_LAYER_NOT_PRESENT) {
 		OWL_CORE_ERROR("Vulkan: Unable to create instance because a layer can't be loaded, Retry without layers.")
 		second = true;
-		instanceCI.ppEnabledLayerNames = nullptr;
-		instanceCI.enabledLayerCount = 0;
-		result = vkCreateInstance(&instanceCI, nullptr, &instance);
+		instanceCi.ppEnabledLayerNames = nullptr;
+		instanceCi.enabledLayerCount = 0;
+		result = vkCreateInstance(&instanceCi, nullptr, &m_instance);
 	}
 	if (result != VK_SUCCESS) {
 		if (second)
 			OWL_CORE_ERROR("Vulkan: Definitively unable to create instance ({}).", resultString(result))
 		else
 			OWL_CORE_ERROR("Vulkan: Unable to create instance ({}).", resultString(result))
-		state = State::Error;
+		m_state = State::Error;
 	}
 }
 
 bool VulkanCore::isHealthy() const {
-	return instance != nullptr &&
-		   physicalDevice != nullptr &&
-		   logicalDevice != nullptr &&
-		   graphicQueue != nullptr &&
-		   presentQueue != nullptr;
+	return m_instance != nullptr &&
+		   m_physicalDevice != nullptr &&
+		   m_logicalDevice != nullptr &&
+		   m_graphicQueue != nullptr &&
+		   m_presentQueue != nullptr;
 }
 
 void VulkanCore::selectPhysicalDevice() {
-	const auto devices = enumerateDevices(instance);
+	const auto devices = enumerateDevices(m_instance);
 	if (devices.empty()) {
 		OWL_CORE_ERROR("Vulkan: No suitable physical device found.")
-		state = State::Error;
+		m_state = State::Error;
 		return;
 	}
-	phyProps = devices.front();
-	if (phyProps.getScore() == 0) {
+	m_phyProps = devices.front();
+	if (m_phyProps.getScore() == 0) {
 		OWL_CORE_ERROR("Vulkan: No suitable physical device found, scores 0.")
-		state = State::Error;
+		m_state = State::Error;
 		return;
 	}
-	physicalDevice = phyProps.device;
+	m_physicalDevice = m_phyProps.device;
 }
 
 void VulkanCore::createLogicalDevice() {
-	std::vector<VkDeviceQueueCreateInfo> deviceQueuesCI;
+	std::vector<VkDeviceQueueCreateInfo> deviceQueuesCi;
 	float queuePriority = 1.0f;
-	for (const uint32_t queue: std::set{phyProps.graphicQueueIndex, phyProps.presentQueueIndex}) {
-		VkDeviceQueueCreateInfo deviceQueueCI{
+	for (const uint32_t queue: std::set{m_phyProps.graphicQueueIndex, m_phyProps.presentQueueIndex}) {
+		VkDeviceQueueCreateInfo deviceQueueCi{
 				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 				.pNext = nullptr,
 				.flags = {},
 				.queueFamilyIndex = queue,
 				.queueCount = 1,
 				.pQueuePriorities = &queuePriority};
-		deviceQueuesCI.push_back(deviceQueueCI);
+		deviceQueuesCi.push_back(deviceQueueCi);
 	}
 	const std::vector layerNames = {"VK_LAYER_KHRONOS_validation"};
 	const std::vector extensionNames = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-	const VkDeviceCreateInfo deviceCI{
+	const VkDeviceCreateInfo deviceCi{
 			.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
-			.queueCreateInfoCount = static_cast<uint32_t>(deviceQueuesCI.size()),
-			.pQueueCreateInfos = deviceQueuesCI.data(),
-			.enabledLayerCount = hasValidation ? static_cast<uint32_t>(extensionNames.size()) : static_cast<uint32_t>(extensionNames.size()) - 1,
+			.queueCreateInfoCount = static_cast<uint32_t>(deviceQueuesCi.size()),
+			.pQueueCreateInfos = deviceQueuesCi.data(),
+			.enabledLayerCount = m_hasValidation
+									 ? static_cast<uint32_t>(extensionNames.size())
+									 : static_cast<uint32_t>(extensionNames.size()) - 1,
 			.ppEnabledLayerNames = layerNames.data(),
 			.enabledExtensionCount = static_cast<uint32_t>(extensionNames.size()),
 			.ppEnabledExtensionNames = extensionNames.data(),
 			.pEnabledFeatures = nullptr};
-	if (const VkResult result = vkCreateDevice(physicalDevice, &deviceCI, nullptr, &logicalDevice); result != VK_SUCCESS) {
-		state = State::Error;
+	if (const VkResult result = vkCreateDevice(m_physicalDevice, &deviceCi, nullptr, &m_logicalDevice);
+		result != VK_SUCCESS) {
+		m_state = State::Error;
 		OWL_CORE_ERROR("Vulkan: Error while creating the logical device ({})", resultString(result))
 	}
 }
@@ -250,78 +258,77 @@ void VulkanCore::createLogicalDevice() {
 void VulkanCore::setupDebugging() {
 	OWL_DIAG_PUSH
 	OWL_DIAG_DISABLE_CLANG17("-Wcast-function-type-strict")
-	vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
-	vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
+	g_vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
+			m_instance, "vkCreateDebugUtilsMessengerEXT"));
+	g_vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
+			m_instance, "vkDestroyDebugUtilsMessengerEXT"));
 	OWL_DIAG_POP
-	if (const VkResult result = vkCreateDebugUtilsMessengerEXT(instance, &debugUtilsMessagerCI, nullptr, &debugUtilsMessenger); result != VK_SUCCESS) {
+	if (const VkResult result =
+				g_vkCreateDebugUtilsMessengerEXT(m_instance, &s_debugUtilsMessagerCi, nullptr, &m_debugUtilsMessenger);
+		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: Error while setup debugging ({})", resultString(result))
-		state = State::Error;
+		m_state = State::Error;
 	}
 }
 
 void VulkanCore::createQueues() {
-	vkGetDeviceQueue(logicalDevice, phyProps.graphicQueueIndex, 0, &graphicQueue);
-	vkGetDeviceQueue(logicalDevice, phyProps.presentQueueIndex, 0, &presentQueue);
+	vkGetDeviceQueue(m_logicalDevice, m_phyProps.graphicQueueIndex, 0, &m_graphicQueue);
+	vkGetDeviceQueue(m_logicalDevice, m_phyProps.presentQueueIndex, 0, &m_presentQueue);
 }
 
 VkExtent2D VulkanCore::getCurrentExtent() const {
 	VkExtent2D extent;
-	if (phyProps.surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-		extent = phyProps.surfaceCapabilities.currentExtent;
+	if (m_phyProps.surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+		extent = m_phyProps.surfaceCapabilities.currentExtent;
 	} else {
 		auto sizes = core::Application::get().getWindow().getSize();
-		extent.width = std::clamp(sizes.width(), phyProps.surfaceCapabilities.minImageExtent.width, phyProps.surfaceCapabilities.maxImageExtent.width);
-		extent.height = std::clamp(sizes.height(), phyProps.surfaceCapabilities.minImageExtent.height, phyProps.surfaceCapabilities.maxImageExtent.height);
+		extent.width = std::clamp(sizes.width(), m_phyProps.surfaceCapabilities.minImageExtent.width,
+								  m_phyProps.surfaceCapabilities.maxImageExtent.width);
+		extent.height = std::clamp(sizes.height(), m_phyProps.surfaceCapabilities.minImageExtent.height,
+								   m_phyProps.surfaceCapabilities.maxImageExtent.height);
 	}
 	return extent;
 }
 
 VkSurfaceFormatKHR VulkanCore::getSurfaceFormat() const {
-	VkSurfaceFormatKHR surfaceFormat = phyProps.surfaceFormats.front();
-	for (const auto &availableFormat: phyProps.surfaceFormats) {
+	VkSurfaceFormatKHR surfaceFormat = m_phyProps.surfaceFormats.front();
+	for (const auto &availableFormat: m_phyProps.surfaceFormats) {
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
-			availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-			surfaceFormat = availableFormat;
-		}
+			availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) { surfaceFormat = availableFormat; }
 	}
 	return surfaceFormat;
 }
 
 VkPresentModeKHR VulkanCore::getPresentMode() const {
 	VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
-	for (const auto &availablePresentMode: phyProps.presentModes) {
-		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-			presentMode = availablePresentMode;
-		}
+	for (const auto &availablePresentMode: m_phyProps.presentModes) {
+		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) { presentMode = availablePresentMode; }
 	}
 	return presentMode;
 }
 
 uint32_t VulkanCore::getImagecount() const {
-	uint32_t imageCount = phyProps.surfaceCapabilities.minImageCount + 1;
-	if (phyProps.surfaceCapabilities.maxImageCount > 0 && imageCount > phyProps.surfaceCapabilities.maxImageCount) {
-		imageCount = phyProps.surfaceCapabilities.maxImageCount;
+	uint32_t imageCount = m_phyProps.surfaceCapabilities.minImageCount + 1;
+	if (m_phyProps.surfaceCapabilities.maxImageCount > 0 && imageCount > m_phyProps.surfaceCapabilities.maxImageCount) {
+		imageCount = m_phyProps.surfaceCapabilities.maxImageCount;
 	}
 	return imageCount;
 }
 
 VkSurfaceTransformFlagBitsKHR VulkanCore::getCurrentTransform() const {
-	return phyProps.surfaceCapabilities.currentTransform;
+	return m_phyProps.surfaceCapabilities.currentTransform;
 }
 
 std::vector<uint32_t> VulkanCore::getQueueIndicies() const {
-	return {phyProps.graphicQueueIndex, phyProps.presentQueueIndex};
+	return {m_phyProps.graphicQueueIndex, m_phyProps.presentQueueIndex};
 }
 
-void VulkanCore::updateSurfaceInformations() {
-	phyProps.updateSurfaceInformations();
-}
+void VulkanCore::updateSurfaceInformations() { m_phyProps.updateSurfaceInformations(); }
 
-uint32_t VulkanCore::findMemoryTypeIndex(uint32_t typeFilter, VkMemoryPropertyFlags memProperties) const {
-	for (uint32_t i = 0; i < phyProps.memoryProperties.memoryTypeCount; i++) {
-		if ((typeFilter & (1 << i)) && (phyProps.memoryProperties.memoryTypes[i].propertyFlags & memProperties) == memProperties) {
-			return i;
-		}
+uint32_t VulkanCore::findMemoryTypeIndex(const uint32_t iTypeFilter, const VkMemoryPropertyFlags iMemProperties) const {
+	for (uint32_t i = 0; i < m_phyProps.memoryProperties.memoryTypeCount; i++) {
+		if ((iTypeFilter & (1 << i)) && (m_phyProps.memoryProperties.memoryTypes[i].propertyFlags & iMemProperties) ==
+			iMemProperties) { return i; }
 	}
 	OWL_CORE_ERROR("Vulkan PhysicalDevice: failed to find suitable memory type!")
 	return std::numeric_limits<uint32_t>::max();
@@ -339,15 +346,14 @@ InstanceInformations::InstanceInformations() {
 		supportedLayers.clear();
 		uint32_t layerCount = 0;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-		std::vector<VkLayerProperties> Layers(layerCount);
-		if (const VkResult result = vkEnumerateInstanceLayerProperties(&layerCount, Layers.data()); result == VK_SUCCESS) {
-			for (const auto &[layerName, specVersion, implementationVersion, description]: Layers) {
+		std::vector<VkLayerProperties> layers(layerCount);
+		if (const VkResult result = vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
+			result == VK_SUCCESS) {
+			for (const auto &[layerName, specVersion, implementationVersion, description]: layers) {
 				supportedLayers.emplace_back(layerName);
 				OWL_CORE_TRACE("Vulkan: Instance layer: {} version {} // {}", layerName, specVersion, description)
 			}
-		} else {
-			OWL_CORE_WARN("Vulkan: unable to enumerate instance layers ({}).", resultString(result))
-		}
+		} else { OWL_CORE_WARN("Vulkan: unable to enumerate instance layers ({}).", resultString(result)) }
 	}
 	// Get extensions supported by the instance and store for later use
 	{
@@ -356,38 +362,41 @@ InstanceInformations::InstanceInformations() {
 		vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
 		if (extCount > 0) {
 			std::vector<VkExtensionProperties> extensions(extCount);
-			if (const VkResult result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, &extensions.front()); result == VK_SUCCESS) {
+			if (const VkResult result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, &extensions.front());
+				result == VK_SUCCESS) {
 				for (const auto &[extensionName, specVersion]: extensions) {
 					supportedExtensions.emplace_back(extensionName);
 					OWL_CORE_TRACE("Vulkan: Supported instance extension: {} version: {}", extensionName, specVersion)
 				}
-			} else {
-				OWL_CORE_WARN("Vulkan: unable to enumerate instance extensions ({}).", resultString(result))
-			}
+			} else { OWL_CORE_WARN("Vulkan: unable to enumerate instance extensions ({}).", resultString(result)) }
 		}
 	}
 }
 
-bool InstanceInformations::hasMinimalVersion(const uint8_t major, const uint8_t minor, const uint8_t patch) const {
-	return VK_API_VERSION_MAJOR(version) > major ||
-		   (VK_API_VERSION_MAJOR(version) == major && VK_API_VERSION_MINOR(version) > minor) ||
-		   (VK_API_VERSION_MAJOR(version) == major && VK_API_VERSION_MINOR(version) == minor && VK_API_VERSION_PATCH(version) >= patch);
+bool InstanceInformations::hasMinimalVersion(const uint8_t iMajor, const uint8_t iMinor, const uint8_t iPatch) const {
+	return VK_API_VERSION_MAJOR(version) > iMajor ||
+		   (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) > iMinor) ||
+		   (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) == iMinor &&
+			VK_API_VERSION_PATCH(version) >= iPatch);
 }
 
-bool InstanceInformations::hasLayer(const std::string &layer) const {
-	return std::ranges::find(supportedLayers.begin(), supportedLayers.end(), layer) != supportedLayers.end();
+bool InstanceInformations::hasLayer(const std::string &iLayer) const {
+	return std::ranges::find(supportedLayers.begin(), supportedLayers.end(), iLayer) != supportedLayers.end();
 }
 
-bool InstanceInformations::hasExtension(const std::string &extension) const {
-	return std::ranges::find(supportedExtensions.begin(), supportedExtensions.end(), extension) != supportedExtensions.end();
+bool InstanceInformations::hasExtension(const std::string &iExtension) const {
+	return std::ranges::find(supportedExtensions.begin(), supportedExtensions.end(), iExtension) != supportedExtensions.
+		   end();
 }
 
-bool InstanceInformations::hasLayers(const std::vector<std::string> &layers) const {
-	return std::ranges::all_of(layers.begin(), layers.end(), [&](const auto &layer) { return this->hasLayer(layer); });
+bool InstanceInformations::hasLayers(const std::vector<std::string> &iLayers) const {
+	return std::ranges::all_of(iLayers.begin(), iLayers.end(),
+							   [&](const auto &iLayer) { return this->hasLayer(iLayer); });
 }
 
-bool InstanceInformations::hasExtensions(const std::vector<std::string> &extensions) const {
-	return std::ranges::all_of(extensions.begin(), extensions.end(), [&](const auto &extension) { return this->hasExtension(extension); });
+bool InstanceInformations::hasExtensions(const std::vector<std::string> &iExtensions) const {
+	return std::ranges::all_of(iExtensions.begin(), iExtensions.end(),
+							   [&](const auto &iExtension) { return this->hasExtension(iExtension); });
 }
 
 // ============= InstanceInformations =====================

@@ -27,6 +27,7 @@
 #ifndef __glad_h_
 #define __glad_h_
 
+// NOLINTBEGIN
 #ifdef __gl_h_
 #error OpenGL header already included, remove this include, glad already provides it
 #endif
@@ -2910,3 +2911,5 @@ GLAPI PFNGLTEXSTORAGE3DMULTISAMPLEPROC glad_glTexStorage3DMultisample;
 #endif
 
 #endif
+
+// NOLINTEND

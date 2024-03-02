@@ -10,7 +10,6 @@
 #include "BaseGauge.h"
 
 namespace drone::panels::gauge {
-
 /**
  * @brief Class AirSpeed
  */
@@ -27,19 +26,19 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	AirSpeed(const AirSpeed &) = default;
+	AirSpeed(const AirSpeed&) = default;
 	/**
 	 * @brief Move constructor.
 	 */
-	AirSpeed(AirSpeed &&) = default;
+	AirSpeed(AirSpeed&&) = default;
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	AirSpeed &operator=(const AirSpeed &) = default;
+	AirSpeed& operator=(const AirSpeed&) = default;
 	/**
 	 * @brief Move affectation operator.
 	 */
-	AirSpeed &operator=(AirSpeed &&) = default;
+	AirSpeed& operator=(AirSpeed&&) = default;
 
 	/**
 	 * @brief Draw the  gauge back ground.
@@ -60,10 +59,9 @@ public:
 private:
 	float velocity = 0.f;
 
-	float velocityToAngle() const;
+	[[nodiscard]] float velocityToAngle() const;
 
 	owl::shared<owl::renderer::Texture> background = nullptr;
 	owl::shared<owl::renderer::Texture> cursor = nullptr;
 };
-
-}// namespace drone::panels::gauge
+} // namespace drone::panels::gauge

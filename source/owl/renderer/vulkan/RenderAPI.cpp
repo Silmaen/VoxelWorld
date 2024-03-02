@@ -25,12 +25,12 @@ void RenderAPI::init() {
 	const auto &app = core::Application::get();
 	const bool extraDebugging = app.getInitParams().useDebugging;
 
-	if (getState() != State::Created) return;
+	if (getState() != State::Created)
+		return;
 
 	auto &vkh = internal::VulkanHandler::get();
-	if (extraDebugging) {
+	if (extraDebugging)
 		vkh.activateValidation();
-	}
 	vkh.initVulkan();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		setState(State::Error);
@@ -46,9 +46,9 @@ void RenderAPI::setViewport(uint32_t, uint32_t, uint32_t, uint32_t) {
 	vkh.setResize();
 }
 
-void RenderAPI::setClearColor(const glm::vec4 &color) {
+void RenderAPI::setClearColor(const glm::vec4 &iColor) {
 	auto &vkh = internal::VulkanHandler::get();
-	vkh.setClearColor(color);
+	vkh.setClearColor(iColor);
 }
 
 void RenderAPI::clear() {
@@ -56,11 +56,11 @@ void RenderAPI::clear() {
 	vkh.clear();
 }
 
-void RenderAPI::drawData(const shared<DrawData> &data, uint32_t index) {
+void RenderAPI::drawData(const shared<DrawData> &iData, const uint32_t iIndexCount) {
 	auto &vkh = internal::VulkanHandler::get();
-	data->bind();
-	const bool isIndexed = data->getIndexCount() > 0;
-	const uint32_t count = index ? index : data->getIndexCount();
+	iData->bind();
+	const bool isIndexed = iData->getIndexCount() > 0;
+	const uint32_t count = iIndexCount ? iIndexCount : iData->getIndexCount();
 	vkh.drawData(count, isIndexed);
 }
 

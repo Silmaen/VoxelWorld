@@ -37,7 +37,7 @@
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
 #include "gui/Theme.h"
-#include "gui/UILayer.h"
+#include "gui/UiLayer.h"
 #include "input/CameraOrthoController.h"
 #include "input/Input.h"
 #include "input/Window.h"

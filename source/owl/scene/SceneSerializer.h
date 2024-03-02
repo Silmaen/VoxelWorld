@@ -11,7 +11,6 @@
 #include "Scene.h"
 
 namespace owl::scene {
-
 /**
  * @brief Class SceneSerializer.
  */
@@ -19,26 +18,25 @@ class OWL_API SceneSerializer {
 public:
 	/**
 	 * @brief Constructor.
-	 * @param scene The attached scene.
+	 * @param[in] iScene The attached scene.
 	 */
-	explicit SceneSerializer(const shared<Scene> &scene);
+	explicit SceneSerializer(const shared<Scene>& iScene);
 
 	/**
 	 * @brief Save the scene into a file.
-	 * @param filepath The file where to save.
+	 * @param[in] iFilepath The file where to save.
 	 */
-	void serialize(const std::filesystem::path &filepath);
+	void serialize(const std::filesystem::path& iFilepath) const;
 
 	/**
 	 * @brief Load the scene from a file.
-	 * @param filepath The file to load.
+	 * @param[in] iFilepath The file to load.
 	 * @return True if everything works.
 	 */
-	bool deserialize(const std::filesystem::path &filepath);
+	[[nodiscard]] bool deserialize(const std::filesystem::path& iFilepath) const;
 
 private:
 	/// Parent Scene.
-	shared<Scene> scene;
+	shared<Scene> mp_scene;
 };
-
-}// namespace owl::scene
+} // namespace owl::scene

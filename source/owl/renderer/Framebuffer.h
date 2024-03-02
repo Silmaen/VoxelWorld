@@ -11,17 +11,16 @@
 #include "core/Core.h"
 
 namespace owl::renderer {
-
 /// Format for the texture frame buffer.
 enum class FramebufferTextureFormat {
 	None = 0,
 	/// Color.
-	RGBA8,
-	RED_INTEGER,
+	Rgba8,
+	RedInteger,
 	/// Depth/stencil.
-	DEPTH24STENCIL8,
+	Depth24Stencil8,
 	/// Defaults.
-	Depth = DEPTH24STENCIL8
+	Depth = Depth24Stencil8
 };
 
 /**
@@ -29,8 +28,13 @@ enum class FramebufferTextureFormat {
  */
 struct FramebufferTextureSpecification {
 	FramebufferTextureSpecification() = default;
-	FramebufferTextureSpecification(FramebufferTextureFormat format)
-		: textureFormat(format) {}
+
+	// NOLINTBEGIN(google-explicit-constructor)
+	FramebufferTextureSpecification(const FramebufferTextureFormat& iFormat)
+		: textureFormat(iFormat) {}
+
+	// NOLINTEND(google-explicit-constructor)
+
 	FramebufferTextureFormat textureFormat = FramebufferTextureFormat::None;
 	// TODO: filtering/wrap
 };
@@ -40,8 +44,10 @@ struct FramebufferTextureSpecification {
  */
 struct FramebufferAttachmentSpecification {
 	FramebufferAttachmentSpecification() = default;
-	FramebufferAttachmentSpecification(std::initializer_list<FramebufferTextureSpecification> attachments_)
-		: attachments(attachments_) {}
+
+	FramebufferAttachmentSpecification(const std::initializer_list<FramebufferTextureSpecification> iAttachments)
+		: attachments(iAttachments) {}
+
 	std::vector<FramebufferTextureSpecification> attachments;
 };
 
@@ -67,10 +73,10 @@ struct FramebufferSpecification {
 class OWL_API Framebuffer {
 public:
 	Framebuffer() = default;
-	Framebuffer(const Framebuffer &) = default;
-	Framebuffer(Framebuffer &&) = default;
-	Framebuffer &operator=(const Framebuffer &) = default;
-	Framebuffer &operator=(Framebuffer &&) = default;
+	Framebuffer(const Framebuffer&) = default;
+	Framebuffer(Framebuffer&&) = default;
+	Framebuffer& operator=(const Framebuffer&) = default;
+	Framebuffer& operator=(Framebuffer&&) = default;
 
 	/**
 	 * @brief Destructor.
@@ -89,48 +95,47 @@ public:
 
 	/**
 	 * @brief Change the size of the frame buffer.
-	 * @param width New width.
-	 * @param height New height.
+	 * @param[in] iWidth New width.
+	 * @param[in] iHeight New height.
 	 */
-	virtual void resize(uint32_t width, uint32_t height) = 0;
+	virtual void resize(uint32_t iWidth, uint32_t iHeight) = 0;
 
 	/**
 	 * Get the Pixel information.
-	 * @param attachmentIndex Index in the attachment.
-	 * @param x Horizontal coordinate.
-	 * @param y Vertical coordinate.
+	 * @param[in] iAttachmentIndex Index in the attachment.
+	 * @param[in] iX Horizontal coordinate.
+	 * @param[in] iY Vertical coordinate.
 	 * @return Pixel index.
 	 */
-	virtual int readPixel(uint32_t attachmentIndex, int x, int y) = 0;
+	virtual int readPixel(uint32_t iAttachmentIndex, int iX, int iY) = 0;
 
 	/**
 	 * @brief Reset an attachment with the given value.
-	 * @param attachmentIndex Index of the attachment.
-	 * @param value The new value to affect.
+	 * @param[in] iAttachmentIndex Index of the attachment.
+	 * @param[in] iValue The new value to affect.
 	 */
-	virtual void clearAttachment(uint32_t attachmentIndex, int value) = 0;
+	virtual void clearAttachment(uint32_t iAttachmentIndex, int iValue) = 0;
 
 	/**
 	 * @brief Get renderer id.
-	 * @param index The color Index.
+	 * @param[in] iIndex The color Index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] virtual uint32_t getColorAttachmentRendererID(uint32_t index = 0) const = 0;
+	[[nodiscard]] virtual uint32_t getColorAttachmentRendererId(uint32_t iIndex) const = 0;
 
 	/**
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] virtual const FramebufferSpecification &getSpecification() const = 0;
+	[[nodiscard]] virtual const FramebufferSpecification& getSpecification() const = 0;
 
 	/**
 	 * @brief Create the frame buffer.
-	 * @param spec Specifications.
+	 * @param[in] iSpec Specifications.
 	 * @return The Frame buffer.
 	 */
-	static shared<Framebuffer> create(const FramebufferSpecification &spec);
+	static shared<Framebuffer> create(const FramebufferSpecification& iSpec);
 
 private:
 };
-
-}// namespace owl::renderer
+} // namespace owl::renderer

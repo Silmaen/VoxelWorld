@@ -12,32 +12,34 @@
 
 namespace owl::renderer {
 
-CameraOrtho::CameraOrtho(float left, float right, float bottom, float top)
-	: viewMatrix(1.0f) {
+CameraOrtho::CameraOrtho(const float iLeft, const float iRight, const float iBottom, const float iTop)
+	: m_viewMatrix(1.0f) {
 	OWL_PROFILE_FUNCTION()
-	setProjection(left, right, bottom, top, -1.0f, 1.0f);
-	viewProjectionMatrix = projectionMatrix * viewMatrix;
+	setProjection(iLeft, iRight, iBottom, iTop, -1.0f, 1.0f);
+	m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 }
-void CameraOrtho::setProjection(float left, float right, float bottom, float top, float near, float far) {
+
+void CameraOrtho::setProjection(const float iLeft, const float iRight, const float iBottom, const float iTop,
+                                const float iNear, const float iFar) {
 	OWL_PROFILE_FUNCTION()
 
-	projectionMatrix = glm::ortho(left, right, bottom, top, near, far);
-	viewProjectionMatrix = projectionMatrix * viewMatrix;
+	m_projectionMatrix = glm::ortho(iLeft, iRight, iBottom, iTop, iNear, iFar);
+	m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 }
 
 void CameraOrtho::recalculateViewMatrix() {
 	OWL_PROFILE_FUNCTION()
 	glm::mat4 transform;
 	if (RenderCommand::getAPI() == RenderAPI::Type::Vulkan) {
-		transform = glm::translate(glm::mat4(1.0f), m_Position) *
-					glm::rotate(glm::mat4(1.0f), glm::radians(-m_Rotation), glm::vec3(0, 0, 1));
+		transform = glm::translate(glm::mat4(1.0f), m_position) *
+		            glm::rotate(glm::mat4(1.0f), glm::radians(-m_rotation), glm::vec3(0, 0, 1));
 	} else {
-		transform = glm::translate(glm::mat4(1.0f), m_Position) *
-					glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation), glm::vec3(0, 0, 1));
+		transform = glm::translate(glm::mat4(1.0f), m_position) *
+		            glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation), glm::vec3(0, 0, 1));
 	}
 
-	viewMatrix = glm::inverse(transform);
-	viewProjectionMatrix = projectionMatrix * viewMatrix;
+	m_viewMatrix = glm::inverse(transform);
+	m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 }
 
 }// namespace owl::renderer

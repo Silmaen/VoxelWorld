@@ -15,7 +15,7 @@ namespace owl::core::layer {
 Layer::~Layer() = default;
 
 LayerStack::~LayerStack() {
-	for (auto &layer: layers) {
+	for (auto &layer: m_layers) {
 		layer->onDetach();
 		layer.reset();
 	}
@@ -23,29 +23,29 @@ LayerStack::~LayerStack() {
 
 void LayerStack::pushLayer(shared<Layer> &&layer) {
 	layer->onAttach();
-	layers.emplace(layers.begin() + layerInsertIndex, std::move(layer));
-	layerInsertIndex++;
+	m_layers.emplace(m_layers.begin() + m_layerInsertIndex, std::move(layer));
+	m_layerInsertIndex++;
 }
 
 void LayerStack::pushOverlay(shared<Layer> &&overlay) {
-	layers.emplace_back(std::move(overlay));
-	layers.back()->onAttach();
+	m_layers.emplace_back(std::move(overlay));
+	m_layers.back()->onAttach();
 }
 
 void LayerStack::popLayer(const shared<Layer> &layer) {
-	auto it = std::find(layers.begin(), layers.begin() + layerInsertIndex, layer);
-	if (it != layers.begin() + layerInsertIndex) {
+	if (const auto it = std::find(m_layers.begin(), m_layers.begin() + m_layerInsertIndex, layer);
+		it != m_layers.begin() + m_layerInsertIndex) {
 		layer->onDetach();
-		layers.erase(it);
-		layerInsertIndex--;
+		m_layers.erase(it);
+		m_layerInsertIndex--;
 	}
 }
 
 void LayerStack::popOverlay(const shared<Layer> &overlay) {
-	auto it = std::find(layers.begin() + layerInsertIndex, layers.end(), overlay);
-	if (it != layers.end()) {
+	if (const auto it = std::find(m_layers.begin() + m_layerInsertIndex, m_layers.end(), overlay);
+		it != m_layers.end()) {
 		overlay->onDetach();
-		layers.erase(it);
+		m_layers.erase(it);
 	}
 }
 

@@ -15,7 +15,7 @@ namespace owl::core::layer {
 /**
  * @brief Class LayerStack.
  */
-class OWL_API LayerStack {
+class OWL_API LayerStack final {
 public:
 	/// Type for the list of Layer.
 	using layerList = std::vector<shared<Layer>>;
@@ -40,87 +40,85 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~LayerStack();
+	~LayerStack();
 
 	/**
 	 * @brief Adding a layer on top of the layers.
-	 * @param layer The new layer to add.
+	 * @param[in] iLayer The new layer to add.
 	 */
-	void pushLayer(shared<Layer> &&layer);
+	void pushLayer(shared<Layer> &&iLayer);
 
 	/**
 	 * @brief Adding an overlay on top of everything.
-	 * @param overlay The new overlay.
+	 * @param[in] iOverlay The new overlay.
 	 */
-	void pushOverlay(shared<Layer> &&overlay);
+	void pushOverlay(shared<Layer> &&iOverlay);
 
 	/**
 	 * @brief Remove the given layer.
-	 * @param layer the layer to remove.
+	 * @param[in] iLayer the layer to remove.
 	 */
-	void popLayer(const shared<Layer> &layer);
+	void popLayer(const shared<Layer> &iLayer);
 
 	/**
 	 * @brief Remove the given overlay.
-	 * @param overlay The overlay to remove.
+	 * @param[in] iOverlay The overlay to remove.
 	 */
-	void popOverlay(const shared<Layer> &overlay);
+	void popOverlay(const shared<Layer> &iOverlay);
 
 	/**
 	 * @brief Get the starting of the layer list.
 	 * @return Iterator at the beginning of the layer list.
 	 */
-	[[nodiscard]] iterator begin() { return layers.begin(); }
+	[[nodiscard]] iterator begin() { return m_layers.begin(); }
 
 	/**
 	 * @brief Get the ending of the layer list.
 	 * @return Iterator at the end of the layer list.
 	 */
-	[[nodiscard]] iterator end() { return layers.end(); }
+	[[nodiscard]] iterator end() { return m_layers.end(); }
 
 	/**
 	 * @brief Get the starting of the reversed layer list.
 	 * @return Reverse iterator at the beginning of the layer list.
 	 */
-	[[nodiscard]] reverse_iterator rbegin() { return layers.rbegin(); }
+	[[nodiscard]] reverse_iterator rbegin() { return m_layers.rbegin(); }
 
 	/**
 	 * @brief Get the ending of the reversed layer list.
 	 * @return Reverse iterator at the end of the layer list.
 	 */
-	[[nodiscard]] reverse_iterator rend() { return layers.rend(); }
+	[[nodiscard]] reverse_iterator rend() { return m_layers.rend(); }
 
 	/**
 	 * @brief Get the starting of the layer list.
 	 * @return Const iterator at the beginning of the layer list.
 	 */
-	[[nodiscard]] const_iterator begin() const { return layers.begin(); }
+	[[nodiscard]] const_iterator begin() const { return m_layers.begin(); }
 
 	/**
 	 * @brief Get the ending of the layer list.
 	 * @return Const iterator at the end of the layer list.
 	 */
-	[[nodiscard]] const_iterator end() const { return layers.end(); }
+	[[nodiscard]] const_iterator end() const { return m_layers.end(); }
 
 	/**
 	 * @brief Get the starting of the reversed layer list.
 	 * @return Const reverse iterator at the beginning of the layer list.
 	 */
-	[[nodiscard]] const_reverse_iterator rbegin() const {
-		return layers.rbegin();
-	}
+	[[nodiscard]] const_reverse_iterator rbegin() const { return m_layers.rbegin(); }
 
 	/**
 	 * @brief Get the ending of the reversed layer list.
 	 * @return Const reverse iterator at the end of the layer list.
 	 */
-	[[nodiscard]] const_reverse_iterator rend() const { return layers.rend(); }
+	[[nodiscard]] const_reverse_iterator rend() const { return m_layers.rend(); }
 
 private:
 	/// The layers.
-	layerList layers;
+	layerList m_layers;
 	/// The inserting index.
-	unsigned int layerInsertIndex = 0;
+	unsigned int m_layerInsertIndex = 0;
 };
 
 }// namespace owl::core::layer

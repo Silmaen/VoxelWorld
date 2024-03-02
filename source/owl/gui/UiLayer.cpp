@@ -1,5 +1,5 @@
 /**
- * @file UILayer.cpp
+ * @file UiLayer.cpp
  * @author Silmaen
  * @date 05/12/2022
  * Copyright © 2022 All rights reserved.
@@ -8,7 +8,7 @@
 
 #include "owlpch.h"
 
-#include "UILayer.h"
+#include "UiLayer.h"
 #include "core/Application.h"
 #include "core/external/glfw3.h"
 #include "core/external/imgui.h"
@@ -22,40 +22,43 @@ OWL_DIAG_POP
 namespace owl::gui {
 
 namespace {
-ImVec4 glm2im(const glm::vec4 &vec) {
-	return {vec.x, vec.y, vec.z, vec.w};
-}
+
+ImVec4 glm2Im(const glm::vec4 &iVec) { return {iVec.x, iVec.y, iVec.z, iVec.w}; }
+
 }// namespace
 
 #include "Roboto-Bold.embed"
 #include "Roboto-Italic.embed"
 #include "Roboto-Regular.embed"
 
-UILayer::UILayer() : core::layer::Layer("ImGuiLayer") {}
-UILayer::~UILayer() = default;
+UiLayer::UiLayer() : core::layer::Layer("ImGuiLayer") {}
+UiLayer::~UiLayer() = default;
 
-void UILayer::onAttach() {// Setup Dear ImGui context
+void UiLayer::onAttach() {// Setup Dear ImGui context
 	OWL_PROFILE_FUNCTION()
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
 	io.ConfigFlags |=
-			ImGuiConfigFlags_NavEnableKeyboard;        // Enable Keyboard Controls
-													   // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad
-													   // Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Enable Docking
+			ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
+	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad
+	// Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;// Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport /
-													   // Platform Windows
+	// Platform Windows
 	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
 	// Better fonts
 	ImFontConfig fontConfig;
 	fontConfig.FontDataOwnedByAtlas = false;
-	ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoRegular)), sizeof(g_RobotoRegular), 20.0f, &fontConfig);
-	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoBold)), sizeof(g_RobotoBold), 20.0f, &fontConfig);
-	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoItalic)), sizeof(g_RobotoItalic), 20.0f, &fontConfig);
+	ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoRegular)),
+	                                                    sizeof(g_RobotoRegular), 20.0f, &fontConfig);
+	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoBold)), sizeof(g_RobotoBold),
+	                               20.0f, &fontConfig);
+	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoItalic)),
+	                               sizeof(g_RobotoItalic), 20.0f, &fontConfig);
 	io.FontDefault = robotoFont;
 
 	// Setup Dear ImGui style
@@ -72,7 +75,7 @@ void UILayer::onAttach() {// Setup Dear ImGui context
 	setTheme();
 
 	auto *window = static_cast<GLFWwindow *>(
-			core::Application::get().getWindow().getNativeWindow());
+		core::Application::get().getWindow().getNativeWindow());
 
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL) {
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -90,7 +93,7 @@ void UILayer::onAttach() {// Setup Dear ImGui context
 	}
 }
 
-void UILayer::onDetach() {
+void UiLayer::onDetach() {
 	OWL_PROFILE_FUNCTION()
 
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
@@ -103,15 +106,15 @@ void UILayer::onDetach() {
 	ImGui::DestroyContext();
 }
 
-void UILayer::onEvent([[maybe_unused]] event::Event &event) {
-	if (blockEvent) {
+void UiLayer::onEvent(event::Event &ioEvent) {
+	if (m_blockEvent) {
 		const ImGuiIO &io = ImGui::GetIO();
-		event.handled |= event.isInCategory(event::category::Mouse) & io.WantCaptureMouse;
-		event.handled |= event.isInCategory(event::category::Keyboard) & io.WantCaptureKeyboard;
+		ioEvent.handled |= ioEvent.isInCategory(event::Category::Mouse) & io.WantCaptureMouse;
+		ioEvent.handled |= ioEvent.isInCategory(event::Category::Keyboard) & io.WantCaptureKeyboard;
 	}
 }
 
-void UILayer::begin() {
+void UiLayer::begin() {
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
 		ImGui_ImplOpenGL3_NewFrame();
 	else if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
@@ -123,22 +126,20 @@ void UILayer::begin() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
-	if (dockingEnable) {
-		initializeDocking();
-	}
+	if (m_dockingEnable) { initializeDocking(); }
 }
 
-void UILayer::end() const {
+void UiLayer::end() const {
 	OWL_PROFILE_FUNCTION()
-	if ((renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL) && (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy) && (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::Vulkan))
+	if ((renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL) && (
+		    renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy) && (
+		    renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::Vulkan))
 		return;
-	if (dockingEnable) {
-		ImGui::End();
-	}
+	if (m_dockingEnable) { ImGui::End(); }
 	ImGuiIO &io = ImGui::GetIO();
 	const core::Application &app = core::Application::get();
 	io.DisplaySize = ImVec2(static_cast<float>(app.getWindow().getWidth()),
-							static_cast<float>(app.getWindow().getHeight()));
+	                        static_cast<float>(app.getWindow().getHeight()));
 	// Rendering
 	ImGui::Render();
 	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
@@ -151,15 +152,16 @@ void UILayer::end() const {
 	}
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-		GLFWwindow *backup_current_context = glfwGetCurrentContext();
+		GLFWwindow *backupCurrentContext = glfwGetCurrentContext();
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
-		if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL || renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy)
-			glfwMakeContextCurrent(backup_current_context);
+		if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL || renderer::RenderAPI::getAPI() !=
+		    renderer::RenderAPI::Type::OpenglLegacy)
+			glfwMakeContextCurrent(backupCurrentContext);
 	}
 }
 
-void UILayer::setTheme(const Theme &theme) {
+void UiLayer::setTheme(const Theme &iTheme) {
 
 	auto &style = ImGui::GetStyle();
 	auto &colors = ImGui::GetStyle().Colors;
@@ -168,9 +170,9 @@ void UILayer::setTheme(const Theme &theme) {
 	// Colors
 
 	// Headers
-	colors[ImGuiCol_Header] = glm2im(theme.groupHeader);
-	colors[ImGuiCol_HeaderHovered] = glm2im(theme.groupHeader);
-	colors[ImGuiCol_HeaderActive] = glm2im(theme.groupHeader);
+	colors[ImGuiCol_Header] = glm2Im(iTheme.groupHeader);
+	colors[ImGuiCol_HeaderHovered] = glm2Im(iTheme.groupHeader);
+	colors[ImGuiCol_HeaderActive] = glm2Im(iTheme.groupHeader);
 
 	// Buttons
 	colors[ImGuiCol_Button] = ImVec4{0.22f, 0.22f, 0.22f, 0.784f};
@@ -178,20 +180,20 @@ void UILayer::setTheme(const Theme &theme) {
 	colors[ImGuiCol_ButtonActive] = ImVec4{0.22f, 0.22f, 0.22f, 0.588f};
 
 	// Frame BG
-	colors[ImGuiCol_FrameBg] = glm2im(theme.propertyField);
-	colors[ImGuiCol_FrameBgHovered] = glm2im(theme.propertyField);
-	colors[ImGuiCol_FrameBgActive] = glm2im(theme.propertyField);
+	colors[ImGuiCol_FrameBg] = glm2Im(iTheme.propertyField);
+	colors[ImGuiCol_FrameBgHovered] = glm2Im(iTheme.propertyField);
+	colors[ImGuiCol_FrameBgActive] = glm2Im(iTheme.propertyField);
 
 	// Tabs
-	colors[ImGuiCol_Tab] = glm2im(theme.titleBar);
+	colors[ImGuiCol_Tab] = glm2Im(iTheme.titleBar);
 	colors[ImGuiCol_TabHovered] = ImVec4{0.38f, 0.3805f, 0.381f, 1.0f};
 	colors[ImGuiCol_TabActive] = ImVec4{0.28f, 0.2805f, 0.281f, 1.0f};
-	colors[ImGuiCol_TabUnfocused] = glm2im(theme.titleBar);
+	colors[ImGuiCol_TabUnfocused] = glm2Im(iTheme.titleBar);
 	colors[ImGuiCol_TabUnfocusedActive] = colors[ImGuiCol_TabHovered];
 
 	// Title
-	colors[ImGuiCol_TitleBg] = glm2im(theme.titleBar);
-	colors[ImGuiCol_TitleBgActive] = glm2im(theme.titleBar);
+	colors[ImGuiCol_TitleBg] = glm2Im(iTheme.titleBar);
+	colors[ImGuiCol_TitleBgActive] = glm2Im(iTheme.titleBar);
 	colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
 
 	// Resize Grip
@@ -213,25 +215,25 @@ void UILayer::setTheme(const Theme &theme) {
 	colors[ImGuiCol_SliderGrabActive] = ImVec4(0.66f, 0.66f, 0.66f, 1.0f);
 
 	// Text
-	colors[ImGuiCol_Text] = glm2im(theme.text);
+	colors[ImGuiCol_Text] = glm2Im(iTheme.text);
 
 	// Checkbox
-	colors[ImGuiCol_CheckMark] = glm2im(theme.text);
+	colors[ImGuiCol_CheckMark] = glm2Im(iTheme.text);
 
 	// Separator
-	colors[ImGuiCol_Separator] = glm2im(theme.backgroundDark);
-	colors[ImGuiCol_SeparatorActive] = glm2im(theme.highlight);
+	colors[ImGuiCol_Separator] = glm2Im(iTheme.backgroundDark);
+	colors[ImGuiCol_SeparatorActive] = glm2Im(iTheme.highlight);
 	colors[ImGuiCol_SeparatorHovered] = ImColor(39, 185, 242, 150);
 
 	// Window Background
 	colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.105f, 0.11f, 1.0f};
-	colors[ImGuiCol_ChildBg] = glm2im(theme.background);
-	colors[ImGuiCol_PopupBg] = glm2im(theme.backgroundPopup);
-	colors[ImGuiCol_Border] = glm2im(theme.backgroundDark);
+	colors[ImGuiCol_ChildBg] = glm2Im(iTheme.background);
+	colors[ImGuiCol_PopupBg] = glm2Im(iTheme.backgroundPopup);
+	colors[ImGuiCol_Border] = glm2Im(iTheme.backgroundDark);
 
 	// Tables
-	colors[ImGuiCol_TableHeaderBg] = glm2im(theme.groupHeader);
-	colors[ImGuiCol_TableBorderLight] = glm2im(theme.backgroundDark);
+	colors[ImGuiCol_TableHeaderBg] = glm2Im(iTheme.groupHeader);
+	colors[ImGuiCol_TableBorderLight] = glm2Im(iTheme.backgroundDark);
 
 	// Menubar
 	colors[ImGuiCol_MenuBarBg] = ImVec4{0.0f, 0.0f, 0.0f, 0.0f};
@@ -243,7 +245,7 @@ void UILayer::setTheme(const Theme &theme) {
 	style.IndentSpacing = 11.0f;
 }
 
-void UILayer::initializeDocking() {
+void UiLayer::initializeDocking() {
 	static bool dockSpaceOpen = true;
 	static bool optFullScreenPersistant = true;
 	const bool optFullScreen = optFullScreenPersistant;
@@ -258,10 +260,12 @@ void UILayer::initializeDocking() {
 		ImGui::SetNextWindowViewport(viewport->ID);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+				ImGuiWindowFlags_NoMove;
 		windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	}
-	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
+	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle
+	// the pass-thru hole, so we ask Begin() to not render a background.
 	if (dockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 		windowFlags |= ImGuiWindowFlags_NoBackground;
 	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).

@@ -16,9 +16,9 @@ namespace owl::input::null {
 
 static uint8_t s_WinCount = 0;
 
-Window::Window(const Properties &props) : ::owl::input::Window() {
+Window::Window(const Properties &iProps) : ::owl::input::Window() {
 	OWL_PROFILE_FUNCTION()
-	init(props);
+	init(iProps);
 }
 
 Window::~Window() {
@@ -27,14 +27,14 @@ Window::~Window() {
 	shutdown();
 }
 
-void Window::init(const Properties &props) {
+void Window::init(const Properties &iProps) {
 	OWL_PROFILE_FUNCTION()
-	windowData.title = props.title;
-	windowData.width = props.width;
-	windowData.height = props.height;
+	m_windowData.m_title = iProps.title;
+	m_windowData.m_width = iProps.width;
+	m_windowData.m_height = iProps.height;
 
-	OWL_CORE_INFO("Creating window {} ({}, {})", props.title, props.width,
-				  props.height)
+	OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width,
+				  iProps.height)
 	++s_WinCount;
 	setVSync(true);
 }
@@ -49,11 +49,11 @@ void Window::onUpdate() {
 	OWL_PROFILE_FUNCTION()
 }
 
-void Window::setVSync(bool enabled) {
+void Window::setVSync(bool iEnabled) {
 	OWL_PROFILE_FUNCTION()
-	windowData.VSync = enabled;
+	m_windowData.m_VSync = iEnabled;
 }
 
-bool Window::isVSync() const { return windowData.VSync; }
+bool Window::isVSync() const { return m_windowData.m_VSync; }
 
 }// namespace owl::input::null

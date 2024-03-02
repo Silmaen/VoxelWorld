@@ -21,10 +21,10 @@ endif ()
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_COVERAGE)
 
 # options for coverage
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+if (${PRJPREFIX}_COMPILER_GCC)
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE --coverage)
     target_link_libraries(${CMAKE_PROJECT_NAME}_Base INTERFACE gcov)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+elseif (${PRJPREFIX}_COMPILER_CLANG)
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE --coverage)
     target_link_options(${CMAKE_PROJECT_NAME}_Base INTERFACE --coverage)
     get_filename_component(COMPILER_PATH ${CMAKE_CXX_COMPILER} DIRECTORY)

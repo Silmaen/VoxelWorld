@@ -14,17 +14,16 @@
  * @brief Namespace for vulkan specific rendering objects.
  */
 namespace owl::renderer::vulkan {
-
 /**
  * @brief Class RenderAPI.
  */
 class RenderAPI final : public ::owl::renderer::RenderAPI {
 public:
 	RenderAPI() = default;
-	RenderAPI(const RenderAPI &) = delete;
-	RenderAPI(RenderAPI &&) = delete;
-	RenderAPI &operator=(const RenderAPI &) = delete;
-	RenderAPI &operator=(RenderAPI &&) = delete;
+	RenderAPI(const RenderAPI&) = delete;
+	RenderAPI(RenderAPI&&) = delete;
+	RenderAPI& operator=(const RenderAPI&) = delete;
+	RenderAPI& operator=(RenderAPI&&) = delete;
 
 	/**
 	 * @brief Destructor.
@@ -38,18 +37,18 @@ public:
 
 	/**
 	 * @brief Define the view port for this API.
-	 * @param x Starting X coordinate.
-	 * @param y Starting Y coordinate.
-	 * @param width Viewport's width.
-	 * @param height Viewport Height.
+	 * @param[in] iX Starting X coordinate.
+	 * @param[in] iY Starting Y coordinate.
+	 * @param[in] iWidth Viewport's width.
+	 * @param[in] iHeight Viewport Height.
 	 */
-	void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+	void setViewport(uint32_t iX, uint32_t iY, uint32_t iWidth, uint32_t iHeight) override;
 
 	/**
 	 * @brief Define the background color.
-	 * @param color The background color.
+	 * @param[in] iColor The background color.
 	 */
-	void setClearColor(const glm::vec4 &color) override;
+	void setClearColor(const glm::vec4& iColor) override;
 
 	/**
 	 * @brief Clear the screen.
@@ -58,16 +57,16 @@ public:
 
 	/**
 	 * @brief Binding the draw of vertex array.
-	 * @param data Draw data to render.
-	 * @param indexCount Number of vertex to draw (=0 all).
+	 * @param[in] iData Draw data to render.
+	 * @param[in] iIndexCount Number of vertex to draw (=0 all).
 	 */
-	void drawData(const shared<DrawData> &data, uint32_t indexCount) override;
+	void drawData(const shared<DrawData>& iData, uint32_t iIndexCount) override;
 
 	/**
 	 * @brief Define the line width.
-	 * @param width New line width.
+	 * @param[in] iWidth New line width.
 	 */
-	void setLineWidth(float width) override;
+	void setLineWidth(float iWidth) override;
 
 	/**
 	 * @brief Get the maximum number of texture slots.
@@ -93,5 +92,4 @@ public:
 	 */
 	void endFrame() override;
 };
-
-}// namespace owl::renderer::vulkan
+} // namespace owl::renderer::vulkan

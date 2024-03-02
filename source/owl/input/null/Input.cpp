@@ -12,36 +12,22 @@
 
 namespace owl::input::null {
 
-bool Input::isKeyPressed_impl(KeyCode keycode) {
-	return keyPressed.contains(keycode);
+bool Input::isKeyPressed_impl(const KeyCode iKeyCode) { return keyPressed.contains(iKeyCode); }
+
+bool Input::isMouseButtonPressed_impl(const MouseCode iMouseCode) { return mouseBtnPressed.contains(iMouseCode); }
+
+glm::vec2 Input::getMousePos_impl() { return mousePos; }
+
+void Input::injectKey_impl(const KeyCode iKeyCode) {
+	if (keyPressed.contains(iKeyCode)) { keyPressed.erase(iKeyCode); } else { keyPressed.insert(iKeyCode); }
 }
 
-bool Input::isMouseButtonPressed_impl(MouseCode mouseCode) {
-	return mouseBtnPressed.contains(mouseCode);
-}
-
-glm::vec2 Input::getMousePos_impl() {
-	return mousePos;
-}
-
-void Input::injectKey_impl(KeyCode keycode) {
-	if (keyPressed.contains(keycode)) {
-		keyPressed.erase(keycode);
-	} else {
-		keyPressed.insert(keycode);
+void Input::injectMouseButton_impl(const MouseCode iMouseCode) {
+	if (mouseBtnPressed.contains(iMouseCode)) { mouseBtnPressed.erase(iMouseCode); } else {
+		mouseBtnPressed.insert(iMouseCode);
 	}
 }
 
-void Input::injectMouseButton_impl(MouseCode mouseCode) {
-	if (mouseBtnPressed.contains(mouseCode)) {
-		mouseBtnPressed.erase(mouseCode);
-	} else {
-		mouseBtnPressed.insert(mouseCode);
-	}
-}
-
-void Input::injectMousePos_impl(const glm::vec2 &mousePos_) {
-	mousePos = mousePos_;
-}
+void Input::injectMousePos_impl(const glm::vec2 &iMousePos) { mousePos = iMousePos; }
 
 }// namespace owl::input::null

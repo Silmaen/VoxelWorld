@@ -15,8 +15,8 @@ namespace owl::renderer::vulkan {
 
 namespace {
 
-VkFormat shaderDataTypeToVulkanFormat(const ShaderDataType &type) {
-	switch (type) {
+VkFormat shaderDataTypeToVulkanFormat(const ShaderDataType &iType) {
+	switch (iType) {
 		case ShaderDataType::None:
 			return VK_FORMAT_UNDEFINED;
 		case ShaderDataType::Float:
@@ -46,31 +46,24 @@ VkFormat shaderDataTypeToVulkanFormat(const ShaderDataType &type) {
 
 }// namespace
 
-VertexBuffer::VertexBuffer(const uint32_t size) {
-	createBuffer(nullptr, size);
-}
+VertexBuffer::VertexBuffer(const uint32_t iSize) { createBuffer(nullptr, iSize); }
 
-VertexBuffer::VertexBuffer(const float *vertices, const uint32_t size) {
-	createBuffer(vertices, size);
-}
+VertexBuffer::VertexBuffer(const float *iVertices, const uint32_t iSize) { createBuffer(iVertices, iSize); }
 
-VertexBuffer::~VertexBuffer() {
-	release();
-}
+VertexBuffer::~VertexBuffer() { release(); }
 
 void VertexBuffer::release() {
-	const auto &vkh = internal::VulkanHandler::get();
-	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+	if (internal::VulkanHandler::get().getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to delete vertex buffer after VulkanHander release...")
 		return;
 	}
 	const auto &vkc = internal::VulkanCore::get();
-	if (vertexBuffer != nullptr)
-		vkDestroyBuffer(vkc.getLogicalDevice(), vertexBuffer, nullptr);
-	vertexBuffer = nullptr;
-	if (vertexBufferMemory != nullptr)
-		vkFreeMemory(vkc.getLogicalDevice(), vertexBufferMemory, nullptr);
-	vertexBufferMemory = nullptr;
+	if (m_vertexBuffer != nullptr)
+		vkDestroyBuffer(vkc.getLogicalDevice(), m_vertexBuffer, nullptr);
+	m_vertexBuffer = nullptr;
+	if (m_vertexBufferMemory != nullptr)
+		vkFreeMemory(vkc.getLogicalDevice(), m_vertexBufferMemory, nullptr);
+	m_vertexBufferMemory = nullptr;
 }
 
 void VertexBuffer::bind() const {
@@ -79,32 +72,34 @@ void VertexBuffer::bind() const {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to bind vertex buffer after VulkanHander release...")
 		return;
 	}
-	const VkBuffer vertexBuffers[] = {vertexBuffer};
+	const VkBuffer vertexBuffers[] = {m_vertexBuffer};
 	constexpr VkDeviceSize offsets[] = {0};
 	vkCmdBindVertexBuffers(vkh.getCurrentCommandBuffer(), 0, 1, vertexBuffers, offsets);
 }
 
 void VertexBuffer::unbind() const {}
 
-void VertexBuffer::setData(const void *data, const uint32_t size) {
+void VertexBuffer::setData(const void *iData, const uint32_t iSize) {
 	const auto &vkh = internal::VulkanHandler::get();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to set vertex buffer data after VulkanHander release...")
 		return;
 	}
 
-	if (data != nullptr) {
+	if (iData != nullptr) {
 		VkBuffer stagingBuffer;
 		VkDeviceMemory stagingBufferMemory;
-		vkh.createBuffer(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+		vkh.createBuffer(iSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+						 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
+						 stagingBufferMemory);
 		const auto &vkc = internal::VulkanCore::get();
 
-		void *data_internal;
-		vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, size, 0, &data_internal);
-		memcpy(data_internal, data, size);
+		void *dataInternal;
+		vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, iSize, 0, &dataInternal);
+		memcpy(dataInternal, iData, iSize);
 		vkUnmapMemory(vkc.getLogicalDevice(), stagingBufferMemory);
 
-		vkh.copyBuffer(stagingBuffer, vertexBuffer, size);
+		vkh.copyBuffer(stagingBuffer, m_vertexBuffer, iSize);
 
 		vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
 		vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
@@ -135,62 +130,63 @@ std::vector<VkVertexInputAttributeDescription> VertexBuffer::getAttributeDescrip
 	return attributeDescriptions;
 }
 
-void VertexBuffer::createBuffer(const float *data, const uint32_t size) {
+void VertexBuffer::createBuffer(const float *iData, const uint32_t iSize) {
 	const auto &vkh = internal::VulkanHandler::get();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to set vertex buffer data after VulkanHander release...")
 		return;
 	}
 	release();
-	vkh.createBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-	setData(data, size);
+	vkh.createBuffer(iSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+					 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffer, m_vertexBufferMemory);
+	setData(iData, iSize);
 }
 
 
-IndexBuffer::IndexBuffer(uint32_t *data, uint32_t size) : count(size) {
+IndexBuffer::IndexBuffer(const uint32_t *iIndices, const uint32_t iSize) : m_count(iSize) {
 	const auto &vkh = internal::VulkanHandler::get();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan index buffer: Trying to create index buffer data after VulkanHander release...")
 		return;
 	}
-	const VkDeviceSize bufferSize = sizeof(uint16_t) * size;
-	vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+	const VkDeviceSize bufferSize = sizeof(uint16_t) * iSize;
+	vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+					 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_indexBuffer, m_indexBufferMemory);
 
-	if (data != nullptr) {
+	if (iIndices != nullptr) {
 		VkBuffer stagingBuffer;
 		VkDeviceMemory stagingBufferMemory;
-		vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-		void *data_internal;
+		vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+						 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
+						 stagingBufferMemory);
+		void *dataInternal;
 		const auto &vkc = internal::VulkanCore::get();
 
-		vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, bufferSize, 0, &data_internal);
-		memcpy(data_internal, data, bufferSize);
+		vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, bufferSize, 0, &dataInternal);
+		memcpy(dataInternal, iIndices, bufferSize);
 		vkUnmapMemory(vkc.getLogicalDevice(), stagingBufferMemory);
-		vkh.copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+		vkh.copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
 		vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
 		vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
 	}
 }
 
-IndexBuffer::~IndexBuffer() {
-	release();
-}
+IndexBuffer::~IndexBuffer() { release(); }
 
 void IndexBuffer::release() {
-	const auto &vkh = internal::VulkanHandler::get();
-	if (vkh.getState() != internal::VulkanHandler::State::Running) {
+	if (internal::VulkanHandler::get().getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to delete vertex buffer after VulkanHander release...")
 		return;
 	}
 	const auto &vkc = internal::VulkanCore::get();
 
-	if (indexBuffer != nullptr)
-		vkDestroyBuffer(vkc.getLogicalDevice(), indexBuffer, nullptr);
-	indexBuffer = nullptr;
-	if (indexBufferMemory != nullptr)
-		vkFreeMemory(vkc.getLogicalDevice(), indexBufferMemory, nullptr);
-	indexBufferMemory = nullptr;
-	count = 0;
+	if (m_indexBuffer != nullptr)
+		vkDestroyBuffer(vkc.getLogicalDevice(), m_indexBuffer, nullptr);
+	m_indexBuffer = nullptr;
+	if (m_indexBufferMemory != nullptr)
+		vkFreeMemory(vkc.getLogicalDevice(), m_indexBufferMemory, nullptr);
+	m_indexBufferMemory = nullptr;
+	m_count = 0;
 }
 
 void IndexBuffer::bind() const {
@@ -199,7 +195,7 @@ void IndexBuffer::bind() const {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to bind vertex buffer after VulkanHander release...")
 		return;
 	}
-	vkCmdBindIndexBuffer(vkh.getCurrentCommandBuffer(), indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+	vkCmdBindIndexBuffer(vkh.getCurrentCommandBuffer(), m_indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
 void IndexBuffer::unbind() const {}

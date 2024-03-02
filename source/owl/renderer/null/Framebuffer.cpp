@@ -12,7 +12,7 @@
 
 namespace owl::renderer::null {
 
-Framebuffer::Framebuffer(FramebufferSpecification spec) : specs{std::move(spec)} {}
+Framebuffer::Framebuffer(FramebufferSpecification iSpec) : m_specs{std::move(iSpec)} {}
 
 Framebuffer::~Framebuffer() = default;
 
@@ -22,9 +22,9 @@ void Framebuffer::bind() {}
 
 void Framebuffer::unbind() {}
 
-void Framebuffer::resize(uint32_t width, uint32_t height) {
-	specs.width = width;
-	specs.height = height;
+void Framebuffer::resize(const uint32_t iWidth, const uint32_t iHeight) {
+	m_specs.width = iWidth;
+	m_specs.height = iHeight;
 }
 
 int Framebuffer::readPixel(uint32_t, int, int) {

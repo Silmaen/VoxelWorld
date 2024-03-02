@@ -12,19 +12,19 @@
 #include "core/external/glfw3.h"
 
 namespace owl::renderer::vulkan {
-
 /**
  * @brief Class GraphContext.
  */
 class OWL_API GraphContext final : public ::owl::renderer::GraphContext {
 public:
-	GraphContext(const GraphContext &) = delete;
-	GraphContext(GraphContext &&) = delete;
+	GraphContext(const GraphContext&) = delete;
+	GraphContext(GraphContext&&) = delete;
 
 	/**
 	 * @brief Default constructor.
+	 * @param[in] ioWindow The windows draw surface.
 	 */
-	explicit GraphContext(GLFWwindow *window);
+	explicit GraphContext(GLFWwindow* ioWindow);
 
 	/**
 	 * @brief Destructor.
@@ -48,22 +48,22 @@ public:
 
 	/**
 	 * @brief Create the Window surface.
-	 * @param instance The Vulkan instance
+	 * @param[in] iInstance The Vulkan instance
 	 * @return The operation result.
 	 */
-	VkResult createSurface(VkInstance instance);
+	VkResult createSurface(const VkInstance& iInstance);
 
 	/**
 	 * @brief Destroy the Window surface.
-	 * @param instance The Vulkan instance
+	 * @param[in] iInstance The Vulkan instance
 	 */
-	void destroySurface(VkInstance instance);
+	void destroySurface(const VkInstance& iInstance);
 
 	/**
 	 * \brief Access to the vulkn surface.
 	 * \return The vulkan surface.
 	 */
-	[[nodiscard]] VkSurfaceKHR getSurface() const { return surface; }
+	[[nodiscard]] VkSurfaceKHR getSurface() const { return m_surface; }
 	/**
 	 * @brief Wait for device ready.
 	 */
@@ -71,9 +71,8 @@ public:
 
 private:
 	/// The window.
-	GLFWwindow *wnd = nullptr;
+	GLFWwindow* mp_wnd = nullptr;
 	/// the presenttin surface.
-	VkSurfaceKHR surface = nullptr;
+	VkSurfaceKHR m_surface = nullptr;
 };
-
-}// namespace owl::renderer::vulkan
+} // namespace owl::renderer::vulkan

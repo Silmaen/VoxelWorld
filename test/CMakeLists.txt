@@ -41,7 +41,7 @@ foreach (child ${children})
     endif ()
 endforeach ()
 
-if (${PRJPREFIX}_COVERAGE)
+if (${PRJPREFIX}_ENABLE_COVERAGE)
 
     set(COVERAGE_RESULT_DIR ${CMAKE_BINARY_DIR}/Coverage)
     file(MAKE_DIRECTORY ${COVERAGE_RESULT_DIR})

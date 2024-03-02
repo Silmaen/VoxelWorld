@@ -12,16 +12,15 @@
 #include "Shader.h"
 
 namespace owl::renderer::opengl_legacy {
-
 /**
  * @brief Class representing what is required for a draw.
  */
 class OWL_API DrawData final : public owl::renderer::DrawData {
 public:
-	DrawData(const DrawData &) = default;
-	DrawData(DrawData &&) = default;
-	DrawData &operator=(const DrawData &) = default;
-	DrawData &operator=(DrawData &&) = default;
+	DrawData(const DrawData&) = default;
+	DrawData(DrawData&&) = default;
+	DrawData& operator=(const DrawData&) = default;
+	DrawData& operator=(DrawData&&) = default;
 	DrawData() = default;
 	/**
 	 * @brief Destructor.
@@ -30,12 +29,14 @@ public:
 
 	/**
 	 * @brief Initialize the draw data.
-	 * @param layout_ Layout of the vertex attributes.
-	 * @param renderer Name of the shader's related renderer.
-	 * @param indices List of vertex indices.
-	 * @param shaderName The shader name.
+	 * @param[in] iLayout Layout of the vertex attributes.
+	 * @param[in] iRenderer Name of the shader's related renderer.
+	 * @param[in] iIndices List of vertex indices.
+	 * @param[in] iShaderName The shader name.
 	 */
-	void init([[maybe_unused]] const BufferLayout &layout_, const std::string &renderer, [[maybe_unused]] std::vector<uint32_t> &indices, [[maybe_unused]] const std::string &shaderName) override;
+	void init([[maybe_unused]] const BufferLayout& iLayout, const std::string& iRenderer,
+			  [[maybe_unused]] std::vector<uint32_t>& iIndices,
+			  [[maybe_unused]] const std::string& iShaderName) override;
 
 	/**
 	 * @brief Bind this draw data.
@@ -49,10 +50,10 @@ public:
 
 	/**
 	 * @brief Push Vertices data  to the draw buffer.
-	 * @param data The raw vertices data
-	 * @param size The size of the raw data.
+	 * @param[in] iData The raw vertices data
+	 * @param[in] iSize The size of the raw data.
 	 */
-	void setVertexData([[maybe_unused]] const void *data, [[maybe_unused]] uint32_t size) override;
+	void setVertexData([[maybe_unused]] const void* iData, [[maybe_unused]] uint32_t iSize) override;
 
 	/**
 	 * @brief Get the number of vertex to draw.
@@ -62,18 +63,17 @@ public:
 
 	/**
 	 * @brief Define the shader for this object.
-	 * @param shaderName The shader name.
-	 * @param renderer Name of the shader's related renderer.
+	 * @param[in] iShaderName The shader name.
+	 * @param[in] iRenderer Name of the shader's related renderer.
 	 */
-	void setShader(const std::string &shaderName, [[maybe_unused]] const std::string &renderer) override;
+	void setShader(const std::string& iShaderName, [[maybe_unused]] const std::string& iRenderer) override;
 
 private:
 	void applyLayout() const;
 	void unApplyLayout() const;
-	bool active = false;
-	shared<VertexBuffer> vertexBuffer;
-	shared<IndexBuffer> indexBuffer;
-	shared<Shader> shader;
+	bool m_active = false;
+	shared<VertexBuffer> mp_vertexBuffer;
+	shared<IndexBuffer> mp_indexBuffer;
+	shared<Shader> mp_shader;
 };
-
-}// namespace owl::renderer::opengl_legacy
+} // namespace owl::renderer::opengl_legacy

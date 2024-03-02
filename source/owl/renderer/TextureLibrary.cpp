@@ -12,60 +12,58 @@ namespace owl::renderer {
 TextureLibrary::TextureLibrary() = default;
 
 TextureLibrary::~TextureLibrary() {
-	for (auto &texture: textures)
+	for (auto &texture: m_textures)
 		texture.second.reset();
-	textures.clear();
+	m_textures.clear();
 }
 
-void TextureLibrary::add(const shared<Texture> &texture) {
-	if (exists(texture->getName())) {
-		OWL_CORE_WARN("Texture {} Already in the library", texture->getName())
+void TextureLibrary::add(const shared<Texture> &iTexture) {
+	if (exists(iTexture->getName())) {
+		OWL_CORE_WARN("Texture {} Already in the library", iTexture->getName())
 		return;
 	}
-	OWL_CORE_TRACE("Texture {} Added from name.", texture->getName())
-	textures[texture->getName()] = texture;
+	OWL_CORE_TRACE("Texture {} Added from name.", iTexture->getName())
+	m_textures[iTexture->getName()] = iTexture;
 }
 
-void TextureLibrary::addNRename(const std::string &name, const shared<Texture> &texture) {
-	if (exists(name)) {
-		OWL_CORE_WARN("Texture {} Already in the library", name)
+void TextureLibrary::addNRename(const std::string &iName, const shared<Texture> &iTexture) {
+	if (exists(iName)) {
+		OWL_CORE_WARN("Texture {} Already in the library", iName)
 		return;
 	}
-	texture->name = name;
-	OWL_CORE_TRACE("Texture {} Added from filename {}.", name, texture->getName())
-	textures[name] = texture;
+	iTexture->m_name = iName;
+	OWL_CORE_TRACE("Texture {} Added from filename {}.", iName, iTexture->getName())
+	m_textures[iName] = iTexture;
 }
 
-void TextureLibrary::addFromStandardPath(const std::string &name) {
-	if (exists(name)) {
-		OWL_CORE_WARN("Texture {} Already in the library", name)
+void TextureLibrary::addFromStandardPath(const std::string &iName) {
+	if (exists(iName)) {
+		OWL_CORE_WARN("Texture {} Already in the library", iName)
 		return;
 	}
-	OWL_CORE_TRACE("Texture {} Added.", name)
-	textures[name] = Texture2D::create(name);
+	OWL_CORE_TRACE("Texture {} Added.", iName)
+	m_textures[iName] = Texture2D::create(iName);
 }
 
-shared<Texture> TextureLibrary::load(const std::filesystem::path &file) {
-	shared<Texture> texture = Texture2D::create(file);
+shared<Texture> TextureLibrary::load(const std::filesystem::path &iFile) {
+	shared<Texture> texture = Texture2D::create(iFile);
 	if (texture == nullptr) {
-		OWL_CORE_WARN("Could not load texture file {}", file.string())
+		OWL_CORE_WARN("Could not load texture file {}", iFile.string())
 		return nullptr;
 	}
 	OWL_CORE_TRACE("Texture {} Added from file.", texture->getName())
-	textures[texture->getName()] = texture;
+	m_textures[texture->getName()] = texture;
 	return texture;
 }
 
-shared<Texture> TextureLibrary::get(const std::string &name) {
-	if (!exists(name)) {
-		OWL_CORE_ERROR("Texture {} not found in library", name)
+shared<Texture> TextureLibrary::get(const std::string &iName) {
+	if (!exists(iName)) {
+		OWL_CORE_ERROR("Texture {} not found in library", iName)
 		return nullptr;
 	}
-	return textures[name];
+	return m_textures[iName];
 }
 
-bool TextureLibrary::exists(const std::string &name) const {
-	return textures.find(name) != textures.end();
-}
+bool TextureLibrary::exists(const std::string &iName) const { return m_textures.contains(iName); }
 
 }// namespace owl::renderer

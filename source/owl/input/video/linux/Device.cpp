@@ -23,8 +23,8 @@ namespace owl::input::video::linux64 {
 
 namespace {
 
-std::string getPixelFormatString(const uint32_t pixelFormat) {
-	switch (pixelFormat) {
+std::string getPixelFormatString(const uint32_t iPixelFormat) {
+	switch (iPixelFormat) {
 		case V4L2_PIX_FMT_RGB24:
 			return "RGB24";
 		case V4L2_PIX_FMT_YUV420:
@@ -91,61 +91,64 @@ std::string unFourCC(const uint32_t pixelFormat) {
 	return fcc;
 }
 
-Device::PixelFormat getDevicePixelFormat(const uint32_t pixelFormat) {
-	if (pixelFormat == V4L2_PIX_FMT_RGB24)
-		return Device::PixelFormat::RGB24;
-	else if (pixelFormat == V4L2_PIX_FMT_NV12)
-		return Device::PixelFormat::NV12;
-	else if (pixelFormat == V4L2_PIX_FMT_YUYV)
-		return Device::PixelFormat::YUYV;
-	else if (pixelFormat == V4L2_PIX_FMT_MJPEG)
-		return Device::PixelFormat::MJPEG;
-	else
-		return Device::PixelFormat::Unknwon;
+Device::PixelFormat getDevicePixelFormat(const uint32_t iPixelFormat) {
+	if (iPixelFormat == V4L2_PIX_FMT_RGB24)
+		return Device::PixelFormat::Rgb24;
+	if (iPixelFormat == V4L2_PIX_FMT_NV12)
+		return Device::PixelFormat::Nv12;
+	if (iPixelFormat == V4L2_PIX_FMT_YUYV)
+		return Device::PixelFormat::YuYv;
+	if (iPixelFormat == V4L2_PIX_FMT_MJPEG)
+		return Device::PixelFormat::MJpeg;
+	return Device::PixelFormat::Unknwon;
 }
 
-uint32_t getV4L2PixelFormat(const Device::PixelFormat &pixelFormat) {
-	if (pixelFormat == Device::PixelFormat::RGB24)
+uint32_t getV4L2PixelFormat(const Device::PixelFormat &iPixelFormat) {
+	if (iPixelFormat == Device::PixelFormat::Rgb24)
 		return V4L2_PIX_FMT_RGB24;
-	else if (pixelFormat == Device::PixelFormat::NV12)
+	if (iPixelFormat == Device::PixelFormat::Nv12)
 		return V4L2_PIX_FMT_NV12;
-	else if (pixelFormat == Device::PixelFormat::YUYV)
+	if (iPixelFormat == Device::PixelFormat::YuYv)
 		return V4L2_PIX_FMT_YUYV;
-	else if (pixelFormat == Device::PixelFormat::MJPEG)
+	if (iPixelFormat == Device::PixelFormat::MJpeg)
 		return V4L2_PIX_FMT_MJPEG;
-	else
-		return 0;
+	return 0;
 }
 
 }// namespace
 
 
-void updateList(std::vector<shared<video::Device>> &list) {
+void updateList(std::vector<shared<video::Device>> &ioList) {
 	// check if all listed devices still exists
-	if (std::remove_if(list.begin(), list.end(), [](const shared<video::Device> &dev) { return !std::static_pointer_cast<Device>(dev)->isValid(); }) != list.end()) { OWL_CORE_WARN("Possible problems during video input listing.") }
+	if (std::remove_if(ioList.begin(), ioList.end(), [](const shared<video::Device> &dev) {
+		return !std::static_pointer_cast<Device>(dev)->isValid();
+	}) != ioList.end()) { OWL_CORE_WARN("Possible problems during video input listing.") }
 
 	// search for new devices.
 	size_t devCounter = 0;
-	for (size_t iCam = 0; iCam < maxDevices; ++iCam) {
-		auto testDev = mk_shared<Device>(fmt::format("/dev/video{}", iCam).c_str());
+	for (size_t iCam = 0; iCam < g_maxDevices; ++iCam) {
+		auto testDev = mkShared<Device>(fmt::format("/dev/video{}", iCam).c_str());
 		if (!testDev->isValid()) { continue; }
 		// don't add a device that already exists
-		if (std::find_if(list.begin(), list.end(),
-						 [&testDev](const shared<video::Device> &dev) { return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo(); }) != list.end())
+		if (std::find_if(ioList.begin(), ioList.end(),
+		                 [&testDev](const shared<video::Device> &dev) {
+			                 return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo();
+		                 }) != ioList.end())
 			continue;
 		OWL_CORE_TRACE("Found: {} ({}) [{}] ", devCounter, testDev->getName(), testDev->getBusInfo())
-		list.push_back(testDev);
+		ioList.push_back(testDev);
 		++devCounter;
 	}
 }
 
-Device::Device(std::string _file)
-	: video::Device{""}, file{std::move(_file)} {
-	if (!exists(std::filesystem::path(file))) return;
+Device::Device(std::string iFile)
+	: video::Device{""}, m_file{std::move(iFile)} {
+	if (!exists(std::filesystem::path(m_file)))
+		return;
 
-	const int fd = ::open(file.c_str(), O_RDONLY);
+	const int fd = ::open(m_file.c_str(), O_RDONLY);
 	if (!fd) {
-		OWL_CORE_WARN("Unable to open device file {}", file)
+		OWL_CORE_WARN("Unable to open device file {}", m_file)
 		return;
 	}
 	v4l2_capability capability{};
@@ -156,18 +159,20 @@ Device::Device(std::string _file)
 		return;
 	}
 	if (vcap == 0) {
-		name = reinterpret_cast<const char *>(capability.card);
-		busInfo = reinterpret_cast<const char *>(capability.bus_info);
+		m_name = reinterpret_cast<const char *>(capability.card);
+		m_busInfo = reinterpret_cast<const char *>(capability.bus_info);
 	} else {
 		// second method
 		media_device_info mdi{};
 		if (ioctl(fd, MEDIA_IOC_DEVICE_INFO, &mdi) > 0) {
-			if (mdi.bus_info[0]) busInfo = mdi.bus_info;
+			if (mdi.bus_info[0])
+				m_busInfo = mdi.bus_info;
 			else
-				busInfo = fmt::format("platform: {}", mdi.driver);
-			if (mdi.model[0]) name = mdi.model;
+				m_busInfo = fmt::format("platform: {}", mdi.driver);
+			if (mdi.model[0])
+				m_name = mdi.model;
 			else
-				name = mdi.driver;
+				m_name = mdi.driver;
 		}
 	}
 	::close(fd);
@@ -176,47 +181,47 @@ Device::Device(std::string _file)
 Device::~Device() { close(); };
 
 void Device::open() {
-	OWL_CORE_INFO("Opening device ({}): {}", file, name)
+	OWL_CORE_INFO("Opening device ({}): {}", m_file, m_name)
 	close();
-	fileHandler = ::open(file.c_str(), O_RDWR);
-	if (fileHandler <= 0) {
-		OWL_CORE_WARN("({}) Unable to open the device.", file)
+	m_fileHandler = ::open(m_file.c_str(), O_RDWR);
+	if (m_fileHandler <= 0) {
+		OWL_CORE_WARN("({}) Unable to open the device.", m_file)
 		return;
 	}
 	// manage format
 	{
 		v4l2_format fmt{};
 		fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-		if (ioctl(fileHandler, VIDIOC_G_FMT, &fmt) < 0) {
-			OWL_CORE_WARN("({}) Unable to get format of device.", file)
+		if (ioctl(m_fileHandler, VIDIOC_G_FMT, &fmt) < 0) {
+			OWL_CORE_WARN("({}) Unable to get format of device.", m_file)
 			close();
 			return;
 		}
 		if (!isPixelFormatSupported(getDevicePixelFormat(fmt.fmt.pix.pixelformat))) {
-			OWL_CORE_WARN("({}) Native pixel format unsupported!", file, getPixelFormatString(V4L2_PIX_FMT_NV12))
-			OWL_CORE_WARN("({}) fourcc: {}", file, unFourCC(fmt.fmt.pix.pixelformat))
+			OWL_CORE_WARN("({}) Native pixel format unsupported!", m_file, getPixelFormatString(V4L2_PIX_FMT_NV12))
+			OWL_CORE_WARN("({}) fourcc: {}", m_file, unFourCC(fmt.fmt.pix.pixelformat))
 			fmt.fmt.pix.pixelformat = getV4L2PixelFormat(getFirstSupportedPixelFormat());
-			if (ioctl(fileHandler, VIDIOC_S_FMT, &fmt) < 0) {
-				OWL_CORE_WARN("({}) Unable to set format of device", file)
+			if (ioctl(m_fileHandler, VIDIOC_S_FMT, &fmt) < 0) {
+				OWL_CORE_WARN("({}) Unable to set format of device", m_file)
 				close();
 				return;
 			}
 			if (!isPixelFormatSupported(getDevicePixelFormat(fmt.fmt.pix.pixelformat))) {
-				OWL_CORE_WARN("({}) Unable to set device to a suitable format", file)
+				OWL_CORE_WARN("({}) Unable to set device to a suitable format", m_file)
 				close();
 				return;
 			}
 		}
-		if (ioctl(fileHandler, VIDIOC_S_FMT, &fmt) < 0) {
-			OWL_CORE_WARN("({}) Unable to set format of device", file)
+		if (ioctl(m_fileHandler, VIDIOC_S_FMT, &fmt) < 0) {
+			OWL_CORE_WARN("({}) Unable to set format of device", m_file)
 			close();
 			return;
 		}
-		OWL_CORE_INFO("({}) Using size is {} x {}", file, fmt.fmt.pix.width, fmt.fmt.pix.height)
-		OWL_CORE_INFO("({}) Using pixel format: {}", file, getPixelFormatString(fmt.fmt.pix.pixelformat))
-		pixFormat = getDevicePixelFormat(fmt.fmt.pix.pixelformat);
-		size = {fmt.fmt.pix.width,
-				fmt.fmt.pix.height};
+		OWL_CORE_INFO("({}) Using size is {} x {}", m_file, fmt.fmt.pix.width, fmt.fmt.pix.height)
+		OWL_CORE_INFO("({}) Using pixel format: {}", m_file, getPixelFormatString(fmt.fmt.pix.pixelformat))
+		m_pixFormat = getDevicePixelFormat(fmt.fmt.pix.pixelformat);
+		m_size = {fmt.fmt.pix.width,
+		          fmt.fmt.pix.height};
 	}
 	// request buffer from device.
 	{
@@ -224,125 +229,132 @@ void Device::open() {
 		requestBuffers.count = 1;// only one buffer requested.
 		requestBuffers.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		requestBuffers.memory = V4L2_MEMORY_MMAP;
-		if (ioctl(fileHandler, VIDIOC_REQBUFS, &requestBuffers) < 0) {
-			OWL_CORE_WARN("({}) Unable to request buffer.", file)
+		if (ioctl(m_fileHandler, VIDIOC_REQBUFS, &requestBuffers) < 0) {
+			OWL_CORE_WARN("({}) Unable to request buffer.", m_file)
 			close();
 			return;
 		}
 	}
 	// define the bufferInfo
 	{
-		memset(&bufferInfo, 0, sizeof(bufferInfo));
-		bufferInfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-		bufferInfo.memory = V4L2_MEMORY_MMAP;
-		bufferInfo.index = 0;
+		memset(&m_bufferInfo, 0, sizeof(m_bufferInfo));
+		m_bufferInfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		m_bufferInfo.memory = V4L2_MEMORY_MMAP;
+		m_bufferInfo.index = 0;
 	}
 	// query buffer from device
 	{
-		if (ioctl(fileHandler, VIDIOC_QUERYBUF, &bufferInfo) < 0) {
-			OWL_CORE_WARN("({}) Unable to query buffer.", file)
+		if (ioctl(m_fileHandler, VIDIOC_QUERYBUF, &m_bufferInfo) < 0) {
+			OWL_CORE_WARN("({}) Unable to query buffer.", m_file)
 			close();
 			return;
 		}
-		OWL_CORE_INFO("({}) Buffer info, length {} , offset {}.", file, bufferInfo.length, bufferInfo.m.offset)
-		buffer = mmap(nullptr, bufferInfo.length, PROT_READ | PROT_WRITE, MAP_SHARED, fileHandler, bufferInfo.m.offset);
-		if (buffer == MAP_FAILED) {
-			OWL_CORE_ERROR("({}) Unable to map the device buffer.", file)
+		OWL_CORE_INFO("({}) Buffer info, length {} , offset {}.", m_file, m_bufferInfo.length, m_bufferInfo.m.offset)
+		mp_buffer = mmap(nullptr, m_bufferInfo.length, PROT_READ | PROT_WRITE, MAP_SHARED, m_fileHandler,
+		                 m_bufferInfo.m.offset);
+		if (mp_buffer == MAP_FAILED) {
+			OWL_CORE_ERROR("({}) Unable to map the device buffer.", m_file)
 			close();
 			return;
 		}
 	}
 	//Activate the streaming
 	{
-		uint32_t type = bufferInfo.type;
-		if (ioctl(fileHandler, VIDIOC_STREAMON, &type) < 0) {
-			OWL_CORE_WARN("({}) Unable to start the streaming.", file)
+		uint32_t type = m_bufferInfo.type;
+		if (ioctl(m_fileHandler, VIDIOC_STREAMON, &type) < 0) {
+			OWL_CORE_WARN("({}) Unable to start the streaming.", m_file)
 			close();
 			return;
 		}
-		streaming = true;
+		m_streaming = true;
 	}
 	// queue the buffer
-	if (ioctl(fileHandler, VIDIOC_QBUF, &bufferInfo) < 0) {
-		OWL_CORE_WARN("Device ({}) unable to queue the buffer.", file)
+	if (ioctl(m_fileHandler, VIDIOC_QBUF, &m_bufferInfo) < 0) {
+		OWL_CORE_WARN("Device ({}) unable to queue the buffer.", m_file)
 		close();
 		return;
 	}
 }
 
 void Device::close() {
-	if (!isOpened()) return;
-	if (buffer)
-		munmap(buffer, bufferInfo.length);
-	if (streaming) {
-		if (ioctl(fileHandler, VIDIOC_STREAMOFF, &bufferInfo) < 0) {
-			OWL_CORE_WARN("({}) Unable to close the streaming.", file)
+	if (!isOpened())
+		return;
+	if (mp_buffer)
+		munmap(mp_buffer, m_bufferInfo.length);
+	if (m_streaming) {
+		if (ioctl(m_fileHandler, VIDIOC_STREAMOFF, &m_bufferInfo) < 0) {
+			OWL_CORE_WARN("({}) Unable to close the streaming.", m_file)
 		}
 	}
-	::close(fileHandler);
-	fileHandler = 0;
-	size = {1, 1};
-	buffer = nullptr;
-	streaming = false;
+	::close(m_fileHandler);
+	m_fileHandler = 0;
+	m_size = {1, 1};
+	mp_buffer = nullptr;
+	m_streaming = false;
 }
 
-bool Device::isOpened() const { return fileHandler != 0; }
+bool Device::isOpened() const { return m_fileHandler != 0; }
 
-void Device::fillFrame(shared<renderer::Texture> &frame) {
-	if (!streaming) return;// need to be open and ready!
+void Device::fillFrame(shared<renderer::Texture> &ioFrame) {
+	if (!m_streaming)
+		return;// need to be open and ready!
 	// recreate the frame if not the right size.
-	if (!frame || frame->getSize() != size) {
-		frame = renderer::Texture2D::create(size, false);
-	}
+	if (!ioFrame || ioFrame->getSize() != m_size) { ioFrame = renderer::Texture2D::create(m_size, false); }
 	// dequeue the buffer
-	if (ioctl(fileHandler, VIDIOC_DQBUF, &bufferInfo) < 0) {
-		OWL_CORE_WARN("Device ({}) unable to dequeue the buffer.", file)
+	if (ioctl(m_fileHandler, VIDIOC_DQBUF, &m_bufferInfo) < 0) {
+		OWL_CORE_WARN("Device ({}) unable to dequeue the buffer.", m_file)
 		return;
 	}
 
-	std::vector<uint8_t> convertedBuffer = getRGBBuffer(static_cast<const uint8_t *>(buffer), static_cast<int32_t>(bufferInfo.bytesused));
+	std::vector<uint8_t> convertedBuffer = getRgbBuffer(static_cast<const uint8_t *>(mp_buffer),
+	                                                    static_cast<int32_t>(m_bufferInfo.bytesused));
 	// frames are written after dequeing the buffer
 	if (!convertedBuffer.empty()) {
-		if (size.surface() * 3 != convertedBuffer.size()) {
-			OWL_CORE_WARN("Device ({}) buffer size missmatch: {}, expecting {}.", file, bufferInfo.bytesused, size.surface() * 3)
-		} else {
-			frame->setData(convertedBuffer.data(), static_cast<uint32_t>(convertedBuffer.size()));
-		}
+		if (m_size.surface() * 3 != convertedBuffer.size()) {
+			OWL_CORE_WARN("Device ({}) buffer size missmatch: {}, expecting {}.", m_file, m_bufferInfo.bytesused,
+			              m_size.surface() * 3)
+		} else { ioFrame->setData(convertedBuffer.data(), static_cast<uint32_t>(convertedBuffer.size())); }
 	}
 	// queue the buffer
-	if (ioctl(fileHandler, VIDIOC_QBUF, &bufferInfo) < 0) {
-		OWL_CORE_WARN("Device ({}) unable to queue the buffer.", file)
+	if (ioctl(m_fileHandler, VIDIOC_QBUF, &m_bufferInfo) < 0) {
+		OWL_CORE_WARN("Device ({}) unable to queue the buffer.", m_file)
 	}
 }
 
 bool Device::isValid() const {
 	// fast out: open is assumed valid.
-	if (isOpened()) return true;
+	if (isOpened())
+		return true;
 
 	// check if realy initiated.
-	if (file.empty()) return false;
-	if (name.empty()) return false;
-	if (busInfo.empty()) return false;
+	if (m_file.empty())
+		return false;
+	if (m_name.empty())
+		return false;
+	if (m_busInfo.empty())
+		return false;
 
 	// check if still exists and still a video source.
-	if (!exists(std::filesystem::path(file))) return false;
-	const int fd = ::open(file.c_str(), O_RDWR);
-	if (!fd) return false;
+	if (!exists(std::filesystem::path(m_file)))
+		return false;
+	const int fd = ::open(m_file.c_str(), O_RDWR);
+	if (!fd)
+		return false;
 	// check have supported capabilities
 	{
 		v4l2_capability capability{};
 		if (ioctl(fd, VIDIOC_QUERYCAP, &capability) < 0) {
-			OWL_CORE_TRACE("Device {} ({}) unable to get Video capability.", name, file)
+			OWL_CORE_TRACE("Device {} ({}) unable to get Video capability.", m_name, m_file)
 			::close(fd);
 			return false;
 		}
 		if (!(capability.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
-			OWL_CORE_TRACE("Device {} ({}) does not have Video capability.", name, file)
+			OWL_CORE_TRACE("Device {} ({}) does not have Video capability.", m_name, m_file)
 			::close(fd);
 			return false;// not a capture device.
 		}
 		if (!(capability.capabilities & V4L2_CAP_STREAMING)) {
-			OWL_CORE_TRACE("Device {} ({}) does not have streaming capability.", name, file)
+			OWL_CORE_TRACE("Device {} ({}) does not have streaming capability.", m_name, m_file)
 			::close(fd);
 			return false;// no read capability.
 		}
@@ -350,7 +362,7 @@ bool Device::isValid() const {
 	// check have supported pixelformat.
 	{
 		if (getFirstSupportedPixelFormat(fd) == PixelFormat::Unknwon) {
-			OWL_CORE_TRACE("Device {} ({}) Does not have a supported pixel format.", name, file)
+			OWL_CORE_TRACE("Device {} ({}) Does not have a supported pixel format.", m_name, m_file)
 			::close(fd);
 			printSupportedFormat();
 			return false;
@@ -362,30 +374,33 @@ bool Device::isValid() const {
 }
 
 void Device::printSupportedFormat() const {
-	if (!exists(std::filesystem::path(file))) return;
-	const int fd = ::open(file.c_str(), O_RDWR);
-	if (!fd) return;
+	if (!exists(std::filesystem::path(m_file)))
+		return;
+	const int fd = ::open(m_file.c_str(), O_RDWR);
+	if (!fd)
+		return;
 	// Structure pour interroger les formats de pixel
 	v4l2_fmtdesc formatDescription{};
 	formatDescription.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
 	// Boucle pour interroger chaque format de pixel
 	while (ioctl(fd, VIDIOC_ENUM_FMT, &formatDescription) == 0) {
-		OWL_CORE_INFO("({}) index {} format {}", file, formatDescription.index, getPixelFormatString(formatDescription.pixelformat))
+		OWL_CORE_INFO("({}) index {} format {}", m_file, formatDescription.index,
+		              getPixelFormatString(formatDescription.pixelformat))
 		// Incrémentation pour passer au format de pixel suivant
 		++formatDescription.index;
 	}
 	::close(fd);
 }
 
-Device::PixelFormat Device::getFirstSupportedPixelFormat(int32_t fd) const {
-	if (fd == -1)
-		fd = fileHandler;
-	if (fd == -1)
+Device::PixelFormat Device::getFirstSupportedPixelFormat(int32_t iFd) const {
+	if (iFd == -1)
+		iFd = m_fileHandler;
+	if (iFd == -1)
 		return PixelFormat::Unknwon;
 	v4l2_fmtdesc formatDescription{};
 	formatDescription.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	while (ioctl(fd, VIDIOC_ENUM_FMT, &formatDescription) == 0) {
+	while (ioctl(iFd, VIDIOC_ENUM_FMT, &formatDescription) == 0) {
 		if (const auto pix = getDevicePixelFormat(formatDescription.pixelformat); isPixelFormatSupported(pix))
 			return pix;
 		++formatDescription.index;
