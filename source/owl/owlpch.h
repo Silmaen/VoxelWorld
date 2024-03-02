@@ -34,6 +34,9 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#if !defined(__clang__) or __clang_major__ > 15
+#include <ranges>
+#endif
 
 #include "debug/Profiler.h"
 #include "debug/Tracker.h"

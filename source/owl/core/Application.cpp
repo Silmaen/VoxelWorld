@@ -10,7 +10,6 @@
 
 #include "Application.h"
 
-#include <ranges>
 #include "Environment.h"
 #include "core/external/yaml.h"
 #include "input/Input.h"
@@ -149,8 +148,7 @@ void Application::run() {
 			if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
 				m_state = State::Error;
 				continue;
-			}
-			{
+			} {
 				OWL_PROFILE_SCOPE("LayerStack onUpdate")
 
 				for (const auto &layer: m_layerStack)
@@ -199,7 +197,12 @@ void Application::onEvent(event::Event &ioEvent) {
 		return onWindowResized(std::forward<decltype(PH1)>(PH1));
 	});
 
+#if defined(__clang__) and __clang_major__ < 16
+	for (auto it2 = m_layerStack.rbegin(); it2 != m_layerStack.rend(); ++it2) {
+		auto it = (*it2);
+#else
 	for (const auto &it: std::ranges::reverse_view(m_layerStack)) {
+#endif
 		if (ioEvent.handled)
 			break;
 		it->onEvent(ioEvent);
