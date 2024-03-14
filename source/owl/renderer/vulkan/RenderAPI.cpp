@@ -11,6 +11,7 @@
 
 #include "core/Application.h"
 #include "core/external/glfw3.h"
+#include "internal/Descriptors.h"
 #include "internal/VulkanHandler.h"
 
 namespace owl::renderer::vulkan {
@@ -94,6 +95,15 @@ void RenderAPI::endFrame() {
 		return;
 	}
 	vkh.endFrame();
+}
+
+void RenderAPI::beginTextureLoad() {
+	auto &vkd = internal::Descriptors::get();
+	vkd.resetTextureBind();
+}
+
+void RenderAPI::endTextureLoad() {
+	internal::Descriptors::get().commitTextureBind(internal::VulkanHandler::get().getCurrentFrame());
 }
 
 }// namespace owl::renderer::vulkan

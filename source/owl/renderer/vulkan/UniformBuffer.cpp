@@ -9,20 +9,22 @@
 
 #include "UniformBuffer.h"
 
+#include "internal/Descriptors.h"
 #include "internal/VulkanHandler.h"
 
 namespace owl::renderer::vulkan {
 
 UniformBuffer::UniformBuffer(const uint32_t iSize, uint32_t, const std::string &) {
-	auto &vkh = internal::VulkanHandler::get();
-	vkh.createUniformBuffers(iSize);
+	auto &vkd = internal::Descriptors::get();
+	vkd.registerUniform(iSize);
+	vkd.updateDescriptors();
 }
 
 UniformBuffer::~UniformBuffer() = default;
 
 void UniformBuffer::setData(const void *iData, const uint32_t iSize, uint32_t) {
-	const auto &vkh = internal::VulkanHandler::get();
-	vkh.setUniformData(iData, iSize);
+	auto &vkd = internal::Descriptors::get();
+	vkd.setUniformData(iData, iSize);
 }
 
 

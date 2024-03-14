@@ -92,7 +92,7 @@ uint32_t PhysicalDeviceCapabilities::getScore() const {
 		score += 1000;// favorize graphic card over CPU-integrated GPU
 	score += properties.limits.maxImageDimension2D;
 	// checking the queue families
-	if (graphicQueueIndex == std::numeric_limits<uint32_t>::max())
+	if (graphicQueueIndex == std::numeric_limits<uint32_t>::max() || !features.samplerAnisotropy)
 		score *= 0;
 	return score;
 }
