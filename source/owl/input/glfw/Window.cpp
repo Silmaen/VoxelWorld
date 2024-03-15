@@ -17,6 +17,7 @@
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
 #include "renderer/RenderAPI.h"
+#include "renderer/RenderCommand.h"
 
 namespace owl::input::glfw {
 
@@ -46,7 +47,7 @@ void Window::init(const Properties &iProps) {
 	m_windowData.height = iProps.height;
 
 	OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width,
-	              iProps.height)
+				  iProps.height)
 
 	if (s_glfwWindowCount == 0) {
 		OWL_PROFILE_SCOPE("glfwInit")
@@ -58,7 +59,7 @@ void Window::init(const Properties &iProps) {
 	// window creation.
 	{
 		OWL_PROFILE_SCOPE("glfwCreateWindow")
-		auto api = renderer::RenderAPI::getAPI();
+		const auto api = renderer::RenderCommand::getApi();
 		if (api == renderer::RenderAPI::Type::Vulkan) {
 			if (!glfwVulkanSupported()) {
 				OWL_CORE_CRITICAL("No Vulkan support for glfw.")
@@ -72,8 +73,8 @@ void Window::init(const Properties &iProps) {
 		if (api == renderer::RenderAPI::Type::Vulkan)
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		mp_glfwWindow = glfwCreateWindow(static_cast<int>(iProps.width),
-		                                 static_cast<int>(iProps.height),
-		                                 m_windowData.title.c_str(), nullptr, nullptr);
+										 static_cast<int>(iProps.height),
+										 m_windowData.title.c_str(), nullptr, nullptr);
 		++s_glfwWindowCount;
 	}
 	// Set icon
@@ -109,8 +110,8 @@ void Window::init(const Properties &iProps) {
 					event);
 		});
 		glfwSetKeyCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const int iKey,
-		                                     [[maybe_unused]] int iScancode, const int iAction,
-		                                     [[maybe_unused]] int iMods) {
+											 [[maybe_unused]] int iScancode, const int iAction,
+											 [[maybe_unused]] int iMods) {
 			const auto cKey = static_cast<KeyCode>(iKey);
 			switch (iAction) {
 				case GLFW_PRESS: {
@@ -142,8 +143,8 @@ void Window::init(const Properties &iProps) {
 		});
 
 		glfwSetMouseButtonCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const int iButton,
-		                                             const int iAction,
-		                                             [[maybe_unused]] const int iMods) {
+													 const int iAction,
+													 [[maybe_unused]] const int iMods) {
 			switch (iAction) {
 				case GLFW_PRESS: {
 					event::MouseButtonPressedEvent event(
@@ -167,14 +168,14 @@ void Window::init(const Properties &iProps) {
 		glfwSetScrollCallback(
 				mp_glfwWindow, [](GLFWwindow *iWindow, const double iXOffset, const double iYOffset) {
 					event::MouseScrolledEvent event(static_cast<float>(iXOffset),
-					                                static_cast<float>(iYOffset));
+													static_cast<float>(iYOffset));
 					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 				});
 
 		glfwSetCursorPosCallback(
 				mp_glfwWindow, [](GLFWwindow *iWindow, const double iX, const double iY) {
 					event::MouseMovedEvent event(static_cast<float>(iX),
-					                             static_cast<float>(iY));
+												 static_cast<float>(iY));
 					static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 				});
 	}
@@ -204,7 +205,7 @@ void Window::onUpdate() {
 void Window::setVSync(const bool iEnabled) {
 	OWL_PROFILE_FUNCTION()
 
-	if (const auto api = renderer::RenderAPI::getAPI();
+	if (const auto api = renderer::RenderCommand::getApi();
 		api == renderer::RenderAPI::Type::OpenGL || api == renderer::RenderAPI::Type::OpenglLegacy) {
 		if (iEnabled)
 			glfwSwapInterval(1);

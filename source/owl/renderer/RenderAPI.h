@@ -17,7 +17,15 @@ namespace owl::renderer {
  */
 class OWL_API RenderAPI {
 public:
-	RenderAPI() = default;
+	/// Render API types.
+	enum struct Type {
+		Null = 0,///< Null Renderer.
+		OpenGL = 1,///< OpenGL Renderer.
+		Vulkan = 2,///< Vulkan renderer API.
+		OpenglLegacy = 3///< OpenGL 2.1 renderer
+	};
+
+	explicit RenderAPI(const Type &iType): m_type{iType} {}
 	RenderAPI(const RenderAPI &) = delete;
 	RenderAPI(RenderAPI &&) = delete;
 	RenderAPI &operator=(const RenderAPI &) = delete;
@@ -72,13 +80,6 @@ public:
 	 */
 	[[nodiscard]] virtual uint32_t getMaxTextureSlots() const = 0;
 
-	/// Render API types.
-	enum struct Type {
-		Null = 0,///< Null Renderer.
-		OpenGL = 1,///< OpenGL Renderer.
-		Vulkan = 2,///< Vulkan renderer API.
-		OpenglLegacy = 3///< OpenGL 2.1 renderer
-	};
 
 	/// Render API states.
 	enum struct State {
@@ -91,7 +92,7 @@ public:
 	 * @brief Get the actual API type.
 	 * @return API Type.
 	 */
-	static Type getAPI() { return m_type; }
+	[[nodiscard]] Type getApi() const { return m_type; }
 
 	/**
 	 * @brief Static method to create a Render API.
@@ -104,13 +105,13 @@ public:
 	 * @brief Get the actual API state.
 	 * @return API State.
 	 */
-	static State getState() { return m_state; }
+	[[nodiscard]] State getState() const { return m_state; }
 
 	/**
 	 * @brief Check if the API type require initializations.
 	 * @return tRue if initialization required.
 	 */
-	static bool requireInit() {
+	[[nodiscard]] bool requireInit() const {
 		return m_type == Type::OpenGL || m_type == Type::OpenglLegacy || m_type == Type::Vulkan;
 	}
 
@@ -149,13 +150,13 @@ protected:
 	 * @brief Define the API State.
 	 * @param[in] iState The new API State.
 	 */
-	static void setState(const State &iState) { m_state = iState; }
+	void setState(const State &iState) { m_state = iState; }
 
 private:
-	/// The current state of the API.
-	static State m_state;
 	/// Type of Renderer API.
-	static Type m_type;
+	Type m_type = Type::Null;
+	/// The current state of the API.
+	State m_state = State::Created;
 };
 
 }// namespace owl::renderer

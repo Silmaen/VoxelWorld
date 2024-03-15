@@ -109,7 +109,7 @@ public:
 
 	[[nodiscard]] ImGui_ImplVulkan_InitInfo toImGuiInfo() const;
 
-	[[nodiscard]] VkRenderPass getRenderPath() const { return m_swapChain.renderPass; }
+	[[nodiscard]] VkRenderPass getRenderPass() const { return m_swapChain.renderPass; }
 
 	[[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const;
 
@@ -166,6 +166,8 @@ public:
 	void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, uint32_t iWidth, uint32_t iHeight) const;
 
 	[[nodiscard]] uint32_t getCurrentFrame() const { return m_currentFrame; }
+
+	void imguiLoadFonts() const;
 
 private:
 	/**

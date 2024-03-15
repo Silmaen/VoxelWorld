@@ -18,9 +18,9 @@
 namespace owl::renderer {
 
 shared<Shader> Shader::create(const std::string &iShaderName, const std::string &iRenderer) {
-	const auto type = Renderer::getAPI();
+	const auto type = RenderCommand::getApi();
 	std::filesystem::path shaderDir;
-	if (RenderAPI::requireInit()) {
+	if (RenderCommand::requireInit()) {
 		shaderDir = core::Application::get().getAssetDirectory() / "shaders";
 		if (!iRenderer.empty()) {
 			shaderDir /= iRenderer;
@@ -36,7 +36,7 @@ shared<Shader> Shader::create(const std::string &iShaderName, const std::string 
 }
 
 shared<Shader> Shader::create(const std::string &iShaderName, const std::string &iRenderer,
-                              const std::filesystem::path &iFile) {
+							  const std::filesystem::path &iFile) {
 	std::vector<std::filesystem::path> sources;
 	if (is_directory(iFile)) {
 		for (const auto &f: std::filesystem::directory_iterator(iFile)) {
@@ -50,8 +50,8 @@ shared<Shader> Shader::create(const std::string &iShaderName, const std::string 
 		}
 	} else { sources = {iFile}; }
 	OWL_CORE_TRACE("Try to create shader {} for renderer {} / API {}.", iShaderName, iRenderer,
-	               magic_enum::enum_name(Renderer::getAPI()))
-	switch (Renderer::getAPI()) {
+				   magic_enum::enum_name(RenderCommand::getApi()))
+	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkShared<null::Shader>(iShaderName, iRenderer, sources);
 		case RenderAPI::Type::OpenGL:

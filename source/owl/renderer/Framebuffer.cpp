@@ -18,7 +18,7 @@
 namespace owl::renderer {
 
 shared<Framebuffer> Framebuffer::create(const FramebufferSpecification &iSpec) {
-	switch (RenderCommand::getAPI()) {
+	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkShared<null::Framebuffer>(iSpec);
 		case RenderAPI::Type::OpenGL:

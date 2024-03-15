@@ -17,13 +17,13 @@ namespace owl::renderer::opengl {
 /**
  * @brief Class RenderAPI.
  */
-class RenderAPI final : public ::owl::renderer::RenderAPI {
+class RenderAPI final : public renderer::RenderAPI {
 public:
-	RenderAPI() = default;
-	RenderAPI(const RenderAPI&) = delete;
-	RenderAPI(RenderAPI&&) = delete;
-	RenderAPI& operator=(const RenderAPI&) = delete;
-	RenderAPI& operator=(RenderAPI&&) = delete;
+	RenderAPI(): renderer::RenderAPI(Type::OpenGL) {}
+	RenderAPI(const RenderAPI &) = delete;
+	RenderAPI(RenderAPI &&) = delete;
+	RenderAPI &operator=(const RenderAPI &) = delete;
+	RenderAPI &operator=(RenderAPI &&) = delete;
 
 	/**
 	 * @brief Destructor.
@@ -48,7 +48,7 @@ public:
 	 * @brief Define the background color.
 	 * @param[in] iColor The background color.
 	 */
-	void setClearColor(const glm::vec4& iColor) override;
+	void setClearColor(const glm::vec4 &iColor) override;
 
 	/**
 	 * @brief Clear the screen.
@@ -60,7 +60,7 @@ public:
 	 * @param[in] iData Draw data to render.
 	 * @param[in] iIndexCount Number of vertex to draw (=0 all).
 	 */
-	void drawData(const shared<DrawData>& iData, uint32_t iIndexCount) override;
+	void drawData(const shared<DrawData> &iData, uint32_t iIndexCount) override;
 
 	/**
 	 * @brief Define the line width.
@@ -74,4 +74,4 @@ public:
 	 */
 	[[nodiscard]] uint32_t getMaxTextureSlots() const override;
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

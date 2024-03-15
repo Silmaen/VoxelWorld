@@ -12,6 +12,7 @@
 #include "core/Application.h"
 #include "core/external/glfw3.h"
 #include "core/external/imgui.h"
+#include "renderer/RenderCommand.h"
 #include "renderer/vulkan/internal/VulkanHandler.h"
 
 OWL_DIAG_PUSH
@@ -54,11 +55,11 @@ void UiLayer::onAttach() {// Setup Dear ImGui context
 	ImFontConfig fontConfig;
 	fontConfig.FontDataOwnedByAtlas = false;
 	ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoRegular)),
-	                                                    sizeof(g_RobotoRegular), 20.0f, &fontConfig);
+														sizeof(g_RobotoRegular), 20.0f, &fontConfig);
 	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoBold)), sizeof(g_RobotoBold),
-	                               20.0f, &fontConfig);
+								   20.0f, &fontConfig);
 	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoItalic)),
-	                               sizeof(g_RobotoItalic), 20.0f, &fontConfig);
+								   sizeof(g_RobotoItalic), 20.0f, &fontConfig);
 	io.FontDefault = robotoFont;
 
 	// Setup Dear ImGui style
@@ -77,31 +78,35 @@ void UiLayer::onAttach() {// Setup Dear ImGui context
 	auto *window = static_cast<GLFWwindow *>(
 		core::Application::get().getWindow().getNativeWindow());
 
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL) {
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL) {
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 	}
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy) {
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenglLegacy) {
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL2_Init();
 	}
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan) {
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
 		ImGui_ImplGlfw_InitForVulkan(window, true);
 		const auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
 		ImGui_ImplVulkan_InitInfo info = vkh.toImGuiInfo();
-		ImGui_ImplVulkan_Init(&info, vkh.getRenderPath());
+		ImGui_ImplVulkan_Init(&info);
+		ImGui_ImplVulkan_CreateFontsTexture();
 	}
 }
 
 void UiLayer::onDetach() {
 	OWL_PROFILE_FUNCTION()
 
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
 		ImGui_ImplOpenGL3_Shutdown();
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenglLegacy)
 		ImGui_ImplOpenGL2_Shutdown();
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan)
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
+		const auto &vkc = renderer::vulkan::internal::VulkanCore::get();
+		vkDeviceWaitIdle(vkc.getLogicalDevice());
 		ImGui_ImplVulkan_Shutdown();
+	}
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
@@ -115,13 +120,13 @@ void UiLayer::onEvent(event::Event &ioEvent) {
 }
 
 void UiLayer::begin() {
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
 		ImGui_ImplOpenGL3_NewFrame();
-	else if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+	else if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenglLegacy)
 		ImGui_ImplOpenGL2_NewFrame();
-	else if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan)
+	else if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
 		ImGui_ImplVulkan_NewFrame();
-	else
+	} else
 		return;
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -131,32 +136,35 @@ void UiLayer::begin() {
 
 void UiLayer::end() const {
 	OWL_PROFILE_FUNCTION()
-	if ((renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL) && (
-		    renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenglLegacy) && (
-		    renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::Vulkan))
+	if ((renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL) && (
+			renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenglLegacy) && (
+			renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::Vulkan))
 		return;
 	if (m_dockingEnable) { ImGui::End(); }
 	ImGuiIO &io = ImGui::GetIO();
 	const core::Application &app = core::Application::get();
 	io.DisplaySize = ImVec2(static_cast<float>(app.getWindow().getWidth()),
-	                        static_cast<float>(app.getWindow().getHeight()));
+							static_cast<float>(app.getWindow().getHeight()));
 	// Rendering
 	ImGui::Render();
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenGL)
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::OpenglLegacy)
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenglLegacy)
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
-	if (renderer::RenderAPI::getAPI() == renderer::RenderAPI::Type::Vulkan) {
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
 		const auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
+		renderer::RenderCommand::beginBatch();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), vkh.getCurrentCommandBuffer());
+		renderer::RenderCommand::endBatch();
 	}
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 		GLFWwindow *backupCurrentContext = glfwGetCurrentContext();
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
-		if (renderer::RenderAPI::getAPI() != renderer::RenderAPI::Type::OpenGL || renderer::RenderAPI::getAPI() !=
-		    renderer::RenderAPI::Type::OpenglLegacy)
+		if (renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL || renderer::RenderCommand::getApi()
+			!=
+			renderer::RenderAPI::Type::OpenglLegacy)
 			glfwMakeContextCurrent(backupCurrentContext);
 	}
 }

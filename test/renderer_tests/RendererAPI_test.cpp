@@ -17,7 +17,7 @@ TEST(RenderAPI, RenderComamand) {
 	EXPECT_EQ(RenderCommand::getState(), RenderAPI::State::Error);
 	RenderCommand::create(RenderAPI::Type::Null);
 	EXPECT_EQ(RenderCommand::getState(), RenderAPI::State::Created);
-	EXPECT_EQ(RenderCommand::getAPI(), RenderAPI::Type::Null);
+	EXPECT_EQ(RenderCommand::getApi(), RenderAPI::Type::Null);
 	RenderCommand::setLineWidth(2.f);
 	RenderCommand::setClearColor({.4f, .4f, .4f, 1.f});
 	RenderCommand::clear();
@@ -55,9 +55,9 @@ TEST(RenderAPI, creation) {
 	owl::core::Log::init(spdlog::level::off);
 	const auto api = RenderAPI::create(RenderAPI::Type::Null);
 	ASSERT_TRUE(api);
-	EXPECT_EQ(RenderAPI::getState(), RenderAPI::State::Created);
+	EXPECT_EQ(api->getState(), RenderAPI::State::Created);
 	api->init();
-	EXPECT_EQ(RenderAPI::getState(), RenderAPI::State::Ready);
-	EXPECT_EQ(RenderAPI::getAPI(), RenderAPI::Type::Null);
+	EXPECT_EQ(api->getState(), RenderAPI::State::Ready);
+	EXPECT_EQ(api->getApi(), RenderAPI::Type::Null);
 	owl::core::Log::invalidate();
 }

@@ -50,12 +50,6 @@ public:
 	static void reset();
 
 	/**
-	 * @brief Get the actual type of rendering API.
-	 * @return The Rendering API.
-	 */
-	static RenderAPI::Type getAPI() { return RenderAPI::getAPI(); }
-
-	/**
 	 * @brief The state of the renderer.
 	 */
 	enum struct State {

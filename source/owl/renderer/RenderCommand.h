@@ -94,39 +94,79 @@ public:
 	 * @brief Get the actual API type.
 	 * @return API Type.
 	 */
-	static RenderAPI::Type getAPI() { return mu_renderAPI->getAPI(); }
+	static RenderAPI::Type getApi() {
+		if (mu_renderAPI)
+			return mu_renderAPI->getApi();
+		return static_cast<RenderAPI::Type>(-1);
+	}
 
 	/**
 	 * @brief Get the maximum number of texture slots.
 	 * @return Number of texture slots.
 	 */
-	static uint32_t getMaxTextureSlots() { return mu_renderAPI->getMaxTextureSlots(); }
+	static uint32_t getMaxTextureSlots() {
+		if (mu_renderAPI)
+			return mu_renderAPI->getMaxTextureSlots();
+		return 0;
+	}
 
 	/**
 	 * @brief Reset value for the frame to render.
 	 */
-	static void beginFrame() { mu_renderAPI->beginFrame(); }
+	static void beginFrame() {
+		if (mu_renderAPI)
+			mu_renderAPI->beginFrame();
+	}
+
 	/**
 	 * @brief Reset value for the batch to render.
 	 */
-	static void beginBatch() { mu_renderAPI->beginBatch(); }
+	static void beginBatch() {
+		if (mu_renderAPI)
+			mu_renderAPI->beginBatch();
+	}
+
 	/**
 	 * @brief Reset value for the teture load.
 	 */
-	static void beginTextureLoad() { mu_renderAPI->beginTextureLoad(); }
+	static void beginTextureLoad() {
+		if (mu_renderAPI)
+			mu_renderAPI->beginTextureLoad();
+	}
 
 	/**
 	 * @brief Ends draw call for the current batch.
 	 */
-	static void endBatch() { mu_renderAPI->endBatch(); }
+	static void endBatch() {
+		if (mu_renderAPI)
+			mu_renderAPI->endBatch();
+	}
+
 	/**
 	 * @brief Ends draw call for the current frame.
 	 */
-	static void endFrame() { mu_renderAPI->endFrame(); }
+	static void endFrame() {
+		if (mu_renderAPI)
+			mu_renderAPI->endFrame();
+	}
+
 	/**
 	 * @brief Ends texture load.
 	 */
-	static void endTextureLoad() { mu_renderAPI->endTextureLoad(); }
+	static void endTextureLoad() {
+		if (mu_renderAPI)
+			mu_renderAPI->endTextureLoad();
+	}
+
+	/**
+	 * @brief Check if the API type require initializations.
+	 * @return tRue if initialization required.
+	 */
+	static bool requireInit() {
+		if (mu_renderAPI)
+			return mu_renderAPI->requireInit();
+		return false;
+	}
 
 private:
 	/// Pointer to the render API

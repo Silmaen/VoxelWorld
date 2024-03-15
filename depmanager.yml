@@ -1,6 +1,7 @@
 packages:
   googletest:
   cpptrace:
+    version: "0.3.1"
   debugbreak:
   entt:
   magic_enum:
