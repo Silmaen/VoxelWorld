@@ -87,6 +87,9 @@ public:
 	VkDescriptorSetLayout *getDescriptorSetLayout() { return &m_descriptorSetLayout; }
 	VkDescriptorSet *getDescriptorSet(const uint32_t iFrame) { return &m_descriptorSets[iFrame]; }
 
+	void createImguiDescriptorPool();
+	[[nodiscard]] VkDescriptorPool getImguiDescriptorPool() const { return m_imguiDescriptorPool; }
+
 private:
 	/**
 	 * @brief Default Constructor.
@@ -100,6 +103,8 @@ private:
 	VkDescriptorSetLayout m_descriptorSetLayout{nullptr};
 	/// The descripto pool.
 	VkDescriptorPool m_descriptorPool{nullptr};
+
+	VkDescriptorPool m_imguiDescriptorPool{nullptr};
 	/// List of descripto
 	std::vector<VkDescriptorSet> m_descriptorSets;
 	std::vector<VkBuffer> m_uniformBuffers;

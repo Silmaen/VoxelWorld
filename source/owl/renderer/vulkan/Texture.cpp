@@ -25,7 +25,7 @@ void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 			.pNext = nullptr,
 			.flags = {},
 			.imageType = VK_IMAGE_TYPE_2D,
-			.format = VK_FORMAT_R8G8B8A8_SRGB,
+			.format = VK_FORMAT_R8G8B8A8_UNORM,
 			.extent = {.width = iDimensions.getWidth(), .height = iDimensions.getHeight(), .depth = 1},
 			.mipLevels = 1,
 			.arrayLayers = 1,
@@ -153,7 +153,7 @@ void Texture2D::setData(void *iData, const uint32_t iSize) {
 			.flags = {},
 			.image = data.m_textureImage,
 			.viewType = VK_IMAGE_VIEW_TYPE_2D,
-			.format = VK_FORMAT_R8G8B8A8_SRGB,
+			.format = VK_FORMAT_R8G8B8A8_UNORM,
 			.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
 						   VK_COMPONENT_SWIZZLE_IDENTITY},
 			.subresourceRange = {

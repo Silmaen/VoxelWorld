@@ -114,7 +114,7 @@ void Application::disableDocking() {
 Application::~Application() {
 	OWL_PROFILE_FUNCTION()
 
-	if (renderer::RenderAPI::getState() != renderer::RenderAPI::State::Error) {
+	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Error) {
 		for (auto &layer: m_layerStack) {
 			m_layerStack.popLayer(layer);
 			m_layerStack.popOverlay(layer);
@@ -148,7 +148,8 @@ void Application::run() {
 			if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
 				m_state = State::Error;
 				continue;
-			} {
+			}
+			{
 				OWL_PROFILE_SCOPE("LayerStack onUpdate")
 
 				for (const auto &layer: m_layerStack)

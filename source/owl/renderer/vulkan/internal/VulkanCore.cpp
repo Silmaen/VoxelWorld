@@ -350,7 +350,7 @@ VkExtent2D VulkanCore::getCurrentExtent() const {
 VkSurfaceFormatKHR VulkanCore::getSurfaceFormat() const {
 	VkSurfaceFormatKHR surfaceFormat = m_phyProps.surfaceFormats.front();
 	for (const auto &availableFormat: m_phyProps.surfaceFormats) {
-		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
+		if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
 			availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) { surfaceFormat = availableFormat; }
 	}
 	return surfaceFormat;

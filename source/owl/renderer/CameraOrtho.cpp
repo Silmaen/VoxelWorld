@@ -20,7 +20,7 @@ CameraOrtho::CameraOrtho(const float iLeft, const float iRight, const float iBot
 }
 
 void CameraOrtho::setProjection(const float iLeft, const float iRight, const float iBottom, const float iTop,
-                                const float iNear, const float iFar) {
+								const float iNear, const float iFar) {
 	OWL_PROFILE_FUNCTION()
 
 	m_projectionMatrix = glm::ortho(iLeft, iRight, iBottom, iTop, iNear, iFar);
@@ -30,12 +30,12 @@ void CameraOrtho::setProjection(const float iLeft, const float iRight, const flo
 void CameraOrtho::recalculateViewMatrix() {
 	OWL_PROFILE_FUNCTION()
 	glm::mat4 transform;
-	if (RenderCommand::getAPI() == RenderAPI::Type::Vulkan) {
+	if (RenderCommand::getApi() == RenderAPI::Type::Vulkan) {
 		transform = glm::translate(glm::mat4(1.0f), m_position) *
-		            glm::rotate(glm::mat4(1.0f), glm::radians(-m_rotation), glm::vec3(0, 0, 1));
+					glm::rotate(glm::mat4(1.0f), glm::radians(-m_rotation), glm::vec3(0, 0, 1));
 	} else {
 		transform = glm::translate(glm::mat4(1.0f), m_position) *
-		            glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation), glm::vec3(0, 0, 1));
+					glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation), glm::vec3(0, 0, 1));
 	}
 
 	m_viewMatrix = glm::inverse(transform);

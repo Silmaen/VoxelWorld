@@ -19,7 +19,7 @@ namespace owl::renderer {
 DrawData::~DrawData() = default;
 
 shared<DrawData> DrawData::create() {
-	switch (RenderCommand::getAPI()) {
+	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkShared<null::DrawData>();
 		case RenderAPI::Type::OpenGL:

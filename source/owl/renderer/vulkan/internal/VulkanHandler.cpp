@@ -111,21 +111,23 @@ static void func(const VkResult iResult) {
 
 ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo() const {
 	const auto &core = VulkanCore::get();
-	const auto &vkd = Descriptors::get();
+	auto &vkd = Descriptors::get();
+	vkd.createImguiDescriptorPool();
 	return {
 			.Instance = core.getInstance(),
 			.PhysicalDevice = core.getPhysicalDevice(),
 			.Device = core.getLogicalDevice(),
 			.QueueFamily = core.getGraphQueueFamilyIndex(),
 			.Queue = core.getGraphicQueue(),
-			.PipelineCache = {},
-			.DescriptorPool = vkd.getDescriptorPool(),
-			.Subpass = 0,
-			.MinImageCount = 2,
-			.ImageCount = 2,
+			.DescriptorPool = vkd.getImguiDescriptorPool(),
+			.RenderPass = m_swapChain.renderPass,
+			.MinImageCount = static_cast<uint32_t>(m_swapChain.swapChainImages.size()),
+			.ImageCount = static_cast<uint32_t>(m_swapChain.swapChainImages.size()),
 			.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+			.PipelineCache = VK_NULL_HANDLE,
+			.Subpass = 0,
 			.UseDynamicRendering = false,
-			.ColorAttachmentFormat = m_swapChain.swapChainImageFormat,
+			.PipelineRenderingCreateInfo = {},
 			.Allocator = nullptr,
 			.CheckVkResultFn = func,
 			.MinAllocationSize = 1024 * 1024};
@@ -219,9 +221,9 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
 			.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
 			.colorBlendOp = VK_BLEND_OP_ADD,
-			.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-			.alphaBlendOp = {},
+			.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+			.alphaBlendOp = VK_BLEND_OP_ADD,
 			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
 							  VK_COLOR_COMPONENT_A_BIT};
 	VkPipelineColorBlendStateCreateInfo colorBlending{
@@ -370,10 +372,9 @@ void VulkanHandler::createSyncObjects() {
 }
 
 void VulkanHandler::setClearColor(const glm::vec4 &iColor) {
-	const glm::vec4 lin = math::sRGBToLinear(iColor);
-	m_clearColor.color.float32[0] = lin.r;
-	m_clearColor.color.float32[1] = lin.g;
-	m_clearColor.color.float32[2] = lin.b;
+	m_clearColor.color.float32[0] = iColor.r;
+	m_clearColor.color.float32[1] = iColor.g;
+	m_clearColor.color.float32[2] = iColor.b;
 	m_clearColor.color.float32[3] = iColor.a;
 }
 
@@ -775,6 +776,14 @@ void VulkanHandler::copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iI
 	vkCmdCopyBufferToImage(commandBuffer, iBuffer, iImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
 	endSingleTimeCommands(commandBuffer);
+}
+
+
+void VulkanHandler::imguiLoadFonts() const {
+	//const auto &commandBuffer = beginSingleTimeCommands();
+	ImGui_ImplVulkan_CreateFontsTexture();
+	//endSingleTimeCommands(commandBuffer);
+
 }
 
 }// namespace owl::renderer::vulkan::internal

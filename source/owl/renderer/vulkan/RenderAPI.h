@@ -17,9 +17,9 @@ namespace owl::renderer::vulkan {
 /**
  * @brief Class RenderAPI.
  */
-class RenderAPI final : public ::owl::renderer::RenderAPI {
+class RenderAPI final : public renderer::RenderAPI {
 public:
-	RenderAPI() = default;
+	RenderAPI(): renderer::RenderAPI(Type::Vulkan) {}
 	RenderAPI(const RenderAPI &) = delete;
 	RenderAPI(RenderAPI &&) = delete;
 	RenderAPI &operator=(const RenderAPI &) = delete;

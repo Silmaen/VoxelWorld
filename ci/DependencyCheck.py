@@ -3,7 +3,7 @@ from pathlib import Path
 from sys import stderr
 
 dependencies = [
-    {"name": "cpptrace", "version": "*", "header": False},
+    {"name": "cpptrace", "version": "0.3.1", "header": False},
     {"name": "debugbreak", "version": "*", "header": True},
     {"name": "entt", "version": "*", "header": True},
     {"name": "magic_enum", "version": "*", "header": True},

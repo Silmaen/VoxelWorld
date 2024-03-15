@@ -17,7 +17,7 @@
 namespace owl::renderer {
 
 uniq<GraphContext> GraphContext::create(void *ioWindow) {
-	switch (RenderCommand::getAPI()) {
+	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkUniq<null::GraphContext>(static_cast<GLFWwindow *>(ioWindow));
 		case RenderAPI::Type::OpenGL:

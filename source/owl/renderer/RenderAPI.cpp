@@ -15,13 +15,9 @@
 
 namespace owl::renderer {
 
-RenderAPI::Type RenderAPI::m_type = Type::Null;
-RenderAPI::State RenderAPI::m_state = State::Created;
 
 uniq<RenderAPI> RenderAPI::create(const RenderAPI::Type &iType) {
-	m_state = State::Created;
-	m_type = iType;
-	switch (m_type) {
+	switch (iType) {
 		case Type::Null:
 			return mkUniq<null::RenderAPI>();
 		case Type::OpenGL:

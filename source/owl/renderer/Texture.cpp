@@ -19,7 +19,7 @@
 namespace owl::renderer {
 
 shared<Texture2D> Texture2D::create(const std::filesystem::path &iFile) {
-	switch (RenderCommand::getAPI()) {
+	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null: {
 			if (auto texture = mkShared<null::Texture2D>(iFile); texture->isLoaded())// No data
 				return texture;
@@ -51,7 +51,7 @@ shared<Texture2D> Texture2D::create(const std::string &iTextureName) {
 }
 
 shared<Texture2D> Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha) {
-	switch (RenderCommand::getAPI()) {
+	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkShared<null::Texture2D>(iWidth, iHeight);
 		case RenderAPI::Type::OpenGL:
@@ -67,7 +67,7 @@ shared<Texture2D> Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWit
 }
 
 shared<Texture2D> Texture2D::create(const math::FrameSize &iSize, bool iWithAlpha) {
-	switch (RenderCommand::getAPI()) {
+	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkShared<null::Texture2D>(iSize);
 		case RenderAPI::Type::OpenGL:
