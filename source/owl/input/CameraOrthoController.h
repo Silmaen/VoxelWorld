@@ -8,22 +8,23 @@
 
 #pragma once
 
+#include <math/sizingTypes.h>
+
 #include "core/Timestep.h"
 #include "event/AppEvent.h"
 #include "event/MouseEvent.h"
 #include "renderer/CameraOrtho.h"
 
 namespace owl::input {
-
 /**
  * @brief Class CameraOrthoController.
  */
 class OWL_API CameraOrthoController final {
 public:
-	CameraOrthoController(const CameraOrthoController &) = default;
-	CameraOrthoController(CameraOrthoController &&) = default;
-	CameraOrthoController &operator=(const CameraOrthoController &) = default;
-	CameraOrthoController &operator=(CameraOrthoController &&) = default;
+	CameraOrthoController(const CameraOrthoController&) = default;
+	CameraOrthoController(CameraOrthoController&&) = default;
+	CameraOrthoController& operator=(const CameraOrthoController&) = default;
+	CameraOrthoController& operator=(CameraOrthoController&&) = default;
 
 	/**
 	 * @brief Constructor.
@@ -41,32 +42,31 @@ public:
 	 * @brief Frame function.
 	 * @param[in] iTimeStep Time step.
 	 */
-	void onUpdate(const core::Timestep &iTimeStep);
+	void onUpdate(const core::Timestep& iTimeStep);
 
 	/**
 	 * @brief Event Management.
 	 * @param[in,out] ioEvent The received event.
 	 */
-	void onEvent(event::Event &ioEvent);
+	void onEvent(event::Event& ioEvent);
 
 	/**
 	 * @brief Action when view port is resized.
-	 * @param[in] iWidth New width.
-	 * @param[in] iHeight New height.
+	 * @param[in] iSize New size.
 	 */
-	void onResize(float iWidth, float iHeight);
+	void onResize(const math::FrameSize& iSize);
 
 	/**
 	 * @brief Access to the camera.
 	 * @return The camera.
 	 */
-	renderer::CameraOrtho &getCamera() { return m_camera; }
+	renderer::CameraOrtho& getCamera() { return m_camera; }
 
 	/**
 	 * @brief Access to the camera.
 	 * @return The camera.
 	 */
-	[[nodiscard]] const renderer::CameraOrtho &getCamera() const { return m_camera; }
+	[[nodiscard]] const renderer::CameraOrtho& getCamera() const { return m_camera; }
 
 	/**
 	 * @brief Access to the zoom level.
@@ -86,14 +86,14 @@ private:
 	 * @param[in] iEvent The Mouse event.
 	 * @return True if treated.
 	 */
-	bool onMouseScrolled(const event::MouseScrolledEvent &iEvent);
+	bool onMouseScrolled(const event::MouseScrolledEvent& iEvent);
 
 	/**
 	 * @brief Action on window resize.
 	 * @param[in] iEvent The Window resize event.
 	 * @return True if treated.
 	 */
-	bool onWindowResized(const event::WindowResizeEvent &iEvent);
+	bool onWindowResized(const event::WindowResizeEvent& iEvent);
 
 	/// Aspect ratio of the camera.
 	float m_aspectRatio;
@@ -112,5 +112,4 @@ private:
 	/// Camera's Rotation Speed.
 	float m_cameraRotationSpeed = 180.0f;
 };
-
-}// namespace owl::input
+} // namespace owl::input

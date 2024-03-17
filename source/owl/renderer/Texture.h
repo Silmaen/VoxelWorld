@@ -21,10 +21,10 @@ class TextureLibrary;
 class OWL_API Texture {
 public:
 	Texture() = default;
-	Texture(const Texture&) = default;
-	Texture(Texture&&) = default;
-	Texture& operator=(const Texture&) = default;
-	Texture& operator=(Texture&&) = default;
+	Texture(const Texture &) = default;
+	Texture(Texture &&) = default;
+	Texture &operator=(const Texture &) = default;
+	Texture &operator=(Texture &&) = default;
 	/**
 	 * @brief Destructor.
 	 */
@@ -35,7 +35,7 @@ public:
 	 * @param[in] iOther Other texture to compare.
 	 * @return True if same.
 	 */
-	virtual bool operator==(const Texture& iOther) const = 0;
+	virtual bool operator==(const Texture &iOther) const = 0;
 
 	/**
 	 * @brief Access to texture's width.
@@ -65,7 +65,7 @@ public:
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] virtual uint32_t getRendererId() const = 0;
+	[[nodiscard]] virtual uint64_t getRendererId() const = 0;
 
 	/**
 	 * @brief Activate the texture in the GPU.
@@ -77,20 +77,20 @@ public:
 	 * @brief Get Path to texture file.
 	 * @return Path to texture file.
 	 */
-	[[nodiscard]] virtual const std::filesystem::path& getPath() const = 0;
+	[[nodiscard]] virtual const std::filesystem::path &getPath() const = 0;
 
 	/**
 	 * @brief Define the texture data.
 	 * @param[in] iData Raw data.
 	 * @param[in] iSize Size of the data.
 	 */
-	virtual void setData(void* iData, uint32_t iSize) = 0;
+	virtual void setData(void *iData, uint32_t iSize) = 0;
 
 	/**
 	 * @brief Get access to the texture's name.
 	 * @return The texture's name.
 	 */
-	[[nodiscard]] const std::string& getName() const { return m_name; }
+	[[nodiscard]] const std::string &getName() const { return m_name; }
 
 private:
 	/// The texture's name.
@@ -99,11 +99,6 @@ private:
 	friend class TextureLibrary;
 };
 
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wweak-vtables"
-#endif
 /**
  * @brief Class texture 2D
  */
@@ -114,21 +109,21 @@ public:
 	 * @param[in] iFile The path to the file to load.
 	 * @return Resulting texture.
 	 */
-	static shared<Texture2D> create(const std::filesystem::path& iFile);
+	static shared<Texture2D> create(const std::filesystem::path &iFile);
 
 	/**
 	 * @brief Create a new texture.
 	 * @param[in] iTextureName Name of the files in the standard path.
 	 * @return Pointer to the texture.
 	 */
-	static shared<Texture2D> create(const std::string& iTextureName);
+	static shared<Texture2D> create(const std::string &iTextureName);
 	/**
 	 * @brief Creates the texture with the given size.
 	 * @param[in] iSize The texture's size.
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 * @return Resulting texture.
 	 */
-	static shared<Texture2D> create(const math::FrameSize& iSize, bool iWithAlpha = true);
+	static shared<Texture2D> create(const math::FrameSize &iSize, bool iWithAlpha = true);
 	/**
 	 * @brief Creates the texture with the given size.
 	 * @param[in] iWidth The texture's width.
@@ -138,7 +133,4 @@ public:
 	 */
 	static shared<Texture2D> create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true);
 };
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-} // namespace owl::renderer
+}// namespace owl::renderer

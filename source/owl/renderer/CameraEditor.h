@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <math/sizingTypes.h>
+
 #include "Camera.h"
 #include "core/Timestep.h"
 #include "event/Event.h"
@@ -61,12 +63,10 @@ public:
 
 	/**
 	 * @brief Set the camera viewport size.
-	 * @param[in] iWidth New width.
-	 * @param[in] iHeight New height.
+	 * @param[in] iSize New size.
 	 */
-	void setViewportSize(const float iWidth, const float iHeight) {
-		m_viewportWidth = iWidth;
-		m_viewportHeight = iHeight;
+	void setViewportSize(const math::FrameSize& iSize) {
+		m_viewportSize = iSize;
 		updateProjection();
 	}
 
@@ -209,9 +209,7 @@ private:
 	/// Camera's yaw.
 	float m_yaw = 0.0f;
 
-	/// Viewport width.
-	float m_viewportWidth = 1280;
-	/// Viewport height.
-	float m_viewportHeight = 720;
+	/// Viewport size.
+	math::FrameSize m_viewportSize = {1280, 720};
 };
 } // namespace owl::renderer

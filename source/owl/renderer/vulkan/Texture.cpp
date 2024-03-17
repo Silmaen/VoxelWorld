@@ -18,6 +18,7 @@
 namespace owl::renderer::vulkan {
 
 namespace {
+
 void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 	const auto &vkc = internal::VulkanCore::get();
 	const VkImageCreateInfo imageInfo{
@@ -31,7 +32,8 @@ void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 			.arrayLayers = 1,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
 			.tiling = VK_IMAGE_TILING_OPTIMAL,
-			.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+			.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+			         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 			.queueFamilyIndexCount = 0,
 			.pQueueFamilyIndices = nullptr,
@@ -39,30 +41,30 @@ void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 
 	auto &data = internal::Descriptors::get().getTextureData(iIndex);
 	data.freeTrexture();
-	if (const VkResult result = vkCreateImage(vkc.getLogicalDevice(), &imageInfo, nullptr, &data.m_textureImage);
+	if (const VkResult result = vkCreateImage(vkc.getLogicalDevice(), &imageInfo, nullptr, &data.textureImage);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture: failed to create image ({}).", internal::resultString(result))
 		return;
 	}
 	VkMemoryRequirements memRequirements;
-	vkGetImageMemoryRequirements(vkc.getLogicalDevice(), data.m_textureImage, &memRequirements);
+	vkGetImageMemoryRequirements(vkc.getLogicalDevice(), data.textureImage, &memRequirements);
 	const VkMemoryAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-										 .pNext = nullptr,
-										 .allocationSize = memRequirements.size,
-										 .memoryTypeIndex =
-										 vkc.findMemoryTypeIndex(memRequirements.memoryTypeBits,
-																 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)};
-	if (const VkResult result = vkAllocateMemory(vkc.getLogicalDevice(), &allocInfo, nullptr,
-												 &data.m_textureImageMemory);
+	                                     .pNext = nullptr,
+	                                     .allocationSize = memRequirements.size,
+	                                     .memoryTypeIndex = vkc.findMemoryTypeIndex(
+			                                     memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)};
+	if (const VkResult result =
+				vkAllocateMemory(vkc.getLogicalDevice(), &allocInfo, nullptr, &data.textureImageMemory);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture: failed to allocate image memory ({}).", internal::resultString(result))
 		return;
 	}
 	internal::Descriptors::get().bindTextureImage(iIndex);
 }
-}
 
-Texture2D::Texture2D(const math::FrameSize &iSize, bool) : m_size{iSize} {}
+}// namespace
+
+Texture2D::Texture2D(const math::FrameSize &iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {}
 
 Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
 	: m_size{iWidth, iHeight}, m_hasAlpha{iWithAlpha} {}
@@ -80,6 +82,7 @@ Texture2D::Texture2D(std::filesystem::path iPath) : m_path{std::move(iPath)} {
 		return;
 	}
 
+	m_hasAlpha = true;
 	if (channels == 3)
 		m_hasAlpha = false;
 	if ((channels != 4) && (channels != 3)) {
@@ -105,21 +108,18 @@ bool Texture2D::operator==(const Texture &iOther) const {
 void Texture2D::bind(uint32_t) const { internal::Descriptors::get().textureBind(m_textureId); }
 
 void Texture2D::setData(void *iData, const uint32_t iSize) {
-
 	const auto &vkc = internal::VulkanCore::get();
-	const auto &vkh = internal::VulkanHandler::get();
-
-	if (iSize != (m_hasAlpha ? m_size.surface() * 4 : m_size.surface() * 3)) {
-		OWL_CORE_ERROR("Vulkan Texture: Image size missmatch!")
+	if (const uint32_t expected = m_hasAlpha ? m_size.surface() * 4 : m_size.surface() * 3; iSize != expected) {
+		OWL_CORE_ERROR("Vulkan Texture {}: Image size missmatch: expect {}, got {}", m_path.string(), expected, iSize)
 		return;
 	}
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
 
 	const VkDeviceSize imageSize = m_size.surface() * 4;
-	vkh.createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-					 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
-					 stagingBufferMemory);
+	internal::createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
+	                       stagingBufferMemory);
 	void *dataPixel;
 	vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, imageSize, 0, &dataPixel);
 	if (m_hasAlpha) {
@@ -139,10 +139,11 @@ void Texture2D::setData(void *iData, const uint32_t iSize) {
 	m_textureId = vkd.registerNewTexture();
 	auto &data = vkd.getTextureData(m_textureId);
 	createImage(m_textureId, m_size);
-	vkh.transitionImageLayout(data.m_textureImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	vkh.copyBufferToImage(stagingBuffer, data.m_textureImage, m_size.width(), m_size.height());
-	vkh.transitionImageLayout(data.m_textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-							  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	internal::transitionImageLayout(data.textureImage, VK_IMAGE_LAYOUT_UNDEFINED,
+	                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	internal::copyBufferToImage(stagingBuffer, data.textureImage, m_size);
+	internal::transitionImageLayout(data.textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+	                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
 	vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
@@ -151,19 +152,20 @@ void Texture2D::setData(void *iData, const uint32_t iSize) {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
-			.image = data.m_textureImage,
+			.image = data.textureImage,
 			.viewType = VK_IMAGE_VIEW_TYPE_2D,
 			.format = VK_FORMAT_R8G8B8A8_UNORM,
-			.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
-						   VK_COMPONENT_SWIZZLE_IDENTITY},
-			.subresourceRange = {
-					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-					.baseMipLevel = 0,
-					.levelCount = 1,
-					.baseArrayLayer = 0,
-					.layerCount = 1}};
-	if (const VkResult result = vkCreateImageView(vkc.getLogicalDevice(), &createInfo, nullptr,
-												  &data.m_textureImageView);
+			.components = {VK_COMPONENT_SWIZZLE_IDENTITY,
+			               VK_COMPONENT_SWIZZLE_IDENTITY,
+			               VK_COMPONENT_SWIZZLE_IDENTITY,
+			               VK_COMPONENT_SWIZZLE_IDENTITY},
+			.subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			                     .baseMipLevel = 0,
+			                     .levelCount = 1,
+			                     .baseArrayLayer = 0,
+			                     .layerCount = 1}};
+	if (const VkResult result =
+				vkCreateImageView(vkc.getLogicalDevice(), &createInfo, nullptr, &data.textureImageView);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture: Error creating image views ({}).", internal::resultString(result))
 		return;
@@ -187,14 +189,20 @@ void Texture2D::setData(void *iData, const uint32_t iSize) {
 			.minLod = {},
 			.maxLod = {},
 			.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
-			.unnormalizedCoordinates = VK_FALSE
-	};
+			.unnormalizedCoordinates = VK_FALSE};
 
-	if (const VkResult result = vkCreateSampler(vkc.getLogicalDevice(), &samplerInfo, nullptr, &data.m_textureSampler);
+	if (const VkResult result = vkCreateSampler(vkc.getLogicalDevice(), &samplerInfo, nullptr, &data.textureSampler);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture: Error creating texture sampler ({}).", internal::resultString(result))
-		throw std::runtime_error("failed to create texture sampler!");
 	}
+}
+
+uint64_t Texture2D::getRendererId() const {
+	auto &desc = internal::Descriptors::get();
+	auto &texData = desc.getTextureData(m_textureId);
+	if (texData.textureDescriptorSet == nullptr)
+		texData.createDescriptorSet();
+	return reinterpret_cast<uint64_t>(texData.textureDescriptorSet);
 }
 
 }// namespace owl::renderer::vulkan

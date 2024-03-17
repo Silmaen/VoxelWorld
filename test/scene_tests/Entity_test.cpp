@@ -31,7 +31,7 @@ TEST(Entity, cameraOrtho) {
 	Scene sc;
 	Entity ent = sc.createEntityWithUUID(0, "boby");
 	auto cam = ent.addComponent<component::Camera>();
-	cam.camera.setViewportSize(50, 50);
+	cam.camera.setViewportSize({50, 50});
 	EXPECT_EQ(cam.camera.getProjectionType(), SceneCamera::ProjectionType::Orthographic);
 	EXPECT_EQ(cam.camera.getOrthographicFarClip(), 1);
 	EXPECT_EQ(cam.camera.getOrthographicNearClip(), -1);
@@ -53,7 +53,7 @@ TEST(Entity, cameraOrtho) {
 
 TEST(Entity, cameraPerspective) {
 	Scene sc;
-	sc.onViewportResize(50, 50);
+	sc.onViewportResize({50, 50});
 	Entity ent = sc.createEntityWithUUID(0, "boby");
 	auto cam = ent.addComponent<component::Camera>();
 	cam.camera.setPerspective(45, -0.25, 125.0);

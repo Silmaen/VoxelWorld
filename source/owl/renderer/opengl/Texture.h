@@ -16,10 +16,10 @@ namespace owl::renderer::opengl {
  */
 class Texture2D final : public renderer::Texture2D {
 public:
-	Texture2D(const Texture2D&) = default;
-	Texture2D(Texture2D&&) = default;
-	Texture2D& operator=(const Texture2D&) = default;
-	Texture2D& operator=(Texture2D&&) = default;
+	Texture2D(const Texture2D &) = default;
+	Texture2D(Texture2D &&) = default;
+	Texture2D &operator=(const Texture2D &) = default;
+	Texture2D &operator=(Texture2D &&) = default;
 
 	/**
 	 * @brief Default constructor.
@@ -50,8 +50,8 @@ public:
 	 * @param[in] iOther Other texture to compare.
 	 * @return True if same.
 	 */
-	bool operator==(const Texture& iOther) const override {
-		return m_textureId == (dynamic_cast<const Texture2D&>(iOther)).m_textureId;
+	bool operator==(const Texture &iOther) const override {
+		return m_textureId == (dynamic_cast<const Texture2D &>(iOther)).m_textureId;
 	}
 
 	/**
@@ -82,7 +82,7 @@ public:
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getRendererId() const override { return m_textureId; }
+	[[nodiscard]] uint64_t getRendererId() const override { return m_textureId; }
 
 	/**
 	 * @brief Activate the texture in the GPU.
@@ -95,15 +95,13 @@ public:
 	 * @param[in] iData Raw data.
 	 * @param[in] iSize Size of the data.
 	 */
-	void setData(void* iData, uint32_t iSize) override;
+	void setData(void *iData, uint32_t iSize) override;
 
 	/**
 	 * @brief Get Path to texture file.
 	 * @return Path to texture file.
 	 */
-	[[nodiscard]] const std::filesystem::path& getPath() const override {
-		return m_path;
-	}
+	[[nodiscard]] const std::filesystem::path &getPath() const override { return m_path; }
 
 private:
 	/// Path to the texture file.
@@ -115,4 +113,4 @@ private:
 	/// If the image has Alpha channel.
 	bool m_hasAlpha = true;
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

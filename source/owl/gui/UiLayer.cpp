@@ -88,8 +88,9 @@ void UiLayer::onAttach() {// Setup Dear ImGui context
 	}
 	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
 		ImGui_ImplGlfw_InitForVulkan(window, true);
-		const auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
-		ImGui_ImplVulkan_InitInfo info = vkh.toImGuiInfo();
+		auto &vkh = renderer::vulkan::internal::VulkanHandler::get();
+		std::vector<VkFormat> formats;
+		ImGui_ImplVulkan_InitInfo info = vkh.toImGuiInfo(formats);
 		ImGui_ImplVulkan_Init(&info);
 		ImGui_ImplVulkan_CreateFontsTexture();
 	}

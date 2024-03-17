@@ -13,6 +13,7 @@
 #include "renderer/CameraEditor.h"
 
 #include <entt/entt.hpp>
+#include <math/sizingTypes.h>
 /**
  * @brief Namespace for the Scene elements
  */
@@ -81,10 +82,9 @@ public:
 
 	/**
 	 * @brief Action when viewport resized.
-	 * @param[in] iWidth New viewport's width.
-	 * @param[in] iHeight New viewport's height.
+	 * @param[in] iSize New viewport's size.
 	 */
-	void onViewportResize(uint32_t iWidth, uint32_t iHeight);
+	void onViewportResize(const math::FrameSize& iSize);
 
 	/**
 	 * @brief Duplicate an entity.
@@ -112,11 +112,8 @@ private:
 	template <typename T>
 	void onComponentAdded(const Entity& iEntity, T& ioComponent);
 
-	/// The viewport's width.
-	uint32_t m_viewportWidth = 0;
-
-	/// The viewport's height.
-	uint32_t m_viewportHeight = 0;
+	/// The viewport's size.
+	math::FrameSize m_viewportSize = {0, 0};
 
 	friend class Entity;
 	friend class ScriptableEntity;

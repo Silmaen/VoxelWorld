@@ -16,10 +16,10 @@ namespace owl::renderer::null {
  */
 class Framebuffer final : public renderer::Framebuffer {
 public:
-	Framebuffer(const Framebuffer&) = default;
-	Framebuffer(Framebuffer&&) = default;
-	Framebuffer& operator=(const Framebuffer&) = default;
-	Framebuffer& operator=(Framebuffer&&) = default;
+	Framebuffer(const Framebuffer &) = default;
+	Framebuffer(Framebuffer &&) = default;
+	Framebuffer &operator=(const Framebuffer &) = default;
+	Framebuffer &operator=(Framebuffer &&) = default;
 
 	/**
 	 * @brief Default constructor.
@@ -49,10 +49,9 @@ public:
 
 	/**
 	 * @brief Change the size of the frame buffer.
-	 * @param[in] iWidth New width.
-	 * @param[in] iHeight New height.
+	 * @param[in] iSize New size.
 	 */
-	void resize(uint32_t iWidth, uint32_t iHeight) override;
+	void resize(math::FrameSize iSize) override;
 
 	/**
 	 * @brief Get the value of given pixel.
@@ -75,18 +74,16 @@ public:
 	 * @param[in] iIndex The color index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getColorAttachmentRendererId([[maybe_unused]] uint32_t iIndex) const override {
-		return 0;
-	}
+	[[nodiscard]] uint64_t getColorAttachmentRendererId([[maybe_unused]] uint32_t iIndex) const override { return 0; }
 
 	/**
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] const FramebufferSpecification& getSpecification() const override { return m_specs; }
+	[[nodiscard]] const FramebufferSpecification &getSpecification() const override { return m_specs; }
 
 private:
 	/// The specs.
 	FramebufferSpecification m_specs;
 };
-} // namespace owl::renderer::null
+}// namespace owl::renderer::null

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "internal/Descriptors.h"
 #include "renderer/Texture.h"
 
 namespace owl::renderer::vulkan {
@@ -25,7 +26,7 @@ public:
 	 * @brief Default constructor.
 	 * @param[in] iPath path to the texture image file.
 	 */
-	explicit Texture2D(std::filesystem::path iPath);
+	Texture2D(std::filesystem::path iPath);
 	/**
 	 * @brief Constructor by size.
 	 * @param[in] iWidth Texture's width.
@@ -38,7 +39,7 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 */
-	explicit Texture2D(const math::FrameSize &iSize, bool iWithAlpha = true);
+	Texture2D(const math::FrameSize &iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Destructor.
@@ -80,7 +81,7 @@ public:
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getRendererId() const override { return 0; }
+	[[nodiscard]] uint64_t getRendererId() const override;
 
 	/**
 	 * @brief Activate the texture in the GPU.
@@ -109,6 +110,5 @@ private:
 
 	bool m_hasAlpha = false;
 	uint32_t m_textureId = 0;
-
 };
 }// namespace owl::renderer::vulkan

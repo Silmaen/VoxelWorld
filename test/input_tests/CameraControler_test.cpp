@@ -14,7 +14,7 @@ TEST(Input, baseCameraControler) {
 
 TEST(Input, ResizeCameraControler) {
 	CameraOrthoController coc(1);
-	coc.onResize(10, 5);
+	coc.onResize({10, 5});
 	EXPECT_EQ(coc.getZoomLevel(), 1.0f);
 }
 

@@ -49,12 +49,15 @@ public:
 	 */
 	void onImGuiRender();
 
+	void detach();
+	void attach();
+
 private:
 	/// The actual folder
 	std::filesystem::path currentPath;
 
-	shared<renderer::Texture2D> fileIcon;
-	shared<renderer::Texture2D> dirIcon;
+	shared<renderer::Texture2D> fileIcon{nullptr};
+	shared<renderer::Texture2D> dirIcon{nullptr};
 };
 
 }// namespace owl::panel
