@@ -1,9 +1,9 @@
 packages:
   googletest:
   cpptrace:
-    version: "0.3.1"
   debugbreak:
   entt:
+  libdwarf:
   magic_enum:
   stb_image:
   fmt:
@@ -18,3 +18,4 @@ packages:
   nfd:
   vulkan_sdk:
     kind: "shared"
+  zstd:
