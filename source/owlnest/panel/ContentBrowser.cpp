@@ -12,8 +12,15 @@ namespace owl::panel {
 
 static std::filesystem::path s_assetPath;
 
-ContentBrowser::ContentBrowser() {
-	OWL_SCOPE_UNTRACK
+ContentBrowser::ContentBrowser() { OWL_SCOPE_UNTRACK }
+
+
+void ContentBrowser::detach() {
+	fileIcon.reset();
+	dirIcon.reset();
+}
+
+void ContentBrowser::attach() {
 	s_assetPath = core::Application::get().getAssetDirectory();
 	currentPath = s_assetPath;
 	if (const auto fileIconPath = s_assetPath / "icons" / "FileIcon.png"; exists(fileIconPath)) {
@@ -22,6 +29,7 @@ ContentBrowser::ContentBrowser() {
 	if (const auto dirIconPath = s_assetPath / "icons" / "DirectoryIcon.png"; exists(dirIconPath)) {
 		dirIcon = renderer::Texture2D::create(dirIconPath);
 	} else { OWL_CORE_WARN("Unable to find directory icon at {}", dirIconPath.string()) }
+
 }
 
 void ContentBrowser::onImGuiRender() {
@@ -49,12 +57,15 @@ void ContentBrowser::onImGuiRender() {
 		ImGui::PushID(filenameString.c_str());
 		shared<renderer::Texture2D> icon = directoryEntry.is_directory() ? dirIcon : fileIcon;
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-		if (icon) {
-			ImGui::ImageButton(reinterpret_cast<ImTextureID>(icon->getRendererId()), {thumbnailSize, thumbnailSize},
-							   {0, 1}, {1, 0});
+		uint64_t textureId = 0;
+		if (icon)
+			textureId = icon->getRendererId();
+		if (textureId != 0) {
+			ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureId), {thumbnailSize, thumbnailSize},
+			                   {0, 1}, {1, 0});
 			if (ImGui::BeginDragDropSource()) {
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", relativePath.string().c_str(),
-										  relativePath.string().size() + 1);
+				                          relativePath.string().size() + 1);
 				ImGui::EndDragDropSource();
 			}
 
@@ -66,9 +77,20 @@ void ContentBrowser::onImGuiRender() {
 			}
 			ImGui::TextWrapped("%s", filenameString.c_str());
 		} else {
-			if (directoryEntry.is_directory()) {
-				if (ImGui::Button(filenameString.c_str())) { currentPath /= path.filename(); }
-			} else { if (ImGui::Button(filenameString.c_str())) {} }
+			ImGui::Button(filenameString.c_str(), {thumbnailSize, thumbnailSize});
+			if (ImGui::BeginDragDropSource()) {
+				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", relativePath.string().c_str(),
+				                          relativePath.string().size() + 1);
+				ImGui::EndDragDropSource();
+			}
+
+			ImGui::PopStyleColor();
+
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+				if (directoryEntry.is_directory())
+					currentPath /= path.filename();
+			}
+			ImGui::TextWrapped("%s", filenameString.c_str());
 		}
 		ImGui::NextColumn();
 		ImGui::PopID();

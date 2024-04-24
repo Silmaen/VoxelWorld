@@ -25,10 +25,7 @@ void Framebuffer::bind() {}
 
 void Framebuffer::unbind() {}
 
-void Framebuffer::resize(const uint32_t iWidth, const uint32_t iHeight) {
-	m_specs.width = iWidth;
-	m_specs.height = iHeight;
-}
+void Framebuffer::resize(const math::FrameSize iSize) { m_specs.size = iSize; }
 
 int Framebuffer::readPixel(uint32_t, int, int) { return 0; }
 

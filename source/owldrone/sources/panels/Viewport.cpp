@@ -14,13 +14,20 @@ using namespace owl;
 namespace drone::panels {
 
 Viewport::Viewport() {
-	renderer::FramebufferSpecification specs;
-	specs.attachments = {
-			renderer::FramebufferTextureFormat::Rgba8,
-			renderer::FramebufferTextureFormat::RedInteger,
-			renderer::FramebufferTextureFormat::Depth};
-	specs.width = 1280;
-	specs.height = 720;
+	const renderer::FramebufferSpecification specs{
+			.size = {1280, 720},
+			.attachments = {
+					{renderer::AttachmentSpecification::Format::Surface,
+					 renderer::AttachmentSpecification::Tiling::Optimal},
+					{renderer::AttachmentSpecification::Format::RedInteger,
+					 renderer::AttachmentSpecification::Tiling::Optimal},
+					//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
+					//renderer::AttachmentSpecification::Tiling::Optimal}
+			},
+			.samples = 1,
+			.swapChainTarget = false,
+			.debugName = "viewport"
+	};
 	mp_framebuffer = renderer::Framebuffer::create(specs);
 	// camera
 	m_camera = mkShared<renderer::CameraOrtho>(0, 1280, 0, 720);
@@ -35,14 +42,12 @@ void Viewport::onUpdate(const core::Timestep &iTimeStep) {
 	cam.onUpdate(iTimeStep);
 
 	const auto spec = mp_framebuffer->getSpecification();
-	const auto width = static_cast<uint32_t>(m_viewportSize.x);
-	const auto height = static_cast<uint32_t>(m_viewportSize.y);
-	const float aspectRatio = m_viewportSize.x / m_viewportSize.y;
+
+	const float aspectRatio = m_viewportSize.ratio();
 	const float scaling = std::min(aspectRatio, 2.f);
 
-	if (width > 0 && height > 0 && (width != spec.width || height != spec.height)) {
-		mp_framebuffer->resize(width, height);
-		m_viewportSize = glm::vec2(width, height);
+	if (m_viewportSize.surface() > 0 && m_viewportSize != spec.size) {
+		mp_framebuffer->resize(m_viewportSize);
 		m_camera->setProjection(-aspectRatio, aspectRatio, -1, 1);
 	}
 	// Render
@@ -56,13 +61,13 @@ void Viewport::onUpdate(const core::Timestep &iTimeStep) {
 	// Do the drawings!
 	// ===============================================================
 	renderer::Renderer2D::beginScene(*m_camera);
-	float ratio = static_cast<float>(cam.getFrame()->getWidth()) / static_cast<float>(cam.getFrame()->getHeight());
+	const float ratio = cam.getFrame()->getSize().ratio();
 	const renderer::utils::PRS tran{
 			.position = {0, 0, 0},
 			.rotation = 180,
 			.size = {ratio * scaling, 1 * scaling}};
 	renderer::Renderer2D::drawQuad({.transform = tran,
-									.texture = cam.getFrame()});
+	                                .texture = cam.getFrame()});
 	renderer::Renderer2D::endScene();
 	// ===============================================================
 	// free the frame buffer.
@@ -84,8 +89,8 @@ void Viewport::onRender() {
 	m_viewportHovered = ImGui::IsWindowHovered();
 	core::Application::get().getImGuiLayer()->blockEvents(!m_viewportFocused && !m_viewportHovered);
 
-	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	m_viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
+	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+	m_viewportSize = {static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y)};
 	if (const uint64_t textureId = mp_framebuffer->getColorAttachmentRendererId(0); textureId != 0)
 		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
 

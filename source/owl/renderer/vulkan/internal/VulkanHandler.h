@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "SwapChain.h"
 #include "VulkanCore.h"
 
 #include <backends/imgui_impl_vulkan.h>
+#include <renderer/vulkan/Framebuffer.h>
 
 /**
  * @brief Internal functions of the vulkan renderer.
@@ -107,12 +107,13 @@ public:
 			m_validation = true;
 	}
 
-	[[nodiscard]] ImGui_ImplVulkan_InitInfo toImGuiInfo() const;
+	[[nodiscard]] ImGui_ImplVulkan_InitInfo toImGuiInfo(std::vector<VkFormat> &ioFormats);
 
-	[[nodiscard]] VkRenderPass getRenderPass() const { return m_swapChain.renderPass; }
+	[[nodiscard]] VkRenderPass getGlobalRenderPass() const { return m_swapChain->getRenderPass(); }
 
 	[[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const;
 
+	void clear() const;
 
 	/**
 	 * @brief Informations about pipelines.
@@ -124,13 +125,10 @@ public:
 
 	[[nodiscard]] PipeLineData getPipeline(int32_t iId) const;
 
-	int32_t pushPipeline(const std::string &iPipeLineName,
-						 std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
-						 VkPipelineVertexInputStateCreateInfo iVertexInputInfo);
+	int32_t pushPipeline(const std::string &iPipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
+	                     VkPipelineVertexInputStateCreateInfo iVertexInputInfo);
 
 	// Command buffer data
-	VkCommandPool commandPool{nullptr};
-	std::vector<VkCommandBuffer> commandBuffers{nullptr};
 	bool inBatch = false;
 	bool firstBatch = true;
 
@@ -152,22 +150,13 @@ public:
 
 	void setClearColor(const glm::vec4 &iColor);
 
-	void clear();
-
 	void setResize();
 
-	void copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, VkDeviceSize iSize) const;
+	[[nodiscard]] uint32_t getCurrentFrameIndex() const;
 
-	void createBuffer(VkDeviceSize iSize, VkBufferUsageFlags iUsage, VkMemoryPropertyFlags iProperties,
-					  VkBuffer &iBuffer, VkDeviceMemory &iBufferMemory) const;
-
-	void transitionImageLayout(const VkImage &iImage, VkImageLayout iOldLayout, VkImageLayout iNewLayout) const;
-
-	void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, uint32_t iWidth, uint32_t iHeight) const;
-
-	[[nodiscard]] uint32_t getCurrentFrame() const { return m_currentFrame; }
-
-	void imguiLoadFonts() const;
+	void bindFramebuffer(Framebuffer *iFrameBuffer);
+	void unbindFramebuffer();
+	[[nodiscard]] std::string getCurrentFrameBufferName() const;
 
 private:
 	/**
@@ -182,16 +171,6 @@ private:
 
 	void createSwapChain();
 
-	void createCommandPool();
-
-	void createCommandBuffers();
-
-	void createSyncObjects();
-
-	[[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;
-
-	void endSingleTimeCommands(VkCommandBuffer iCommandBuffer) const;
-
 	/// The current state of the handler.
 	State m_state = State::Uninitialized;
 	/// Loaded version.
@@ -199,21 +178,17 @@ private:
 	/// Enable Validation layers.
 	bool m_validation = false;
 	bool m_resize = false;
+	VkRenderPass m_ImGuiRenderPass{};
 
-	/// The swapchain.
-	SwapChain m_swapChain;
+	/// The swapchain (main framebuffer).
+	uniq<Framebuffer> m_swapChain;
+	/// The active framebuffer.
+	Framebuffer *m_currentframebuffer = nullptr;
 
-	VkClearValue m_clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+	glm::vec4 m_clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
 	/// List of piplines.
 	std::map<int32_t, PipeLineData> m_pipeLines;
 
-	/// Main FrameBuffers
-	std::vector<VkSemaphore> m_imageAvailableSemaphores{nullptr};
-	std::vector<VkSemaphore> m_renderFinishedSemaphores{nullptr};
-	std::vector<VkFence> m_inFlightFences{nullptr};
-	uint32_t m_currentFrame = 0;
-
-	uint32_t m_imageIndex = 0;
 };
 }// namespace owl::renderer::vulkan::internal

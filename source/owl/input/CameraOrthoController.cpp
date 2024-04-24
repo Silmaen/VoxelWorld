@@ -81,12 +81,12 @@ bool CameraOrthoController::onMouseScrolled(const event::MouseScrolledEvent &iEv
 bool CameraOrthoController::onWindowResized(const event::WindowResizeEvent &iEvent) {
 	OWL_PROFILE_FUNCTION()
 
-	onResize(static_cast<float>(iEvent.getWidth()), static_cast<float>(iEvent.getHeight()));
+	onResize(iEvent.getSize());
 	return false;
 }
 
-void CameraOrthoController::onResize(const float iWidth, const float iHeight) {
-	m_aspectRatio = iWidth / iHeight;
+void CameraOrthoController::onResize(const math::FrameSize &iSize) {
+	m_aspectRatio = iSize.ratio();
 	m_camera.setProjection(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel);
 }
 

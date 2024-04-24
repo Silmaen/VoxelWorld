@@ -11,11 +11,10 @@
 #include "gauge/BaseGauge.h"
 
 namespace drone::panels {
-
 /**
  * @brief Class Gauges
  */
-class Gauges final: public BasePanel {
+class Gauges final : public BasePanel {
 public:
 	/**
 	 * @brief Constructor.
@@ -30,28 +29,28 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Gauges(const Gauges &) = default;
+	Gauges(const Gauges&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Gauges(Gauges &&) = default;
+	Gauges(Gauges&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Gauges &operator=(const Gauges &) = default;
+	Gauges& operator=(const Gauges&) = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Gauges &operator=(Gauges &&) = default;
+	Gauges& operator=(Gauges&&) = default;
 
 	/**
 	 * @brief Update panel Status.
 	 * @param ts The Time delta of the frame.
 	 */
-	void onUpdate(const owl::core::Timestep &ts) override;
+	void onUpdate(const owl::core::Timestep& ts) override;
 
 	/**
 	 * @brief Do the rendering.
@@ -60,20 +59,19 @@ public:
 
 private:
 	/// the frame buffer for this panel.
-	owl::shared<owl::renderer::Framebuffer> framebuffer;
+	owl::shared<owl::renderer::Framebuffer> m_framebuffer;
 	/// Size of the viewport
-	glm::vec2 viewportSize = {0.0f, 0.0f};
+	owl::math::FrameSize m_viewportSize = {0, 0};
 	/// View port bounds
-	glm::vec2 viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
+	glm::vec2 m_viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
 
-	bool viewportFocused = false;
-	bool viewportHovered = false;
+	bool m_viewportFocused = false;
+	bool m_viewportHovered = false;
 
 	// The gauges..
-	std::vector<owl::shared<gauge::BaseGauge>> gauges;
+	std::vector<owl::shared<gauge::BaseGauge>> m_gauges;
 
 	/// The camera
-	owl::shared<owl::renderer::CameraOrtho> camera;
+	owl::shared<owl::renderer::CameraOrtho> m_camera;
 };
-
-}// namespace drone::panels
+} // namespace drone::panels

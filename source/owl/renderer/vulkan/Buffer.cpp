@@ -10,6 +10,7 @@
 #include "Buffer.h"
 
 #include "internal/VulkanHandler.h"
+#include "internal/utils.h"
 
 namespace owl::renderer::vulkan {
 
@@ -89,9 +90,10 @@ void VertexBuffer::setData(const void *iData, const uint32_t iSize) {
 	if (iData != nullptr) {
 		VkBuffer stagingBuffer;
 		VkDeviceMemory stagingBufferMemory;
-		vkh.createBuffer(iSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-						 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
-						 stagingBufferMemory);
+		internal::createBuffer(iSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+							   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+							   stagingBuffer,
+							   stagingBufferMemory);
 		const auto &vkc = internal::VulkanCore::get();
 
 		void *dataInternal;
@@ -99,7 +101,7 @@ void VertexBuffer::setData(const void *iData, const uint32_t iSize) {
 		memcpy(dataInternal, iData, iSize);
 		vkUnmapMemory(vkc.getLogicalDevice(), stagingBufferMemory);
 
-		vkh.copyBuffer(stagingBuffer, m_vertexBuffer, iSize);
+		internal::copyBuffer(stagingBuffer, m_vertexBuffer, iSize);
 
 		vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
 		vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
@@ -137,8 +139,8 @@ void VertexBuffer::createBuffer(const float *iData, const uint32_t iSize) {
 		return;
 	}
 	release();
-	vkh.createBuffer(iSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-					 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffer, m_vertexBufferMemory);
+	internal::createBuffer(iSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+						   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffer, m_vertexBufferMemory);
 	setData(iData, iSize);
 }
 
@@ -150,22 +152,23 @@ IndexBuffer::IndexBuffer(const uint32_t *iIndices, const uint32_t iSize) : m_cou
 		return;
 	}
 	const VkDeviceSize bufferSize = sizeof(uint16_t) * iSize;
-	vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-					 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_indexBuffer, m_indexBufferMemory);
+	internal::createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+						   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_indexBuffer, m_indexBufferMemory);
 
 	if (iIndices != nullptr) {
 		VkBuffer stagingBuffer;
 		VkDeviceMemory stagingBufferMemory;
-		vkh.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-						 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
-						 stagingBufferMemory);
+		internal::createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+							   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+							   stagingBuffer,
+							   stagingBufferMemory);
 		void *dataInternal;
 		const auto &vkc = internal::VulkanCore::get();
 
 		vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, bufferSize, 0, &dataInternal);
 		memcpy(dataInternal, iIndices, bufferSize);
 		vkUnmapMemory(vkc.getLogicalDevice(), stagingBufferMemory);
-		vkh.copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
+		internal::copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
 		vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
 		vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
 	}

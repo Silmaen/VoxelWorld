@@ -21,30 +21,42 @@ LayerStack::~LayerStack() {
 	}
 }
 
-void LayerStack::pushLayer(shared<Layer> &&layer) {
-	layer->onAttach();
-	m_layers.emplace(m_layers.begin() + m_layerInsertIndex, std::move(layer));
+void LayerStack::clear() {
+	for (auto &layer: m_layers) {
+		auto name = layer->getName();
+		layer->onDetach();
+		layer.reset();
+		OWL_CORE_TRACE("Layer {} deleted.", name)
+	}
+	m_layers.clear();
+	m_layerInsertIndex = 0;
+	OWL_CORE_TRACE("LayerStack is empty.")
+}
+
+void LayerStack::pushLayer(shared<Layer> &&iLayer) {
+	iLayer->onAttach();
+	m_layers.emplace(m_layers.begin() + m_layerInsertIndex, std::move(iLayer));
 	m_layerInsertIndex++;
 }
 
-void LayerStack::pushOverlay(shared<Layer> &&overlay) {
-	m_layers.emplace_back(std::move(overlay));
+void LayerStack::pushOverlay(shared<Layer> &&iOverlay) {
+	m_layers.emplace_back(std::move(iOverlay));
 	m_layers.back()->onAttach();
 }
 
-void LayerStack::popLayer(const shared<Layer> &layer) {
-	if (const auto it = std::find(m_layers.begin(), m_layers.begin() + m_layerInsertIndex, layer);
+void LayerStack::popLayer(const shared<Layer> &iLayer) {
+	if (const auto it = std::find(m_layers.begin(), m_layers.begin() + m_layerInsertIndex, iLayer);
 		it != m_layers.begin() + m_layerInsertIndex) {
-		layer->onDetach();
+		iLayer->onDetach();
 		m_layers.erase(it);
 		m_layerInsertIndex--;
 	}
 }
 
-void LayerStack::popOverlay(const shared<Layer> &overlay) {
-	if (const auto it = std::find(m_layers.begin() + m_layerInsertIndex, m_layers.end(), overlay);
+void LayerStack::popOverlay(const shared<Layer> &iOverlay) {
+	if (const auto it = std::find(m_layers.begin() + m_layerInsertIndex, m_layers.end(), iOverlay);
 		it != m_layers.end()) {
-		overlay->onDetach();
+		iOverlay->onDetach();
 		m_layers.erase(it);
 	}
 }

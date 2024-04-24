@@ -48,8 +48,7 @@ Scene::~Scene() = default;
 shared<Scene> Scene::copy(const shared<Scene> &iOther) {
 	shared<Scene> newScene = mkShared<Scene>();
 
-	newScene->m_viewportWidth = iOther->m_viewportWidth;
-	newScene->m_viewportHeight = iOther->m_viewportHeight;
+	newScene->m_viewportSize = iOther->m_viewportSize;
 
 	auto &srcSceneRegistry = iOther->registry;
 	auto &dstSceneRegistry = newScene->registry;
@@ -165,13 +164,12 @@ void Scene::onUpdateEditor([[maybe_unused]] const core::Timestep &iTimeStep, con
 	renderer::Renderer2D::endScene();
 }
 
-void Scene::onViewportResize(const uint32_t iWidth, const uint32_t iHeight) {
-	m_viewportWidth = iWidth;
-	m_viewportHeight = iHeight;
+void Scene::onViewportResize(const math::FrameSize &iSize) {
+	m_viewportSize = iSize;
 	// Resize our non-FixedAspectRatio cameras
 	for (const auto view = registry.view<component::Camera>(); const auto entity: view) {
 		if (auto &cameraComponent = view.get<component::Camera>(entity); !cameraComponent.fixedAspectRatio)
-			cameraComponent.camera.setViewportSize(iWidth, iHeight);
+			cameraComponent.camera.setViewportSize(iSize);
 	}
 }
 
@@ -218,8 +216,8 @@ OWL_API void Scene::onComponentAdded<component::Transform>([[maybe_unused]] cons
 template<>
 OWL_API void Scene::onComponentAdded<component::Camera>([[maybe_unused]] const Entity &iEntity,
 														component::Camera &ioComponent) {
-	if (m_viewportWidth > 0 && m_viewportHeight > 0)
-		ioComponent.camera.setViewportSize(m_viewportWidth, m_viewportHeight);
+	if (m_viewportSize.surface() > 0)
+		ioComponent.camera.setViewportSize(m_viewportSize);
 }
 
 template<>

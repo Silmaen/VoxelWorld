@@ -16,12 +16,15 @@ namespace owl::renderer::vulkan::internal {
  * @brief Data for Texture description.
  */
 struct TextureData {
-	VkImage m_textureImage = nullptr;
-	VkDeviceMemory m_textureImageMemory = nullptr;
-	VkImageView m_textureImageView = nullptr;
-	VkSampler m_textureSampler = nullptr;
+	VkImage textureImage = nullptr;
+	VkDeviceMemory textureImageMemory = nullptr;
+	VkImageView textureImageView = nullptr;
+	VkSampler textureSampler = nullptr;
+	VkDescriptorSet textureDescriptorSet = nullptr;
+	VkDescriptorSetLayout textureDescriptorSetLayout = nullptr;
 
 	void freeTrexture();
+	void createDescriptorSet();
 };
 
 /**
@@ -89,6 +92,13 @@ public:
 
 	void createImguiDescriptorPool();
 	[[nodiscard]] VkDescriptorPool getImguiDescriptorPool() const { return m_imguiDescriptorPool; }
+	void createSingleImageDescriptorPool();
+
+	[[nodiscard]] VkDescriptorPool getSingleImageDescriptorPool() {
+		if (!m_singleImageDescriptorPool)
+			createSingleImageDescriptorPool();
+		return m_singleImageDescriptorPool;
+	}
 
 private:
 	/**
@@ -97,14 +107,16 @@ private:
 	Descriptors();
 	/// The list of texture bindings.
 	std::unordered_map<uint32_t, TextureData> m_textures;
-	uint32_t nextId = 0;
+	uint32_t m_nextId = 0;
 
 	/// The descriptor set layout.
 	VkDescriptorSetLayout m_descriptorSetLayout{nullptr};
-	/// The descripto pool.
+	/// The main descriptor pool.
 	VkDescriptorPool m_descriptorPool{nullptr};
-
+	/// The descriptor pool for Imgui.
 	VkDescriptorPool m_imguiDescriptorPool{nullptr};
+	/// The descriptor pool for the single images.
+	VkDescriptorPool m_singleImageDescriptorPool{nullptr};
 	/// List of descripto
 	std::vector<VkDescriptorSet> m_descriptorSets;
 	std::vector<VkBuffer> m_uniformBuffers;

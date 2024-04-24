@@ -110,7 +110,7 @@ void base2D::onEvent(event::Event &event) { cameraController.onEvent(event); }
 
 void base2D::onImGuiRender(const core::Timestep &ts) {
 	{
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 	}
 	// ==================================================================
 	{
@@ -143,6 +143,7 @@ void base2D::onImGuiRender(const core::Timestep &ts) {
 		ImGui::Text("Indices: %d", stats.getTotalIndexCount());
 		ImGui::Text("Viewport size: %f %f", static_cast<double>(viewportSize.x), static_cast<double>(viewportSize.y));
 		ImGui::Text("Aspect ratio: %f", static_cast<double>(viewportSize.x / viewportSize.y));
+		ImGui::Text("Entity Id: %d", m_hoveredEntity);
 		ImGui::End();
 	}
 	viewportSize = {core::Application::get().getWindow().getWidth(), core::Application::get().getWindow().getHeight()};

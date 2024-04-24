@@ -115,14 +115,13 @@ Application::~Application() {
 	OWL_PROFILE_FUNCTION()
 
 	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Error) {
-		for (auto &layer: m_layerStack) {
-			m_layerStack.popLayer(layer);
-			m_layerStack.popOverlay(layer);
-		}
+		m_layerStack.clear();
 		input::Input::invalidate();
 		mu_appWindow->shutdown();
+		OWL_CORE_TRACE("Application window shut down.")
 		renderer::Renderer::shutdown();
 		renderer::RenderCommand::invalidate();
+		OWL_CORE_TRACE("Renderer shut down and invalidated.")
 		mu_appWindow.reset();
 	}
 	invalidate();

@@ -16,10 +16,10 @@ namespace owl::renderer::opengl {
  */
 class Framebuffer final : public renderer::Framebuffer {
 public:
-	Framebuffer(const Framebuffer&) = default;
-	Framebuffer(Framebuffer&&) = default;
-	Framebuffer& operator=(const Framebuffer&) = default;
-	Framebuffer& operator=(Framebuffer&&) = default;
+	Framebuffer(const Framebuffer &) = default;
+	Framebuffer(Framebuffer &&) = default;
+	Framebuffer &operator=(const Framebuffer &) = default;
+	Framebuffer &operator=(Framebuffer &&) = default;
 
 	/**
 	 * @brief Default constructor.
@@ -49,10 +49,9 @@ public:
 
 	/**
 	 * @brief Change the size of the frame buffer.
-	 * @param[in] iWidth New width.
-	 * @param[in] iHeight New height.
+	 * @param[in] iSize New size.
 	 */
-	void resize(uint32_t iWidth, uint32_t iHeight) override;
+	void resize(math::FrameSize iSize) override;
 
 	/**
 	 * @brief Get the value of given pixel.
@@ -75,7 +74,7 @@ public:
 	 * @param[in] iIndex The color index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint32_t getColorAttachmentRendererId(const uint32_t iIndex) const override {
+	[[nodiscard]] uint64_t getColorAttachmentRendererId(const uint32_t iIndex) const override {
 		OWL_CORE_ASSERT(iIndex < m_colorAttachments.size(), "ColorAttachment out of bounds")
 		return m_colorAttachments[iIndex];
 	}
@@ -84,7 +83,7 @@ public:
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] const FramebufferSpecification& getSpecification() const override { return m_specs; }
+	[[nodiscard]] const FramebufferSpecification &getSpecification() const override { return m_specs; }
 
 private:
 	/// The renderer ID.
@@ -95,7 +94,7 @@ private:
 	uint32_t m_depthAttachment = 0;
 	/// The specs.
 	FramebufferSpecification m_specs;
-	std::vector<FramebufferTextureSpecification> m_colorAttachmentSpecifications;
-	FramebufferTextureSpecification m_depthAttachmentSpecification = FramebufferTextureFormat::None;
+	std::vector<AttachmentSpecification> m_colorAttachmentSpecifications;
+	AttachmentSpecification m_depthAttachmentSpecification = {};
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "PhysicalDeviceCapabilities.h"
+#include "math/sizingTypes.h"
 
 /**
  * @brief Namespace for vulkan intenal functions
@@ -169,6 +170,12 @@ public:
 	[[nodiscard]] VkExtent2D getCurrentExtent() const;
 
 	/**
+	 * @brief Get the current Size.
+	 * @return The current size.
+	 */
+	[[nodiscard]] math::FrameSize getCurrentSize() const;
+
+	/**
 	 * @brief Get the surface format.
 	 * @return The surface format.
 	 */
@@ -213,6 +220,12 @@ public:
 
 	[[nodiscard]] float getMaxSamplerAnisotropy() const;
 
+	[[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;
+
+	void endSingleTimeCommands(VkCommandBuffer iCommandBuffer) const;
+
+	[[nodiscard]] VkCommandBuffer createCommandBuffer() const;
+
 private:
 	/**
 	 * @brief Default Constructor.
@@ -245,6 +258,9 @@ private:
 	/// The present queue.
 	VkQueue m_presentQueue = nullptr;
 
+	/// The command pool.
+	VkCommandPool m_commandPool{nullptr};
+
 	void createInstance();
 
 	void selectPhysicalDevice();
@@ -254,5 +270,7 @@ private:
 	void setupDebugging();
 
 	void createQueues();
+
+	void createCommandPool();
 };
 }// namespace owl::renderer::vulkan::internal

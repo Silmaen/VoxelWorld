@@ -57,38 +57,38 @@ private:
 	bool onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent);
 	void onScenePlay();
 	void onSceneStop();
-	void onDuplicateEntity()const;
+	void onDuplicateEntity() const;
 
-	input::CameraOrthoController cameraController;
+	input::CameraOrthoController m_cameraController;
 
 	enum class State {
 		Edit,
 		Play
 	};
 
-	State state = State::Edit;
+	State m_state = State::Edit;
 
-	scene::Entity hoveredEntity;
-	renderer::CameraEditor editorCamera;
+	scene::Entity m_hoveredEntity;
+	renderer::CameraEditor m_editorCamera;
 
-	bool viewportFocused = false;
-	bool viewportHovered = false;
-	glm::vec2 viewportSize = {0.0f, 0.0f};
-	glm::vec2 viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
-	shared<renderer::Framebuffer> framebuffer;
+	bool m_viewportFocused = false;
+	bool m_viewportHovered = false;
+	math::FrameSize m_viewportSize = {0, 0};
+	glm::vec2 m_viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
+	shared<renderer::Framebuffer> m_framebuffer;
 
-	shared<scene::Scene> activeScene;
-	shared<scene::Scene> editorScene;
+	shared<scene::Scene> m_activeScene;
+	shared<scene::Scene> m_editorScene;
 
-	int gizmoType = -1;
-	std::filesystem::path currentScenePath{};
+	int m_gizmoType = -1;
+	std::filesystem::path m_currentScenePath{};
 
 	// Panels
-	panel::SceneHierarchy sceneHierarchy;
-	panel::ContentBrowser contentBrowser;
+	panel::SceneHierarchy m_sceneHierarchy;
+	panel::ContentBrowser m_contentBrowser;
 
 	// Editor resources
-	shared<renderer::Texture2D> iconPlay;
-	shared<renderer::Texture2D> iconStop;
+	shared<renderer::Texture2D> m_iconPlay;
+	shared<renderer::Texture2D> m_iconStop;
 };
 } // namespace owl

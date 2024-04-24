@@ -20,7 +20,7 @@ public:
 	[[nodiscard]] uint32_t getHeight() const override { return 0; }
 	[[nodiscard]] owl::math::FrameSize getSize() const override { return {0, 0}; }
 	[[nodiscard]] bool isLoaded() const override { return true; }
-	[[nodiscard]] uint32_t getRendererId() const override { return 0; }
+	[[nodiscard]] uint64_t getRendererId() const override { return 0; }
 	void bind(uint32_t) const override {}
 	[[nodiscard]] const std::filesystem::path &getPath() const override { return p; }
 	void setData(void *, uint32_t) override {}

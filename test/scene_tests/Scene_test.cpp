@@ -25,15 +25,15 @@ TEST(Scene, camera) {
 	Scene sc;
 	auto cam = sc.getPrimaryCamera();
 	EXPECT_FALSE(cam);
-	sc.onViewportResize(0, 1);
+	sc.onViewportResize({0, 1});
 	auto camFix = sc.createEntity("CamFixPrim");
-	sc.onViewportResize(4, 0);
+	sc.onViewportResize({4, 0});
 	auto camFloat = sc.createEntity("CamFloat");
 	camFix.addOrReplaceComponent<component::Camera>(true, true);
 	camFloat.addOrReplaceComponent<component::Camera>(false, false);
 	cam = sc.getPrimaryCamera();
 	EXPECT_TRUE(camFix == cam);
-	sc.onViewportResize(60, 60);
+	sc.onViewportResize({60, 60});
 }
 
 TEST(Scene, Copy) {
@@ -51,14 +51,15 @@ TEST(Scene, Copy) {
 	ent3.addOrReplaceComponent<component::Transform>();
 	ent3.addOrReplaceComponent<component::CircleRenderer>();
 	owl::shared<Scene> sc2 = owl::mkShared<Scene>();
-	sc2->onViewportResize(800, 600);
+	sc2->onViewportResize({800, 600});
 	sc2 = Scene::copy(sc);
-	EXPECT_TRUE(sc2->registry.storage<owl::scene::Entity>().size() == sc->registry.storage<owl::scene::Entity>().size());
+	EXPECT_TRUE(
+			sc2->registry.storage<owl::scene::Entity>().size() == sc->registry.storage<owl::scene::Entity>().size());
 }
 
 TEST(Scene, RenderEmpty) {
 	const owl::shared<Scene> sc = owl::mkShared<Scene>();
-	sc->onViewportResize(800, 600);
+	sc->onViewportResize({800, 600});
 	owl::core::Timestep ts;
 	ts.update();
 	sc->onUpdateRuntime(ts);

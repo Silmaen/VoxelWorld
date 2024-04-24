@@ -114,6 +114,11 @@ public:
 	 */
 	[[nodiscard]] const_reverse_iterator rend() const { return m_layers.rend(); }
 
+	/**
+	 * @brief Destroy all layers and overlays.
+	 */
+	void clear();
+
 private:
 	/// The layers.
 	layerList m_layers;

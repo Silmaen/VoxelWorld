@@ -3,17 +3,17 @@
 #
 file(GLOB_RECURSE SRCS
         *.cpp
-        )
+)
 file(GLOB_RECURSE HDRS
         *.h
-        )
+)
 add_executable(${CMAKE_PROJECT_NAME}nest
         ${SRCS} ${HDRS})
 set_target_properties(${CMAKE_PROJECT_NAME}nest PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 target_link_libraries(${CMAKE_PROJECT_NAME}nest PRIVATE
         ${ENGINE_NAME}
-        )
+)
 
 target_compile_definitions(${CMAKE_PROJECT_NAME}nest PRIVATE OWL_ASSETS_LOCATION="source/owlnest/assets")
 

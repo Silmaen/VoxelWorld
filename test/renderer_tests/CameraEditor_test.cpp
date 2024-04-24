@@ -41,7 +41,7 @@ TEST(CameraEditor, fovCreation) {
 
 TEST(CameraEditor, ChangeViewport) {
 	CameraEditor cam(45, 1.5f, 0.1f, 15);
-	cam.setViewportSize(800, 600);
+	cam.setViewportSize({800, 600});
 	auto proj = cam.getViewProjection();
 	EXPECT_NEAR(proj[0][0], 1.8106f, 0.001);
 }
@@ -73,11 +73,11 @@ TEST(CameraEditor, Frames) {
 	ts.update();
 	cam.onUpdate(ts);
 	owl::input::Input::injectMouseButton(owl::input::mouse::ButtonRight);// release btn
-	owl::input::Input::injectMouseButton(owl::input::mouse::ButtonLeft); // press btn
+	owl::input::Input::injectMouseButton(owl::input::mouse::ButtonLeft);// press btn
 	owl::input::Input::injectMousePos({1.f, 1.f});
 	ts.update();
 	cam.onUpdate(ts);
-	owl::input::Input::injectMouseButton(owl::input::mouse::ButtonLeft);  // release btn
+	owl::input::Input::injectMouseButton(owl::input::mouse::ButtonLeft);// release btn
 	owl::input::Input::injectMouseButton(owl::input::mouse::ButtonMiddle);// press btn
 	owl::input::Input::injectMousePos({1.f, 4.f});
 	ts.update();

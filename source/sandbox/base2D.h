@@ -39,6 +39,7 @@ private:
 
 	shared<renderer::Texture> checkerboardTexture;
 	glm::vec4 squareColor = {0.2f, 0.3f, 0.8f, 1.0f};
+	int32_t m_hoveredEntity = -1;
 };
 
 }// namespace owl

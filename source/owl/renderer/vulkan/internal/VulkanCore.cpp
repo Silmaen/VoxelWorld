@@ -10,6 +10,7 @@
 
 #include "VulkanCore.h"
 
+#include "VulkanHandler.h"
 #include "core/Application.h"
 #include "renderer/vulkan/GraphContext.h"
 #include "utils.h"
@@ -28,22 +29,30 @@ constexpr VkApplicationInfo g_appInfo = {
 		.apiVersion = VK_API_VERSION_1_3};
 
 VkBool32 debugUtilsMessageCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT iMessageSeverity,
-								   VkDebugUtilsMessageTypeFlagsEXT,
-								   const VkDebugUtilsMessengerCallbackDataEXT *iPCallbackData,
-								   void *) {
-
+                                   VkDebugUtilsMessageTypeFlagsEXT,
+                                   const VkDebugUtilsMessengerCallbackDataEXT *iPCallbackData, void *) {
+	auto bufferName = VulkanHandler::get().getCurrentFrameBufferName();
+	auto frameId = core::Application::get().getTimeStep().getFrameNumber();
 	if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
-		OWL_CORE_TRACE("Vulkan: [{}][{}]: {}", iPCallbackData->messageIdNumber, iPCallbackData->pMessageIdName,
-					   iPCallbackData->pMessage)
+		OWL_CORE_TRACE("Vulkan fb({} {}): [{}][{}]: {}", frameId, bufferName,
+		               iPCallbackData->messageIdNumber,
+		               iPCallbackData->pMessageIdName,
+		               iPCallbackData->pMessage)
 	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-		OWL_CORE_INFO("Vulkan: [{}][{}]: {}", iPCallbackData->messageIdNumber, iPCallbackData->pMessageIdName,
-					  iPCallbackData->pMessage)
+		OWL_CORE_INFO("Vulkan fb({} {}): [{}][{}]: {}", frameId, bufferName,
+		              iPCallbackData->messageIdNumber,
+		              iPCallbackData->pMessageIdName,
+		              iPCallbackData->pMessage)
 	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-		OWL_CORE_WARN("Vulkan: [{}][{}]: {}", iPCallbackData->messageIdNumber, iPCallbackData->pMessageIdName,
-					  iPCallbackData->pMessage)
+		OWL_CORE_WARN("Vulkan fb({} {}): [{}][{}]: {}", frameId, bufferName,
+		              iPCallbackData->messageIdNumber,
+		              iPCallbackData->pMessageIdName,
+		              iPCallbackData->pMessage)
 	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-		OWL_CORE_ERROR("Vulkan: [{}][{}]: {}", iPCallbackData->messageIdNumber, iPCallbackData->pMessageIdName,
-					   iPCallbackData->pMessage)
+		OWL_CORE_ERROR("Vulkan fb({} {}): [{}][{}]: {}", frameId, bufferName,
+		               iPCallbackData->messageIdNumber,
+		               iPCallbackData->pMessageIdName,
+		               iPCallbackData->pMessage)
 	}
 	// The return value of this callback controls whether the Vulkan call that caused the validation message will
 	// be aborted or not. We return VK_FALSE as we DON'T want Vulkan calls that cause a validation message to abort
@@ -57,11 +66,10 @@ VkDebugUtilsMessengerCreateInfoEXT s_debugUtilsMessagerCi{
 		.pNext = nullptr,
 		.flags = {},
 		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-					   VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-					   VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
-					   VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
+		                   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+		               VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
+		               VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
 		.pfnUserCallback = debugUtilsMessageCallback,
 		.pUserData = nullptr};
 
@@ -102,11 +110,17 @@ void VulkanCore::init(const VulkanConfiguraton &iConfiguration) {
 		return;
 	createLogicalDevice();
 	createQueues();
+	createCommandPool();
 	if (isHealthy())
 		m_state = State::Initialized;
 }
 
 void VulkanCore::release() {
+	vkDeviceWaitIdle(m_logicalDevice);
+	if (m_commandPool != nullptr) {
+		vkDestroyCommandPool(m_logicalDevice, m_commandPool, nullptr);
+		OWL_CORE_TRACE("Vulkan: commandPool destroyed.")
+	}
 	if (m_logicalDevice != nullptr) {
 		vkDestroyDevice(m_logicalDevice, nullptr);
 		m_logicalDevice = nullptr;
@@ -198,10 +212,10 @@ void VulkanCore::createInstance() {
 
 bool VulkanCore::isHealthy() const {
 	return m_instance != nullptr &&
-		   m_physicalDevice != nullptr &&
-		   m_logicalDevice != nullptr &&
-		   m_graphicQueue != nullptr &&
-		   m_presentQueue != nullptr;
+	       m_physicalDevice != nullptr &&
+	       m_logicalDevice != nullptr &&
+	       m_graphicQueue != nullptr &&
+	       m_presentQueue != nullptr;
 }
 
 void VulkanCore::selectPhysicalDevice() {
@@ -239,7 +253,7 @@ void VulkanCore::createLogicalDevice() {
 			.robustBufferAccess = VK_FALSE,
 			.fullDrawIndexUint32 = VK_FALSE,
 			.imageCubeArray = VK_FALSE,
-			.independentBlend = VK_FALSE,
+			.independentBlend = VK_TRUE,
 			.geometryShader = VK_FALSE,
 			.tessellationShader = VK_FALSE,
 			.sampleRateShading = VK_FALSE,
@@ -299,8 +313,8 @@ void VulkanCore::createLogicalDevice() {
 			.queueCreateInfoCount = static_cast<uint32_t>(deviceQueuesCi.size()),
 			.pQueueCreateInfos = deviceQueuesCi.data(),
 			.enabledLayerCount = m_hasValidation
-									 ? static_cast<uint32_t>(extensionNames.size())
-									 : static_cast<uint32_t>(extensionNames.size()) - 1,
+				                     ? static_cast<uint32_t>(extensionNames.size())
+				                     : static_cast<uint32_t>(extensionNames.size()) - 1,
 			.ppEnabledLayerNames = layerNames.data(),
 			.enabledExtensionCount = static_cast<uint32_t>(extensionNames.size()),
 			.ppEnabledExtensionNames = extensionNames.data(),
@@ -340,9 +354,23 @@ VkExtent2D VulkanCore::getCurrentExtent() const {
 	} else {
 		auto sizes = core::Application::get().getWindow().getSize();
 		extent.width = std::clamp(sizes.width(), m_phyProps.surfaceCapabilities.minImageExtent.width,
-								  m_phyProps.surfaceCapabilities.maxImageExtent.width);
+		                          m_phyProps.surfaceCapabilities.maxImageExtent.width);
 		extent.height = std::clamp(sizes.height(), m_phyProps.surfaceCapabilities.minImageExtent.height,
-								   m_phyProps.surfaceCapabilities.maxImageExtent.height);
+		                           m_phyProps.surfaceCapabilities.maxImageExtent.height);
+	}
+	return extent;
+}
+
+math::FrameSize VulkanCore::getCurrentSize() const {
+	math::FrameSize extent;
+	if (m_phyProps.surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+		extent = toFrameSize(m_phyProps.surfaceCapabilities.currentExtent);
+	} else {
+		auto sizes = core::Application::get().getWindow().getSize();
+		extent.width() = std::clamp(sizes.width(), m_phyProps.surfaceCapabilities.minImageExtent.width,
+		                            m_phyProps.surfaceCapabilities.maxImageExtent.width);
+		extent.height() = std::clamp(sizes.height(), m_phyProps.surfaceCapabilities.minImageExtent.height,
+		                             m_phyProps.surfaceCapabilities.maxImageExtent.height);
 	}
 	return extent;
 }
@@ -351,7 +379,7 @@ VkSurfaceFormatKHR VulkanCore::getSurfaceFormat() const {
 	VkSurfaceFormatKHR surfaceFormat = m_phyProps.surfaceFormats.front();
 	for (const auto &availableFormat: m_phyProps.surfaceFormats) {
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
-			availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) { surfaceFormat = availableFormat; }
+		    availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) { surfaceFormat = availableFormat; }
 	}
 	return surfaceFormat;
 }
@@ -385,13 +413,102 @@ void VulkanCore::updateSurfaceInformations() { m_phyProps.updateSurfaceInformati
 uint32_t VulkanCore::findMemoryTypeIndex(const uint32_t iTypeFilter, const VkMemoryPropertyFlags iMemProperties) const {
 	for (uint32_t i = 0; i < m_phyProps.memoryProperties.memoryTypeCount; i++) {
 		if ((iTypeFilter & (1 << i)) && (m_phyProps.memoryProperties.memoryTypes[i].propertyFlags & iMemProperties) ==
-			iMemProperties) { return i; }
+		    iMemProperties) { return i; }
 	}
 	OWL_CORE_ERROR("Vulkan PhysicalDevice: failed to find suitable memory type!")
 	return std::numeric_limits<uint32_t>::max();
 }
 
 float VulkanCore::getMaxSamplerAnisotropy() const { return m_phyProps.properties.limits.maxSamplerAnisotropy; }
+
+VkCommandBuffer VulkanCore::beginSingleTimeCommands() const {
+	const auto &core = VulkanCore::get();
+	const VkCommandBufferAllocateInfo allocInfo{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+			.pNext = nullptr,
+			.commandPool = m_commandPool,
+			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+			.commandBufferCount = 1};
+
+	VkCommandBuffer commandBuffer;
+	if (const VkResult result = vkAllocateCommandBuffers(core.getLogicalDevice(), &allocInfo, &commandBuffer);
+		result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to create command buffer for buffer copy.")
+		return nullptr;
+	}
+
+	constexpr VkCommandBufferBeginInfo beginInfo{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+			.pNext = nullptr,
+			.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+			.pInheritanceInfo = nullptr};
+	if (const VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to begin command buffer for buffer copy.")
+		return nullptr;
+	}
+	return commandBuffer;
+}
+
+void VulkanCore::endSingleTimeCommands(VkCommandBuffer iCommandBuffer) const {
+	const auto &core = VulkanCore::get();
+	if (const VkResult result = vkEndCommandBuffer(iCommandBuffer); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to end command buffer for buffer copy.")
+		return;
+	}
+
+	const VkSubmitInfo submitInfo{
+			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+			.pNext = nullptr,
+			.waitSemaphoreCount = 0,
+			.pWaitSemaphores = nullptr,
+			.pWaitDstStageMask = nullptr,
+			.commandBufferCount = 1,
+			.pCommandBuffers = &iCommandBuffer,
+			.signalSemaphoreCount = 0,
+			.pSignalSemaphores = nullptr};
+
+	if (const VkResult result = vkQueueSubmit(core.getGraphicQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+		result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to submit to queue for buffer copy.")
+		return;
+	}
+	if (const VkResult result = vkQueueWaitIdle(core.getGraphicQueue()); result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan: failed to wait for idle queue for buffer copy.")
+		return;
+	}
+
+	vkFreeCommandBuffers(core.getLogicalDevice(), m_commandPool, 1, &iCommandBuffer);
+}
+
+
+[[nodiscard]] VkCommandBuffer VulkanCore::createCommandBuffer() const {
+	VkCommandBuffer cmd;
+	const VkCommandBufferAllocateInfo allocInfo{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+			.pNext = nullptr,
+			.commandPool = m_commandPool,
+			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+			.commandBufferCount = 1};
+	if (const VkResult result = vkAllocateCommandBuffers(m_logicalDevice, &allocInfo, &cmd);
+		result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan Core: failed to allocate command buffers ({}).", resultString(result))
+	}
+	return cmd;
+}
+
+void VulkanCore::createCommandPool() {
+	const VkCommandPoolCreateInfo poolInfo{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+			.queueFamilyIndex = getGraphQueueFamilyIndex()};
+
+	if (const VkResult result = vkCreateCommandPool(getLogicalDevice(), &poolInfo, nullptr, &m_commandPool);
+		result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan Core: failed to create command pool ({}).", resultString(result))
+		m_state = State::Error;
+	}
+}
 
 // ============= VulkanCore =====================
 
@@ -426,8 +543,7 @@ InstanceInformations::InstanceInformations() {
 				result == VK_SUCCESS) {
 				for (const auto &[extensionName, specVersion]: extensions) {
 					supportedExtensions.emplace_back(extensionName);
-					OWL_CORE_TRACE("Vulkan: Supported instance extension: {} version: {}", extensionName,
-								   specVersion)
+					OWL_CORE_TRACE("Vulkan: Supported instance extension: {} version: {}", extensionName, specVersion)
 				}
 			} else { OWL_CORE_WARN("Vulkan: unable to enumerate instance extensions ({}).", resultString(result)) }
 		}
@@ -436,9 +552,9 @@ InstanceInformations::InstanceInformations() {
 
 bool InstanceInformations::hasMinimalVersion(const uint8_t iMajor, const uint8_t iMinor, const uint8_t iPatch) const {
 	return VK_API_VERSION_MAJOR(version) > iMajor ||
-		   (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) > iMinor) ||
-		   (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) == iMinor &&
-			VK_API_VERSION_PATCH(version) >= iPatch);
+	       (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) > iMinor) ||
+	       (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) == iMinor &&
+	        VK_API_VERSION_PATCH(version) >= iPatch);
 }
 
 bool InstanceInformations::hasLayer(const std::string &iLayer) const {
@@ -447,18 +563,17 @@ bool InstanceInformations::hasLayer(const std::string &iLayer) const {
 
 bool InstanceInformations::hasExtension(const std::string &iExtension) const {
 	return std::ranges::find(supportedExtensions.begin(), supportedExtensions.end(), iExtension) !=
-		   supportedExtensions.
-		   end();
+	       supportedExtensions.end();
 }
 
 bool InstanceInformations::hasLayers(const std::vector<std::string> &iLayers) const {
 	return std::ranges::all_of(iLayers.begin(), iLayers.end(),
-							   [&](const auto &iLayer) { return this->hasLayer(iLayer); });
+	                           [&](const auto &iLayer) { return this->hasLayer(iLayer); });
 }
 
 bool InstanceInformations::hasExtensions(const std::vector<std::string> &iExtensions) const {
 	return std::ranges::all_of(iExtensions.begin(), iExtensions.end(),
-							   [&](const auto &iExtension) { return this->hasExtension(iExtension); });
+	                           [&](const auto &iExtension) { return this->hasExtension(iExtension); });
 }
 
 // ============= InstanceInformations =====================

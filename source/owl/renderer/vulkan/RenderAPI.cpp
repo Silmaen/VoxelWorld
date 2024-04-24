@@ -53,7 +53,7 @@ void RenderAPI::setClearColor(const glm::vec4 &iColor) {
 }
 
 void RenderAPI::clear() {
-	auto &vkh = internal::VulkanHandler::get();
+	const auto &vkh = internal::VulkanHandler::get();
 	vkh.clear();
 }
 
@@ -103,7 +103,8 @@ void RenderAPI::beginTextureLoad() {
 }
 
 void RenderAPI::endTextureLoad() {
-	internal::Descriptors::get().commitTextureBind(internal::VulkanHandler::get().getCurrentFrame());
+	auto &vkd = internal::Descriptors::get();
+	vkd.commitTextureBind(internal::VulkanHandler::get().getCurrentFrameIndex());
 }
 
 }// namespace owl::renderer::vulkan
