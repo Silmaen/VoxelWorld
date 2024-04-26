@@ -42,6 +42,14 @@ else ()
     message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")
 endif ()
 
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(AMD64|amd64|x86_64)")
+    set(OWL_PLATFORM_X64 ON)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_X64)
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(ARM64|arm64|aarch64)")
+    set(OWL_PLATFORM_ARM64 ON)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_ARM64)
+endif ()
+
 #
 # ---=== Supported Compiler ===----
 #
