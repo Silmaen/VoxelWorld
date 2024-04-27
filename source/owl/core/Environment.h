@@ -7,6 +7,7 @@
  */
 
 #pragma once
+#include "Core.h"
 
 namespace owl::core {
 
@@ -21,14 +22,14 @@ constexpr char g_sep[] = ":";
  * @param[in] iKey The Environment vaiable's name.
  * @return Value or empty string.
  */
-std::string getEnv(const std::string &iKey);
+std::string OWL_API getEnv(const std::string &iKey);
 
 /**
  * @brief Define (overwrite) an environment variable.
  * @param[in] iKey The Environment vaiable's name.
  * @param[in] iValue The new value.
  */
-void setEnv(const std::string &iKey, const std::string &iValue);
+void OWL_API setEnv(const std::string &iKey, const std::string &iValue);
 
 /**
  * @brief Append a value to existing environment variable.
@@ -36,7 +37,7 @@ void setEnv(const std::string &iKey, const std::string &iValue);
  * @param[in] iValue The value to add.
  * @param[in] iSepparator The sepparator between values.
  */
-void appendEnv(const std::string &iKey, const std::string &iValue, const std::string &iSepparator = g_sep);
+void OWL_API appendEnv(const std::string &iKey, const std::string &iValue, const std::string &iSepparator = g_sep);
 
 /**
  * @brief Define (overwrite) an environment variable.
@@ -45,7 +46,7 @@ void appendEnv(const std::string &iKey, const std::string &iValue, const std::st
  * @param[in] iValue The new value.
  */
 template<typename T>
-void setEnvValue(const std::string &iKey, const T &iValue);
+void OWL_API setEnvValue(const std::string &iKey, const T &iValue);
 
 /**
  * @brief Append a value to existing environment variable.
@@ -54,6 +55,6 @@ void setEnvValue(const std::string &iKey, const T &iValue);
  * @param[in] iValue The value to add.
  */
 template<typename T>
-void appendEnvValue(const std::string &iKey, const T &iValue);
+void OWL_API appendEnvValue(const std::string &iKey, const T &iValue);
 
 }// namespace owl::core

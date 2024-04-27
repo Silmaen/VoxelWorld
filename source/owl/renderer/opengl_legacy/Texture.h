@@ -55,30 +55,6 @@ public:
 	}
 
 	/**
-	 * @brief Access to texture's width.
-	 * @return Texture's width.
-	 */
-	[[nodiscard]] uint32_t getWidth() const override { return m_size.getWidth(); }
-
-	/**
-	 * @brief Access to texture's height.
-	 * @return Texture's height.
-	 */
-	[[nodiscard]] uint32_t getHeight() const override { return m_size.getHeight(); }
-
-	/**
-	 * @brief Access to texture's size.
-	 * @return Texture's size.
-	 */
-	[[nodiscard]] math::FrameSize getSize() const override { return m_size; }
-
-	/**
-	 * @brief Tells if the data effectively loaded.
-	 * @return True if texture contains data.
-	 */
-	[[nodiscard]] bool isLoaded() const override { return m_size.surface() > 0; }
-
-	/**
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
@@ -97,20 +73,8 @@ public:
 	 */
 	void setData(void *iData, uint32_t iSize) override;
 
-	/**
-	 * @brief Get Path to texture file.
-	 * @return Path to texture file.
-	 */
-	[[nodiscard]] const std::filesystem::path &getPath() const override { return m_path; }
-
 private:
-	/// Path to the texture file.
-	std::filesystem::path m_path;
-	/// Texture's size.
-	math::FrameSize m_size = {0, 0};
 	/// OpenGL binding.
 	uint32_t m_textureId = 0;
-	/// If the image has Alpha channel.
-	bool m_hasAlpha = true;
 };
 }// namespace owl::renderer::opengl_legacy

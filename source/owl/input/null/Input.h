@@ -14,10 +14,10 @@ namespace owl::input::null {
 /**
  * @brief Class Input
  */
-class OWL_API Input final : public ::owl::input::Input {
+class OWL_API Input final : public input::Input {
 public:
-	Input(const Input&) = delete;
-	Input(Input&&) = delete;
+	Input(const Input &) = delete;
+	Input(Input &&) = delete;
 
 	/**
 	 * @brief Default constructor.
@@ -61,10 +61,14 @@ public:
 	 * @brief Simulate mouse movement, private implementation.
 	 * @param[in] iMousePos The new mouse pos.
 	 */
-	void injectMousePos_impl(const glm::vec2& iMousePos) override;
+	void injectMousePos_impl(const glm::vec2 &iMousePos) override;
+	/**
+	 * @brief Clear the previously defined injections.
+	 */
+	void resetInjection_impl() override;
 
 	std::set<KeyCode> keyPressed;
 	std::set<MouseCode> mouseBtnPressed;
 	glm::vec2 mousePos{0, 0};
 };
-} // namespace owl::input::null
+}// namespace owl::input::null

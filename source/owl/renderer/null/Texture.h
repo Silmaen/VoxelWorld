@@ -14,7 +14,7 @@ namespace owl::renderer::null {
 /**
  * @brief Class Texture.
  */
-class Texture2D final : public ::owl::renderer::Texture2D {
+class OWL_API Texture2D final : public ::owl::renderer::Texture2D {
 public:
 	Texture2D(const Texture2D &) = default;
 	Texture2D(Texture2D &&) = default;
@@ -30,13 +30,15 @@ public:
 	 * @brief Constructor by size.
 	 * @param[in] iWidth Texture's width.
 	 * @param[in] iHeight Texture's height.
+	 * @param[in] iWithAlpha Texture has alpha channel.
 	 */
-	Texture2D(uint32_t iWidth, uint32_t iHeight);
+	Texture2D(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true);
 	/**
 	 * @brief Constructor by size.
 	 * @param[in] iSize Texture's width.
+	 * @param[in] iWithAlpha Texture has alpha channel.
 	 */
-	explicit Texture2D(math::FrameSize iSize);
+	explicit Texture2D(math::FrameSize iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Destructor.
@@ -51,30 +53,6 @@ public:
 	bool operator==(const Texture &iOther) const override {
 		return m_rendererId == (dynamic_cast<const Texture2D &>(iOther)).m_rendererId;
 	}
-
-	/**
-	 * @brief Access to texture's width.
-	 * @return Texture's width.
-	 */
-	[[nodiscard]] uint32_t getWidth() const override { return m_size.getWidth(); }
-
-	/**
-	 * @brief Access to texture's height.
-	 * @return Texture's height.
-	 */
-	[[nodiscard]] uint32_t getHeight() const override { return m_size.getHeight(); }
-
-	/**
-	 * @brief Access to texture's size.
-	 * @return Texture's size.
-	 */
-	[[nodiscard]] math::FrameSize getSize() const override { return m_size; }
-
-	/**
-	 * @brief Tells if the data effectively loaded.
-	 * @return True if texture contains data.
-	 */
-	[[nodiscard]] bool isLoaded() const override { return m_size.surface() > 0; }
 
 	/**
 	 * @brief Get renderer id.
@@ -95,17 +73,7 @@ public:
 	 */
 	void setData(void *iData, uint32_t iSize) override;
 
-	/**
-	 * @brief Get Path to texture file.
-	 * @return Path to texture file.
-	 */
-	[[nodiscard]] const std::filesystem::path &getPath() const override { return m_path; }
-
 private:
-	/// Path to the texture file.
-	std::filesystem::path m_path;
-	/// Texture's size.
-	math::FrameSize m_size = {0, 0};
 	/// OpenGL binding.
 	uint64_t m_rendererId = 0;
 };

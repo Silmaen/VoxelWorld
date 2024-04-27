@@ -29,6 +29,24 @@ public:
 	 * @brief Destructor.
 	 */
 	virtual ~Texture();
+	/**
+	 * @brief Default constructor.
+	 * @param[in] iPath path to the texture image file.
+	 */
+	explicit Texture(std::filesystem::path iPath);
+	/**
+	 * @brief Constructor by size.
+	 * @param[in] iWidth Texture's width.
+	 * @param[in] iHeight Texture's height.
+	 * @param[in] iWithAlpha Texture has alpha channel.
+	 */
+	Texture(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha);
+	/**
+	 * @brief Constructor by size.
+	 * @param[in] iSize Texture's width.
+	 * @param[in] iWithAlpha Texture has alpha channel.
+	 */
+	explicit Texture(math::FrameSize iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Comparison operator.
@@ -41,25 +59,25 @@ public:
 	 * @brief Access to texture's width.
 	 * @return Texture's width.
 	 */
-	[[nodiscard]] virtual uint32_t getWidth() const = 0;
+	[[nodiscard]] uint32_t getWidth() const { return m_size.getWidth(); }
 
 	/**
 	 * @brief Access to texture's height.
 	 * @return Texture's height.
 	 */
-	[[nodiscard]] virtual uint32_t getHeight() const = 0;
+	[[nodiscard]] uint32_t getHeight() const { return m_size.getHeight(); }
 
 	/**
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] virtual math::FrameSize getSize() const = 0;
+	[[nodiscard]] math::FrameSize getSize() const { return m_size; }
 
 	/**
 	 * @brief Tells if the data effectively loaded.
 	 * @return True if texture contains data.
 	 */
-	[[nodiscard]] virtual bool isLoaded() const = 0;
+	[[nodiscard]] bool isLoaded() const { return m_size.surface() > 0; }
 
 	/**
 	 * @brief Get renderer id.
@@ -77,7 +95,7 @@ public:
 	 * @brief Get Path to texture file.
 	 * @return Path to texture file.
 	 */
-	[[nodiscard]] virtual const std::filesystem::path &getPath() const = 0;
+	[[nodiscard]] const std::filesystem::path &getPath() const { return m_path; }
 
 	/**
 	 * @brief Define the texture data.
@@ -92,6 +110,20 @@ public:
 	 */
 	[[nodiscard]] const std::string &getName() const { return m_name; }
 
+	/**
+	 * @brief Get a string that can be serialized.
+	 * @return A serialized String.
+	 */
+	[[nodiscard]] std::string getSerializeString() const;
+
+protected:
+	/// Texture's size.
+	math::FrameSize m_size = {0, 0};
+	/// Path to the texture file.
+	std::filesystem::path m_path;
+	/// If texture has alpha.
+	bool m_hasAlpha{false};
+
 private:
 	/// The texture's name.
 	std::string m_name;
@@ -105,6 +137,24 @@ private:
 class OWL_API Texture2D : public Texture {
 public:
 	/**
+	 * @brief Default constructor.
+	 * @param[in] iPath path to the texture image file.
+	 */
+	explicit Texture2D(std::filesystem::path iPath);
+	/**
+	 * @brief Constructor by size.
+	 * @param[in] iWidth Texture's width.
+	 * @param[in] iHeight Texture's height.
+	 * @param[in] iWithAlpha Texture has alpha channel.
+	 */
+	Texture2D(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true);
+	/**
+	 * @brief Constructor by size.
+	 * @param[in] iSize Texture's width.
+	 * @param[in] iWithAlpha Texture has alpha channel.
+	 */
+	explicit Texture2D(const math::FrameSize &iSize, bool iWithAlpha = true);
+	/**
 	 * @brief Creates the texture with the given filename.
 	 * @param[in] iFile The path to the file to load.
 	 * @return Resulting texture.
@@ -117,6 +167,14 @@ public:
 	 * @return Pointer to the texture.
 	 */
 	static shared<Texture2D> create(const std::string &iTextureName);
+
+	/**
+	 * @brief Create a new texture.
+	 * @param[in] iTextureSerializedName Name of the files in the standard path.
+	 * @return Pointer to the texture.
+	 */
+	static shared<Texture2D> createFromSerialized(const std::string &iTextureSerializedName);
+
 	/**
 	 * @brief Creates the texture with the given size.
 	 * @param[in] iSize The texture's size.

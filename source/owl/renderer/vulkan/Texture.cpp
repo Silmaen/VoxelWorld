@@ -33,7 +33,7 @@ void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 			.samples = VK_SAMPLE_COUNT_1_BIT,
 			.tiling = VK_IMAGE_TILING_OPTIMAL,
 			.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-			         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+					 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 			.queueFamilyIndexCount = 0,
 			.pQueueFamilyIndices = nullptr,
@@ -49,12 +49,11 @@ void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 	VkMemoryRequirements memRequirements;
 	vkGetImageMemoryRequirements(vkc.getLogicalDevice(), data.textureImage, &memRequirements);
 	const VkMemoryAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-	                                     .pNext = nullptr,
-	                                     .allocationSize = memRequirements.size,
-	                                     .memoryTypeIndex = vkc.findMemoryTypeIndex(
-			                                     memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)};
-	if (const VkResult result =
-				vkAllocateMemory(vkc.getLogicalDevice(), &allocInfo, nullptr, &data.textureImageMemory);
+										 .pNext = nullptr,
+										 .allocationSize = memRequirements.size,
+										 .memoryTypeIndex = vkc.findMemoryTypeIndex(
+												 memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)};
+	if (const VkResult result = vkAllocateMemory(vkc.getLogicalDevice(), &allocInfo, nullptr, &data.textureImageMemory);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture: failed to allocate image memory ({}).", internal::resultString(result))
 		return;
@@ -64,12 +63,12 @@ void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 
 }// namespace
 
-Texture2D::Texture2D(const math::FrameSize &iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {}
+Texture2D::Texture2D(const math::FrameSize &iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {}
 
 Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
-	: m_size{iWidth, iHeight}, m_hasAlpha{iWithAlpha} {}
+	: renderer::Texture2D{iWidth, iHeight, iWithAlpha} {}
 
-Texture2D::Texture2D(std::filesystem::path iPath) : m_path{std::move(iPath)} {
+Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(1);
 	stbi_uc *data;
@@ -118,8 +117,8 @@ void Texture2D::setData(void *iData, const uint32_t iSize) {
 
 	const VkDeviceSize imageSize = m_size.surface() * 4;
 	internal::createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-	                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
-	                       stagingBufferMemory);
+						   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
+						   stagingBufferMemory);
 	void *dataPixel;
 	vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, imageSize, 0, &dataPixel);
 	if (m_hasAlpha) {
@@ -139,57 +138,51 @@ void Texture2D::setData(void *iData, const uint32_t iSize) {
 	m_textureId = vkd.registerNewTexture();
 	auto &data = vkd.getTextureData(m_textureId);
 	createImage(m_textureId, m_size);
-	internal::transitionImageLayout(data.textureImage, VK_IMAGE_LAYOUT_UNDEFINED,
-	                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	internal::transitionImageLayout(data.textureImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	internal::copyBufferToImage(stagingBuffer, data.textureImage, m_size);
 	internal::transitionImageLayout(data.textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-	                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+									VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
 	vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
 
-	const VkImageViewCreateInfo createInfo{
-			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.image = data.textureImage,
-			.viewType = VK_IMAGE_VIEW_TYPE_2D,
-			.format = VK_FORMAT_R8G8B8A8_UNORM,
-			.components = {VK_COMPONENT_SWIZZLE_IDENTITY,
-			               VK_COMPONENT_SWIZZLE_IDENTITY,
-			               VK_COMPONENT_SWIZZLE_IDENTITY,
-			               VK_COMPONENT_SWIZZLE_IDENTITY},
-			.subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			                     .baseMipLevel = 0,
-			                     .levelCount = 1,
-			                     .baseArrayLayer = 0,
-			                     .layerCount = 1}};
-	if (const VkResult result =
-				vkCreateImageView(vkc.getLogicalDevice(), &createInfo, nullptr, &data.textureImageView);
+	const VkImageViewCreateInfo createInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+										   .pNext = nullptr,
+										   .flags = {},
+										   .image = data.textureImage,
+										   .viewType = VK_IMAGE_VIEW_TYPE_2D,
+										   .format = VK_FORMAT_R8G8B8A8_UNORM,
+										   .components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
+														  VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
+										   .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+																.baseMipLevel = 0,
+																.levelCount = 1,
+																.baseArrayLayer = 0,
+																.layerCount = 1}};
+	if (const VkResult result = vkCreateImageView(vkc.getLogicalDevice(), &createInfo, nullptr, &data.textureImageView);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture: Error creating image views ({}).", internal::resultString(result))
 		return;
 	}
 
-	const VkSamplerCreateInfo samplerInfo{
-			.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.magFilter = VK_FILTER_NEAREST,
-			.minFilter = VK_FILTER_NEAREST,
-			.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
-			.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.mipLodBias = {},
-			.anisotropyEnable = VK_TRUE,
-			.maxAnisotropy = vkc.getMaxSamplerAnisotropy(),
-			.compareEnable = VK_FALSE,
-			.compareOp = VK_COMPARE_OP_ALWAYS,
-			.minLod = {},
-			.maxLod = {},
-			.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
-			.unnormalizedCoordinates = VK_FALSE};
+	const VkSamplerCreateInfo samplerInfo{.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+										  .pNext = nullptr,
+										  .flags = {},
+										  .magFilter = VK_FILTER_NEAREST,
+										  .minFilter = VK_FILTER_NEAREST,
+										  .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+										  .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .mipLodBias = {},
+										  .anisotropyEnable = VK_TRUE,
+										  .maxAnisotropy = vkc.getMaxSamplerAnisotropy(),
+										  .compareEnable = VK_FALSE,
+										  .compareOp = VK_COMPARE_OP_ALWAYS,
+										  .minLod = {},
+										  .maxLod = {},
+										  .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+										  .unnormalizedCoordinates = VK_FALSE};
 
 	if (const VkResult result = vkCreateSampler(vkc.getLogicalDevice(), &samplerInfo, nullptr, &data.textureSampler);
 		result != VK_SUCCESS) {

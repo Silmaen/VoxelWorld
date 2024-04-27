@@ -42,6 +42,8 @@ struct OWL_API AppParams {
 	char **args = nullptr;
 	/// If extra debugging symbols should be loaded.
 	bool useDebugging = false;
+	/// Run application in Dummy mode.
+	bool isDummy = false;
 	/// The frequency for the frame debugging
 	uint64_t frameLogFrequency = 0;
 

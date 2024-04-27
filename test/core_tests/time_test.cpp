@@ -14,6 +14,9 @@ TEST(TimeStep, update) {
 #endif
 	EXPECT_LT(ts.getSeconds(), 0.001f * millis);// there can be a little delay.
 	EXPECT_LT(ts.getMilliseconds(), millis);// there can be a little delay.
+	EXPECT_EQ(ts.getFrameNumber(), 1);
 	ts.update();
 	EXPECT_GT(ts.getFps(), 0);
+	EXPECT_EQ(ts.getFrameNumber(), 2);
+	EXPECT_GT(ts.getStabilizedFps(), 0);
 }

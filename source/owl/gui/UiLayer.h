@@ -14,84 +14,88 @@
  * @brief Namespace for gui
  */
 namespace owl::gui {
+/**
+ * @brief Class ImGuiLayer
+ */
+class OWL_API UiLayer final : public core::layer::Layer {
+public:
+	UiLayer(const UiLayer &) = delete;
+	UiLayer(UiLayer &&) = delete;
+	UiLayer &operator=(const UiLayer &) = delete;
+	UiLayer &operator=(UiLayer &&) = delete;
+
 	/**
-	 * @brief Class ImGuiLayer
+	 * @brief Default constructor.
 	 */
-	class OWL_API UiLayer final : public core::layer::Layer {
-	public:
-		UiLayer(const UiLayer &) = delete;
+	UiLayer();
 
-		UiLayer(UiLayer &&) = delete;
+	/**
+	 * @brief Destructor.
+	 */
+	~UiLayer() override;
 
-		UiLayer &operator=(const UiLayer &) = delete;
+	/**
+	 * @brief Action on Attach.
+	 */
+	void onAttach() override;
 
-		UiLayer &operator=(UiLayer &&) = delete;
+	/**
+	 * @brief Action on detach.
+	 */
+	void onDetach() override;
 
-		/**
-		 * @brief Default constructor.
-		 */
-		UiLayer();
+	/**
+	 * @brief Action on event.
+	 * @param[in,out] ioEvent The Event to react.
+	 */
+	void onEvent(event::Event &ioEvent) override;
 
-		/**
-		 * @brief Destructor.
-		 */
-		~UiLayer() override;
+	/**
+	 * @brief Begin layer definition.
+	 */
+	void begin();
 
-		/**
-		 * @brief Action on Attach.
-		 */
-		void onAttach() override;
+	/**
+	 * @brief End layer definition.
+	 */
+	void end() const;
 
-		/**
-		 * @brief Action on detach.
-		 */
-		void onDetach() override;
+	/**
+	 * @brief Defines layer as blocking events.
+	 * @param[in] iBlock If layer block event or let them pass to next layer.
+	 */
+	void blockEvents(const bool iBlock) { m_blockEvent = iBlock; }
 
-		/**
-		 * @brief Action on event.
-		 * @param[in,out] ioEvent The Event to react.
-		 */
-		void onEvent(event::Event &ioEvent) override;
+	/**
+	 * @brief Defines the theme for the UI.
+	 * @param[in] iTheme The theme to apply.
+	 */
+	void setTheme(const Theme &iTheme = Theme());
 
-		/**
-		 * @brief Begin layer definition.
-		 */
-		void begin();
+	/**
+	 * @brief Enable docking of windows.
+	 */
+	void enableDocking() { m_dockingEnable = true; }
 
-		/**
-		 * @brief End layer definition.
-		 */
-		void end() const;
+	/**
+	 * @brief Disable docking of windows.
+	 */
+	void disableDocking() { m_dockingEnable = false; }
 
-		/**
-		 * @brief Defines layer as blocking events.
-		 * @param[in] iBlock If layer block event or let them pass to next layer.
-		 */
-		void blockEvents(const bool iBlock) { m_blockEvent = iBlock; }
+	/**
+	 * @brief Assume that there is no application.
+	 */
+	void disableApp() { m_withApp = false; }
 
-		/**
-		 * @brief Defines the theme for the UI.
-		 * @param[in] iTheme The theme to apply.
-		 */
-		void setTheme(const Theme &iTheme = Theme());
+private:
+	/// If event should be bocked.
+	bool m_blockEvent = true;
+	/// If the docking space exists.
+	bool m_dockingEnable = false;
+	/// If is attached.
+	bool m_withApp = true;
 
-		/**
-		 * @brief Enable docking of windows.
-		 */
-		void enableDocking() { m_dockingEnable = true; }
-
-		/**
-		 * @brief Disable docking of windows.
-		 */
-		void disableDocking() { m_dockingEnable = false; }
-
-	private:
-		/// If event should be bocked.
-		bool m_blockEvent = true;
-		/// If the docking space exists.
-		bool m_dockingEnable = false;
-
-		/// Function that initialize the docking port.
-		void initializeDocking();
-	};
-} // namespace owl::gui
+	/// Function that initialize the docking port.
+	void initializeDocking();
+};
+}// namespace owl::gui

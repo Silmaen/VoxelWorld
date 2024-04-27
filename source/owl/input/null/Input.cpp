@@ -19,15 +19,26 @@ bool Input::isMouseButtonPressed_impl(const MouseCode iMouseCode) { return mouse
 glm::vec2 Input::getMousePos_impl() { return mousePos; }
 
 void Input::injectKey_impl(const KeyCode iKeyCode) {
-	if (keyPressed.contains(iKeyCode)) { keyPressed.erase(iKeyCode); } else { keyPressed.insert(iKeyCode); }
+	if (keyPressed.contains(iKeyCode)) {
+		keyPressed.erase(iKeyCode);
+	} else {
+		keyPressed.insert(iKeyCode);
+	}
 }
 
 void Input::injectMouseButton_impl(const MouseCode iMouseCode) {
-	if (mouseBtnPressed.contains(iMouseCode)) { mouseBtnPressed.erase(iMouseCode); } else {
+	if (mouseBtnPressed.contains(iMouseCode)) {
+		mouseBtnPressed.erase(iMouseCode);
+	} else {
 		mouseBtnPressed.insert(iMouseCode);
 	}
 }
 
 void Input::injectMousePos_impl(const glm::vec2 &iMousePos) { mousePos = iMousePos; }
+
+void Input::resetInjection_impl() {
+	keyPressed.clear();
+	mouseBtnPressed.clear();
+}
 
 }// namespace owl::input::null

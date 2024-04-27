@@ -14,7 +14,6 @@
 #include "core/Core.h"
 
 namespace owl::input {
-
 /**
  * @brief Class Input
  */
@@ -96,6 +95,11 @@ public:
 	 */
 	static void injectMousePos(const glm::vec2 &iMousePos);
 
+	/**
+	 * @brief Clear the previously defined injections.
+	 */
+	static void resetInjection();
+
 private:
 	/// The Input type.
 	static Type ms_type;
@@ -135,7 +139,10 @@ private:
 	 * @param[in] iMousePos The new mouse pos.
 	 */
 	virtual void injectMousePos_impl(const glm::vec2 &iMousePos) = 0;
+
+	/**
+	 * @brief Clear the previously defined injections.
+	 */
+	virtual void resetInjection_impl() = 0;
 };
-
-
 }// namespace owl::input
