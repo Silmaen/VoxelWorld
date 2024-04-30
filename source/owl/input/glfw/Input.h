@@ -63,6 +63,11 @@ public:
 	 * @param[in] iMousePos The new mouse pos.
 	 */
 	void injectMousePos_impl([[maybe_unused]] const glm::vec2 &iMousePos) override {}
+
+	/**
+	 * @brief Clear the previously defined injections.
+	 */
+	void resetInjection_impl() override {}
 };
 
 

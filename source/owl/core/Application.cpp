@@ -34,11 +34,13 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 		OWL_CORE_INFO("Working directory: {}", m_workingDirectory.string())
 
 		// load config file if any
-		const auto configPath = m_workingDirectory / "config.yml";
-		if (exists(configPath))
-			m_initParams.loadFromFile(configPath);
-		// save config
-		m_initParams.saveToFile(configPath);
+		if (!iAppParams.isDummy) {
+			const auto configPath = m_workingDirectory / "config.yml";
+			if (exists(configPath))
+				m_initParams.loadFromFile(configPath);
+			// save config
+			m_initParams.saveToFile(configPath);
+		}
 
 		if (m_initParams.useDebugging) {
 			appendEnv("VK_ADD_LAYER_PATH", m_workingDirectory.string());
@@ -66,6 +68,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 	// create main window
 	{
 		mu_appWindow = input::Window::create({
+				.winType = m_initParams.isDummy ? input::Type::Null : input::Type::GLFW,
 				.title = m_initParams.name,
 				.iconPath = m_initParams.icon.empty() ? "" : (m_assetDirectory / m_initParams.icon).string(),
 				.width = m_initParams.width,

@@ -11,10 +11,9 @@
 #include "core/Core.h"
 
 namespace owl::core {
-
 /**
- * @brief Time Steps.
- */
+	 * @brief Time Steps.
+	 */
 class OWL_API Timestep {
 public:
 	/// The type of clock.
@@ -25,59 +24,69 @@ public:
 	using duration = clock::duration;
 
 	/**
-	 * @brief Default constructor.
-	 */
+		 * @brief Default constructor.
+		 */
 	Timestep() : m_lastCall{clock::now()} {
 		m_statFps.resize(maxIndex, 0.0);
 		update();
 	}
 
 	/**
-	 * @brief Time step update.
-	 */
+		 * @brief Time step update.
+		 */
 	void update() {
 		const timePoint tp = clock::now();
 		m_delta = tp - m_lastCall;
 		m_lastCall = tp;
-		if (m_delta.count() > 0) {
-			m_statFps[m_index] = getFps();
-			m_index = (m_index + 1) % maxIndex;
-		}
+		m_statFps[m_index] = getFps();
+		m_index = (m_index + 1) % maxIndex;
 		++m_frameId;
 	}
 
 	/**
-	 * @brief Get the seconds elapsed since last update.
-	 * @return Seconds elapsed.
-	 */
+		 * @brief Force the step with a given duration
+		 * @param iDelta The duration.
+		 */
+	void forceUpdate(const duration iDelta) {
+		m_delta = iDelta;
+		m_lastCall += iDelta;
+		m_statFps[m_index] = getFps();
+		m_index = (m_index + 1) % maxIndex;
+		++m_frameId;
+	}
+
+	/**
+		 * @brief Get the seconds elapsed since last update.
+		 * @return Seconds elapsed.
+		 */
 	[[nodiscard]] float getSeconds() const {
 		return static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(m_delta).count()) / 1000.0f;
 	}
 
 	/**
-	 * @brief Get the milliseconds elapsed since last update.
-	 * @return Milliseconds elapsed.
-	 */
+		 * @brief Get the milliseconds elapsed since last update.
+		 * @return Milliseconds elapsed.
+		 */
 	[[nodiscard]] float getMilliseconds() const {
 		return static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(m_delta).count()) / 1000.0f;
 	}
 
 	/**
-	 * @brief Get the mean number of update call in one second.
-	 * @return The Frame per second number.
-	 */
+		 * @brief Get the mean number of update call in one second.
+		 * @return The Frame per second number.
+		 */
 	[[nodiscard]] float getFps() const { return 1e3f / getMilliseconds(); }
 
 	/**
-	 * @brief Get the mean number of update call in one second.
-	 * @return The Frame per second number.
-	 */
+		 * @brief Get the mean number of update call in one second.
+		 * @return The Frame per second number.
+		 */
 	[[nodiscard]] float getStabilizedFps() const;
 
 	/**
-	 * @brief Get the frame number.
-	 * @return The Frame number.
-	 */
+		 * @brief Get the frame number.
+		 * @return The Frame number.
+		 */
 	[[nodiscard]] uint64_t getFrameNumber() const { return m_frameId; }
 
 private:
@@ -94,5 +103,4 @@ private:
 	/// Max va in stats.
 	static constexpr size_t maxIndex = 20;
 };
-
 }// namespace owl::core

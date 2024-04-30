@@ -132,7 +132,7 @@ static void serializeEntity(YAML::Emitter &out, const Entity &iEntity) {
 		out << YAML::Key << "color" << YAML::Value << spriteRendererComponent.color;
 		if (spriteRendererComponent.texture) {
 			out << YAML::Key << "tilingFactor" << YAML::Value << spriteRendererComponent.tilingFactor;
-			out << YAML::Key << "texture" << YAML::Value << spriteRendererComponent.texture->getPath().string();
+			out << YAML::Key << "texture" << YAML::Value << spriteRendererComponent.texture->getSerializeString();
 		}
 		out << YAML::EndMap;// SpriteRenderer
 	}
@@ -168,72 +168,80 @@ void SceneSerializer::serialize(const std::filesystem::path &iFilepath) const {
 }
 
 bool SceneSerializer::deserialize(const std::filesystem::path &iFilepath) const {
-	YAML::Node data = YAML::LoadFile(iFilepath.string());
-	if (!data["Scene"])
-		return false;
-	auto sceneName = data["Scene"].as<std::string>();
-	OWL_CORE_TRACE("Deserializing scene '{0}'", sceneName)
-	if (auto entities = data["Entities"]; entities) {
-		for (auto entity: entities) {
-			auto uuid = entity["Entity"].as<uint64_t>();
-			std::string name;
+	try {
+		YAML::Node data = YAML::LoadFile(iFilepath.string());
 
-			if (auto tagComponent = entity["Tag"]; tagComponent)
-				name = tagComponent["tag"].as<std::string>();
+		if (!data["Scene"]) {
+			OWL_CORE_ERROR("File {} is not a scene.", iFilepath.string())
+			return false;
+		}
+		auto sceneName = data["Scene"].as<std::string>();
+		OWL_CORE_TRACE("Deserializing scene '{0}'", sceneName)
+		if (auto entities = data["Entities"]; entities) {
+			for (auto entity: entities) {
+				auto uuid = entity["Entity"].as<uint64_t>();
+				std::string name;
 
-			OWL_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name)
+				if (auto tagComponent = entity["Tag"]; tagComponent)
+					name = tagComponent["tag"].as<std::string>();
 
-			Entity deserializedEntity = mp_scene->createEntityWithUUID(core::UUID{uuid}, name);
+				OWL_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name)
 
-
-			if (auto transformComponent = entity["Transform"]; transformComponent) {
-				// Entities always have transforms
-				auto &tc = deserializedEntity.getComponent<component::Transform>();
-				tc.translation = transformComponent["translation"].as<glm::vec3>();
-				tc.rotation = transformComponent["rotation"].as<glm::vec3>();
-				tc.scale = transformComponent["scale"].as<glm::vec3>();
-			}
+				Entity deserializedEntity = mp_scene->createEntityWithUUID(core::UUID{uuid}, name);
 
 
-			if (auto cameraComponent = entity["Camera"]; cameraComponent) {
-				auto &cc = deserializedEntity.addComponent<component::Camera>();
-				auto cameraProps = cameraComponent["camera"];
-				auto projType = magic_enum::enum_cast<SceneCamera::ProjectionType>(
-						cameraProps["projectionType"].as<std::string>());
-				if (projType.has_value())
-					cc.camera.setProjectionType(projType.value());
-				cc.camera.setPerspectiveVerticalFOV(cameraProps["perspectiveFOV"].as<float>());
-				cc.camera.setPerspectiveNearClip(cameraProps["perspectiveNear"].as<float>());
-				cc.camera.setPerspectiveFarClip(cameraProps["perspectiveFar"].as<float>());
-
-				cc.camera.setOrthographicSize(cameraProps["orthographicSize"].as<float>());
-				cc.camera.setOrthographicNearClip(cameraProps["orthographicNear"].as<float>());
-				cc.camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
-
-				cc.primary = cameraComponent["primary"].as<bool>();
-				cc.fixedAspectRatio = cameraComponent["fixedAspectRatio"].as<bool>();
-			}
+				if (auto transformComponent = entity["Transform"]; transformComponent) {
+					// Entities always have transforms
+					auto &tc = deserializedEntity.getComponent<component::Transform>();
+					tc.translation = transformComponent["translation"].as<glm::vec3>();
+					tc.rotation = transformComponent["rotation"].as<glm::vec3>();
+					tc.scale = transformComponent["scale"].as<glm::vec3>();
+				}
 
 
-			if (auto spriteRendererComponent = entity["SpriteRenderer"]; spriteRendererComponent) {
-				auto &src = deserializedEntity.addComponent<component::SpriteRenderer>();
-				src.color = spriteRendererComponent["color"].as<glm::vec4>();
-				if (spriteRendererComponent["tilingFactor"])
-					src.tilingFactor = spriteRendererComponent["tilingFactor"].as<float>();
-				if (spriteRendererComponent["texture"])
-					src.texture = renderer::Texture2D::create(spriteRendererComponent["texture"].as<std::string>());
-			}
+				if (auto cameraComponent = entity["Camera"]; cameraComponent) {
+					auto &cc = deserializedEntity.addComponent<component::Camera>();
+					auto cameraProps = cameraComponent["camera"];
+					auto projType = magic_enum::enum_cast<SceneCamera::ProjectionType>(
+							cameraProps["projectionType"].as<std::string>());
+					if (projType.has_value())
+						cc.camera.setProjectionType(projType.value());
+					cc.camera.setPerspectiveVerticalFOV(cameraProps["perspectiveFOV"].as<float>());
+					cc.camera.setPerspectiveNearClip(cameraProps["perspectiveNear"].as<float>());
+					cc.camera.setPerspectiveFarClip(cameraProps["perspectiveFar"].as<float>());
+
+					cc.camera.setOrthographicSize(cameraProps["orthographicSize"].as<float>());
+					cc.camera.setOrthographicNearClip(cameraProps["orthographicNear"].as<float>());
+					cc.camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
+
+					cc.primary = cameraComponent["primary"].as<bool>();
+					cc.fixedAspectRatio = cameraComponent["fixedAspectRatio"].as<bool>();
+				}
 
 
-			if (auto circleRendererComponent = entity["CircleRenderer"]; circleRendererComponent) {
-				auto &src = deserializedEntity.addComponent<component::CircleRenderer>();
-				src.color = circleRendererComponent["color"].as<glm::vec4>();
-				src.thickness = circleRendererComponent["thickness"].as<float>();
-				src.fade = circleRendererComponent["fade"].as<float>();
+				if (auto spriteRendererComponent = entity["SpriteRenderer"]; spriteRendererComponent) {
+					auto &src = deserializedEntity.addComponent<component::SpriteRenderer>();
+					src.color = spriteRendererComponent["color"].as<glm::vec4>();
+					if (spriteRendererComponent["tilingFactor"])
+						src.tilingFactor = spriteRendererComponent["tilingFactor"].as<float>();
+					if (spriteRendererComponent["texture"])
+						src.texture = renderer::Texture2D::createFromSerialized(
+								spriteRendererComponent["texture"].as<std::string>());
+				}
+
+
+				if (auto circleRendererComponent = entity["CircleRenderer"]; circleRendererComponent) {
+					auto &src = deserializedEntity.addComponent<component::CircleRenderer>();
+					src.color = circleRendererComponent["color"].as<glm::vec4>();
+					src.thickness = circleRendererComponent["thickness"].as<float>();
+					src.fade = circleRendererComponent["fade"].as<float>();
+				}
 			}
 		}
+	} catch (...) {
+		OWL_CORE_ERROR("Unable to load scene from file {}", iFilepath.string())
+		return false;
 	}
-
 	return true;
 }
 

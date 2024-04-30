@@ -72,4 +72,9 @@ void Input::injectMousePos(const glm::vec2 &iMousePos) {
 		mus_instance->injectMousePos_impl(iMousePos);
 }
 
+void Input::resetInjection() {
+	if (mus_instance)
+		mus_instance->resetInjection_impl();
+}
+
 }// namespace owl::input

@@ -11,7 +11,12 @@ TEST(Log, basic) {
 	EXPECT_EQ(Log::getCoreLogger(), nullptr);
 	Log::init();
 	Log::init();
+	Log::newFrame();
 	EXPECT_NE(Log::getClientLogger(), nullptr);
 	EXPECT_NE(Log::getCoreLogger(), nullptr);
+	Log::setFrameFrequency(0);
+	Log::newFrame();
+	Log::setFrameFrequency(1);
+	Log::newFrame();
 	Log::invalidate();
 }

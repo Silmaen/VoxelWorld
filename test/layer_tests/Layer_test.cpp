@@ -17,12 +17,13 @@ using namespace owl::core::layer;
 
 TEST(Layer, base) {
 	Layer layer("test");
-	owl::core::Timestep ts;
+	Timestep ts;
 	ts.update();
 	layer.onUpdate(ts);
+	layer.onImGuiRender(ts);
 	layer.onAttach();
 	layer.onDetach();
-	owl::event::AppTickEvent evt;
+	AppTickEvent evt;
 	layer.onEvent(evt);
 	EXPECT_STREQ(layer.getName().c_str(), "test");
 }

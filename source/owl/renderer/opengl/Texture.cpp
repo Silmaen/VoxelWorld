@@ -13,7 +13,7 @@
 
 namespace owl::renderer::opengl {
 
-Texture2D::Texture2D(math::FrameSize iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {
+Texture2D::Texture2D(math::FrameSize iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {
 	OWL_PROFILE_FUNCTION()
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_textureId);
@@ -27,10 +27,10 @@ Texture2D::Texture2D(math::FrameSize iSize, const bool iWithAlpha) : m_size{iSiz
 	glTextureParameteri(m_textureId, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
-Texture2D::Texture2D(uint32_t iWidth, uint32_t iHeight, const bool iWithAlpha) : Texture2D(
-		{iWidth, iHeight}, iWithAlpha) {}
+Texture2D::Texture2D(uint32_t iWidth, uint32_t iHeight, const bool iWithAlpha)
+	: Texture2D({iWidth, iHeight}, iWithAlpha) {}
 
-Texture2D::Texture2D(std::filesystem::path iPath) : m_path{std::move(iPath)} {
+Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {
 	OWL_PROFILE_FUNCTION()
 
 	int width, height, channels;
@@ -87,8 +87,7 @@ void Texture2D::setData(void *iData, [[maybe_unused]] const uint32_t iSize) {
 
 	OWL_CORE_ASSERT(iSize == m_size.surface() * (m_hasAlpha ? 4 : 3), "Data size missmatch texture size!")
 	glTextureSubImage2D(m_textureId, 0, 0, 0, static_cast<GLsizei>(m_size.width()),
-						static_cast<GLsizei>(m_size.height()),
-						m_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, iData);
+						static_cast<GLsizei>(m_size.height()), m_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, iData);
 }
 
 }// namespace owl::renderer::opengl

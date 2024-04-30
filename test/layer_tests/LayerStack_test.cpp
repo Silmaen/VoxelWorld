@@ -26,8 +26,9 @@ TEST(LayerStack, base) {
 }
 
 TEST(LayerStack, pushLayer) {
+	owl::core::Log::init(spdlog::level::off);
 	{
-		LayerStack stack;
+		auto stack = LayerStack();
 		stack.pushLayer(owl::mkShared<Layer>("Layer 1"));
 		stack.pushLayer(owl::mkShared<Layer>("Layer 2"));
 		stack.pushOverlay(owl::mkShared<Layer>("Overlay 1"));
@@ -57,5 +58,8 @@ TEST(LayerStack, pushLayer) {
 		stack.popLayer(item);
 		stack.popOverlay(item2);
 		EXPECT_EQ(std::distance(stack.begin(), stack.end()), 2);
+		stack.clear();
+		EXPECT_EQ(std::distance(stack.begin(), stack.end()), 0);
 	}
+	owl::core::Log::invalidate();
 }

@@ -1,4 +1,5 @@
 
+#include "renderer/null/Texture.h"
 #include "testHelper.h"
 
 #include <renderer/Texture.h>
@@ -11,23 +12,6 @@
 #include <scene/component/Transform.h>
 
 using namespace owl::scene;
-
-class MyTexture2D final : public owl::renderer::Texture2D {
-public:
-	MyTexture2D() : Texture2D() {}
-	[[nodiscard]] bool operator==(const Texture &iOther) const override { return p == iOther.getPath(); }
-	[[nodiscard]] uint32_t getWidth() const override { return 0; }
-	[[nodiscard]] uint32_t getHeight() const override { return 0; }
-	[[nodiscard]] owl::math::FrameSize getSize() const override { return {0, 0}; }
-	[[nodiscard]] bool isLoaded() const override { return true; }
-	[[nodiscard]] uint64_t getRendererId() const override { return 0; }
-	void bind(uint32_t) const override {}
-	[[nodiscard]] const std::filesystem::path &getPath() const override { return p; }
-	void setData(void *, uint32_t) override {}
-
-private:
-	std::filesystem::path p{""};
-};
 
 TEST(SceneSerializer, SaveLoad) {
 	owl::core::Log::init(spdlog::level::off);
@@ -56,8 +40,9 @@ TEST(SceneSerializer, SaveLoadFULL) {
 	ent.addOrReplaceComponent<component::CircleRenderer>();
 	ent.addOrReplaceComponent<component::SpriteRenderer>();
 	auto ent2 = sc->createEntityWithUUID(7, "bobObject2");
-	auto spr = ent2.addOrReplaceComponent<component::SpriteRenderer>();
-	spr.texture = owl::mkShared<MyTexture2D>();
+	auto &spr = ent2.addOrReplaceComponent<component::SpriteRenderer>();
+	spr.texture = owl::mkShared<owl::renderer::null::Texture2D>(1, 1);
+	spr.tilingFactor = 12.3f;
 
 	const SceneSerializer saver(sc);
 	const auto fs = std::filesystem::temp_directory_path() / "tempSave.yml";
@@ -70,6 +55,96 @@ TEST(SceneSerializer, SaveLoadFULL) {
 
 	EXPECT_EQ(sc2->registry.storage<owl::scene::Entity>().size(), sc->registry.storage<owl::scene::Entity>().size());
 	remove(fs);
+	EXPECT_FALSE(exists(fs));
+	owl::core::Log::invalidate();
+}
+
+TEST(SceneSerializer, badScene) {
+	owl::core::Log::init(spdlog::level::off);
+	const auto fs = std::filesystem::temp_directory_path() / "tempSave.yml";
+
+	// write bad file
+	{
+		std::ofstream file(fs);
+		file << "Bob: toto" << std::endl;
+		file.close();
+		const auto sc = owl::mkShared<Scene>();
+		const SceneSerializer loader(sc);
+		EXPECT_FALSE(loader.deserialize(fs));
+		remove(fs);
+	}
+	// write bad file
+	{
+		std::ofstream file(fs);
+		file << "Scene: untitled" << std::endl;
+		file << "  - je suis une fougère.:" << std::endl;
+		file.close();
+		const auto sc = owl::mkShared<Scene>();
+		const SceneSerializer loader(sc);
+		EXPECT_FALSE(loader.deserialize(fs));
+		remove(fs);
+	}
+	// write another bad file
+	{
+		std::ofstream file(fs);
+		file << "Scene: untitled" << std::endl;
+		file << "Entities:" << std::endl;
+		file << "  - Entity: 1" << std::endl;
+		file << "  - Entity: 2" << std::endl;
+		file << "    SpriteRenderer:" << std::endl;
+		file << "      color: 0.949019611" << std::endl;
+		file << "  - Entity: 3" << std::endl;
+		file.close();
+		const auto sc = owl::mkShared<Scene>();
+		const SceneSerializer loader(sc);
+		EXPECT_FALSE(loader.deserialize(fs));
+		remove(fs);
+	}
+	// write another bad file
+	{
+		std::ofstream file(fs);
+		file << "Scene: untitled" << std::endl;
+		file << "Entities:" << std::endl;
+		file << "  - Entity: 1" << std::endl;
+		file << "  - Entity: 2" << std::endl;
+		file << "    Transform:" << std::endl;
+		file << "      translation: 0.353553385" << std::endl;
+		file.close();
+		const auto sc = owl::mkShared<Scene>();
+		const SceneSerializer loader(sc);
+		EXPECT_FALSE(loader.deserialize(fs));
+		remove(fs);
+	}
+	// write another bad file
+	{
+		std::ofstream file(fs);
+		file << "Scene: untitled" << std::endl;
+		file << "Entities:" << std::endl;
+		file << "  - Entity: 1" << std::endl;
+		file << "  - Entity: 3" << std::endl;
+		file << "    Transform:" << std::endl;
+		file << "      translation: [0.353553385, 0]" << std::endl;
+		file.close();
+		const auto sc = owl::mkShared<Scene>();
+		const SceneSerializer loader(sc);
+		EXPECT_FALSE(loader.deserialize(fs));
+		remove(fs);
+	}
+	// write another bad file
+	{
+		std::ofstream file(fs);
+		file << "Scene: untitled" << std::endl;
+		file << "Entities:" << std::endl;
+		file << "  - Entity: 1" << std::endl;
+		file << "  - Entity: 3" << std::endl;
+		file << "    SpriteRenderer:" << std::endl;
+		file << "      color: [0, 0.949019611]" << std::endl;
+		file.close();
+		const auto sc = owl::mkShared<Scene>();
+		const SceneSerializer loader(sc);
+		EXPECT_FALSE(loader.deserialize(fs));
+		remove(fs);
+	}
 	EXPECT_FALSE(exists(fs));
 	owl::core::Log::invalidate();
 }
