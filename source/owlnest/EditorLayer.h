@@ -19,10 +19,10 @@ namespace owl {
  */
 class EditorLayer final : public core::layer::Layer {
 public:
-	EditorLayer(const EditorLayer&) = delete;
-	EditorLayer(EditorLayer&&) = delete;
-	EditorLayer& operator=(const EditorLayer&) = delete;
-	EditorLayer& operator=(EditorLayer&&) = delete;
+	EditorLayer(const EditorLayer &) = delete;
+	EditorLayer(EditorLayer &&) = delete;
+	EditorLayer &operator=(const EditorLayer &) = delete;
+	EditorLayer &operator=(EditorLayer &&) = delete;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -34,37 +34,34 @@ public:
 
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const core::Timestep& iTimeStep) override;
-	void onEvent(event::Event& ioEvent) override;
-	void onImGuiRender(const core::Timestep& iTimeStep) override;
+	void onUpdate(const core::Timestep &iTimeStep) override;
+	void onEvent(event::Event &ioEvent) override;
+	void onImGuiRender(const core::Timestep &iTimeStep) override;
 
 private:
 	void renderViewport();
 
-	void renderStats(const core::Timestep& iTimeStep);
+	void renderStats(const core::Timestep &iTimeStep);
 	void renderMenu();
 	void renderGizmo();
 	void renderToolbar();
 
 	void newScene();
 	void openScene();
-	void openScene(const std::filesystem::path& iScenePath);
+	void openScene(const std::filesystem::path &iScenePath);
 	void saveSceneAs();
-	void saveSceneAs(const std::filesystem::path& iScenePath);
+	void saveSceneAs(const std::filesystem::path &iScenePath);
 	void saveCurrentScene();
 
-	bool onKeyPressed(const event::KeyPressedEvent& ioEvent);
-	bool onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent);
+	bool onKeyPressed(const event::KeyPressedEvent &ioEvent);
+	bool onMouseButtonPressed(const event::MouseButtonPressedEvent &ioEvent);
 	void onScenePlay();
 	void onSceneStop();
 	void onDuplicateEntity() const;
 
 	input::CameraOrthoController m_cameraController;
 
-	enum class State {
-		Edit,
-		Play
-	};
+	enum class State { Edit, Play };
 
 	State m_state = State::Edit;
 
@@ -74,7 +71,8 @@ private:
 	bool m_viewportFocused = false;
 	bool m_viewportHovered = false;
 	math::FrameSize m_viewportSize = {0, 0};
-	glm::vec2 m_viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
+	glm::vec2 m_viewportLower = {0.0f, 0.0f};
+	glm::vec2 m_viewportUpper = {0.0f, 0.0f};
 	shared<renderer::Framebuffer> m_framebuffer;
 
 	shared<scene::Scene> m_activeScene;
@@ -91,4 +89,4 @@ private:
 	shared<renderer::Texture2D> m_iconPlay;
 	shared<renderer::Texture2D> m_iconStop;
 };
-} // namespace owl
+}// namespace owl

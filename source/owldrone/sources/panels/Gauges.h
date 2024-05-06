@@ -29,28 +29,28 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Gauges(const Gauges&) = default;
+	Gauges(const Gauges &) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Gauges(Gauges&&) = default;
+	Gauges(Gauges &&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Gauges& operator=(const Gauges&) = default;
+	Gauges &operator=(const Gauges &) = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Gauges& operator=(Gauges&&) = default;
+	Gauges &operator=(Gauges &&) = default;
 
 	/**
 	 * @brief Update panel Status.
 	 * @param ts The Time delta of the frame.
 	 */
-	void onUpdate(const owl::core::Timestep& ts) override;
+	void onUpdate(const owl::core::Timestep &ts) override;
 
 	/**
 	 * @brief Do the rendering.
@@ -63,7 +63,8 @@ private:
 	/// Size of the viewport
 	owl::math::FrameSize m_viewportSize = {0, 0};
 	/// View port bounds
-	glm::vec2 m_viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
+	glm::vec2 m_viewportLower = {0.0f, 0.0f};
+	glm::vec2 m_viewportUpper = {0.0f, 0.0f};
 
 	bool m_viewportFocused = false;
 	bool m_viewportHovered = false;
@@ -74,4 +75,4 @@ private:
 	/// The camera
 	owl::shared<owl::renderer::CameraOrtho> m_camera;
 };
-} // namespace drone::panels
+}// namespace drone::panels

@@ -28,18 +28,18 @@ void EditorLayer::onAttach() {
 
 	const renderer::FramebufferSpecification specs{
 			.size = {1280, 720},
-			.attachments = {
-					{renderer::AttachmentSpecification::Format::Surface,
-					 renderer::AttachmentSpecification::Tiling::Optimal},
-					{renderer::AttachmentSpecification::Format::RedInteger,
-					 renderer::AttachmentSpecification::Tiling::Optimal},
-					//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
-					// renderer::AttachmentSpecification::Tiling::Optimal}
-			},
+			.attachments =
+					{
+							{renderer::AttachmentSpecification::Format::Surface,
+							 renderer::AttachmentSpecification::Tiling::Optimal},
+							{renderer::AttachmentSpecification::Format::RedInteger,
+							 renderer::AttachmentSpecification::Tiling::Optimal},
+							//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
+							// renderer::AttachmentSpecification::Tiling::Optimal}
+					},
 			.samples = 1,
 			.swapChainTarget = false,
-			.debugName = "editor"
-	};
+			.debugName = "editor"};
 	m_framebuffer = renderer::Framebuffer::create(specs);
 
 	m_activeScene = mkShared<scene::Scene>();
@@ -89,40 +89,39 @@ void EditorLayer::onUpdate(const core::Timestep &iTimeStep) {
 
 	// Update scene
 	switch (m_state) {
-		case State::Edit: {
-			if (m_viewportFocused)
-				m_cameraController.onUpdate(iTimeStep);
-			if (m_viewportHovered)
-				m_editorCamera.onUpdate(iTimeStep);
-			m_activeScene->onUpdateEditor(iTimeStep, m_editorCamera);
-			break;
-		}
-		case State::Play: {
-			m_activeScene->onUpdateRuntime(iTimeStep);
-			break;
-		}
+		case State::Edit:
+			{
+				if (m_viewportFocused)
+					m_cameraController.onUpdate(iTimeStep);
+				if (m_viewportHovered)
+					m_editorCamera.onUpdate(iTimeStep);
+				m_activeScene->onUpdateEditor(iTimeStep, m_editorCamera);
+				break;
+			}
+		case State::Play:
+			{
+				m_activeScene->onUpdateRuntime(iTimeStep);
+				break;
+			}
 	}
 	//if constexpr ((false)) {
 	auto [mx, my] = ImGui::GetMousePos();
-	mx -= m_viewportBounds[0].x;
-	my -= m_viewportBounds[0].y;
-	const glm::vec2 viewportSizeInternal = m_viewportBounds[1] - m_viewportBounds[0];
+	mx -= m_viewportLower.x;
+	my -= m_viewportLower.y;
+	const glm::vec2 viewportSizeInternal = m_viewportUpper - m_viewportLower;
 	my = viewportSizeInternal.y - my;
 	const int mouseX = static_cast<int>(mx);
 	const int mouseY = static_cast<int>(my);
 
-	if (mouseX >= 0 && mouseY >= 0 &&
-	    mouseX < static_cast<int>(viewportSizeInternal.x) &&
-	    mouseY < static_cast<int>(viewportSizeInternal.y)) {
+	if (mouseX >= 0 && mouseY >= 0 && mouseX < static_cast<int>(viewportSizeInternal.x) &&
+		mouseY < static_cast<int>(viewportSizeInternal.y)) {
 		int pixelData = m_framebuffer->readPixel(1, mouseX, mouseY);
-		m_hoveredEntity = pixelData == -1
-			                  ? scene::Entity()
-			                  : scene::Entity(static_cast<entt::entity>(pixelData), m_activeScene.get());
+		m_hoveredEntity = pixelData == -1 ? scene::Entity()
+										  : scene::Entity(static_cast<entt::entity>(pixelData), m_activeScene.get());
 	}
 	//}
 
 	m_framebuffer->unbind();
-
 }
 
 void EditorLayer::onEvent(event::Event &ioEvent) {
@@ -130,12 +129,10 @@ void EditorLayer::onEvent(event::Event &ioEvent) {
 	m_editorCamera.onEvent(ioEvent);
 
 	event::EventDispatcher dispatcher(ioEvent);
-	dispatcher.dispatch<event::KeyPressedEvent>([this](auto &&PH1) {
-		return onKeyPressed(std::forward<decltype(PH1)>(PH1));
-	});
-	dispatcher.dispatch<event::MouseButtonPressedEvent>([this](auto &&PH1) {
-		return onMouseButtonPressed(std::forward<decltype(PH1)>(PH1));
-	});
+	dispatcher.dispatch<event::KeyPressedEvent>(
+			[this](auto &&PH1) { return onKeyPressed(std::forward<decltype(PH1)>(PH1)); });
+	dispatcher.dispatch<event::MouseButtonPressedEvent>(
+			[this](auto &&PH1) { return onMouseButtonPressed(std::forward<decltype(PH1)>(PH1)); });
 }
 
 void EditorLayer::onImGuiRender(const core::Timestep &iTimeStep) {
@@ -159,17 +156,10 @@ void EditorLayer::renderStats(const core::Timestep &iTimeStep) {
 	ImGui::Begin("Stats");
 	ImGui::Text("%s", fmt::format("FPS: {:.2f}", iTimeStep.getFps()).c_str());
 	ImGui::Separator();
-	ImGui::Text("%s", fmt::format("Current used memory: {}",
-	                              tracker.globals().allocatedMemory)
-	            .c_str());
-	ImGui::Text("%s", fmt::format("Max used memory: {}", tracker.globals().memoryPeek)
-	            .c_str());
-	ImGui::Text(
-			"%s", fmt::format("Allocation calls: {}", tracker.globals().allocationCalls)
-			.c_str());
-	ImGui::Text("%s", fmt::format("Deallocation calls: {}",
-	                              tracker.globals().deallocationCalls)
-	            .c_str());
+	ImGui::Text("%s", fmt::format("Current used memory: {}", tracker.globals().allocatedMemory).c_str());
+	ImGui::Text("%s", fmt::format("Max used memory: {}", tracker.globals().memoryPeek).c_str());
+	ImGui::Text("%s", fmt::format("Allocation calls: {}", tracker.globals().allocationCalls).c_str());
+	ImGui::Text("%s", fmt::format("Deallocation calls: {}", tracker.globals().deallocationCalls).c_str());
 	ImGui::Separator();
 	std::string name = "None";
 	if (m_hoveredEntity) {
@@ -185,7 +175,7 @@ void EditorLayer::renderStats(const core::Timestep &iTimeStep) {
 	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
 	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
 	ImGui::Text("Viewport size: %f %f", static_cast<double>(m_viewportSize.getWidth()),
-	            static_cast<double>(m_viewportSize.getHeight()));
+				static_cast<double>(m_viewportSize.getHeight()));
 	ImGui::Text("Aspect ratio: %f", static_cast<double>(m_viewportSize.ratio()));
 	ImGui::End();
 }
@@ -196,8 +186,8 @@ void EditorLayer::renderViewport() {
 	const auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 	const auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 	const auto viewportOffset = ImGui::GetWindowPos();
-	m_viewportBounds[0] = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
-	m_viewportBounds[1] = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
+	m_viewportLower = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
+	m_viewportUpper = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
 
 	m_viewportFocused = ImGui::IsWindowFocused();
 	m_viewportHovered = ImGui::IsWindowHovered();
@@ -235,8 +225,8 @@ void EditorLayer::renderGizmo() {
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
 
-		ImGuizmo::SetRect(m_viewportBounds[0].x, m_viewportBounds[0].y, m_viewportBounds[1].x - m_viewportBounds[0].x,
-		                  m_viewportBounds[1].y - m_viewportBounds[0].y);
+		ImGuizmo::SetRect(m_viewportLower.x, m_viewportLower.y, m_viewportUpper.x - m_viewportLower.x,
+						  m_viewportUpper.y - m_viewportLower.y);
 
 		// Runtime camera from entity
 		// auto cameraEntity = activeScene->getPrimaryCamera();
@@ -262,8 +252,8 @@ void EditorLayer::renderGizmo() {
 		const float snapValues[3] = {snapValue, snapValue, snapValue};
 
 		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-		                     static_cast<ImGuizmo::OPERATION>(m_gizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform),
-		                     nullptr, snap ? snapValues : nullptr);
+							 static_cast<ImGuizmo::OPERATION>(m_gizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform),
+							 nullptr, snap ? snapValues : nullptr);
 
 		if (ImGuizmo::IsUsing()) {
 			glm::vec3 translation, rotation, scale;
@@ -298,6 +288,8 @@ void EditorLayer::renderMenu() {
 	}
 }
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 void EditorLayer::renderToolbar() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
@@ -309,7 +301,7 @@ void EditorLayer::renderToolbar() {
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
 	ImGui::Begin("##toolbar", nullptr,
-	             ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+				 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	const float size = ImGui::GetWindowHeight() - 4.0f;
 	const shared<renderer::Texture2D> icon = m_state == State::Edit ? m_iconPlay : m_iconStop;
@@ -318,8 +310,8 @@ void EditorLayer::renderToolbar() {
 	if (icon)
 		textureId = icon->getRendererId();
 	if (textureId != 0) {
-		if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureId), ImVec2(size, size), ImVec2(0, 0),
-		                       ImVec2(1, 1), 0)) {
+		if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureId), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1),
+							   0)) {
 			if (m_state == State::Edit)
 				onScenePlay();
 			else if (m_state == State::Play)
@@ -338,6 +330,7 @@ void EditorLayer::renderToolbar() {
 	ImGui::PopStyleColor(3);
 	ImGui::End();
 }
+OWL_DIAG_POP
 
 void EditorLayer::newScene() {
 	m_activeScene = mkShared<scene::Scene>();
@@ -391,57 +384,65 @@ bool EditorLayer::onKeyPressed(const event::KeyPressedEvent &ioEvent) {
 	if (ioEvent.getRepeatCount() > 0)
 		return false;
 
-	const bool control = input::Input::isKeyPressed(input::key::LeftControl) || input::Input::isKeyPressed(
-			                     input::key::RightControl);
-	const bool shift = input::Input::isKeyPressed(input::key::LeftShift) ||
-	                   input::Input::isKeyPressed(input::key::RightShift);
+	const bool control =
+			input::Input::isKeyPressed(input::key::LeftControl) || input::Input::isKeyPressed(input::key::RightControl);
+	const bool shift =
+			input::Input::isKeyPressed(input::key::LeftShift) || input::Input::isKeyPressed(input::key::RightShift);
 	switch (ioEvent.getKeyCode()) {
-		case input::key::N: {
-			if (control)
-				newScene();
-			break;
-		}
-		case input::key::O: {
-			if (control)
-				openScene();
-			break;
-		}
-		case input::key::S: {
-			if (control) {
-				if (shift)
-					saveSceneAs();
-				else
-					saveCurrentScene();
+		case input::key::N:
+			{
+				if (control)
+					newScene();
+				break;
 			}
-			break;
-		}
+		case input::key::O:
+			{
+				if (control)
+					openScene();
+				break;
+			}
+		case input::key::S:
+			{
+				if (control) {
+					if (shift)
+						saveSceneAs();
+					else
+						saveCurrentScene();
+				}
+				break;
+			}
 		// Scene Commands
-		case input::key::D: {
-			if (control)
-				onDuplicateEntity();
-			break;
-		}
+		case input::key::D:
+			{
+				if (control)
+					onDuplicateEntity();
+				break;
+			}
 		// Gizmos
-		case input::key::Q: {
-			if (!ImGuizmo::IsUsing())
-				m_gizmoType = -1;
-			break;
-		}
-		case input::key::W: {
-			if (!ImGuizmo::IsUsing())
-				m_gizmoType = ImGuizmo::OPERATION::TRANSLATE;
-			break;
-		}
-		case input::key::E: {
-			if (!ImGuizmo::IsUsing())
-				m_gizmoType = ImGuizmo::OPERATION::ROTATE;
-			break;
-		}
-		case input::key::R: {
-			if (!ImGuizmo::IsUsing())
-				m_gizmoType = ImGuizmo::OPERATION::SCALE;
-			break;
-		}
+		case input::key::Q:
+			{
+				if (!ImGuizmo::IsUsing())
+					m_gizmoType = -1;
+				break;
+			}
+		case input::key::W:
+			{
+				if (!ImGuizmo::IsUsing())
+					m_gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			}
+		case input::key::E:
+			{
+				if (!ImGuizmo::IsUsing())
+					m_gizmoType = ImGuizmo::OPERATION::ROTATE;
+				break;
+			}
+		case input::key::R:
+			{
+				if (!ImGuizmo::IsUsing())
+					m_gizmoType = ImGuizmo::OPERATION::SCALE;
+				break;
+			}
 		default:
 			break;
 	}

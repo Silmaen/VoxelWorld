@@ -9,8 +9,6 @@
 
 #include "Texture.h"
 
-#include <utility>
-
 namespace owl::renderer::null {
 
 Texture2D::Texture2D(const math::FrameSize iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {}

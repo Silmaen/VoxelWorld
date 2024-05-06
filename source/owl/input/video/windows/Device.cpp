@@ -177,13 +177,17 @@ Device::PixelFormat getDevicePixelFormat(const GUID &videoFormat) {
 
 }// namespace
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 void updateList(std::vector<shared<video::Device>> &ioList) {
 	if (!cc.addRef())
 		return;
 	// check if all listed devices still exists
 	if (std::remove_if(ioList.begin(), ioList.end(), [](const shared<video::Device> &iDev) {
-		return !std::static_pointer_cast<Device>(iDev)->isValid();
-	}) != ioList.end()) { OWL_CORE_WARN("Possible problems during video input listing.") }
+			return !std::static_pointer_cast<Device>(iDev)->isValid();
+		}) != ioList.end()) {
+		OWL_CORE_WARN("Possible problems during video input listing.")
+	}
 
 	WPointer<IMFAttributes> pConfig;
 	HRESULT hr = MFCreateAttributes(pConfig.addr(), 1);
@@ -194,9 +198,7 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 		return;
 	}
 	// define what we search: Video input!
-	hr = pConfig->SetGUID(
-			MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
-			MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+	hr = pConfig->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
 	if (FAILED(hr)) {
 		OWL_CORE_ERROR("{}updateList: Unable to setup attributes.", g_baseName)
 		return;
@@ -207,8 +209,7 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 		uint32_t count;
 		hr = MFEnumDeviceSources(pConfig.get(), &pDevices, &count);
 		devices.reserve(count);
-		for (uint32_t i = 0; i < count; ++i)
-			devices.emplace_back(pDevices[i]);
+		for (uint32_t i = 0; i < count; ++i) devices.emplace_back(pDevices[i]);
 	}
 	if (devices.empty()) {
 		OWL_CORE_WARN("{}updateList: No devices found.", g_baseName)
@@ -218,12 +219,13 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 	size_t devCounter = 0;
 	for (auto &devivce: devices) {
 		auto testDev = mkShared<Device>(devivce);
-		if (!testDev->isValid()) { continue; }
+		if (!testDev->isValid()) {
+			continue;
+		}
 		// don't add a device that already exists
-		if (std::ranges::find_if(ioList.begin(), ioList.end(),
-		                         [&testDev](const shared<video::Device> &dev) {
-			                         return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo();
-		                         }) != ioList.end())
+		if (std::ranges::find_if(ioList.begin(), ioList.end(), [&testDev](const shared<video::Device> &dev) {
+				return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo();
+			}) != ioList.end())
 			continue;
 		OWL_CORE_TRACE("Found: {} ({}) [{}] ", devCounter, testDev->getName(), testDev->getBusInfo())
 		ioList.push_back(testDev);
@@ -231,6 +233,7 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 	}
 	cc.delRef();
 }
+OWL_DIAG_POP
 
 Device::Device(WPointer<IMFActivate> &iMfa) : video::Device("") {
 	if (!cc.addRef())
@@ -276,9 +279,7 @@ void Device::open() {
 		return;
 	}
 	// define what we search: Video input!
-	hr = pConfig->SetGUID(
-			MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
-			MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+	hr = pConfig->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
 	if (FAILED(hr)) {
 		OWL_CORE_ERROR("Device ({}): Unable to setup attributes.", m_name)
 		return;
@@ -291,7 +292,7 @@ void Device::open() {
 	}
 	WPointer<IMFMediaType> mediaType;
 	hr = m_sourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READER_CURRENT_TYPE_INDEX,
-	                                        mediaType.addr());
+											mediaType.addr());
 	if (FAILED(hr)) {
 		OWL_CORE_WARN("Device ({}): Unable to get native media type.", m_name)
 		close();
@@ -315,7 +316,9 @@ void Device::open() {
 }
 
 void Device::close() {
-	if (m_sourceReader) { m_sourceReader.release(); }
+	if (m_sourceReader) {
+		m_sourceReader.release();
+	}
 	if (m_mediaSource) {
 		m_mediaSource->Shutdown();
 		m_mediaSource.release();
@@ -331,14 +334,16 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 	// Resizing the frame.
 	if (m_size.surface() == 0)
 		return;
-	if (!frame || frame->getSize() != m_size) { frame = renderer::Texture2D::create(m_size, false); }
+	if (!frame || frame->getSize() != m_size) {
+		frame = renderer::Texture2D::create(m_size, false);
+	}
 	// For now only fill with black
 	WPointer<IMFSample> sample;
 	int64_t timestamp;
 	u_long actualIndex, sampleFlags;
 	do {
 		HRESULT hr = m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &actualIndex, &sampleFlags,
-		                                        &timestamp, sample.addr());
+												&timestamp, sample.addr());
 		if (FAILED(hr)) {
 			OWL_CORE_WARN("Device ({}): Unable to read sample from device.", m_name)
 			return;

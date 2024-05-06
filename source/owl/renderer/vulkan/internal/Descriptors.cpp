@@ -5,6 +5,7 @@
  * Copyright © 2024 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "owlpch.h"
 
 #include "Descriptors.h"
 
@@ -53,46 +54,39 @@ void TextureData::createDescriptorSet() {
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.pImmutableSamplers = nullptr
-	};
-	constexpr VkDescriptorSetLayoutCreateInfo layoutCi{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.bindingCount = 1,
-			.pBindings = &samplerLayoutBinding
-	};
+			.pImmutableSamplers = nullptr};
+	constexpr VkDescriptorSetLayoutCreateInfo layoutCi{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+													   .pNext = nullptr,
+													   .flags = {},
+													   .bindingCount = 1,
+													   .pBindings = &samplerLayoutBinding};
 	if (const auto result =
 				vkCreateDescriptorSetLayout(core.getLogicalDevice(), &layoutCi, nullptr, &textureDescriptorSetLayout);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture Descriptor: failed to create descriptor set layout ({}).", resultString(result))
 	}
-	const VkDescriptorSetAllocateInfo allocInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-			.pNext = nullptr,
-			.descriptorPool = pool,
-			.descriptorSetCount = 1,
-			.pSetLayouts = &textureDescriptorSetLayout};
+	const VkDescriptorSetAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+												.pNext = nullptr,
+												.descriptorPool = pool,
+												.descriptorSetCount = 1,
+												.pSetLayouts = &textureDescriptorSetLayout};
 	if (const auto result = vkAllocateDescriptorSets(core.getLogicalDevice(), &allocInfo, &textureDescriptorSet);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture Descriptor: failed to allocate descriptor sets ({})", resultString(result))
 	}
-	VkDescriptorImageInfo info{
-			.sampler = textureSampler,
-			.imageView = textureImageView,
-			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
-	const VkWriteDescriptorSet wrt{
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.pNext = nullptr,
-			.dstSet = textureDescriptorSet,
-			.dstBinding = 0,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.pImageInfo = &info,
-			.pBufferInfo = nullptr,
-			.pTexelBufferView = nullptr
-	};
+	VkDescriptorImageInfo info{.sampler = textureSampler,
+							   .imageView = textureImageView,
+							   .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+	const VkWriteDescriptorSet wrt{.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+								   .pNext = nullptr,
+								   .dstSet = textureDescriptorSet,
+								   .dstBinding = 0,
+								   .dstArrayElement = 0,
+								   .descriptorCount = 1,
+								   .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+								   .pImageInfo = &info,
+								   .pBufferInfo = nullptr,
+								   .pTexelBufferView = nullptr};
 	vkUpdateDescriptorSets(core.getLogicalDevice(), 1, &wrt, 0, nullptr);
 }
 
@@ -132,46 +126,40 @@ void Descriptors::createDescriptors() {
 	const auto &core = VulkanCore::get();
 
 	// Descriptor pools.
-	std::vector<VkDescriptorPoolSize> poolSizes{{
-			                                            .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			                                            .descriptorCount = static_cast<uint32_t>(g_maxFrameInFlight)},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			                                            .descriptorCount = static_cast<uint32_t>(g_maxFrameInFlight)},
+	std::vector<VkDescriptorPoolSize> poolSizes{
+			{.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = static_cast<uint32_t>(g_maxFrameInFlight)},
+			{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			 .descriptorCount = static_cast<uint32_t>(g_maxFrameInFlight)},
 	};
-	const VkDescriptorPoolCreateInfo poolInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.maxSets = static_cast<uint32_t>(g_maxFrameInFlight),
-			.poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
-			.pPoolSizes = poolSizes.data()};
+	const VkDescriptorPoolCreateInfo poolInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+											  .pNext = nullptr,
+											  .flags = {},
+											  .maxSets = static_cast<uint32_t>(g_maxFrameInFlight),
+											  .poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
+											  .pPoolSizes = poolSizes.data()};
 	if (const VkResult result = vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr, &m_descriptorPool);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Descriptors: failed to create descriptor pool ({})", resultString(result))
 	}
 
 	// Descriptor sets layout
-	constexpr VkDescriptorSetLayoutBinding uboLayoutBinding{
-			.binding = 0,
-			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-			.pImmutableSamplers = nullptr};
-	constexpr VkDescriptorSetLayoutBinding samplerLayoutBinding{
-			.binding = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 32,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.pImmutableSamplers = nullptr
-	};
+	constexpr VkDescriptorSetLayoutBinding uboLayoutBinding{.binding = 0,
+															.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+															.descriptorCount = 1,
+															.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+															.pImmutableSamplers = nullptr};
+	constexpr VkDescriptorSetLayoutBinding samplerLayoutBinding{.binding = 1,
+																.descriptorType =
+																		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+																.descriptorCount = 32,
+																.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+																.pImmutableSamplers = nullptr};
 	std::vector bindings = {uboLayoutBinding, samplerLayoutBinding};
-	const VkDescriptorSetLayoutCreateInfo layoutInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.bindingCount = static_cast<uint32_t>(bindings.size()),
-			.pBindings = bindings.data()};
+	const VkDescriptorSetLayoutCreateInfo layoutInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+													 .pNext = nullptr,
+													 .flags = {},
+													 .bindingCount = static_cast<uint32_t>(bindings.size()),
+													 .pBindings = bindings.data()};
 	if (const auto result =
 				vkCreateDescriptorSetLayout(core.getLogicalDevice(), &layoutInfo, nullptr, &m_descriptorSetLayout);
 		result != VK_SUCCESS) {
@@ -180,12 +168,11 @@ void Descriptors::createDescriptors() {
 
 	// Descriptor sets
 	std::vector<VkDescriptorSetLayout> layouts(g_maxFrameInFlight, m_descriptorSetLayout);
-	const VkDescriptorSetAllocateInfo allocInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-			.pNext = nullptr,
-			.descriptorPool = m_descriptorPool,
-			.descriptorSetCount = static_cast<uint32_t>(g_maxFrameInFlight),
-			.pSetLayouts = layouts.data()};
+	const VkDescriptorSetAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+												.pNext = nullptr,
+												.descriptorPool = m_descriptorPool,
+												.descriptorSetCount = static_cast<uint32_t>(g_maxFrameInFlight),
+												.pSetLayouts = layouts.data()};
 	m_descriptorSets.resize(g_maxFrameInFlight);
 	if (const auto result = vkAllocateDescriptorSets(core.getLogicalDevice(), &allocInfo, m_descriptorSets.data());
 		result != VK_SUCCESS) {
@@ -193,58 +180,51 @@ void Descriptors::createDescriptors() {
 	}
 }
 
-void Descriptors::updateDescriptors() { for (size_t i = 0; i < g_maxFrameInFlight; i++) { updateDescriptor(i); } }
+void Descriptors::updateDescriptors() {
+	for (size_t i = 0; i < g_maxFrameInFlight; i++) { updateDescriptor(i); }
+}
 
 void Descriptors::updateDescriptor(const size_t iFrame) {
 	const auto &core = VulkanCore::get();
 	std::vector<VkDescriptorBufferInfo> bufferInfos;
 	if (!m_uniformBuffers.empty()) {
-		bufferInfos.push_back({
-				.buffer = m_uniformBuffers[iFrame],
-				.offset = 0,
-				.range = m_uniformSize});
+		bufferInfos.push_back({.buffer = m_uniformBuffers[iFrame], .offset = 0, .range = m_uniformSize});
 	}
 	std::vector<VkDescriptorImageInfo> imageInfos;
 	imageInfos.reserve(m_textureBind.size());
 	for (const auto &id: m_textureBind) {
-		imageInfos.push_back({
-				.sampler = m_textures[id].textureSampler,
-				.imageView = m_textures[id].textureImageView,
-				.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-		});
+		imageInfos.push_back({.sampler = m_textures[id].textureSampler,
+							  .imageView = m_textures[id].textureImageView,
+							  .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL});
 	}
 	std::vector<VkWriteDescriptorSet> descriptorWrites;
 	if (!bufferInfos.empty()) {
-		descriptorWrites.push_back({
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.pNext = nullptr,
-				.dstSet = m_descriptorSets[iFrame],
-				.dstBinding = 0,
-				.dstArrayElement = 0,
-				.descriptorCount = static_cast<uint32_t>(bufferInfos.size()),
-				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				.pImageInfo = nullptr,
-				.pBufferInfo = bufferInfos.data(),
-				.pTexelBufferView = nullptr
-		});
+		descriptorWrites.push_back({.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+									.pNext = nullptr,
+									.dstSet = m_descriptorSets[iFrame],
+									.dstBinding = 0,
+									.dstArrayElement = 0,
+									.descriptorCount = static_cast<uint32_t>(bufferInfos.size()),
+									.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+									.pImageInfo = nullptr,
+									.pBufferInfo = bufferInfos.data(),
+									.pTexelBufferView = nullptr});
 	}
 	if (!imageInfos.empty()) {
-		descriptorWrites.push_back({
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.pNext = nullptr,
-				.dstSet = m_descriptorSets[iFrame],
-				.dstBinding = 1,
-				.dstArrayElement = 0,
-				.descriptorCount = static_cast<uint32_t>(imageInfos.size()),
-				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				.pImageInfo = imageInfos.data(),
-				.pBufferInfo = nullptr,
-				.pTexelBufferView = nullptr
-		});
+		descriptorWrites.push_back({.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+									.pNext = nullptr,
+									.dstSet = m_descriptorSets[iFrame],
+									.dstBinding = 1,
+									.dstArrayElement = 0,
+									.descriptorCount = static_cast<uint32_t>(imageInfos.size()),
+									.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+									.pImageInfo = imageInfos.data(),
+									.pBufferInfo = nullptr,
+									.pTexelBufferView = nullptr});
 	}
 	if (!descriptorWrites.empty()) {
 		vkUpdateDescriptorSets(core.getLogicalDevice(), static_cast<uint32_t>(descriptorWrites.size()),
-		                       descriptorWrites.data(), 0, nullptr);
+							   descriptorWrites.data(), 0, nullptr);
 	}
 }
 
@@ -256,11 +236,11 @@ void Descriptors::registerUniform(const uint32_t iSize) {
 	const auto &core = VulkanCore::get();
 	for (size_t i = 0; i < g_maxFrameInFlight; i++) {
 		createBuffer(iSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		             m_uniformBuffers[i],
-		             m_uniformBuffersMemory[i]);
+					 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_uniformBuffers[i],
+					 m_uniformBuffersMemory[i]);
 		if (const auto result = vkMapMemory(core.getLogicalDevice(), m_uniformBuffersMemory[i], 0, iSize, 0,
-		                                    &m_uniformBuffersMapped[i]); result != VK_SUCCESS)
+											&m_uniformBuffersMapped[i]);
+			result != VK_SUCCESS)
 			OWL_CORE_ERROR("Vulkan: Failed to create uniform buffer {}.", i)
 	}
 }
@@ -287,7 +267,7 @@ void Descriptors::bindTextureImage(const uint32_t iIndex) {
 	if (iIndex == m_bindedTexture)
 		return;
 	vkBindImageMemory(VulkanCore::get().getLogicalDevice(), m_textures[iIndex].textureImage,
-	                  m_textures[iIndex].textureImageMemory, 0);
+					  m_textures[iIndex].textureImageMemory, 0);
 	m_bindedTexture = iIndex;
 }
 
@@ -302,49 +282,27 @@ void Descriptors::createImguiDescriptorPool() {
 		return;
 	const auto &core = VulkanCore::get();
 	// Descriptor pools.
-	std::vector<VkDescriptorPoolSize> poolSizes{{
-			                                            .type = VK_DESCRIPTOR_TYPE_SAMPLER,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
-			                                            .descriptorCount = 1000},
-	                                            {
-			                                            .type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
-			                                            .descriptorCount = 1000},
+	std::vector<VkDescriptorPoolSize> poolSizes{
+			{.type = VK_DESCRIPTOR_TYPE_SAMPLER, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, .descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, .descriptorCount = 1000},
 	};
-	const VkDescriptorPoolCreateInfo poolInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-			.maxSets = static_cast<uint32_t>(g_maxFrameInFlight),
-			.poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
-			.pPoolSizes = poolSizes.data()};
-	if (const VkResult result = vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr,
-	                                                   &m_imguiDescriptorPool);
+	const VkDescriptorPoolCreateInfo poolInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+											  .pNext = nullptr,
+											  .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+											  .maxSets = static_cast<uint32_t>(g_maxFrameInFlight),
+											  .poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
+											  .pPoolSizes = poolSizes.data()};
+	if (const VkResult result =
+				vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr, &m_imguiDescriptorPool);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Descriptors: failed to create descriptor pool ({})", resultString(result))
 	}
@@ -356,23 +314,20 @@ void Descriptors::createSingleImageDescriptorPool() {
 	const auto &core = VulkanCore::get();
 	// Descriptor pools.
 	std::vector<VkDescriptorPoolSize> poolSizes{
-			{
-					.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-					.descriptorCount = 1000},
+			{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1000},
 	};
-	const VkDescriptorPoolCreateInfo poolInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-			.maxSets = 1024,
-			.poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
-			.pPoolSizes = poolSizes.data()};
-	if (const VkResult result = vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr,
-	                                                   &m_singleImageDescriptorPool);
+	const VkDescriptorPoolCreateInfo poolInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+											  .pNext = nullptr,
+											  .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+											  .maxSets = 1024,
+											  .poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
+											  .pPoolSizes = poolSizes.data()};
+	if (const VkResult result =
+				vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr, &m_singleImageDescriptorPool);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Descriptors: failed to create descriptor pool ({})", resultString(result))
 	}
 }
 
 
-}// internal
+}// namespace owl::renderer::vulkan::internal

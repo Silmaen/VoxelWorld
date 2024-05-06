@@ -6,6 +6,8 @@
  * All modification must get authorization from the author.
  */
 
+#include "owlpch.h"
+
 #include "ShaderLibrary.h"
 
 namespace owl::renderer {
@@ -41,7 +43,7 @@ void ShaderLibrary::addFromStandardPath(const std::string &iName, const std::str
 }
 
 shared<Shader> ShaderLibrary::load(const std::string &iName, const std::string &iRenderer,
-                                   const std::filesystem::path &iFile) {
+								   const std::filesystem::path &iFile) {
 	shared<Shader> shader = Shader::create(iName, iRenderer, iFile);
 	if (shader == nullptr) {
 		OWL_CORE_WARN("Could not load shader file {}", iFile.string())
@@ -64,8 +66,7 @@ bool ShaderLibrary::exists(const std::string &iName, const std::string &iRendere
 }
 
 ShaderLibrary::~ShaderLibrary() {
-	for (auto &shader: m_shaders)
-		shader.second.reset();
+	for (auto &shader: m_shaders) shader.second.reset();
 	m_shaders.clear();
 }
 

@@ -106,6 +106,8 @@ bool Texture2D::operator==(const Texture &iOther) const {
 
 void Texture2D::bind(uint32_t) const { internal::Descriptors::get().textureBind(m_textureId); }
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 void Texture2D::setData(void *iData, const uint32_t iSize) {
 	const auto &vkc = internal::VulkanCore::get();
 	if (const uint32_t expected = m_hasAlpha ? m_size.surface() * 4 : m_size.surface() * 3; iSize != expected) {
@@ -189,6 +191,7 @@ void Texture2D::setData(void *iData, const uint32_t iSize) {
 		OWL_CORE_ERROR("Vulkan Texture: Error creating texture sampler ({}).", internal::resultString(result))
 	}
 }
+OWL_DIAG_POP
 
 uint64_t Texture2D::getRendererId() const {
 	auto &desc = internal::Descriptors::get();

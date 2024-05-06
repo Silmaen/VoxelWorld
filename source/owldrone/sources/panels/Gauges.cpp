@@ -22,18 +22,18 @@ Gauges::Gauges() {
 
 	const renderer::FramebufferSpecification specs{
 			.size = {1280, 720},
-			.attachments = {
-					{renderer::AttachmentSpecification::Format::Surface,
-					 renderer::AttachmentSpecification::Tiling::Optimal},
-					{renderer::AttachmentSpecification::Format::RedInteger,
-					 renderer::AttachmentSpecification::Tiling::Optimal},
-					//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
-					// renderer::AttachmentSpecification::Tiling::Optimal}
-			},
+			.attachments =
+					{
+							{renderer::AttachmentSpecification::Format::Surface,
+							 renderer::AttachmentSpecification::Tiling::Optimal},
+							{renderer::AttachmentSpecification::Format::RedInteger,
+							 renderer::AttachmentSpecification::Tiling::Optimal},
+							//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
+							// renderer::AttachmentSpecification::Tiling::Optimal}
+					},
 			.samples = 1,
 			.swapChainTarget = false,
-			.debugName = "gauges"
-	};
+			.debugName = "gauges"};
 	m_framebuffer = renderer::Framebuffer::create(specs);
 
 	// camera
@@ -100,15 +100,12 @@ void Gauges::onUpdate(const core::Timestep &) {
 	renderer::Renderer2D::beginScene(*m_camera);
 
 	// draw all backgrounds
-	for (const auto &gauge: m_gauges)
-		gauge->drawBack();
+	for (const auto &gauge: m_gauges) gauge->drawBack();
 	// draw all cursors
 
-	for (const auto &gauge: m_gauges)
-		gauge->drawCursors();
+	for (const auto &gauge: m_gauges) gauge->drawCursors();
 	// draw all covers
-	for (const auto &gauge: m_gauges)
-		gauge->drawCover();
+	for (const auto &gauge: m_gauges) gauge->drawCover();
 
 	renderer::Renderer2D::endScene();
 	// ===============================================================
@@ -124,8 +121,8 @@ void Gauges::onRender() {
 	const auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 	const auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 	const auto viewportOffset = ImGui::GetWindowPos();
-	m_viewportBounds[0] = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
-	m_viewportBounds[1] = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
+	m_viewportLower = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
+	m_viewportUpper = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
 
 	m_viewportFocused = ImGui::IsWindowFocused();
 	m_viewportHovered = ImGui::IsWindowHovered();

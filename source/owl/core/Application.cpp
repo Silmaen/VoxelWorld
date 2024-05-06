@@ -34,7 +34,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 		OWL_CORE_INFO("Working directory: {}", m_workingDirectory.string())
 
 		// load config file if any
-		if (!iAppParams.isDummy) {
+		if (!m_initParams.isDummy) {
 			const auto configPath = m_workingDirectory / "config.yml";
 			if (exists(configPath))
 				m_initParams.loadFromFile(configPath);
@@ -91,8 +91,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 	}
 
 	// set up the callbacks
-	mu_appWindow->setEventCallback(
-			[this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
+	mu_appWindow->setEventCallback([this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 
 	// create the GUI layer
 	if (m_initParams.hasGui) {
@@ -154,14 +153,12 @@ void Application::run() {
 			{
 				OWL_PROFILE_SCOPE("LayerStack onUpdate")
 
-				for (const auto &layer: m_layerStack)
-					layer->onUpdate(m_stepper);
+				for (const auto &layer: m_layerStack) layer->onUpdate(m_stepper);
 			}
 			if (mp_imGuiLayer) {
 				OWL_PROFILE_SCOPE("LayerStack onImUpdate")
 				mp_imGuiLayer->begin();
-				for (const auto &layer: m_layerStack)
-					layer->onImGuiRender(m_stepper);
+				for (const auto &layer: m_layerStack) layer->onImGuiRender(m_stepper);
 				mp_imGuiLayer->end();
 			}
 			renderer::RenderCommand::endFrame();
@@ -176,10 +173,9 @@ void Application::run() {
 				OWL_CORE_TRACE("Frame Leak Detected")
 				OWL_CORE_TRACE("-----------------------------------")
 				OWL_CORE_TRACE("")
-				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory, memState.allocs.size())
-				for (const auto &chunk: memState.allocs) {
-					OWL_CORE_TRACE(" ** {}", chunk.toStr())
-				}
+				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory,
+							   memState.allocs.size())
+				for (const auto &chunk: memState.allocs) { OWL_CORE_TRACE(" ** {}", chunk.toStr()) }
 				OWL_CORE_TRACE("----------------------------------")
 				OWL_CORE_TRACE("")
 			}
@@ -193,12 +189,10 @@ void Application::onEvent(event::Event &ioEvent) {
 	OWL_PROFILE_FUNCTION()
 
 	event::EventDispatcher dispatcher(ioEvent);
-	dispatcher.dispatch<event::WindowCloseEvent>([this](auto &&PH1) {
-		return onWindowClosed(std::forward<decltype(PH1)>(PH1));
-	});
-	dispatcher.dispatch<event::WindowResizeEvent>([this](auto &&PH1) {
-		return onWindowResized(std::forward<decltype(PH1)>(PH1));
-	});
+	dispatcher.dispatch<event::WindowCloseEvent>(
+			[this](auto &&PH1) { return onWindowClosed(std::forward<decltype(PH1)>(PH1)); });
+	dispatcher.dispatch<event::WindowResizeEvent>(
+			[this](auto &&PH1) { return onWindowResized(std::forward<decltype(PH1)>(PH1)); });
 
 #if defined(__clang__) and __clang_major__ < 16
 	for (auto it2 = m_layerStack.rbegin(); it2 != m_layerStack.rend(); ++it2) {
@@ -272,8 +266,9 @@ void AppParams::loadFromFile(const std::filesystem::path &iFile) {
 		if (appConfig["height"])
 			height = appConfig["height"].as<uint32_t>();
 		if (appConfig["renderer"]) {
-			if (const auto dRenderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(
-					appConfig["renderer"].as<std::string>()); dRenderer.has_value())
+			if (const auto dRenderer =
+						magic_enum::enum_cast<renderer::RenderAPI::Type>(appConfig["renderer"].as<std::string>());
+				dRenderer.has_value())
 				renderer = dRenderer.value();
 		}
 		if (appConfig["hasGui"])

@@ -11,7 +11,9 @@
 
 #include "droneLayer.h"
 
-class OwlNest final: public owl::core::Application {
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
+class OwlNest final : public owl::core::Application {
 public:
 	OwlNest() = delete;
 	explicit OwlNest(const owl::core::AppParams &param) : owl::core::Application(param) {
@@ -19,6 +21,7 @@ public:
 			pushLayer(owl::mkShared<drone::droneLayer>());
 	}
 };
+OWL_DIAG_POP
 
 owl::shared<owl::core::Application> owl::core::createApplication(int argc, char **argv) {
 	return mkShared<OwlNest>(core::AppParams{

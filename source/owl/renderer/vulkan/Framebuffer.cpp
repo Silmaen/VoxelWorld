@@ -22,25 +22,22 @@ namespace owl::renderer::vulkan {
 Framebuffer::Framebuffer(FramebufferSpecification iSpec) : m_specs{std::move(iSpec)} {
 	if (m_specs.samples > 1 && !m_specs.swapChainTarget) {
 		OWL_CORE_ERROR("Vulkan Framebuffer ({}): only FrameBuffer for swapchain supports multiple sample.",
-		               m_specs.debugName)
+					   m_specs.debugName)
 		return;
 	}
 	if (m_specs.samples < 1) {
-		OWL_CORE_ERROR("Vulkan Framebuffer ({}): sample must be at least one.",
-		               m_specs.debugName)
+		OWL_CORE_ERROR("Vulkan Framebuffer ({}): sample must be at least one.", m_specs.debugName)
 		return;
 	}
 	if (m_specs.swapChainTarget && m_specs.attachments[0].format != AttachmentSpecification::Format::Surface) {
 		OWL_CORE_ERROR("Vulkan Framebuffer ({}): format of swap chain's first attachment is not 'Surface'.",
-		               m_specs.debugName)
+					   m_specs.debugName)
 		return;
 	}
 	if (m_specs.swapChainTarget) {
-		OWL_CORE_INFO("Vulkan Framebuffer ({}): creation for swapchain use.",
-		              m_specs.debugName)
+		OWL_CORE_INFO("Vulkan Framebuffer ({}): creation for swapchain use.", m_specs.debugName)
 	} else {
-		OWL_CORE_INFO("Vulkan Framebuffer ({}): creation for simple frame buffer use.",
-		              m_specs.debugName)
+		OWL_CORE_INFO("Vulkan Framebuffer ({}): creation for simple frame buffer use.", m_specs.debugName)
 	}
 	// Render Pass creation.
 	createRenderPass();
@@ -78,7 +75,7 @@ void Framebuffer::bind() {
 	if (!m_specs.swapChainTarget) {
 		for (auto &img: m_images) {
 			internal::transitionImageLayout(img.image, VK_IMAGE_LAYOUT_UNDEFINED,
-			                                VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+											VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 		}
 	}
 	vkh.bindFramebuffer(this);
@@ -89,7 +86,7 @@ void Framebuffer::unbind() {
 	if (!m_specs.swapChainTarget) {
 		for (auto &img: m_images) {
 			internal::transitionImageLayout(img.image, VK_IMAGE_LAYOUT_UNDEFINED,
-			                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+											VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
 	}
 	vkh.unbindFramebuffer();
@@ -104,7 +101,7 @@ void Framebuffer::resize(const math::FrameSize iSize) {
 
 void Framebuffer::deepCleanup() {
 	const auto &vkc = internal::VulkanCore::get();
-	for (auto &[imgAvail, renderFinish, fence,cmd]: m_samples) {
+	for (auto &[imgAvail, renderFinish, fence, cmd]: m_samples) {
 		if (renderFinish != nullptr) {
 			vkDestroySemaphore(vkc.getLogicalDevice(), renderFinish, nullptr);
 			renderFinish = nullptr;
@@ -140,7 +137,7 @@ void Framebuffer::cleanup() {
 	m_framebuffers.clear();
 	const auto &pool = internal::Descriptors::get().getSingleImageDescriptorPool();
 	vkDeviceWaitIdle(vkc.getLogicalDevice());
-	for (auto &[image,memory,view,sampler,dSet,dSetLayout]: m_images) {
+	for (auto &[image, memory, view, sampler, dSet, dSetLayout]: m_images) {
 		if (dSet != nullptr)
 			vkFreeDescriptorSets(vkc.getLogicalDevice(), pool, 1, &dSet);
 		if (dSetLayout != nullptr)
@@ -165,17 +162,17 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 	VkBuffer stagingBuffer;
 	{
 		const VkBufferCreateInfo bufferCi{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-		                                  .pNext = nullptr,
-		                                  .flags = {},
-		                                  .size = internal::attachmentFormatToSize(format),
-		                                  .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		                                  .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		                                  .queueFamilyIndexCount = 0,
-		                                  .pQueueFamilyIndices = nullptr};
+										  .pNext = nullptr,
+										  .flags = {},
+										  .size = internal::attachmentFormatToSize(format),
+										  .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+										  .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+										  .queueFamilyIndexCount = 0,
+										  .pQueueFamilyIndices = nullptr};
 		if (const VkResult result = vkCreateBuffer(vkc.getLogicalDevice(), &bufferCi, nullptr, &stagingBuffer);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to create staging buffer ({}).", m_specs.debugName,
-			               internal::resultString(result))
+						   internal::resultString(result))
 			return 0;
 		}
 	}
@@ -187,36 +184,35 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 				.pNext = nullptr,
 				.allocationSize = memRequirements.size,
-				.memoryTypeIndex =
-				vkc.findMemoryTypeIndex(memRequirements.memoryTypeBits,
-				                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-				                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)};
+				.memoryTypeIndex = vkc.findMemoryTypeIndex(memRequirements.memoryTypeBits,
+														   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+																   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)};
 		if (const VkResult result = vkAllocateMemory(vkc.getLogicalDevice(), &allocInfo, nullptr, &stagingBufferMemory);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to allocate staging buffer memory ({}).", m_specs.debugName,
-			               internal::resultString(result))
+						   internal::resultString(result))
 			return 0;
 		}
 		if (const VkResult result = vkBindBufferMemory(vkc.getLogicalDevice(), stagingBuffer, stagingBufferMemory, 0);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to bind staging buffer memory ({}).", m_specs.debugName,
-			               internal::resultString(result))
+						   internal::resultString(result))
 			return 0;
 		}
 	}
 	internal::transitionImageLayout(m_images[imgIndex].image, VK_IMAGE_LAYOUT_UNDEFINED,
-	                                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+									VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 	internal::copyImageToBuffer(m_images[imgIndex].image, stagingBuffer, {1, 1},
-	                            {static_cast<uint32_t>(iX), static_cast<uint32_t>(iY)});
+								{static_cast<uint32_t>(iX), static_cast<uint32_t>(iY)});
 	internal::transitionImageLayout(m_images[imgIndex].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-	                                m_specs.swapChainTarget
-		                                ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-		                                : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+									m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+															: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	void *data;
 	if (const VkResult result = vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0,
-	                                        internal::attachmentFormatToSize(format), 0, &data); result != VK_SUCCESS) {
+											internal::attachmentFormatToSize(format), 0, &data);
+		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to map memory ({}).", m_specs.debugName,
-		               internal::resultString(result))
+					   internal::resultString(result))
 		return 0;
 	}
 	int32_t pixel;
@@ -234,24 +230,24 @@ void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const int iVa
 	const uint32_t imgIndex = attToImgIdx(iAttachmentIndex);
 	VkClearColorValue val;
 	val.int32[0] = iValue;
-	constexpr VkImageSubresourceRange range{
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1};
+	constexpr VkImageSubresourceRange range{.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+											.baseMipLevel = 0,
+											.levelCount = 1,
+											.baseArrayLayer = 0,
+											.layerCount = 1};
 	internal::transitionImageLayout(cmd, m_images[imgIndex].image, VK_IMAGE_LAYOUT_UNDEFINED,
-	                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+									VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	vkCmdClearColorImage(cmd, m_images[imgIndex].image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &val, 1, &range);
 
 	internal::transitionImageLayout(cmd, m_images[imgIndex].image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-	                                m_specs.swapChainTarget
-		                                ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-		                                : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+									m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+															: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
 	core.endSingleTimeCommands(cmd);
 }
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const glm::vec4 iColorValue) {
 	if (m_specs.attachments[iAttachmentIndex].format == AttachmentSpecification::Format::RedInteger) {
 		OWL_CORE_WARN("Vulkan Framebuffer ({}): Try to color-clear non color attachment.", m_specs.debugName)
@@ -265,21 +261,20 @@ void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const glm::ve
 	val.float32[1] = iColorValue.g;
 	val.float32[2] = iColorValue.b;
 	val.float32[3] = iColorValue.a;
-	constexpr VkImageSubresourceRange range{
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1};
+	constexpr VkImageSubresourceRange range{.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+											.baseMipLevel = 0,
+											.levelCount = 1,
+											.baseArrayLayer = 0,
+											.layerCount = 1};
 	internal::transitionImageLayout(m_images[imgIndex].image, VK_IMAGE_LAYOUT_UNDEFINED,
-	                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+									VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	vkCmdClearColorImage(cmd, m_images[imgIndex].image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &val, 1, &range);
 	core.endSingleTimeCommands(cmd);
 	internal::transitionImageLayout(m_images[imgIndex].image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-	                                m_specs.swapChainTarget
-		                                ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-		                                : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+									m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+															: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 }
+OWL_DIAG_POP
 
 void Framebuffer::createImages() {
 	const auto &vkc = internal::VulkanCore::get();
@@ -312,7 +307,7 @@ void Framebuffer::createImages() {
 		if (const VkResult result = vkCreateSwapchainKHR(vkc.getLogicalDevice(), &createInfo, nullptr, &m_swapChain);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to create swap chain ({}).", m_specs.debugName,
-			               internal::resultString(result))
+						   internal::resultString(result))
 			return;
 		}
 		vkGetSwapchainImagesKHR(vkc.getLogicalDevice(), m_swapChain, &m_swapChainImageCount, nullptr);
@@ -324,7 +319,7 @@ void Framebuffer::createImages() {
 			internal::transitionImageLayout(temp[ii], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 		}
 		OWL_CORE_INFO("Vulkan Framebuffer ({}): Created {} images for swapchain", m_specs.debugName,
-		              m_swapChainImageCount)
+					  m_swapChainImageCount)
 	} else
 		m_images.resize(m_specs.attachments.size());
 	// create swapchain images (nothing to do)
@@ -344,7 +339,7 @@ void Framebuffer::createImages() {
 				.samples = VK_SAMPLE_COUNT_1_BIT,
 				.tiling = internal::attachmentTilingToVulkan(m_specs.attachments[attIndex].tiling),
 				.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT |
-				         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+						 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.queueFamilyIndexCount = 1,
 				.pQueueFamilyIndices = nullptr,
@@ -352,7 +347,7 @@ void Framebuffer::createImages() {
 		if (const VkResult result = vkCreateImage(vkc.getLogicalDevice(), &imageInfo, nullptr, &m_images[i].image);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to create image ({}).", m_specs.debugName,
-			               internal::resultString(result))
+						   internal::resultString(result))
 			return;
 		}
 		VkMemoryRequirements memRequirements;
@@ -362,24 +357,24 @@ void Framebuffer::createImages() {
 				.pNext = nullptr,
 				.allocationSize = memRequirements.size,
 				.memoryTypeIndex =
-				vkc.findMemoryTypeIndex(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)};
-		if (const VkResult result = vkAllocateMemory(vkc.getLogicalDevice(), &allocInfo, nullptr,
-		                                             &m_images[i].imageMemory);
+						vkc.findMemoryTypeIndex(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)};
+		if (const VkResult result =
+					vkAllocateMemory(vkc.getLogicalDevice(), &allocInfo, nullptr, &m_images[i].imageMemory);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to allocate image memory ({}).", m_specs.debugName,
-			               internal::resultString(result))
+						   internal::resultString(result))
 			return;
 		}
-		if (const VkResult result = vkBindImageMemory(vkc.getLogicalDevice(), m_images[i].image,
-		                                              m_images[i].imageMemory, 0);
+		if (const VkResult result =
+					vkBindImageMemory(vkc.getLogicalDevice(), m_images[i].image, m_images[i].imageMemory, 0);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to bind image memory ({}).", m_specs.debugName,
-			               internal::resultString(result))
+						   internal::resultString(result))
 			return;
 		}
-		internal::transitionImageLayout(m_images[i].image, VK_IMAGE_LAYOUT_UNDEFINED, m_specs.swapChainTarget
-			                                ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-			                                : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+		internal::transitionImageLayout(m_images[i].image, VK_IMAGE_LAYOUT_UNDEFINED,
+										m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+																: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	}
 }
 
@@ -394,21 +389,19 @@ void Framebuffer::createImageViews() {
 				.image = m_images[i].image,
 				.viewType = VK_IMAGE_VIEW_TYPE_2D,
 				.format = internal::attachmentFormatToVulkan(m_specs.attachments[attIndex].format),
-				.components = {VK_COMPONENT_SWIZZLE_IDENTITY,
-				               VK_COMPONENT_SWIZZLE_IDENTITY,
-				               VK_COMPONENT_SWIZZLE_IDENTITY,
-				               VK_COMPONENT_SWIZZLE_IDENTITY},
-				.subresourceRange = {
-						.aspectMask = internal::attachmentFormatToAspect(m_specs.attachments[attIndex].format),
-						.baseMipLevel = 0,
-						.levelCount = 1,
-						.baseArrayLayer = 0,
-						.layerCount = 1}};
-		if (const VkResult result = vkCreateImageView(vkc.getLogicalDevice(), &createInfo, nullptr,
-		                                              &m_images[i].imageView);
+				.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
+							   VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
+				.subresourceRange = {.aspectMask =
+											 internal::attachmentFormatToAspect(m_specs.attachments[attIndex].format),
+									 .baseMipLevel = 0,
+									 .levelCount = 1,
+									 .baseArrayLayer = 0,
+									 .layerCount = 1}};
+		if (const VkResult result =
+					vkCreateImageView(vkc.getLogicalDevice(), &createInfo, nullptr, &m_images[i].imageView);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): Error creating image views ({}).", m_specs.debugName,
-			               internal::resultString(result))
+						   internal::resultString(result))
 		}
 	}
 }
@@ -422,21 +415,20 @@ void Framebuffer::createFrameBuffer() {
 		for (uint32_t iv = 1; iv < m_specs.attachments.size(); ++iv) {
 			views.push_back(m_images[m_swapChainImageCount == 0 ? iv : m_swapChainImageCount - 1 + iv].imageView);
 		}
-		const VkFramebufferCreateInfo framebufferInfo{
-				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = {},
-				.renderPass = m_renderPass,
-				.attachmentCount = static_cast<uint32_t>(views.size()),
-				.pAttachments = views.data(),
-				.width = m_specs.size.width(),
-				.height = m_specs.size.height(),
-				.layers = 1};
-		if (const VkResult result = vkCreateFramebuffer(vkc.getLogicalDevice(), &framebufferInfo, nullptr,
-		                                                &framebuffer);
+		const VkFramebufferCreateInfo framebufferInfo{.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+													  .pNext = nullptr,
+													  .flags = {},
+													  .renderPass = m_renderPass,
+													  .attachmentCount = static_cast<uint32_t>(views.size()),
+													  .pAttachments = views.data(),
+													  .width = m_specs.size.width(),
+													  .height = m_specs.size.height(),
+													  .layers = 1};
+		if (const VkResult result =
+					vkCreateFramebuffer(vkc.getLogicalDevice(), &framebufferInfo, nullptr, &framebuffer);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): Error creating framebuffer {} ({}).", m_specs.debugName, idx,
-			               internal::resultString(result))
+						   internal::resultString(result))
 		}
 		++idx;
 	}
@@ -451,67 +443,55 @@ void Framebuffer::createRenderPass() {
 	uint32_t i = 0;
 	for (const auto &[format, tiling]: m_specs.attachments) {
 		if (format == AttachmentSpecification::Format::Depth24Stencil8) {
-			depthRefs = mkUniq<VkAttachmentReference>(VkAttachmentReference{
-					.attachment = i,
-					.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-			});
+			depthRefs = mkUniq<VkAttachmentReference>(
+					VkAttachmentReference{.attachment = i, .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL});
 		} else {
-			attRefs.push_back({
-					.attachment = i,
-					.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-			});
+			attRefs.push_back({.attachment = i, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL});
 		}
-		attDesc.push_back({
-				.flags = {},
-				.format = internal::attachmentFormatToVulkan(format),
-				.samples = VK_SAMPLE_COUNT_1_BIT,
-				.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
-				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
-				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE,
-				.initialLayout = m_specs.swapChainTarget
-					                 ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-					                 : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				.finalLayout = m_specs.swapChainTarget
-					               ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-					               : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-		});
+		attDesc.push_back({.flags = {},
+						   .format = internal::attachmentFormatToVulkan(format),
+						   .samples = VK_SAMPLE_COUNT_1_BIT,
+						   .loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+						   .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+						   .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+						   .stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE,
+						   .initialLayout = m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+																	: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+						   .finalLayout = m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+																  : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL});
 		++i;
 	}
 
-	const VkSubpassDescription subpass{
-			.flags = {},
-			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-			.inputAttachmentCount = 0,
-			.pInputAttachments = nullptr,
-			.colorAttachmentCount = static_cast<uint32_t>(attRefs.size()),
-			.pColorAttachments = attRefs.data(),
-			.pResolveAttachments = nullptr,
-			.pDepthStencilAttachment = depthRefs.get(),
-			.preserveAttachmentCount = 0,
-			.pPreserveAttachments = nullptr};
-	constexpr VkSubpassDependency dependency{
-			.srcSubpass = VK_SUBPASS_EXTERNAL,
-			.dstSubpass = 0,
-			.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-			.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-			.srcAccessMask = 0,
-			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-			.dependencyFlags = {}};
-	const VkRenderPassCreateInfo renderPassInfo{
-			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.attachmentCount = static_cast<uint32_t>(attDesc.size()),
-			.pAttachments = attDesc.data(),
-			.subpassCount = 1,
-			.pSubpasses = &subpass,
-			.dependencyCount = 1,
-			.pDependencies = &dependency};
+	const VkSubpassDescription subpass{.flags = {},
+									   .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+									   .inputAttachmentCount = 0,
+									   .pInputAttachments = nullptr,
+									   .colorAttachmentCount = static_cast<uint32_t>(attRefs.size()),
+									   .pColorAttachments = attRefs.data(),
+									   .pResolveAttachments = nullptr,
+									   .pDepthStencilAttachment = depthRefs.get(),
+									   .preserveAttachmentCount = 0,
+									   .pPreserveAttachments = nullptr};
+	constexpr VkSubpassDependency dependency{.srcSubpass = VK_SUBPASS_EXTERNAL,
+											 .dstSubpass = 0,
+											 .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+											 .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+											 .srcAccessMask = 0,
+											 .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+											 .dependencyFlags = {}};
+	const VkRenderPassCreateInfo renderPassInfo{.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+												.pNext = nullptr,
+												.flags = {},
+												.attachmentCount = static_cast<uint32_t>(attDesc.size()),
+												.pAttachments = attDesc.data(),
+												.subpassCount = 1,
+												.pSubpasses = &subpass,
+												.dependencyCount = 1,
+												.pDependencies = &dependency};
 	if (const VkResult result = vkCreateRenderPass(vkc.getLogicalDevice(), &renderPassInfo, nullptr, &m_renderPass);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan framebuffer ({}): failed to create render pass ({})", m_specs.debugName,
-		               internal::resultString(result))
+					   internal::resultString(result))
 	}
 }
 
@@ -519,39 +499,36 @@ void Framebuffer::nextFrame() { m_currentFrame = (m_currentFrame + 1) % m_specs.
 
 void Framebuffer::createCommandBuffers() {
 	const auto &core = internal::VulkanCore::get();
-	for (auto &[imgAvail, renderFinish, fence,cmd]: m_samples)
-		cmd = core.createCommandBuffer();
+	for (auto &[imgAvail, renderFinish, fence, cmd]: m_samples) cmd = core.createCommandBuffer();
 }
 
 void Framebuffer::createSyncObjects() {
-	constexpr VkSemaphoreCreateInfo semaphoreInfo{
-			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {}};
-	constexpr VkFenceCreateInfo fenceInfo{
-			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = VK_FENCE_CREATE_SIGNALED_BIT};
+	constexpr VkSemaphoreCreateInfo semaphoreInfo{.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+												  .pNext = nullptr,
+												  .flags = {}};
+	constexpr VkFenceCreateInfo fenceInfo{.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+										  .pNext = nullptr,
+										  .flags = VK_FENCE_CREATE_SIGNALED_BIT};
 
 	const auto &core = internal::VulkanCore::get();
 	uint32_t idx = 0;
-	for (auto &[imgAvail, renderFinish, fence,cmd]: m_samples) {
+	for (auto &[imgAvail, renderFinish, fence, cmd]: m_samples) {
 		if (m_specs.swapChainTarget) {
-			if (const VkResult result = vkCreateSemaphore(core.getLogicalDevice(), &semaphoreInfo, nullptr,
-			                                              &imgAvail); result != VK_SUCCESS) {
+			if (const VkResult result = vkCreateSemaphore(core.getLogicalDevice(), &semaphoreInfo, nullptr, &imgAvail);
+				result != VK_SUCCESS) {
 				OWL_CORE_ERROR("Vulkan framebuffer ({}): failed to create image available semaphore {} ({}).",
-				               m_specs.debugName, idx, internal::resultString(result))
+							   m_specs.debugName, idx, internal::resultString(result))
 			}
 		}
-		if (const VkResult result = vkCreateSemaphore(core.getLogicalDevice(), &semaphoreInfo, nullptr,
-		                                              &renderFinish); result != VK_SUCCESS) {
+		if (const VkResult result = vkCreateSemaphore(core.getLogicalDevice(), &semaphoreInfo, nullptr, &renderFinish);
+			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan framebuffer ({}): failed to create render finish semaphore {} ({}).",
-			               m_specs.debugName, idx, internal::resultString(result))
+						   m_specs.debugName, idx, internal::resultString(result))
 		}
 		if (const VkResult result = vkCreateFence(core.getLogicalDevice(), &fenceInfo, nullptr, &fence);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan framebuffer ({}): failed to create synchronization in flight fence {} ({}).",
-			               m_specs.debugName, idx, internal::resultString(result))
+						   m_specs.debugName, idx, internal::resultString(result))
 		}
 		idx++;
 	}
@@ -594,78 +571,69 @@ uint64_t Framebuffer::getColorAttachmentRendererId(const uint32_t iIndex) const 
 void Framebuffer::createDescriptorSets() {
 	const auto &pool = internal::Descriptors::get().getSingleImageDescriptorPool();
 	const auto &core = internal::VulkanCore::get();
-	const VkSamplerCreateInfo samplerInfo{
-			.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.magFilter = VK_FILTER_NEAREST,
-			.minFilter = VK_FILTER_NEAREST,
-			.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
-			.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.mipLodBias = {},
-			.anisotropyEnable = VK_TRUE,
-			.maxAnisotropy = core.getMaxSamplerAnisotropy(),
-			.compareEnable = VK_FALSE,
-			.compareOp = VK_COMPARE_OP_ALWAYS,
-			.minLod = {},
-			.maxLod = {},
-			.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
-			.unnormalizedCoordinates = VK_FALSE};
+	const VkSamplerCreateInfo samplerInfo{.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+										  .pNext = nullptr,
+										  .flags = {},
+										  .magFilter = VK_FILTER_NEAREST,
+										  .minFilter = VK_FILTER_NEAREST,
+										  .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+										  .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .mipLodBias = {},
+										  .anisotropyEnable = VK_TRUE,
+										  .maxAnisotropy = core.getMaxSamplerAnisotropy(),
+										  .compareEnable = VK_FALSE,
+										  .compareOp = VK_COMPARE_OP_ALWAYS,
+										  .minLod = {},
+										  .maxLod = {},
+										  .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+										  .unnormalizedCoordinates = VK_FALSE};
 	static constexpr VkDescriptorSetLayoutBinding samplerLayoutBinding{
 			.binding = 0,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.pImmutableSamplers = nullptr
-	};
-	constexpr VkDescriptorSetLayoutCreateInfo layoutCi{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.bindingCount = 1,
-			.pBindings = &samplerLayoutBinding
-	};
+			.pImmutableSamplers = nullptr};
+	constexpr VkDescriptorSetLayoutCreateInfo layoutCi{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+													   .pNext = nullptr,
+													   .flags = {},
+													   .bindingCount = 1,
+													   .pBindings = &samplerLayoutBinding};
 	for (auto &img: m_images) {
 		if (const VkResult result = vkCreateSampler(core.getLogicalDevice(), &samplerInfo, nullptr, &img.imageSampler);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Texture: Error creating texture sampler ({}).", internal::resultString(result))
 		}
 		if (const auto result =
-					vkCreateDescriptorSetLayout(core.getLogicalDevice(), &layoutCi, nullptr,
-					                            &img.descriptorSetLayout);
+					vkCreateDescriptorSetLayout(core.getLogicalDevice(), &layoutCi, nullptr, &img.descriptorSetLayout);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Texture Descriptor: failed to create descriptor set layout ({}).",
-			               internal::resultString(result))
+						   internal::resultString(result))
 		}
-		const VkDescriptorSetAllocateInfo allocInfo{
-				.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-				.pNext = nullptr,
-				.descriptorPool = pool,
-				.descriptorSetCount = 1,
-				.pSetLayouts = &img.descriptorSetLayout};
+		const VkDescriptorSetAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+													.pNext = nullptr,
+													.descriptorPool = pool,
+													.descriptorSetCount = 1,
+													.pSetLayouts = &img.descriptorSetLayout};
 		if (const auto result = vkAllocateDescriptorSets(core.getLogicalDevice(), &allocInfo, &img.descriptorSet);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Texture Descriptor: failed to allocate descriptor sets ({})",
-			               internal::resultString(result))
+						   internal::resultString(result))
 		}
-		VkDescriptorImageInfo info{
-				.sampler = img.imageSampler,
-				.imageView = img.imageView,
-				.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
-		const VkWriteDescriptorSet wrt{
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.pNext = nullptr,
-				.dstSet = img.descriptorSet,
-				.dstBinding = 0,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				.pImageInfo = &info,
-				.pBufferInfo = nullptr,
-				.pTexelBufferView = nullptr
-		};
+		VkDescriptorImageInfo info{.sampler = img.imageSampler,
+								   .imageView = img.imageView,
+								   .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+		const VkWriteDescriptorSet wrt{.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+									   .pNext = nullptr,
+									   .dstSet = img.descriptorSet,
+									   .dstBinding = 0,
+									   .dstArrayElement = 0,
+									   .descriptorCount = 1,
+									   .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+									   .pImageInfo = &info,
+									   .pBufferInfo = nullptr,
+									   .pTexelBufferView = nullptr};
 		vkUpdateDescriptorSets(core.getLogicalDevice(), 1, &wrt, 0, nullptr);
 	}
 }

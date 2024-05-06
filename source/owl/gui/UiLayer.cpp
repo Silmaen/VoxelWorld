@@ -42,8 +42,7 @@ void UiLayer::onAttach() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
-	io.ConfigFlags |=
-			ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
 	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad
 	// Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;// Enable Docking
@@ -56,29 +55,17 @@ void UiLayer::onAttach() {
 	ImFontConfig fontConfig;
 	fontConfig.FontDataOwnedByAtlas = false;
 	ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoRegular)),
-	                                                    sizeof(g_RobotoRegular), 20.0f, &fontConfig);
+														sizeof(g_RobotoRegular), 20.0f, &fontConfig);
 	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoBold)), sizeof(g_RobotoBold),
-	                               20.0f, &fontConfig);
+								   20.0f, &fontConfig);
 	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoItalic)),
-	                               sizeof(g_RobotoItalic), 20.0f, &fontConfig);
+								   sizeof(g_RobotoItalic), 20.0f, &fontConfig);
 	io.FontDefault = robotoFont;
-
-	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-
-	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
-	// windows can look identical to regular ones.
-	ImGuiStyle &style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
 
 	setTheme();
 
 	if (m_withApp) {
-		auto *window = static_cast<GLFWwindow *>(
-			core::Application::get().getWindow().getNativeWindow());
+		auto *window = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
 
 		if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL) {
 			ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -136,20 +123,24 @@ void UiLayer::begin() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
-	if (m_dockingEnable) { initializeDocking(); }
+	if (m_dockingEnable) {
+		initializeDocking();
+	}
 }
 
 void UiLayer::end() const {
 	OWL_PROFILE_FUNCTION()
-	if ((renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL) && (
-		    renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenglLegacy) && (
-		    renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::Vulkan))
+	if ((renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL) &&
+		(renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenglLegacy) &&
+		(renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::Vulkan))
 		return;
-	if (m_dockingEnable) { ImGui::End(); }
+	if (m_dockingEnable) {
+		ImGui::End();
+	}
 	ImGuiIO &io = ImGui::GetIO();
 	const core::Application &app = core::Application::get();
-	io.DisplaySize = ImVec2(static_cast<float>(app.getWindow().getWidth()),
-	                        static_cast<float>(app.getWindow().getHeight()));
+	io.DisplaySize =
+			ImVec2(static_cast<float>(app.getWindow().getWidth()), static_cast<float>(app.getWindow().getHeight()));
 	// Rendering
 	ImGui::Render();
 	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
@@ -167,17 +158,20 @@ void UiLayer::end() const {
 		GLFWwindow *backupCurrentContext = glfwGetCurrentContext();
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
-		if (renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL || renderer::RenderCommand::getApi()
-		    !=
-		    renderer::RenderAPI::Type::OpenglLegacy)
+		if (renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL ||
+			renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenglLegacy)
 			glfwMakeContextCurrent(backupCurrentContext);
 	}
 }
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 void UiLayer::setTheme(const Theme &iTheme) {
 
-	auto &colors = ImGui::GetStyle().Colors;
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
 
+	auto &colors = ImGui::GetStyle().Colors;
 	// ======================
 	// Colors
 
@@ -254,10 +248,17 @@ void UiLayer::setTheme(const Theme &iTheme) {
 	//========================================================
 	// Style
 	auto &style = ImGui::GetStyle();
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
+	// windows can look identical to regular ones.
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
 	style.FrameRounding = 2.5f;
 	style.FrameBorderSize = 1.0f;
 	style.IndentSpacing = 11.0f;
 }
+OWL_DIAG_POP
 
 void UiLayer::initializeDocking() {
 	static bool dockSpaceOpen = true;
@@ -275,7 +276,7 @@ void UiLayer::initializeDocking() {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
-				ImGuiWindowFlags_NoMove;
+					   ImGuiWindowFlags_NoMove;
 		windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	}
 	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle

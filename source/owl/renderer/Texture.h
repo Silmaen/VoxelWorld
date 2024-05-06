@@ -134,6 +134,8 @@ private:
 /**
  * @brief Class texture 2D
  */
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 class OWL_API Texture2D : public Texture {
 public:
 	/**
@@ -191,4 +193,6 @@ public:
 	 */
 	static shared<Texture2D> create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true);
 };
+OWL_DIAG_POP
+
 }// namespace owl::renderer

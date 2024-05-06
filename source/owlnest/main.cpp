@@ -13,6 +13,8 @@
 
 namespace owl {
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 class OwlNest final : public core::Application {
 public:
 	OwlNest() = delete;
@@ -21,6 +23,7 @@ public:
 			pushLayer(mkShared<EditorLayer>());
 	}
 };
+OWL_DIAG_POP
 
 shared<core::Application> core::createApplication(int argc, char **argv) {
 	return mkShared<OwlNest>(core::AppParams{

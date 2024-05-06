@@ -28,28 +28,28 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Viewport(const Viewport&) = default;
+	Viewport(const Viewport &) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Viewport(Viewport&&) = default;
+	Viewport(Viewport &&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Viewport& operator=(const Viewport&) = default;
+	Viewport &operator=(const Viewport &) = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Viewport& operator=(Viewport&&) = default;
+	Viewport &operator=(Viewport &&) = default;
 
 	/**
 	 * @brief Update panel Status.
 	 * @param iTimeStep The Time delta of the frame.
 	 */
-	void onUpdate(const owl::core::Timestep& iTimeStep) override;
+	void onUpdate(const owl::core::Timestep &iTimeStep) override;
 
 	/**
 	 * @brief Do the rendering.
@@ -62,11 +62,12 @@ private:
 	/// Size of the viewport
 	owl::math::FrameSize m_viewportSize = {0, 0};
 	/// View port bounds
-	glm::vec2 m_viewportBounds[2] = {{0.0f, 0.0f}, {0.0f, 0.0f}};
+	glm::vec2 m_viewportLower = {0.0f, 0.0f};
+	glm::vec2 m_viewportUpper = {0.0f, 0.0f};
 
 	bool m_viewportFocused = false;
 	bool m_viewportHovered = false;
 	/// The camera
 	owl::shared<owl::renderer::CameraOrtho> m_camera;
 };
-} // namespace drone::panels
+}// namespace drone::panels

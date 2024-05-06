@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include <memory>
 
 #if defined(OWL_PLATFORM_WINDOWS)
 #ifndef _WIN64
@@ -44,6 +43,7 @@
 #endif
 #endif
 
+#include <memory>
 
 /**
  * @brief Base Namespace for the project.
@@ -62,7 +62,9 @@ using uniq = std::unique_ptr<T>;
  * @return Unique pointer.
  */
 template<typename T, typename... Args>
-constexpr uniq<T> mkUniq(Args &&... iArgs) { return std::make_unique<T>(std::forward<Args>(iArgs)...); }
+constexpr uniq<T> mkUniq(Args &&...iArgs) {
+	return std::make_unique<T>(std::forward<Args>(iArgs)...);
+}
 
 /// Wrap to shared pointer.
 template<typename T>
@@ -70,13 +72,15 @@ using shared = std::shared_ptr<T>;
 
 /**
  * @brief Wrap to shared pointer creator.
-* @tparam T Type of data.
-* @tparam Args Args type to pass to the constructor.
-* @param[in] iArgs Args to pass to the constructor.
-* @return Shared pointer.
-*/
+ * @tparam T Type of data.
+ * @tparam Args Args type to pass to the constructor.
+ * @param[in] iArgs Args to pass to the constructor.
+ * @return Shared pointer.
+ */
 template<typename T, typename... Args>
-constexpr shared<T> mkShared(Args &&... iArgs) { return std::make_shared<T>(std::forward<Args>(iArgs)...); }
+constexpr shared<T> mkShared(Args &&...iArgs) {
+	return std::make_shared<T>(std::forward<Args>(iArgs)...);
+}
 
 }// namespace owl
 

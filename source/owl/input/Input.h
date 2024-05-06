@@ -32,7 +32,7 @@ public:
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~Input() = default;
+	virtual ~Input();
 
 	/**
 	 * @brief Initialize the input;

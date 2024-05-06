@@ -40,7 +40,7 @@
 #endif
 
 #if defined(OWL_COMPILER_CLANG)
-#define OWL_DIAG_POP OWL_DO_PRAGMA(clang diagnostic push)
+#define OWL_DIAG_POP OWL_DO_PRAGMA(clang diagnostic pop)
 #define OWL_DIAG_PUSH OWL_DO_PRAGMA(clang diagnostic push)
 #define OWL_DIAG_DISABLE_CLANG(diag) OWL_DO_PRAGMA(clang diagnostic ignored diag)
 #if __clang_major__ > 15

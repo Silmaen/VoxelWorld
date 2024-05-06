@@ -159,34 +159,37 @@ void Renderer2D::init() {
 	}
 	// quads
 	g_data->drawQuad = DrawData::create();
-	g_data->drawQuad->init({
-								   {"a_Position", ShaderDataType::Float3},
-								   {"a_Color", ShaderDataType::Float4},
-								   {"a_TexCoord", ShaderDataType::Float2},
-								   {"a_TexIndex", ShaderDataType::Float},
-								   {"a_TilingFactor", ShaderDataType::Float},
-								   {"a_EntityID", ShaderDataType::Int},
-						   },
-						   "renderer2D", quadIndices, "quad");
+	g_data->drawQuad->init(
+			{
+					{"a_Position", ShaderDataType::Float3},
+					{"a_Color", ShaderDataType::Float4},
+					{"a_TexCoord", ShaderDataType::Float2},
+					{"a_TexIndex", ShaderDataType::Float},
+					{"a_TilingFactor", ShaderDataType::Float},
+					{"a_EntityID", ShaderDataType::Int},
+			},
+			"renderer2D", quadIndices, "quad");
 	// circles
 	g_data->drawCircle = DrawData::create();
-	g_data->drawCircle->init({
-									 {"a_WorldPosition", ShaderDataType::Float3},
-									 {"a_LocalPosition", ShaderDataType::Float3},
-									 {"a_Color", ShaderDataType::Float4},
-									 {"a_Thickness", ShaderDataType::Float},
-									 {"a_Fade", ShaderDataType::Float},
-									 {"a_EntityID", ShaderDataType::Int},
-							 },
-							 "renderer2D", quadIndices, "circle");
+	g_data->drawCircle->init(
+			{
+					{"a_WorldPosition", ShaderDataType::Float3},
+					{"a_LocalPosition", ShaderDataType::Float3},
+					{"a_Color", ShaderDataType::Float4},
+					{"a_Thickness", ShaderDataType::Float},
+					{"a_Fade", ShaderDataType::Float},
+					{"a_EntityID", ShaderDataType::Int},
+			},
+			"renderer2D", quadIndices, "circle");
 	// Lines
 	g_data->drawLine = DrawData::create();
-	g_data->drawLine->init({
-								   {"a_Position", ShaderDataType::Float3},
-								   {"a_Color", ShaderDataType::Float4},
-								   {"a_EntityID", ShaderDataType::Int},
-						   },
-						   "renderer2D", quadIndices, "line");
+	g_data->drawLine->init(
+			{
+					{"a_Position", ShaderDataType::Float3},
+					{"a_Color", ShaderDataType::Float4},
+					{"a_EntityID", ShaderDataType::Int},
+			},
+			"renderer2D", quadIndices, "line");
 
 	g_data->whiteTexture = Texture2D::create(1, 1);
 	uint32_t whiteTextureData = 0xffffffff;
@@ -202,8 +205,7 @@ void Renderer2D::init() {
 
 	// debug
 	g_data->drawDataTriangle = DrawData::create();
-	g_data->drawDataTriangle->init({},
-								   "renderer2D", quadIndices, "triangle");
+	g_data->drawDataTriangle->init({}, "renderer2D", quadIndices, "triangle");
 }
 
 void Renderer2D::shutdown() {
@@ -262,36 +264,37 @@ void Renderer2D::flush() {
 	// bind textures
 	RenderCommand::beginBatch();
 	RenderCommand::beginTextureLoad();
-	for (uint32_t i = 0; i < g_data->textureSlotIndex; i++)
-		g_data->textureSlots[i]->bind(i);
+	for (uint32_t i = 0; i < g_data->textureSlotIndex; i++) g_data->textureSlots[i]->bind(i);
 	RenderCommand::endTextureLoad();
 
 	if (g_data->quad.indexCount > 0) {
-		g_data->drawQuad->setVertexData(g_data->quad.vertexBuf.data(),
-										static_cast<uint32_t>(
-											g_data->quad.vertexBuf.size() * sizeof(utils::QuadVertex)));
+		g_data->drawQuad->setVertexData(
+				g_data->quad.vertexBuf.data(),
+				static_cast<uint32_t>(g_data->quad.vertexBuf.size() * sizeof(utils::QuadVertex)));
 
 		// draw call
 		RenderCommand::drawData(g_data->drawQuad, g_data->quad.indexCount);
 		g_data->stats.drawCalls++;
 	}
 	if (g_data->circle.indexCount > 0) {
-		g_data->drawCircle->setVertexData(g_data->circle.vertexBuf.data(),
-										  static_cast<uint32_t>(
-											  g_data->circle.vertexBuf.size() * sizeof(utils::CircleVertex)));
+		g_data->drawCircle->setVertexData(
+				g_data->circle.vertexBuf.data(),
+				static_cast<uint32_t>(g_data->circle.vertexBuf.size() * sizeof(utils::CircleVertex)));
 		// draw call
 		RenderCommand::drawData(g_data->drawCircle, g_data->circle.indexCount);
 		g_data->stats.drawCalls++;
 	}
 	if (g_data->line.indexCount > 0) {
-		g_data->drawLine->setVertexData(g_data->line.vertexBuf.data(),
-										static_cast<uint32_t>(
-											g_data->line.vertexBuf.size() * sizeof(utils::LineVertex)));
+		g_data->drawLine->setVertexData(
+				g_data->line.vertexBuf.data(),
+				static_cast<uint32_t>(g_data->line.vertexBuf.size() * sizeof(utils::LineVertex)));
 		// draw call
 		RenderCommand::drawData(g_data->drawLine, g_data->line.indexCount);
 		g_data->stats.drawCalls++;
 	}
-	if (g_data->doTriangleDraw) { RenderCommand::drawData(g_data->drawDataTriangle, 3); }
+	if (g_data->doTriangleDraw) {
+		RenderCommand::drawData(g_data->drawDataTriangle, 3);
+	}
 	RenderCommand::endBatch();
 }
 
@@ -325,10 +328,8 @@ void Renderer2D::drawRect(const RectData &iRectData) {
 	const glm::mat4 trans = iRectData.transform.transform;
 	std::vector<glm::vec3> points;
 	static const std::vector<std::pair<uint8_t, uint8_t>> idx = {{0, 1}, {1, 2}, {2, 3}, {3, 0}};
-	for (const auto &vtx: utils::g_quadVertexPositions)
-		points.emplace_back(trans * vtx);
-	for (const auto &[p1, p2]: idx)
-		drawLine({points[p1], points[p2], iRectData.color, iRectData.entityID});
+	for (const auto &vtx: utils::g_quadVertexPositions) points.emplace_back(trans * vtx);
+	for (const auto &[p1, p2]: idx) drawLine({points[p1], points[p2], iRectData.color, iRectData.entityID});
 }
 
 void Renderer2D::drawPolyLine(const PolyLineData &iLineData) {
@@ -348,8 +349,7 @@ void Renderer2D::drawPolyLine(const PolyLineData &iLineData) {
 	}
 	if (iLineData.closed)
 		link.emplace_back(iLineData.points.size() - 1, 0);
-	for (const auto &[p1, p2]: link)
-		drawLine({points[p1], points[p2], iLineData.color, iLineData.entityID});
+	for (const auto &[p1, p2]: link) drawLine({points[p1], points[p2], iLineData.color, iLineData.entityID});
 }
 
 void Renderer2D::drawCircle(const CircleData &iCircleData) {
@@ -360,13 +360,13 @@ void Renderer2D::drawCircle(const CircleData &iCircleData) {
 	// 	nextBatch();
 
 	for (const auto &vtx: utils::g_quadVertexPositions) {
-		g_data->circle.vertexBuf.emplace_back(utils::CircleVertex{
-				.worldPosition = iCircleData.transform.transform * vtx,
-				.localPosition = vtx * 2.0f,
-				.color = iCircleData.color,
-				.thickness = iCircleData.thickness,
-				.fade = iCircleData.fade,
-				.entityID = iCircleData.entityID});
+		g_data->circle.vertexBuf.emplace_back(
+				utils::CircleVertex{.worldPosition = iCircleData.transform.transform * vtx,
+									.localPosition = vtx * 2.0f,
+									.color = iCircleData.color,
+									.thickness = iCircleData.thickness,
+									.fade = iCircleData.fade,
+									.entityID = iCircleData.entityID});
 	}
 
 	g_data->circle.indexCount += 6;
@@ -374,6 +374,9 @@ void Renderer2D::drawCircle(const CircleData &iCircleData) {
 	g_data->stats.quadCount++;
 }
 
+
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 void Renderer2D::drawQuad(const Quad2DData &iQuadData) {
 	OWL_PROFILE_FUNCTION()
 	if (g_data->quad.indexCount >= utils::g_maxIndices)
@@ -395,18 +398,19 @@ void Renderer2D::drawQuad(const Quad2DData &iQuadData) {
 		}
 	}
 	for (size_t i = 0; i < utils::g_quadVertexCount; i++) {
-		g_data->quad.vertexBuf.emplace_back(utils::QuadVertex{
-				.position = iQuadData.transform.transform * utils::g_quadVertexPositions[i],
-				.color = iQuadData.color,
-				.texCoord = utils::g_textureCoords[i],
-				.texIndex = textureIndex,
-				.tilingFactor = iQuadData.tilingFactor,
-				.entityID = iQuadData.entityID});
+		g_data->quad.vertexBuf.emplace_back(
+				utils::QuadVertex{.position = iQuadData.transform.transform * utils::g_quadVertexPositions[i],
+								  .color = iQuadData.color,
+								  .texCoord = utils::g_textureCoords[i],
+								  .texIndex = textureIndex,
+								  .tilingFactor = iQuadData.tilingFactor,
+								  .entityID = iQuadData.entityID});
 	}
 	g_data->quad.indexCount += 6;
 
 	g_data->stats.quadCount++;
 }
+OWL_DIAG_POP
 
 void Renderer2D::drawSprite(const glm::mat4 &iTransform, const scene::component::SpriteRenderer &iSrc,
 							const int iEntityID) {

@@ -14,22 +14,24 @@ namespace owl::scene {
 /**
  * @brief Class ScriptableEntity.
  */
-class OWL_API ScriptableEntity {
+class OWL_API ScriptableEntity final {
 public:
 	/**
 	 * @brief Wrapper to access to a component.
 	 * @tparam T Type of component.
 	 * @return The component.
 	 */
-	template <typename T>
-	T& getComponent() { return entity.getComponent<T>(); }
+	template<typename T>
+	T &getComponent() {
+		return entity.getComponent<T>();
+	}
 
 	/// The actual entity.
 	Entity entity;
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~ScriptableEntity() = default;
+	virtual ~ScriptableEntity();
 	/**
 	 * @brief Function called on script creation.
 	 */
@@ -42,10 +44,10 @@ public:
 	 * @brief Function called on script update.
 	 * @param[in] iTimeStep Timestamp.
 	 */
-	virtual void onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) {}
+	virtual void onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) {}
 
 private:
 	/// To access the scene privates.
 	friend class scene;
 };
-} // namespace owl::scene
+}// namespace owl::scene

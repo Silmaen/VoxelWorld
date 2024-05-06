@@ -27,7 +27,7 @@ public:
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override { return Category::Input | Category::Keyboard; }
+	[[nodiscard]] uint8_t getCategoryFlags() const final;
 
 protected:
 	explicit KeyEvent(const input::KeyCode iKeyCode) : m_keyCode(iKeyCode) {}
@@ -66,7 +66,7 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("KeyPressedEvent"); }
+	[[nodiscard]] std::string getName() const override;
 
 	/**
 	 * @brief Get the event's static type.
@@ -106,7 +106,7 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("KeyReleasedEvent"); }
+	[[nodiscard]] std::string getName() const override;
 
 	/**
 	 * @brief Get the event's static type.
@@ -124,7 +124,7 @@ public:
 /**
  * @brief Event of key typed
  */
-class KeyTypedEvent final : public KeyEvent {
+class OWL_API KeyTypedEvent final : public KeyEvent {
 public:
 	/**
 	 * @brief Constructor.
@@ -142,7 +142,7 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("KeyTypedEvent"); }
+	[[nodiscard]] std::string getName() const override;
 
 	/**
 	 * @brief Get the event's static type.
