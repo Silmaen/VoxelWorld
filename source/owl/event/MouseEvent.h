@@ -53,7 +53,7 @@ public:
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override { return Category::Input | Category::Mouse; }
+	[[nodiscard]] uint8_t getCategoryFlags() const override;
 
 	/**
 	 * @brief Get the event's static type.
@@ -84,8 +84,7 @@ public:
 	 * @param[in] iXOffset X wheel offset.
 	 * @param[in] iYOffset Y wheel offset.
 	 */
-	MouseScrolledEvent(const float iXOffset, const float iYOffset)
-		: m_xOffset(iXOffset), m_yOffset(iYOffset) {}
+	MouseScrolledEvent(const float iXOffset, const float iYOffset) : m_xOffset(iXOffset), m_yOffset(iYOffset) {}
 
 	/**
 	 * @brief Get X wheel offset.
@@ -129,7 +128,7 @@ public:
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override { return Category::Input | Category::Mouse; }
+	[[nodiscard]] uint8_t getCategoryFlags() const override;
 
 private:
 	/// X wheel offset.
@@ -153,17 +152,14 @@ public:
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override {
-		return Category::Input | Category::Mouse | Category::MouseButton;
-	}
+	[[nodiscard]] uint8_t getCategoryFlags() const override;
 
 protected:
 	/**
 	 * @brief Constructor.
 	 * @param[in] iXOffset The mouse button.
 	 */
-	explicit MouseButtonEvent(const input::MouseCode iXOffset)
-		: m_mouseButton(iXOffset) {}
+	explicit MouseButtonEvent(const input::MouseCode iXOffset) : m_mouseButton(iXOffset) {}
 
 	/// The mouse button of the event.
 	input::MouseCode m_mouseButton;
@@ -178,8 +174,7 @@ public:
 	 * @brief Constructor.
 	 * @param[in] iButton The mouse button.
 	 */
-	explicit MouseButtonPressedEvent(const input::MouseCode iButton)
-		: MouseButtonEvent(iButton) {}
+	explicit MouseButtonPressedEvent(const input::MouseCode iButton) : MouseButtonEvent(iButton) {}
 
 	/**
 	 * @brief Get the event as string.
@@ -193,7 +188,7 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("MouseButtonPressedEvent"); }
+	[[nodiscard]] std::string getName() const override;
 
 	/**
 	 * @brief Get the event's static type.
@@ -217,8 +212,7 @@ public:
 	 * @brief Constructor.
 	 * @param[in] iButton The mouse button.
 	 */
-	explicit MouseButtonReleasedEvent(const input::MouseCode iButton)
-		: MouseButtonEvent(iButton) {}
+	explicit MouseButtonReleasedEvent(const input::MouseCode iButton) : MouseButtonEvent(iButton) {}
 
 	/**
 	 * @brief Get the event as string.
@@ -232,7 +226,7 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("MouseButtonReleasedEvent"); }
+	[[nodiscard]] std::string getName() const override;
 
 	/**
 	 * @brief Get the event's static type.
@@ -246,4 +240,4 @@ public:
 	 */
 	[[nodiscard]] Type getType() const override { return getStaticType(); }
 };
-} // namespace owl::event
+}// namespace owl::event

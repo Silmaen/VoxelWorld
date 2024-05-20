@@ -178,5 +178,27 @@ if (OWL_PLATFORM_WINDOWS)
             )
         endforeach ()
     endif ()
+elseif (OWL_PLATFORM_LINUX)
+    get_target_property(DEPENDENCIES ${ENGINE_NAME} INTERFACE_LINK_LIBRARIES)
 
+    foreach (DEP ${DEPENDENCIES})
+        # Filtrer les dépendances LINK_ONLY
+        string(REGEX REPLACE "^\\$<LINK_ONLY:(.*)>$" "\\1" DEP ${DEP})
+        # Vérifier si la dépendance est une cible
+        if (TARGET ${DEP})
+            get_target_property(TYPE ${DEP} TYPE)
+            message(STATUS "Found dep type: ${TYPE}: ${DEP}")
+            if (TYPE STREQUAL "SHARED_LIBRARY")
+                get_target_property(LIB_PATH ${DEP} LOCATION)
+                get_target_property(LIB_PATH2 ${DEP} LINK_DEPENDS)
+                message(STATUS "Will copy shared library: ${LIB_PATH}")
+                message(STATUS "Will copy shared library: ${LIB_PATH2}")
+
+                add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy "${LIB_PATH}" "$<TARGET_FILE_DIR:${ENGINE_NAME}>"
+                        COMMENT "Copy shared library ${DEP}"
+                )
+            endif ()
+        endif ()
+    endforeach ()
 endif ()

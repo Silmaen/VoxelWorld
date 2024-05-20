@@ -51,12 +51,14 @@ void SceneHierarchy::onImGuiRender() {
 void SceneHierarchy::drawEntityNode(scene::Entity &ioEntity) {
 	const auto &tag = ioEntity.getComponent<scene::component::Tag>().tag;
 
-	ImGuiTreeNodeFlags flags = ((m_selection == ioEntity) ? ImGuiTreeNodeFlags_Selected : 0) |
-							   ImGuiTreeNodeFlags_OpenOnArrow;
+	ImGuiTreeNodeFlags flags =
+			((m_selection == ioEntity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 	const bool opened = ImGui::TreeNodeEx(
 			reinterpret_cast<void *>(static_cast<uint64_t>(static_cast<uint32_t>(ioEntity))), flags, "%s", tag.c_str());
-	if (ImGui::IsItemClicked()) { m_selection = ioEntity; }
+	if (ImGui::IsItemClicked()) {
+		m_selection = ioEntity;
+	}
 
 	bool entityDeleted = false;
 	if (ImGui::BeginPopupContextItem()) {
@@ -146,20 +148,22 @@ static void drawVec3Control(const std::string &iLabel, glm::vec3 &iValues, const
 
 template<typename T, typename UIFunction>
 static void drawComponent(const std::string &iName, scene::Entity &ioEntity, UIFunction iUiFunction) {
-	constexpr ImGuiTreeNodeFlags treeNodeFlags =
-			ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth |
-			ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+	constexpr ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
+												 ImGuiTreeNodeFlags_SpanAvailWidth |
+												 ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 	if (ioEntity.hasComponent<T>()) {
 		auto &component = ioEntity.getComponent<T>();
 		const ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
 		const float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 		ImGui::Separator();
-		const bool open = ImGui::TreeNodeEx(reinterpret_cast<void *>(typeid(T).hash_code()), treeNodeFlags, "%s",
-											iName.c_str());
+		const bool open =
+				ImGui::TreeNodeEx(reinterpret_cast<void *>(typeid(T).hash_code()), treeNodeFlags, "%s", iName.c_str());
 		ImGui::PopStyleVar();
 		ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-		if (ImGui::Button("+", ImVec2{lineHeight, lineHeight})) { ImGui::OpenPopup("ComponentSettings"); }
+		if (ImGui::Button("+", ImVec2{lineHeight, lineHeight})) {
+			ImGui::OpenPopup("ComponentSettings");
+		}
 		bool removeComponent = false;
 		if (ImGui::BeginPopup("ComponentSettings")) {
 			if (ImGui::MenuItem("Remove component"))
@@ -175,6 +179,8 @@ static void drawComponent(const std::string &iName, scene::Entity &ioEntity, UIF
 	}
 }
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 void SceneHierarchy::drawComponents(scene::Entity &ioEntity) {
 	if (ioEntity.hasComponent<scene::component::Tag>()) {
 		auto &tag = ioEntity.getComponent<scene::component::Tag>().tag;
@@ -182,7 +188,9 @@ void SceneHierarchy::drawComponents(scene::Entity &ioEntity) {
 		char buffer[256];
 		memset(buffer, 0, sizeof(buffer));
 		memcpy(buffer, tag.c_str(), sizeof(buffer));
-		if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) { tag = std::string(buffer); }
+		if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
+			tag = std::string(buffer);
+		}
 	}
 
 	ImGui::SameLine();
@@ -223,29 +231,23 @@ void SceneHierarchy::drawComponents(scene::Entity &ioEntity) {
 		auto &camera = component.camera;
 		ImGui::Checkbox("Primary", &component.primary);
 		const char *projectionTypeStrings[] = {"Perspective", "Orthographic"};
-		const char *currentProjectionTypeString = projectionTypeStrings[
-			static_cast<int>(camera.getProjectionType())];
+		const char *currentProjectionTypeString = projectionTypeStrings[static_cast<int>(camera.getProjectionType())];
 		if (ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
 			for (int i = 0; i < 2; i++) {
-				const bool isSelected =
-						currentProjectionTypeString == projectionTypeStrings[i];
+				const bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
 				if (ImGui::Selectable(projectionTypeStrings[i], isSelected)) {
 					currentProjectionTypeString = projectionTypeStrings[i];
-					camera.setProjectionType(
-							static_cast<scene::SceneCamera::ProjectionType>(i));
+					camera.setProjectionType(static_cast<scene::SceneCamera::ProjectionType>(i));
 				}
 				if (isSelected)
 					ImGui::SetItemDefaultFocus();
 			}
 			ImGui::EndCombo();
 		}
-		if (camera.getProjectionType() ==
-			scene::SceneCamera::ProjectionType::Perspective) {
-			float perspectiveVerticalFov = glm::degrees(
-					camera.getPerspectiveVerticalFOV());
+		if (camera.getProjectionType() == scene::SceneCamera::ProjectionType::Perspective) {
+			float perspectiveVerticalFov = glm::degrees(camera.getPerspectiveVerticalFOV());
 			if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov))
-				camera.setPerspectiveVerticalFOV(
-						glm::radians(perspectiveVerticalFov));
+				camera.setPerspectiveVerticalFOV(glm::radians(perspectiveVerticalFov));
 			float perspectiveNear = camera.getPerspectiveNearClip();
 			if (ImGui::DragFloat("Near", &perspectiveNear))
 				camera.setPerspectiveNearClip(perspectiveNear);
@@ -253,8 +255,7 @@ void SceneHierarchy::drawComponents(scene::Entity &ioEntity) {
 			if (ImGui::DragFloat("Far", &perspectiveFar))
 				camera.setPerspectiveFarClip(perspectiveFar);
 		}
-		if (camera.getProjectionType() ==
-			scene::SceneCamera::ProjectionType::Orthographic) {
+		if (camera.getProjectionType() == scene::SceneCamera::ProjectionType::Orthographic) {
 			float orthoSize = camera.getOrthographicSize();
 			if (ImGui::DragFloat("Size", &orthoSize))
 				camera.setOrthographicSize(orthoSize);
@@ -271,29 +272,21 @@ void SceneHierarchy::drawComponents(scene::Entity &ioEntity) {
 		ImGui::ColorEdit4("Color", glm::value_ptr(component.color));
 		ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget()) {
-			if (const ImGuiPayload *payload =
-					ImGui::AcceptDragDropPayload(
-							"CONTENT_BROWSER_ITEM")) {
-				const auto path = static_cast<const char *>(payload->
-					Data);
-				const std::filesystem::path texturePath =
-						core::Application::get().getAssetDirectory() /
-						path;
-				component.texture = renderer::Texture2D::create(
-						texturePath);
+			if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+				const auto path = static_cast<const char *>(payload->Data);
+				const std::filesystem::path texturePath = core::Application::get().getAssetDirectory() / path;
+				component.texture = renderer::Texture2D::create(texturePath);
 			}
 			ImGui::EndDragDropTarget();
 		}
-		ImGui::DragFloat(
-				"Tiling Factor", &component.tilingFactor, 0.1f, 0.0f,
-				100.0f);
+		ImGui::DragFloat("Tiling Factor", &component.tilingFactor, 0.1f, 0.0f, 100.0f);
 	});
 	drawComponent<scene::component::CircleRenderer>("Circle Renderer", ioEntity, [](auto &component) {
 		ImGui::ColorEdit4("Color", glm::value_ptr(component.color));
-		ImGui::DragFloat(
-				"Thickness", &component.thickness, 0.025f, 0.0f, 1.0f);
+		ImGui::DragFloat("Thickness", &component.thickness, 0.025f, 0.0f, 1.0f);
 		ImGui::DragFloat("Fade", &component.fade, 0.00025f, 0.0f, 1.0f);
 	});
 }
+OWL_DIAG_POP
 
 }// namespace owl::panel

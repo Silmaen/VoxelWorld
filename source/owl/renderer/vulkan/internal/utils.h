@@ -9,12 +9,9 @@
 #pragma once
 #include "../Framebuffer.h"
 
-namespace owl::renderer::vulkan::internal
-{
-	static constexpr std::string resultString(const VkResult iResult)
-	{
-		switch (iResult)
-		{
+namespace owl::renderer::vulkan::internal {
+static constexpr std::string resultString(const VkResult iResult) {
+	switch (iResult) {
 		case VK_SUCCESS:
 			return "VK_SUCCESS";
 		case VK_NOT_READY:
@@ -111,34 +108,33 @@ namespace owl::renderer::vulkan::internal
 			return "VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT";
 		case VK_RESULT_MAX_ENUM:
 			return "VK_RESULT_MAX_ENUM";
-		}
-		return "VK_RESULT_unknown";
 	}
+	return "VK_RESULT_unknown";
+}
 
-	VkFormat attachmentFormatToVulkan(const AttachmentSpecification::Format& iFormat);
+VkFormat attachmentFormatToVulkan(const AttachmentSpecification::Format &iFormat);
 
-	VkImageAspectFlags attachmentFormatToAspect(const AttachmentSpecification::Format& iFormat);
+VkImageAspectFlags attachmentFormatToAspect(const AttachmentSpecification::Format &iFormat);
 
-	uint32_t attachmentFormatToSize(const AttachmentSpecification::Format& iFormat);
+uint32_t attachmentFormatToSize(const AttachmentSpecification::Format &iFormat);
 
-	VkImageTiling attachmentTilingToVulkan(const AttachmentSpecification::Tiling& iTiling);
+VkImageTiling attachmentTilingToVulkan(const AttachmentSpecification::Tiling &iTiling);
 
-	void copyBuffer(const VkBuffer& iSrcBuffer, const VkBuffer& iDstBuffer, const VkDeviceSize iSize);
+void copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, VkDeviceSize iSize);
 
-	void createBuffer(VkDeviceSize iSize, VkBufferUsageFlags iUsage, VkMemoryPropertyFlags iProperties,
-	                  VkBuffer& iBuffer, VkDeviceMemory& iBufferMemory);
-	void transitionImageLayout(const VkImage& iImage, VkImageLayout iOldLayout, VkImageLayout iNewLayout);
-	void transitionImageLayout(const VkCommandBuffer& iCmd, const VkImage& iImage, VkImageLayout iOldLayout,
-	                           VkImageLayout
-	                           iNewLayout);
+void createBuffer(VkDeviceSize iSize, VkBufferUsageFlags iUsage, VkMemoryPropertyFlags iProperties, VkBuffer &iBuffer,
+				  VkDeviceMemory &iBufferMemory);
+void transitionImageLayout(const VkImage &iImage, VkImageLayout iOldLayout, VkImageLayout iNewLayout);
+void transitionImageLayout(const VkCommandBuffer &iCmd, const VkImage &iImage, VkImageLayout iOldLayout,
+						   VkImageLayout iNewLayout);
 
-	void copyBufferToImage(const VkBuffer& iBuffer, const VkImage& iImage, const math::FrameSize& iSize,
-	                       const math::FrameSize& iOffset = {0, 0});
+void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const math::FrameSize &iSize,
+					   const math::FrameSize &iOffset = {0, 0});
 
-	void copyImageToBuffer(const VkImage& iImage, const VkBuffer& iBuffer, const math::FrameSize& iSize,
-	                       const math::FrameSize& iOffset = {0, 0});
+void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const math::FrameSize &iSize,
+					   const math::FrameSize &iOffset = {0, 0});
 
-	static constexpr VkExtent2D toExtent(const math::FrameSize& iSize) { return {iSize.getWidth(), iSize.getHeight()}; }
+static constexpr VkExtent2D toExtent(const math::FrameSize &iSize) { return {iSize.getWidth(), iSize.getHeight()}; }
 
-	static constexpr math::FrameSize toFrameSize(const VkExtent2D& iSize) { return {iSize.width, iSize.height}; }
-} // namespace owl::renderer::vulkan::internal
+static constexpr math::FrameSize toFrameSize(const VkExtent2D &iSize) { return {iSize.width, iSize.height}; }
+}// namespace owl::renderer::vulkan::internal

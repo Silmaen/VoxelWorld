@@ -93,9 +93,9 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
             -Wno-global-constructors # Ony in gtest -> only for tests
     )
-    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 16)
+    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18)
         target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
-                -Wno-unsafe-buffer-usage
+                -Wno-switch-default
         )
     endif ()
     set(${PRJPREFIX}_COMPILER_CLANG ON)

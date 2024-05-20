@@ -5,6 +5,8 @@
  * Copyright (c) 2023 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "owlpch.h"
+
 #include "TextureLibrary.h"
 
 namespace owl::renderer {
@@ -12,8 +14,7 @@ namespace owl::renderer {
 TextureLibrary::TextureLibrary() = default;
 
 TextureLibrary::~TextureLibrary() {
-	for (auto &texture: m_textures)
-		texture.second.reset();
+	for (auto &texture: m_textures) texture.second.reset();
 	m_textures.clear();
 }
 

@@ -81,6 +81,8 @@ std::string getPixelFormatString(const uint32_t iPixelFormat) {
 	}
 }
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 std::string unFourCC(const uint32_t pixelFormat) {
 	constexpr uint32_t mmask = 0xff;
 	char fcc[4];
@@ -90,6 +92,7 @@ std::string unFourCC(const uint32_t pixelFormat) {
 	fcc[3] = static_cast<char>((pixelFormat >> 24) & mmask);
 	return fcc;
 }
+OWL_DIAG_POP
 
 Device::PixelFormat getDevicePixelFormat(const uint32_t iPixelFormat) {
 	if (iPixelFormat == V4L2_PIX_FMT_RGB24)
@@ -121,19 +124,22 @@ uint32_t getV4L2PixelFormat(const Device::PixelFormat &iPixelFormat) {
 void updateList(std::vector<shared<video::Device>> &ioList) {
 	// check if all listed devices still exists
 	if (std::remove_if(ioList.begin(), ioList.end(), [](const shared<video::Device> &dev) {
-		return !std::static_pointer_cast<Device>(dev)->isValid();
-	}) != ioList.end()) { OWL_CORE_WARN("Possible problems during video input listing.") }
+			return !std::static_pointer_cast<Device>(dev)->isValid();
+		}) != ioList.end()) {
+		OWL_CORE_WARN("Possible problems during video input listing.")
+	}
 
 	// search for new devices.
 	size_t devCounter = 0;
 	for (size_t iCam = 0; iCam < g_maxDevices; ++iCam) {
 		auto testDev = mkShared<Device>(fmt::format("/dev/video{}", iCam).c_str());
-		if (!testDev->isValid()) { continue; }
+		if (!testDev->isValid()) {
+			continue;
+		}
 		// don't add a device that already exists
-		if (std::find_if(ioList.begin(), ioList.end(),
-		                 [&testDev](const shared<video::Device> &dev) {
-			                 return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo();
-		                 }) != ioList.end())
+		if (std::find_if(ioList.begin(), ioList.end(), [&testDev](const shared<video::Device> &dev) {
+				return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo();
+			}) != ioList.end())
 			continue;
 		OWL_CORE_TRACE("Found: {} ({}) [{}] ", devCounter, testDev->getName(), testDev->getBusInfo())
 		ioList.push_back(testDev);
@@ -141,8 +147,7 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 	}
 }
 
-Device::Device(std::string iFile)
-	: video::Device{""}, m_file{std::move(iFile)} {
+Device::Device(std::string iFile) : video::Device{""}, m_file{std::move(iFile)} {
 	if (!exists(std::filesystem::path(m_file)))
 		return;
 
@@ -220,8 +225,7 @@ void Device::open() {
 		OWL_CORE_INFO("({}) Using size is {} x {}", m_file, fmt.fmt.pix.width, fmt.fmt.pix.height)
 		OWL_CORE_INFO("({}) Using pixel format: {}", m_file, getPixelFormatString(fmt.fmt.pix.pixelformat))
 		m_pixFormat = getDevicePixelFormat(fmt.fmt.pix.pixelformat);
-		m_size = {fmt.fmt.pix.width,
-		          fmt.fmt.pix.height};
+		m_size = {fmt.fmt.pix.width, fmt.fmt.pix.height};
 	}
 	// request buffer from device.
 	{
@@ -251,7 +255,7 @@ void Device::open() {
 		}
 		OWL_CORE_INFO("({}) Buffer info, length {} , offset {}.", m_file, m_bufferInfo.length, m_bufferInfo.m.offset)
 		mp_buffer = mmap(nullptr, m_bufferInfo.length, PROT_READ | PROT_WRITE, MAP_SHARED, m_fileHandler,
-		                 m_bufferInfo.m.offset);
+						 m_bufferInfo.m.offset);
 		if (mp_buffer == MAP_FAILED) {
 			OWL_CORE_ERROR("({}) Unable to map the device buffer.", m_file)
 			close();
@@ -299,21 +303,25 @@ void Device::fillFrame(shared<renderer::Texture> &ioFrame) {
 	if (!m_streaming)
 		return;// need to be open and ready!
 	// recreate the frame if not the right size.
-	if (!ioFrame || ioFrame->getSize() != m_size) { ioFrame = renderer::Texture2D::create(m_size, false); }
+	if (!ioFrame || ioFrame->getSize() != m_size) {
+		ioFrame = renderer::Texture2D::create(m_size, false);
+	}
 	// dequeue the buffer
 	if (ioctl(m_fileHandler, VIDIOC_DQBUF, &m_bufferInfo) < 0) {
 		OWL_CORE_WARN("Device ({}) unable to dequeue the buffer.", m_file)
 		return;
 	}
 
-	std::vector<uint8_t> convertedBuffer = getRgbBuffer(static_cast<const uint8_t *>(mp_buffer),
-	                                                    static_cast<int32_t>(m_bufferInfo.bytesused));
+	std::vector<uint8_t> convertedBuffer =
+			getRgbBuffer(static_cast<const uint8_t *>(mp_buffer), static_cast<int32_t>(m_bufferInfo.bytesused));
 	// frames are written after dequeing the buffer
 	if (!convertedBuffer.empty()) {
 		if (m_size.surface() * 3 != convertedBuffer.size()) {
 			OWL_CORE_WARN("Device ({}) buffer size missmatch: {}, expecting {}.", m_file, m_bufferInfo.bytesused,
-			              m_size.surface() * 3)
-		} else { ioFrame->setData(convertedBuffer.data(), static_cast<uint32_t>(convertedBuffer.size())); }
+						  m_size.surface() * 3)
+		} else {
+			ioFrame->setData(convertedBuffer.data(), static_cast<uint32_t>(convertedBuffer.size()));
+		}
 	}
 	// queue the buffer
 	if (ioctl(m_fileHandler, VIDIOC_QBUF, &m_bufferInfo) < 0) {
@@ -386,7 +394,7 @@ void Device::printSupportedFormat() const {
 	// Boucle pour interroger chaque format de pixel
 	while (ioctl(fd, VIDIOC_ENUM_FMT, &formatDescription) == 0) {
 		OWL_CORE_INFO("({}) index {} format {}", m_file, formatDescription.index,
-		              getPixelFormatString(formatDescription.pixelformat))
+					  getPixelFormatString(formatDescription.pixelformat))
 		// Incrémentation pour passer au format de pixel suivant
 		++formatDescription.index;
 	}

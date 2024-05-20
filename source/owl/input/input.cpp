@@ -17,6 +17,9 @@ namespace owl::input {
 Type Input::ms_type = Type::GLFW;
 uniq<Input> Input::mus_instance = nullptr;
 
+Input::~Input() = default;
+
+
 void Input::init(const Type &iType) {
 	if (mus_instance)
 		mus_instance.reset();

@@ -19,13 +19,13 @@ constexpr float g_one = 1.f;
 constexpr float g_epsi = glm::epsilon<float>();
 
 glm::mat4 composeTransform(const glm::vec3 &iTranslation, const glm::vec3 &iRotation, const glm::vec3 &iScale) {
-	return glm::translate(glm::mat4(1.0f), iTranslation) *
-	       glm::rotate(glm::mat4(1.0f), iRotation[2], {0, 0, 1}) *
-	       glm::rotate(glm::mat4(1.0f), iRotation[1], {0, 1, 0}) *
-	       glm::rotate(glm::mat4(1.0f), iRotation[0], {1, 0, 0}) *
-	       glm::scale(glm::mat4(1.0f), iScale);
+	return glm::translate(glm::mat4(1.0f), iTranslation) * glm::rotate(glm::mat4(1.0f), iRotation[2], {0, 0, 1}) *
+		   glm::rotate(glm::mat4(1.0f), iRotation[1], {0, 1, 0}) *
+		   glm::rotate(glm::mat4(1.0f), iRotation[0], {1, 0, 0}) * glm::scale(glm::mat4(1.0f), iScale);
 }
 
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
 bool decomposeTransform(const glm::mat4 &iTransform, glm::vec3 &oTranslation, glm::vec3 &oRotation, glm::vec3 &oScale) {
 	// From glm::decompose in matrix_decompose.inl
 
@@ -34,13 +34,12 @@ bool decomposeTransform(const glm::mat4 &iTransform, glm::vec3 &oTranslation, gl
 	if (glm::epsilonEqual(localMatrix[3][3], g_zero, g_epsi))
 		return false;
 	for (uint8_t i = 0; i < 4; ++i) {
-		for (uint8_t j = 0; j < 4; ++j)
-			localMatrix[i][j] /= localMatrix[3][3];
+		for (uint8_t j = 0; j < 4; ++j) localMatrix[i][j] /= localMatrix[3][3];
 	}
 	// first Suppress perspective.
 	if (glm::epsilonNotEqual(localMatrix[0][3], g_zero, g_epsi) ||
-	    glm::epsilonNotEqual(localMatrix[1][3], g_zero, g_epsi) ||
-	    glm::epsilonNotEqual(localMatrix[2][3], g_zero, g_epsi)) {
+		glm::epsilonNotEqual(localMatrix[1][3], g_zero, g_epsi) ||
+		glm::epsilonNotEqual(localMatrix[2][3], g_zero, g_epsi)) {
 		// clear the perspective part
 		localMatrix[0][3] = localMatrix[1][3] = localMatrix[2][3] = g_zero;
 		localMatrix[3][3] = g_one;
@@ -53,8 +52,7 @@ bool decomposeTransform(const glm::mat4 &iTransform, glm::vec3 &oTranslation, gl
 
 	// Now get scale and shear.
 	for (glm::length_t i = 0; i < 3; ++i) {
-		for (glm::length_t j = 0; j < 3; ++j)
-			row[i][j] = localMatrix[i][j];
+		for (glm::length_t j = 0; j < 3; ++j) row[i][j] = localMatrix[i][j];
 	}
 	// Compute X scale factor and normalize first row.
 	oScale.x = glm::length(row[0]);
@@ -97,5 +95,6 @@ bool decomposeTransform(const glm::mat4 &iTransform, glm::vec3 &oTranslation, gl
 
 	return true;
 }
+OWL_DIAG_POP
 
 }// namespace owl::math

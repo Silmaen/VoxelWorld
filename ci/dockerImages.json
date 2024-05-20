@@ -1,15 +1,15 @@
 {
   "images": {
-    "CodeCoverage": "builder-gcc12-ubuntu2204",
-    "Documentation": "builder-clang15-ubuntu2204",
-    "clang-tidy": "builder-clang15-ubuntu2204",
-    "linux-gcc-release-static": "builder-gcc12-ubuntu2204",
-    "linux-gcc-debug-static": "builder-gcc12-ubuntu2204",
-    "linux-gcc-release-shared": "builder-gcc12-ubuntu2204",
-    "linux-gcc-debug-shared": "builder-gcc12-ubuntu2204",
-    "linux-clang-release-static": "builder-clang15-ubuntu2204",
-    "linux-clang-debug-static": "builder-clang15-ubuntu2204",
-    "linux-clang-release-shared": "builder-clang15-ubuntu2204",
-    "linux-clang-debug-shared": "builder-clang15-ubuntu2204"
+    "CodeCoverage": "builder-gcc14-ubuntu2404",
+    "Documentation": "builder-clang18-ubuntu2404",
+    "clang-tidy": "builder-clang18-ubuntu2404",
+    "linux-gcc-release-static": "builder-gcc14-ubuntu2404",
+    "linux-gcc-debug-static": "builder-gcc14-ubuntu2404",
+    "linux-gcc-release-shared": "builder-gcc14-ubuntu2404",
+    "linux-gcc-debug-shared": "builder-gcc14-ubuntu2404",
+    "linux-clang-release-static": "builder-clang18-ubuntu2404",
+    "linux-clang-debug-static": "builder-clang18-ubuntu2404",
+    "linux-clang-release-shared": "builder-clang18-ubuntu2404",
+    "linux-clang-debug-shared": "builder-clang18-ubuntu2404"
   }
 }

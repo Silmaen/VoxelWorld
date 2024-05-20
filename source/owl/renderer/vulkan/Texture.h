@@ -26,7 +26,7 @@ public:
 	 * @brief Default constructor.
 	 * @param[in] iPath path to the texture image file.
 	 */
-	Texture2D(std::filesystem::path iPath);
+	explicit Texture2D(std::filesystem::path iPath);
 	/**
 	 * @brief Constructor by size.
 	 * @param[in] iWidth Texture's width.
@@ -39,7 +39,7 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 */
-	Texture2D(const math::FrameSize &iSize, bool iWithAlpha = true);
+	explicit Texture2D(const math::FrameSize &iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Destructor.

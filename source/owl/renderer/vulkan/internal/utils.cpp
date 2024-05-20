@@ -5,6 +5,7 @@
  * Copyright © 2024 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "owlpch.h"
 
 #include "utils.h"
 
@@ -75,17 +76,16 @@ void copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, const Vk
 }
 
 void createBuffer(const VkDeviceSize iSize, const VkBufferUsageFlags iUsage, const VkMemoryPropertyFlags iProperties,
-                  VkBuffer &iBuffer, VkDeviceMemory &iBufferMemory) {
+				  VkBuffer &iBuffer, VkDeviceMemory &iBufferMemory) {
 	const auto &core = VulkanCore::get();
-	const VkBufferCreateInfo bufferInfo{
-			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.size = iSize,
-			.usage = iUsage,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-			.queueFamilyIndexCount = 0,
-			.pQueueFamilyIndices = nullptr};
+	const VkBufferCreateInfo bufferInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+										.pNext = nullptr,
+										.flags = {},
+										.size = iSize,
+										.usage = iUsage,
+										.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+										.queueFamilyIndexCount = 0,
+										.pQueueFamilyIndices = nullptr};
 
 	if (const VkResult result = vkCreateBuffer(core.getLogicalDevice(), &bufferInfo, nullptr, &iBuffer);
 		result != VK_SUCCESS) {
@@ -96,11 +96,11 @@ void createBuffer(const VkDeviceSize iSize, const VkBufferUsageFlags iUsage, con
 	VkMemoryRequirements memRequirements;
 	vkGetBufferMemoryRequirements(core.getLogicalDevice(), iBuffer, &memRequirements);
 
-	const VkMemoryAllocateInfo allocInfo{
-			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-			.pNext = nullptr,
-			.allocationSize = memRequirements.size,
-			.memoryTypeIndex = core.findMemoryTypeIndex(memRequirements.memoryTypeBits, iProperties)};
+	const VkMemoryAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+										 .pNext = nullptr,
+										 .allocationSize = memRequirements.size,
+										 .memoryTypeIndex =
+												 core.findMemoryTypeIndex(memRequirements.memoryTypeBits, iProperties)};
 
 	if (const VkResult result = vkAllocateMemory(core.getLogicalDevice(), &allocInfo, nullptr, &iBufferMemory);
 		result != VK_SUCCESS) {
@@ -150,34 +150,27 @@ void transitionImageLayout(const VkImage &iImage, const VkImageLayout iOldLayout
 }
 
 void transitionImageLayout(const VkCommandBuffer &iCmd, const VkImage &iImage, const VkImageLayout iOldLayout,
-                           const VkImageLayout iNewLayout) {
-	const VkImageMemoryBarrier barrier{
-			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.pNext = nullptr,
-			.srcAccessMask = layoutToAccFlag(iOldLayout),
-			.dstAccessMask = layoutToAccFlag(iNewLayout),
-			.oldLayout = iOldLayout,
-			.newLayout = iNewLayout,
-			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image = iImage,
-			.subresourceRange = {
-					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-					.baseMipLevel = 0,
-					.levelCount = 1,
-					.baseArrayLayer = 0,
-					.layerCount = 1}};
-	vkCmdPipelineBarrier(
-			iCmd,
-			layoutToStgFlag(iOldLayout), layoutToStgFlag(iNewLayout),
-			0,
-			0, nullptr,
-			0, nullptr,
-			1, &barrier);
+						   const VkImageLayout iNewLayout) {
+	const VkImageMemoryBarrier barrier{.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+									   .pNext = nullptr,
+									   .srcAccessMask = layoutToAccFlag(iOldLayout),
+									   .dstAccessMask = layoutToAccFlag(iNewLayout),
+									   .oldLayout = iOldLayout,
+									   .newLayout = iNewLayout,
+									   .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									   .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									   .image = iImage,
+									   .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+															.baseMipLevel = 0,
+															.levelCount = 1,
+															.baseArrayLayer = 0,
+															.layerCount = 1}};
+	vkCmdPipelineBarrier(iCmd, layoutToStgFlag(iOldLayout), layoutToStgFlag(iNewLayout), 0, 0, nullptr, 0, nullptr, 1,
+						 &barrier);
 }
 
 void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const math::FrameSize &iSize,
-                       const math::FrameSize &iOffset) {
+					   const math::FrameSize &iOffset) {
 	const auto &core = VulkanCore::get();
 	const auto &commandBuffer = core.beginSingleTimeCommands();
 	const VkBufferImageCopy region{
@@ -185,9 +178,9 @@ void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const mat
 			.bufferRowLength = 0,
 			.bufferImageHeight = 0,
 			.imageSubresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			                     .mipLevel = 0,
-			                     .baseArrayLayer = 0,
-			                     .layerCount = 1},
+								 .mipLevel = 0,
+								 .baseArrayLayer = 0,
+								 .layerCount = 1},
 			.imageOffset = {static_cast<int32_t>(iOffset.width()), static_cast<int32_t>(iOffset.height()), 0},
 			.imageExtent = {iSize.width(), iSize.height(), 1}};
 	vkCmdCopyBufferToImage(commandBuffer, iBuffer, iImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
@@ -195,7 +188,7 @@ void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const mat
 }
 
 void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const math::FrameSize &iSize,
-                       const math::FrameSize &iOffset) {
+					   const math::FrameSize &iOffset) {
 	const auto &core = VulkanCore::get();
 	const auto &commandBuffer = core.beginSingleTimeCommands();
 	const VkBufferImageCopy region{
@@ -203,9 +196,9 @@ void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const mat
 			.bufferRowLength = 0,
 			.bufferImageHeight = 0,
 			.imageSubresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			                     .mipLevel = 0,
-			                     .baseArrayLayer = 0,
-			                     .layerCount = 1},
+								 .mipLevel = 0,
+								 .baseArrayLayer = 0,
+								 .layerCount = 1},
 			.imageOffset = {static_cast<int32_t>(iOffset.width()), static_cast<int32_t>(iOffset.height()), 0},
 			.imageExtent = {iSize.width(), iSize.height(), 1}};
 	vkCmdCopyImageToBuffer(commandBuffer, iImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, iBuffer, 1, &region);

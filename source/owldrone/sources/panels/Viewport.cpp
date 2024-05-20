@@ -16,18 +16,18 @@ namespace drone::panels {
 Viewport::Viewport() {
 	const renderer::FramebufferSpecification specs{
 			.size = {1280, 720},
-			.attachments = {
-					{renderer::AttachmentSpecification::Format::Surface,
-					 renderer::AttachmentSpecification::Tiling::Optimal},
-					{renderer::AttachmentSpecification::Format::RedInteger,
-					 renderer::AttachmentSpecification::Tiling::Optimal},
-					//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
-					//renderer::AttachmentSpecification::Tiling::Optimal}
-			},
+			.attachments =
+					{
+							{renderer::AttachmentSpecification::Format::Surface,
+							 renderer::AttachmentSpecification::Tiling::Optimal},
+							{renderer::AttachmentSpecification::Format::RedInteger,
+							 renderer::AttachmentSpecification::Tiling::Optimal},
+							//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
+							//renderer::AttachmentSpecification::Tiling::Optimal}
+					},
 			.samples = 1,
 			.swapChainTarget = false,
-			.debugName = "viewport"
-	};
+			.debugName = "viewport"};
 	mp_framebuffer = renderer::Framebuffer::create(specs);
 	// camera
 	m_camera = mkShared<renderer::CameraOrtho>(0, 1280, 0, 720);
@@ -62,12 +62,8 @@ void Viewport::onUpdate(const core::Timestep &iTimeStep) {
 	// ===============================================================
 	renderer::Renderer2D::beginScene(*m_camera);
 	const float ratio = cam.getFrame()->getSize().ratio();
-	const renderer::utils::PRS tran{
-			.position = {0, 0, 0},
-			.rotation = 180,
-			.size = {ratio * scaling, 1 * scaling}};
-	renderer::Renderer2D::drawQuad({.transform = tran,
-	                                .texture = cam.getFrame()});
+	const renderer::utils::PRS tran{.position = {0, 0, 0}, .rotation = 180, .size = {ratio * scaling, 1 * scaling}};
+	renderer::Renderer2D::drawQuad({.transform = tran, .texture = cam.getFrame()});
 	renderer::Renderer2D::endScene();
 	// ===============================================================
 	// free the frame buffer.
@@ -82,8 +78,8 @@ void Viewport::onRender() {
 	const auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 	const auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 	const auto viewportOffset = ImGui::GetWindowPos();
-	m_viewportBounds[0] = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
-	m_viewportBounds[1] = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
+	m_viewportLower = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
+	m_viewportUpper = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
 
 	m_viewportFocused = ImGui::IsWindowFocused();
 	m_viewportHovered = ImGui::IsWindowHovered();
