@@ -11,6 +11,7 @@
   "configurePresets": [
     {
       "name": "mingw-gcc-release-static",
+      "displayName": "mingw-gcc-release-static",
       "inherits": [
         "toolset-mingw",
         "gcc-release-static"
@@ -18,6 +19,7 @@
     },
     {
       "name": "mingw-gcc-debug-static",
+      "displayName": "mingw-gcc-debug-static",
       "inherits": [
         "toolset-mingw",
         "gcc-debug-static"
@@ -25,6 +27,7 @@
     },
     {
       "name": "mingw-clang-release-static",
+      "displayName": "mingw-clang-release-static",
       "inherits": [
         "toolset-mingw",
         "clang-release-static"
@@ -32,6 +35,7 @@
     },
     {
       "name": "mingw-clang-debug-static",
+      "displayName": "mingw-clang-debug-static",
       "inherits": [
         "toolset-mingw",
         "clang-debug-static"
@@ -39,6 +43,7 @@
     },
     {
       "name": "mingw-gcc-release-shared",
+      "displayName": "mingw-gcc-release-shared",
       "inherits": [
         "toolset-mingw",
         "gcc-release-shared"
@@ -46,6 +51,7 @@
     },
     {
       "name": "mingw-gcc-debug-shared",
+      "displayName": "mingw-gcc-debug-shared",
       "inherits": [
         "toolset-mingw",
         "gcc-debug-shared"
@@ -53,6 +59,7 @@
     },
     {
       "name": "mingw-clang-release-shared",
+      "displayName": "mingw-clang-release-shared",
       "inherits": [
         "toolset-mingw",
         "clang-release-shared"
@@ -60,6 +67,7 @@
     },
     {
       "name": "mingw-clang-debug-shared",
+      "displayName": "mingw-clang-debug-shared",
       "inherits": [
         "toolset-mingw",
         "clang-debug-shared"

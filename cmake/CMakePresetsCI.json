@@ -12,6 +12,7 @@
   "configurePresets": [
     {
       "name": "Documentation",
+      "displayName": "Documentation",
       "inherits": "base",
       "cacheVariables": {
         "OWL_DOC_ONLY": "ON",
@@ -21,6 +22,7 @@
     },
     {
       "name": "CodeCoverage",
+      "displayName": "CodeCoverage",
       "inherits": "gcc-debug-static",
       "cacheVariables": {
         "OWL_ENABLE_COVERAGE": "ON"
@@ -33,6 +35,7 @@
     },
     {
       "name": "CodeCoverage_mingw",
+      "displayName": "CodeCoverage_mingw",
       "inherits": "mingw-gcc-debug-static",
       "cacheVariables": {
         "OWL_ENABLE_COVERAGE": "ON"
@@ -45,6 +48,7 @@
     },
     {
       "name": "clang-tidy",
+      "displayName": "clang-tidy",
       "inherits": "clang-debug-shared",
       "cacheVariables": {
         "OWL_ENABLE_CLANG_TIDY": "ON"
@@ -57,6 +61,7 @@
     },
     {
       "name": "clang-tidy_mingw",
+      "displayName": "clang-tidy_mingw",
       "inherits": "mingw-clang-debug-shared",
       "cacheVariables": {
         "OWL_ENABLE_CLANG_TIDY": "ON"

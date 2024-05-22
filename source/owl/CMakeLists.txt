@@ -9,25 +9,31 @@ file(GLOB_RECURSE HDRS
 )
 list(REMOVE_ITEM
         SRCS
-        owlpch.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/owlpch.cpp)
 list(REMOVE_ITEM
         HDRS
-        owlpch.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/owlpch.h)
 if (${PRJPREFIX}_BUILD_SHARED)
-    add_library(${ENGINE_NAME}
-            SHARED
-            ${SRCS} ${HDRS})
+    add_library(${ENGINE_NAME} SHARED)
     target_compile_definitions(${ENGINE_NAME} PUBLIC ${PRJPREFIX}_BUILD_SHARED)
     target_compile_definitions(${ENGINE_NAME} PRIVATE ${PRJPREFIX}_BUILD_DLL)
-    set_target_properties(${ENGINE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 else ()
-    add_library(${ENGINE_NAME}
-            STATIC
-            ${SRCS} ${HDRS})
+    add_library(${ENGINE_NAME} STATIC)
+    set_target_properties(${ENGINE_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif ()
-target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_sources(${ENGINE_NAME}
+        PRIVATE
+        ${SRCS}
+        PUBLIC FILE_SET HEADERS
+        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} FILES
+        ${HDRS}
+)
+target_include_directories(${ENGINE_NAME} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>
+)
 target_link_libraries(${ENGINE_NAME} PUBLIC ${CMAKE_PROJECT_NAME}_Base)
-install(TARGETS ${ENGINE_NAME})
+
 # precompiled headers
 if (NOT ${PRJPREFIX}_ENABLE_CLANG_TIDY)
     if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${PRJPREFIX_LOWER}pch.h")
@@ -92,8 +98,9 @@ if (${PRJPREFIX}_DEFINE_VULKAN_LAYERS)
         set(${PRJPREFIX}_VULKAN_LAYER_PATH ${VULKAN_DIR}/share/vulkan/explicit_layer.d)
         set(${PRJPREFIX}_VULKAN_LAYER_BIN_PATH ${VULKAN_DIR}/lib)
     endif ()
-    target_compile_definitions(${ENGINE_NAME} PUBLIC ${PRJPREFIX}_VULKAN_LAYER_PATH="${${PRJPREFIX}_VULKAN_LAYER_PATH}")
-    target_compile_definitions(${ENGINE_NAME} PUBLIC ${PRJPREFIX}_VULKAN_LAYER_BIN_PATH="${${PRJPREFIX}_VULKAN_LAYER_BIN_PATH}")
+    target_compile_definitions(${ENGINE_NAME} PUBLIC
+            $<BUILD_INTERFACE:${PRJPREFIX}_VULKAN_LAYER_PATH="${${PRJPREFIX}_VULKAN_LAYER_PATH}">
+            $<BUILD_INTERFACE:${PRJPREFIX}_VULKAN_LAYER_BIN_PATH="${${PRJPREFIX}_VULKAN_LAYER_BIN_PATH}">)
 endif ()
 # ----------------------
 
@@ -155,7 +162,7 @@ find_package(shaderc REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
 
 # additional windows libs
-if (OWL_PLATFORM_WINDOWS)
+if (${PRJPREFIX}_PLATFORM_WINDOWS)
     target_link_libraries(${ENGINE_NAME} PUBLIC Mf Mfplat Mfreadwrite)
 
     if (${PRJPREFIX}_BUILD_SHARED)
@@ -178,27 +185,43 @@ if (OWL_PLATFORM_WINDOWS)
             )
         endforeach ()
     endif ()
-elseif (OWL_PLATFORM_LINUX)
-    get_target_property(DEPENDENCIES ${ENGINE_NAME} INTERFACE_LINK_LIBRARIES)
-
-    foreach (DEP ${DEPENDENCIES})
-        # Filtrer les dépendances LINK_ONLY
-        string(REGEX REPLACE "^\\$<LINK_ONLY:(.*)>$" "\\1" DEP ${DEP})
-        # Vérifier si la dépendance est une cible
-        if (TARGET ${DEP})
-            get_target_property(TYPE ${DEP} TYPE)
-            message(STATUS "Found dep type: ${TYPE}: ${DEP}")
-            if (TYPE STREQUAL "SHARED_LIBRARY")
-                get_target_property(LIB_PATH ${DEP} LOCATION)
-                get_target_property(LIB_PATH2 ${DEP} LINK_DEPENDS)
-                message(STATUS "Will copy shared library: ${LIB_PATH}")
-                message(STATUS "Will copy shared library: ${LIB_PATH2}")
-
-                add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy "${LIB_PATH}" "$<TARGET_FILE_DIR:${ENGINE_NAME}>"
-                        COMMENT "Copy shared library ${DEP}"
-                )
-            endif ()
-        endif ()
+elseif (${PRJPREFIX}_PLATFORM_LINUX)
+    target_import_so_files(${ENGINE_NAME})
+endif ()
+# ------------------------------------------------------------------------------
+#    Installations
+# ------------------------------------------------------------------------------
+if (${PRJPREFIX}_PACKAGE_ENGINE)
+    foreach (config IN ITEMS Debug Release)
+        install(TARGETS ${ENGINE_NAME} EXPORT OwlTargets${CMAKE_SYSTEM_NAME}${CMAKE_SYSTEM_PROCESSOR}-${config}
+                CONFIGURATIONS ${config}
+                LIBRARY DESTINATION ${${PRJPREFIX}_INSTALL_BIN}/${config}
+                ARCHIVE DESTINATION ${${PRJPREFIX}_INSTALL_LIB}/${config}
+                RUNTIME DESTINATION ${${PRJPREFIX}_INSTALL_BIN}/${config}
+                FRAMEWORK DESTINATION ${${PRJPREFIX}_INSTALL_BIN}/${config}
+                FILE_SET HEADERS DESTINATION include
+                COMPONENT Engine
+        )
+        install(TARGETS ${CMAKE_PROJECT_NAME}_Base EXPORT OwlTargets${CMAKE_SYSTEM_NAME}${CMAKE_SYSTEM_PROCESSOR}-${config}
+                CONFIGURATIONS ${config}
+                COMPONENT Engine)
+        install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/
+                DESTINATION ${${PRJPREFIX}_INSTALL_BIN}/${config}
+                CONFIGURATIONS ${config}
+                COMPONENT Engine
+        )
     endforeach ()
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/
+            DESTINATION assets
+            COMPONENT Engine
+    )
+else ()
+    install(TARGETS ${ENGINE_NAME}
+            LIBRARY DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
+            RUNTIME DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
+            FRAMEWORK DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
+    )
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/
+            DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
+    )
 endif ()

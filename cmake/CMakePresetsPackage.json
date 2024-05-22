@@ -1,0 +1,154 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "include": [
+    "CMakePresetsBase.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "packaging-common",
+      "binaryDir": "output/build/${presetName}",
+      "installDir": "output/install/${presetName}",
+      "hidden": true,
+      "cacheVariables": {
+        "OWL_PACKAGING": "ON",
+        "OWL_TESTING": "OFF",
+        "CMAKE_INSTALL_PREFIX": "output/install/${presetName}",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fuse-ld=lld",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fuse-ld=lld"
+      }
+    },
+    {
+      "name": "packaging-static",
+      "generator": "Ninja Multi-Config",
+      "hidden": true,
+      "inherits": [
+        "packaging-common"
+      ],
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release"
+      }
+    },
+    {
+      "name": "packaging-shared",
+      "inherits": [
+        "packaging-static"
+      ],
+      "hidden": true,
+      "cacheVariables": {
+        "OWL_BUILD_SHARED": "ON"
+      }
+    },
+    {
+      "name": "package-engine-static",
+      "displayName": "Package-engine-static",
+      "inherits": [
+        "packaging-static"
+      ],
+      "cacheVariables": {
+        "OWL_PACKAGE_NAME": "OwlEngine",
+        "OWL_BUILD_NEST": "OFF",
+        "OWL_BUILD_SANDBOX": "ON",
+        "OWL_BUILD_DRONE": "OFF",
+        "OWL_PACKAGE_ENGINE": "ON"
+      }
+    },
+    {
+      "name": "package-engine-shared",
+      "displayName": "Package-engine-shared",
+      "inherits": [
+        "packaging-shared"
+      ],
+      "cacheVariables": {
+        "OWL_PACKAGE_NAME": "OwlEngine",
+        "OWL_BUILD_NEST": "OFF",
+        "OWL_BUILD_SANDBOX": "ON",
+        "OWL_BUILD_DRONE": "OFF",
+        "OWL_PACKAGE_ENGINE": "ON"
+      }
+    },
+    {
+      "name": "packaging-app-static",
+      "generator": "Ninja",
+      "hidden": true,
+      "inherits": [
+        "packaging-common"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "packaging-app-shared",
+      "inherits": [
+        "packaging-app-static"
+      ],
+      "hidden": true,
+      "cacheVariables": {
+        "OWL_BUILD_SHARED": "ON"
+      }
+    },
+    {
+      "name": "package-app-nest-shared",
+      "displayName": "Package-app-nest-shared",
+      "inherits": [
+        "packaging-app-shared"
+      ],
+      "cacheVariables": {
+        "OWL_PACKAGE_NAME": "OwlNest",
+        "OWL_BUILD_NEST": "ON",
+        "OWL_BUILD_SANDBOX": "OFF",
+        "OWL_BUILD_DRONE": "OFF",
+        "OWL_PACKAGE_ENGINE": "OFF"
+      }
+    },
+    {
+      "name": "package-app-nest-static",
+      "displayName": "Package-app-nest-shared",
+      "inherits": [
+        "packaging-app-static"
+      ],
+      "cacheVariables": {
+        "OWL_PACKAGE_NAME": "OwlNest",
+        "OWL_BUILD_NEST": "ON",
+        "OWL_BUILD_SANDBOX": "OFF",
+        "OWL_BUILD_DRONE": "OFF",
+        "OWL_PACKAGE_ENGINE": "OFF"
+      }
+    },
+    {
+      "name": "package-app-drone-shared",
+      "displayName": "Package-app-drone-shared",
+      "inherits": [
+        "packaging-app-shared"
+      ],
+      "cacheVariables": {
+        "OWL_PACKAGE_NAME": "OwlDrone",
+        "OWL_BUILD_NEST": "OFF",
+        "OWL_BUILD_SANDBOX": "OFF",
+        "OWL_BUILD_DRONE": "ON",
+        "OWL_PACKAGE_ENGINE": "OFF"
+      }
+    },
+    {
+      "name": "packaging-app-drone-static",
+      "displayName": "Package-app-drone-shared",
+      "inherits": [
+        "packaging-static"
+      ],
+      "cacheVariables": {
+        "OWL_PACKAGE_NAME": "OwlDrone",
+        "OWL_BUILD_NEST": "OFF",
+        "OWL_BUILD_SANDBOX": "OFF",
+        "OWL_BUILD_DRONE": "ON",
+        "OWL_PACKAGE_ENGINE": "OFF"
+      }
+    }
+  ]
+}

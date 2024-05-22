@@ -46,3 +46,12 @@ if (NOT ${PRJPREFIX}_DOC_ONLY)
         add_subdirectory(test)
     endif ()
 endif ()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Include CPack package
+if (${PRJPREFIX}_PACKAGING)
+    include(CPackConfig.cmake)
+    include(CPack)
+endif ()
+# ----------------------------------------------------------------------------------------------------------------------
