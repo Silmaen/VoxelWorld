@@ -19,11 +19,11 @@ The full documentation is available on the dedicated website [owl](https:://owl.
 We try to be multiplatform and using different compilers:
 
 * Windows x64
-    * mingw g++ 13.2
-    * mingw clang++ 17.0
+    * mingw g++ 13 (and above)
+    * mingw clang++ 18 (and above)
 * Linux x64 & arm64
-    * Ubuntu 22.04 (glibc 2.35) gcc 12 (and above)
-    * Ubuntu 22.04 (glibc 2.35) clang 15 (and above)
+    * Ubuntu 24.04 (glibc 2.39) g++ 13 (and above)
+    * Ubuntu 24.04 (glibc 2.39) clang++ 18 (and above)
 
 These platform requires a graphic card that supports one of the following renderer:
 
@@ -40,6 +40,13 @@ The section [coding style](doc/CodingStyle.md) describes the guidelines to follo
 
 ## Dependencies
 
+### Update to latest
+
+To automatically update the dependencies, you an run `python3 -u ci/DependencyCheck.py` that will communicate with the
+remote server to get the latest dependencies according to the current platform.
+
+The description of dependencies is located in [depmanager.yml](depmanager.yml).
+
 ### Dependencies manager
 
 Dependencies are managed by my dependency tool [DepManger](https://github.com/Silmaen/DepManager).
@@ -55,6 +62,13 @@ Most are configured as git submodules.
 
 ## Build
 
-To build the engine Cmake (>2.24) is required.
+To build the engine Cmake (>3.24) is required.
 
 Most user will use one of the cmake's preset defined.
+
+## RoadMap
+
+* [ ] v1.x.x -- First stable release
+* [ ] v0.2.x
+    * [ ] OwlDrone Compatible with vulkan
+* [ ] v0.1.0 -- First Development Release

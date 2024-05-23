@@ -2,7 +2,6 @@
 if (NOT CMAKE_BUILD_TYPE MATCHES "Debug")
     message(FATAL_ERROR "Coverage only works on debug builds")
 endif ()
-find_package(Python REQUIRED)
 #set(GCOVR ${Python_EXECUTABLE} -u -m gcovr)
 set(GCOVR gcovr)
 # Get gcov version

@@ -383,3 +383,13 @@ function(print_target_properties TARGET)
         endif ()
     endforeach ()
 endfunction()
+
+function(target_import_so_files TARGET)
+    if (${PRJPREFIX}_PLATFORM_LINUX)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+                COMMAND ${Python_EXECUTABLE} -u ${PROJECT_SOURCE_DIR}/cmake/importSharedLibs.py
+                "$<TARGET_FILE:${TARGET}>" \"${CMAKE_PREFIX_PATH}\"
+                COMMENT "Copy the needed shared libraries"
+        )
+    endif ()
+endfunction()

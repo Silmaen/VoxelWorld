@@ -11,6 +11,7 @@
   "configurePresets": [
     {
       "name": "wsl-gcc-release-static",
+      "displayName": "wsl-gcc-release-static",
       "inherits": [
         "toolset-wsl",
         "gcc-release-static"
@@ -18,6 +19,7 @@
     },
     {
       "name": "wsl-gcc-debug-static",
+      "displayName": "wsl-gcc-debug-static",
       "inherits": [
         "toolset-wsl",
         "gcc-debug-static"
@@ -25,6 +27,7 @@
     },
     {
       "name": "wsl-clang-release-static",
+      "displayName": "wsl-clang-release-static",
       "inherits": [
         "toolset-wsl",
         "clang-release-static"
@@ -32,6 +35,7 @@
     },
     {
       "name": "wsl-clang-debug-static",
+      "displayName": "wsl-clang-debug-static",
       "inherits": [
         "toolset-wsl",
         "clang-debug-static"
@@ -39,6 +43,7 @@
     },
     {
       "name": "wsl-gcc-release-shared",
+      "displayName": "wsl-gcc-release-shared",
       "inherits": [
         "toolset-wsl",
         "gcc-release-shared"
@@ -46,6 +51,7 @@
     },
     {
       "name": "wsl-gcc-debug-shared",
+      "displayName": "wsl-gcc-debug-shared",
       "inherits": [
         "toolset-wsl",
         "gcc-debug-shared"
@@ -53,6 +59,7 @@
     },
     {
       "name": "wsl-clang-release-shared",
+      "displayName": "wsl-clang-release-shared",
       "inherits": [
         "toolset-wsl",
         "clang-release-shared"
@@ -60,6 +67,7 @@
     },
     {
       "name": "wsl-clang-debug-shared",
+      "displayName": "wsl-clang-debug-shared",
       "inherits": [
         "toolset-wsl",
         "clang-debug-shared"

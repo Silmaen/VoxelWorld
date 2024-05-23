@@ -41,8 +41,8 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=lld",
-        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=lld"
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fuse-ld=lld",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fuse-ld=lld"
       }
     },
     {
@@ -105,51 +105,6 @@
       "vendor": {
         "jetbrains.com/clion": {
           "toolchain": "WSL"
-        }
-      }
-    },
-    {
-      "name": "toolset-raspberrypi",
-      "hidden": true,
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "RaspberryPi"
-        }
-      }
-    },
-    {
-      "name": "toolset-msvc",
-      "hidden": true,
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      },
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "VisualStudio"
-        }
-      }
-    },
-    {
-      "name": "toolset-docker-gcc",
-      "hidden": true,
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "DockerGcc"
-        }
-      }
-    },
-    {
-      "name": "toolset-docker-clang",
-      "hidden": true,
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "DockerClang"
         }
       }
     }

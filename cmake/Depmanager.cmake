@@ -20,3 +20,8 @@ else ()
 endif ()
 
 dm_load_environment(KIND ${LOCAL_KIND})
+
+dm_get_glibc(GLIBC_VERSION)
+if (${GLIBC_VERSION})
+    set(${PRJPREFIX}_GLIBC_STR "glibc_${GLIBC_VERSION}")
+endif ()
