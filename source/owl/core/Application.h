@@ -55,7 +55,7 @@ struct OWL_API AppParams {
 	const char *operator[](const int iIndex) const {
 		OWL_CORE_ASSERT(iIndex < argCount, "Bad command line index.")
 		OWL_DIAG_PUSH
-		OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+		OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 		return args[iIndex];
 		OWL_DIAG_POP
 	}

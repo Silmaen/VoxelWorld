@@ -25,7 +25,7 @@ glm::mat4 composeTransform(const glm::vec3 &iTranslation, const glm::vec3 &iRota
 }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 bool decomposeTransform(const glm::mat4 &iTransform, glm::vec3 &oTranslation, glm::vec3 &oRotation, glm::vec3 &oScale) {
 	// From glm::decompose in matrix_decompose.inl
 

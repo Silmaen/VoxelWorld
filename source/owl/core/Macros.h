@@ -44,9 +44,19 @@
 #define OWL_DIAG_PUSH OWL_DO_PRAGMA(clang diagnostic push)
 #define OWL_DIAG_DISABLE_CLANG(diag) OWL_DO_PRAGMA(clang diagnostic ignored diag)
 #if __clang_major__ > 15
+#define OWL_DIAG_DISABLE_CLANG16(diag) OWL_DO_PRAGMA(clang diagnostic ignored diag)
+#else
+#define OWL_DIAG_DISABLE_CLANG16(diag)
+#endif
+#if __clang_major__ > 16
 #define OWL_DIAG_DISABLE_CLANG17(diag) OWL_DO_PRAGMA(clang diagnostic ignored diag)
 #else
 #define OWL_DIAG_DISABLE_CLANG17(diag)
+#endif
+#if __clang_major__ > 17
+#define OWL_DIAG_DISABLE_CLANG18(diag) OWL_DO_PRAGMA(clang diagnostic ignored diag)
+#else
+#define OWL_DIAG_DISABLE_CLANG18(diag)
 #endif
 #define OWL_DIAG_DISABLE_GCC(diag)
 #define OWL_DIAG_DISABLE_CLANG_CL(diag)
@@ -55,7 +65,9 @@
 #define OWL_DIAG_POP OWL_DO_PRAGMA(GCC diagnostic pop)
 #define OWL_DIAG_PUSH OWL_DO_PRAGMA(GCC diagnostic push)
 #define OWL_DIAG_DISABLE_CLANG(diag)
+#define OWL_DIAG_DISABLE_CLANG16(diag)
 #define OWL_DIAG_DISABLE_CLANG17(diag)
+#define OWL_DIAG_DISABLE_CLANG18(diag)
 #define OWL_DIAG_DISABLE_GCC(diag) OWL_DO_PRAGMA(GCC diagnostic ignored diag)
 #define OWL_DIAG_DISABLE_CLANG_CL(diag)
 #define OWL_DIAG_DISABLE_MSVC(diag)
@@ -65,13 +77,17 @@
 #define OWL_DIAG_DISABLE_CLANG(diag)
 #define OWL_DIAG_DISABLE_GCC(diag)
 #define OWL_DIAG_DISABLE_CLANG_CL(diag)
+#define OWL_DIAG_DISABLE_CLANG16(diag)
 #define OWL_DIAG_DISABLE_CLANG17(diag)
+#define OWL_DIAG_DISABLE_CLANG18(diag)
 #define OWL_DIAG_DISABLE_MSVC(diag)
 #elif defined(OWL_COMPILER_MSVC)
 #define OWL_DIAG_POP OWL_DO_PRAGMA(warning(pop))
 #define OWL_DIAG_PUSH OWL_DO_PRAGMA(warning(push))
 #define OWL_DIAG_DISABLE_CLANG(diag)
+#define OWL_DIAG_DISABLE_CLANG16(diag)
 #define OWL_DIAG_DISABLE_CLANG17(diag)
+#define OWL_DIAG_DISABLE_CLANG18(diag)
 #define OWL_DIAG_DISABLE_GCC(diag)
 #define OWL_DIAG_DISABLE_CLANG_CL(diag)
 #define OWL_DIAG_DISABLE_MSVC(diag) OWL_DO_PRAGMA(warning(disable : diag))
@@ -79,7 +95,9 @@
 #define OWL_DIAG_POP
 #define OWL_DIAG_PUSH
 #define OWL_DIAG_DISABLE_CLANG(diag)
+#define OWL_DIAG_DISABLE_CLANG16(diag)
 #define OWL_DIAG_DISABLE_CLANG17(diag)
+#define OWL_DIAG_DISABLE_CLANG18(diag)
 #define OWL_DIAG_DISABLE_GCC(diag)
 #define OWL_DIAG_DISABLE_CLANG_CL(diag)
 #define OWL_DIAG_DISABLE_MSVC(diag)

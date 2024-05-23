@@ -386,10 +386,13 @@ endfunction()
 
 function(target_import_so_files TARGET)
     if (${PRJPREFIX}_PLATFORM_LINUX)
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-                COMMAND ${Python_EXECUTABLE} -u ${PROJECT_SOURCE_DIR}/cmake/importSharedLibs.py
-                "$<TARGET_FILE:${TARGET}>" \"${CMAKE_PREFIX_PATH}\"
-                COMMENT "Copy the needed shared libraries"
-        )
+        get_target_property(TARGET_TYPE ${TARGET} TYPE)
+        if (${TARGET_TYPE} EQUAL EXECUTABLE OR ${TARGET_TYPE} EQUAL SHARED_LIBRARY)
+            add_custom_command(TARGET ${TARGET} POST_BUILD
+                    COMMAND ${Python_EXECUTABLE} -u ${PROJECT_SOURCE_DIR}/cmake/importSharedLibs.py
+                    "$<TARGET_FILE:${TARGET}>" \"${CMAKE_PREFIX_PATH}\"
+                    COMMENT "Copy the needed shared libraries"
+            )
+        endif ()
     endif ()
 endfunction()

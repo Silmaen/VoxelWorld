@@ -16,7 +16,7 @@ namespace owl::input::video {
 namespace {
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void convertNv12ToRgb24(const uint8_t *iNv12Buffer, const math::FrameSize &iFrameSize, uint8_t *oRgb24Buffer) {
 	// Chaque composant Y occupe width * height octets
 	const uint32_t ySize = iFrameSize.surface();

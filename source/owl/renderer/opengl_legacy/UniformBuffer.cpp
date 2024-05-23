@@ -22,7 +22,7 @@ UniformBuffer::UniformBuffer(const uint32_t iSize, const uint32_t iBinding) {
 UniformBuffer::~UniformBuffer() { UniformBindingLibrary::get().removeUniformBuffer(m_internalBinding); }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void UniformBuffer::setData(const void *iData, const uint32_t iSize, const uint32_t iOffset) {
 	memcpy(m_internalData.data() + iOffset, iData, iSize);
 }

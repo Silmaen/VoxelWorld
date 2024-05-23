@@ -15,7 +15,7 @@
 namespace owl::core::utils {
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 static std::vector<std::string_view> split(const std::string_view iString, const char iDelimiter = '\n') {
 	std::vector<std::string_view> result;
 	int indexCommaToRightOfColumn = -1;

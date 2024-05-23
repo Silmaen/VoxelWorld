@@ -376,7 +376,7 @@ void Renderer2D::drawCircle(const CircleData &iCircleData) {
 
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void Renderer2D::drawQuad(const Quad2DData &iQuadData) {
 	OWL_PROFILE_FUNCTION()
 	if (g_data->quad.indexCount >= utils::g_maxIndices)
