@@ -82,7 +82,7 @@ std::string getPixelFormatString(const uint32_t iPixelFormat) {
 }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 std::string unFourCC(const uint32_t pixelFormat) {
 	constexpr uint32_t mmask = 0xff;
 	char fcc[4];

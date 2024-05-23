@@ -133,7 +133,7 @@ void VulkanCore::release() {
 }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void VulkanCore::createInstance() {
 	// first check for requested Layers
 	std::vector<std::string> requestedLayers;
@@ -401,7 +401,7 @@ std::vector<uint32_t> VulkanCore::getQueueIndicies() const {
 void VulkanCore::updateSurfaceInformations() { m_phyProps.updateSurfaceInformations(); }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 uint32_t VulkanCore::findMemoryTypeIndex(const uint32_t iTypeFilter, const VkMemoryPropertyFlags iMemProperties) const {
 	for (uint32_t i = 0; i < m_phyProps.memoryProperties.memoryTypeCount; i++) {
 		if ((iTypeFilter & (1 << i)) &&

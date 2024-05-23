@@ -247,7 +247,7 @@ void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const int iVa
 }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const glm::vec4 iColorValue) {
 	if (m_specs.attachments[iAttachmentIndex].format == AttachmentSpecification::Format::RedInteger) {
 		OWL_CORE_WARN("Vulkan Framebuffer ({}): Try to color-clear non color attachment.", m_specs.debugName)

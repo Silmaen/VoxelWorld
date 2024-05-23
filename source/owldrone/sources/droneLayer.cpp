@@ -221,7 +221,7 @@ bool droneLayer::onMouseButtonPressed(event::MouseButtonPressedEvent &ioEvent) {
 }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void droneLayer::renderToolbar() {
 	ImGui::Begin("##toolbar", nullptr,
 				 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);

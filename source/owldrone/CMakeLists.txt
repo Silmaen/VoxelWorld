@@ -19,6 +19,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}drone PRIVATE
 
 target_compile_definitions(${CMAKE_PROJECT_NAME}drone PRIVATE OWL_ASSETS_LOCATION="source/owldrone/assets")
 
+target_import_so_files(${CMAKE_PROJECT_NAME}drone)
 # ----==== third party ====----
 
 if (OWL_PLATFORM_WINDOWS)

@@ -180,7 +180,7 @@ static void drawComponent(const std::string &iName, scene::Entity &ioEntity, UIF
 }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void SceneHierarchy::drawComponents(scene::Entity &ioEntity) {
 	if (ioEntity.hasComponent<scene::component::Tag>()) {
 		auto &tag = ioEntity.getComponent<scene::component::Tag>().tag;

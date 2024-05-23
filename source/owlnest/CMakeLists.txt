@@ -16,6 +16,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}nest PRIVATE
 )
 
 target_compile_definitions(${CMAKE_PROJECT_NAME}nest PRIVATE OWL_ASSETS_LOCATION="source/owlnest/assets")
+target_import_so_files(${CMAKE_PROJECT_NAME}nest)
 
 # magic_enum
 find_package(magic_enum REQUIRED)

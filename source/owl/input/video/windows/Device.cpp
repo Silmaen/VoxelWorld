@@ -178,7 +178,7 @@ Device::PixelFormat getDevicePixelFormat(const GUID &videoFormat) {
 }// namespace
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void updateList(std::vector<shared<video::Device>> &ioList) {
 	if (!cc.addRef())
 		return;

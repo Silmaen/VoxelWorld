@@ -165,7 +165,7 @@ void UiLayer::end() const {
 }
 
 OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wunsafe-buffer-usage")
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void UiLayer::setTheme(const Theme &iTheme) {
 
 	// Setup Dear ImGui style
