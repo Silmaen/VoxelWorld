@@ -65,19 +65,6 @@ def main():
         has_missing = False
 
     missing, extern = list_missing_so(binary_file, has_missing)
-    if len(missing) + len(extern) > 0:
-        if len(missing) > 0:
-            print("Initial missing list:")
-            for miss in missing:
-                print(f" -- {miss}")
-        if len(extern) > 0:
-            print("Initial missing list:")
-            for ext in extern:
-                print(f" -- {ext[0]} <- {ext[1]}")
-    else:
-        print("Nothing is missing!")
-        exit(0)
-
     not_found = []
     if len(missing) > 0:
         available_so = list_available_so(lib_list)
@@ -97,6 +84,7 @@ def main():
                 if miss == av.name:
                     try:
                         copy2(av, binary_dir / miss)
+                        print(f" Importing {miss} from {av}")
                     except Exception as err:
                         print(f"ERROR while copy {av} to {binary_dir / miss} : {err}", file=stderr)
                         exit(1)
@@ -109,12 +97,12 @@ def main():
         for ext in extern:
             try:
                 copy2(ext[1], binary_dir / ext[0])
+                print(f" Importing {ext[0]} from {ext[1]}")
             except Exception as err:
                 print(f"ERROR while copy {ext[1]} to {binary_dir / ext[0]} : {err}", file=stderr)
                 exit(1)
     missing, extern = list_missing_so(binary_file, has_missing)
     if len(missing) + len(extern) == 0:
-        print(f"Success: all missing dependencies have been solved")
         exit(0)
     else:
         for miss in missing:
