@@ -2,9 +2,6 @@
 #
 #
 include(OwlUtils)
-if (NOT ${PRJPREFIX}_SKIP_DEPMANAGER)
-    include(Depmanager)
-endif ()
 #
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,37 +18,41 @@ find_package(Python REQUIRED)
 #
 # Operating System
 #
-if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(EXE_EXT ".exe")
-    set(LIB_EXT ".dll")
-    message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
+# -- host
+pretty_platform_str(${CMAKE_HOST_SYSTEM_NAME} ${PRJPREFIX}_HOST_PLATFORM_STR)
+set(${PRJPREFIX}_HOST_PLATFORM_VER_STR "${CMAKE_HOST_SYSTEM_VERSION}")
+# -- target
+if (NOT ${PRJPREFIX}_PLATFORM_STR)
+    pretty_platform_str(${CMAKE_SYSTEM_NAME} ${PRJPREFIX}_PLATFORM_STR)
+endif ()
+if (${PRJPREFIX}_PLATFORM_STR MATCHES "Windows")
     set(${PRJPREFIX}_PLATFORM_WINDOWS ON)
-    set(${PRJPREFIX}_PLATFORM_STR "Windows")
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_PLATFORM_WINDOWS)
-elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    set(EXE_EXT "")
-    set(LIB_EXT ".so")
-    message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
+elseif (${PRJPREFIX}_PLATFORM_STR MATCHES "Linux")
     set(${PRJPREFIX}_PLATFORM_LINUX ON)
-    set(${PRJPREFIX}_PLATFORM_STR "Linux")
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_PLATFORM_LINUX)
 else ()
-    message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")
+    message(FATAL_ERROR "Unsupported Target Operating System '${${PRJPREFIX}_PLATFORM_STR}'")
 endif ()
-
+set(${PRJPREFIX}_PLATFORM_VER_STR "${CMAKE_SYSTEM_VERSION}")
 #
 # CPU Architecture
 #
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "(AMD64|amd64|x86_64|x64)")
-    set(${PRJPREFIX}_PLATFORM_X64 ON)
-    set(${PRJPREFIX}_ARCH_STR "x64")
-    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_X64)
-elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(ARM64|arm64|aarch64)")
-    set(${PRJPREFIX}_PLATFORM_ARM64 ON)
-    set(${PRJPREFIX}_ARCH_STR "arm64")
-    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_ARM64)
+# -- host
+pretty_architecture_str(${CMAKE_HOST_SYSTEM_PROCESSOR} ${PRJPREFIX}_HOST_ARCH_STR)
+# -- target
+if (NOT ${PRJPREFIX}_ARCH_STR)
+    set(${PRJPREFIX}_ARCH_STR ${${PRJPREFIX}_HOST_ARCH_STR})
 endif ()
-
+if (${PRJPREFIX}_ARCH_STR STREQUAL "x86_64")
+    set(${PRJPREFIX}_PLATFORM_X64 ON)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_X64)
+elseif (${PRJPREFIX}_ARCH_STR STREQUAL "aarch64")
+    set(${PRJPREFIX}_PLATFORM_ARM64 ON)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_PLATFORM_ARM64)
+else ()
+    message(FATAL_ERROR "Unsupported Target architecture '${${PRJPREFIX}_ARCH_STR}'")
+endif ()
 #
 # ---=== Supported Compiler ===----
 #
@@ -62,7 +63,6 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_GNU_MINIMAL})
         message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler version too old: ${CMAKE_CXX_COMPILER_VERSION}, need ${${PRJPREFIX}_GNU_MINIMAL}")
     endif ()
-    message(STATUS "Using GNU compiler")
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
             -Werror -Wall -Wextra -pedantic
             -Wdeprecated
@@ -74,11 +74,11 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE
             STBI_NO_SIMD)
     set(${PRJPREFIX}_COMPILER_GCC ON)
+    set(${PRJPREFIX}_COMPILER_STR "gcc")
 elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${${PRJPREFIX}_CLANG_MINIMAL})
         message(FATAL_ERROR "${CMAKE_CXX_COMPILER_ID} compiler version too old: ${CMAKE_CXX_COMPILER_VERSION}, need ${${PRJPREFIX}_CLANG_MINIMAL}")
     endif ()
-    message(STATUS "Using Clang compiler")
     target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
             -Werror -Weverything -pedantic
             -Wno-c++98-compat
@@ -96,9 +96,30 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
         )
     endif ()
     set(${PRJPREFIX}_COMPILER_CLANG ON)
+    set(${PRJPREFIX}_COMPILER_STR "clang")
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
+
+# Cross compilation
+if (NOT (${${PRJPREFIX}_HOST_PLATFORM_STR} STREQUAL ${${PRJPREFIX}_PLATFORM_STR} AND
+        ${${PRJPREFIX}_HOST_ARCH_STR} STREQUAL ${${PRJPREFIX}_ARCH_STR}))
+    set(${PRJPREFIX}_CROSS_COMPILATION ON)
+endif ()
+
+# sum up the system
+print_system_n_target_infos()
+#
+# Third parties
+#
+if (NOT ${PRJPREFIX}_SKIP_DEPMANAGER)
+    include(Depmanager)
+endif ()
+
+#
+# --== Properties ==--
+#
+
 
 get_property(${PRJPREFIX}_IS_GENERATOR_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 

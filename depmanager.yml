@@ -19,3 +19,4 @@ packages:
   vulkan_sdk:
     kind: "shared"
   zstd:
+  zlib:

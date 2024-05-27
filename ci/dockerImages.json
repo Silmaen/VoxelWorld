@@ -1,15 +1,37 @@
 {
   "images": {
-    "CodeCoverage": "builder-gcc14-ubuntu2404",
-    "Documentation": "builder-clang18-ubuntu2404",
-    "clang-tidy": "builder-clang18-ubuntu2404",
-    "linux-gcc-release-static": "builder-gcc14-ubuntu2404",
-    "linux-gcc-debug-static": "builder-gcc14-ubuntu2404",
-    "linux-gcc-release-shared": "builder-gcc14-ubuntu2404",
-    "linux-gcc-debug-shared": "builder-gcc14-ubuntu2404",
-    "linux-clang-release-static": "builder-clang18-ubuntu2404",
-    "linux-clang-debug-static": "builder-clang18-ubuntu2404",
-    "linux-clang-release-shared": "builder-clang18-ubuntu2404",
-    "linux-clang-debug-shared": "builder-clang18-ubuntu2404"
+    "CodeCoverage": {
+      "image": "builder-gcc14-ubuntu2404"
+    },
+    "Documentation": {
+      "image": "builder-clang18-ubuntu2404"
+    },
+    "clang-tidy": {
+      "image": "builder-clang18-ubuntu2404"
+    },
+    "linux-gcc-release-static": {
+      "image": "builder-gcc12-ubuntu2204"
+    },
+    "linux-gcc-debug-static": {
+      "image": "builder-gcc12-ubuntu2204"
+    },
+    "linux-gcc-release-shared": {
+      "image": "builder-gcc12-ubuntu2204"
+    },
+    "linux-gcc-debug-shared": {
+      "image": "builder-gcc12-ubuntu2204"
+    },
+    "linux-clang-release-static": {
+      "image": "builder-clang15-ubuntu2204"
+    },
+    "linux-clang-debug-static": {
+      "image": "builder-clang15-ubuntu2204"
+    },
+    "linux-clang-release-shared": {
+      "image": "builder-clang15-ubuntu2204"
+    },
+    "linux-clang-debug-shared": {
+      "image": "builder-clang15-ubuntu2204"
+    }
   }
 }

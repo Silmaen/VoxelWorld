@@ -4,6 +4,7 @@ from sys import stderr
 
 dependencies = [
     {"name": "cpptrace", "version": "*", "header": False},
+    {"name": "zlib", "version": "*", "header": False},
     {"name": "libdwarf", "version": "*", "header": False},
     {"name": "zstd", "version": "*", "header": False},
     {"name": "debugbreak", "version": "*", "header": True},

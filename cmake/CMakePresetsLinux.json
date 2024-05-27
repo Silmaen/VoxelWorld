@@ -26,49 +26,84 @@
       "displayName": "linux-gcc-debug-static",
       "inherits": [
         "gcc-debug-static"
-      ]
+      ],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     },
     {
       "name": "linux-clang-release-static",
       "displayName": "linux-clang-release-static",
       "inherits": [
         "clang-release-static"
-      ]
+      ],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     },
     {
       "name": "linux-clang-debug-static",
       "displayName": "linux-clang-debug-static",
       "inherits": [
         "clang-debug-static"
-      ]
+      ],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     },
     {
       "name": "linux-gcc-release-shared",
       "displayName": "linux-gcc-release-shared",
       "inherits": [
         "gcc-release-shared"
-      ]
+      ],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     },
     {
       "name": "linux-gcc-debug-shared",
       "displayName": "linux-gcc-debug-shared",
       "inherits": [
         "gcc-debug-shared"
-      ]
+      ],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     },
     {
       "name": "linux-clang-release-shared",
       "displayName": "linux-clang-release-shared",
       "inherits": [
         "clang-release-shared"
-      ]
+      ],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     },
     {
       "name": "linux-clang-debug-shared",
       "displayName": "linux-clang-debug-shared",
       "inherits": [
         "clang-debug-shared"
-      ]
+      ],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     }
   ]
 }

@@ -14,7 +14,6 @@ function(dump_cmake_variables)
     endforeach ()
 endfunction()
 
-
 function(print_target_properties TARGET)
     set(PROPERTIES
             ADDITIONAL_CLEAN_FILES
@@ -387,12 +386,50 @@ endfunction()
 function(target_import_so_files TARGET)
     if (${PRJPREFIX}_PLATFORM_LINUX)
         get_target_property(TARGET_TYPE ${TARGET} TYPE)
-        if (${TARGET_TYPE} EQUAL EXECUTABLE OR ${TARGET_TYPE} EQUAL SHARED_LIBRARY)
+        if (${TARGET_TYPE} STREQUAL "EXECUTABLE" OR ${TARGET_TYPE} STREQUAL "SHARED_LIBRARY")
+            message(STATUS "Target: ${TARGET} of type ${TARGET_TYPE}: copy additional shared libs.")
             add_custom_command(TARGET ${TARGET} POST_BUILD
                     COMMAND ${Python_EXECUTABLE} -u ${PROJECT_SOURCE_DIR}/cmake/importSharedLibs.py
                     "$<TARGET_FILE:${TARGET}>" \"${CMAKE_PREFIX_PATH}\"
                     COMMENT "Copy the needed shared libraries"
+                    USES_TERMINAL
             )
         endif ()
     endif ()
+endfunction()
+
+function(pretty_platform_str INVAR OUTVAR)
+    string(REPLACE "Darwin" "MacOS" TMP "${INVAR}")
+    set(${OUTVAR} ${TMP} PARENT_SCOPE)
+endfunction()
+
+function(pretty_architecture_str INVAR OUTVAR)
+    if (INVAR MATCHES "(AMD64|amd64|x86_64|x64)")
+        set(${OUTVAR} "x86_64" PARENT_SCOPE)
+    elseif (INVAR MATCHES "(ARM64|arm64|aarch64)")
+        set(${OUTVAR} "aarch64" PARENT_SCOPE)
+    else ()
+        set(${OUTVAR} ${INVAR} PARENT_SCOPE)
+    endif ()
+endfunction()
+
+function(print_system_n_target_infos)
+    message(STATUS "---------- HOST SYSTEM ---------")
+    message(STATUS " OS       : ${${PRJPREFIX}_HOST_PLATFORM_STR}")
+    message(STATUS " ARCH     : ${${PRJPREFIX}_HOST_ARCH_STR}")
+    message(STATUS " VERSION  : ${CMAKE_HOST_SYSTEM_VERSION}")
+    message(STATUS "--------- TARGET SYSTEM --------")
+    message(STATUS " OS       : ${${PRJPREFIX}_PLATFORM_STR}")
+    message(STATUS " ARCH     : ${${PRJPREFIX}_ARCH_STR}")
+    message(STATUS " COMPILER : ${${PRJPREFIX}_COMPILER_STR} - ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER})")
+    if (${CMAKE_CXX_COMPILER_TARGET})
+        message(STATUS " TARGET   : ${CMAKE_CXX_COMPILER_TARGET}")
+    endif ()
+    if (${CMAKE_CXX_COMPILER_ABI})
+        message(STATUS " ABI      : ${CMAKE_CXX_COMPILER_ABI}")
+    endif ()
+    if (${CMAKE_CXX_COMPILER_ARCHITECTURE_ID})
+        message(STATUS " ARCH     : ${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}")
+    endif ()
+    message(STATUS "--------------------------------")
 endfunction()
