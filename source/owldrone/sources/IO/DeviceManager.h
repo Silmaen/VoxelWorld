@@ -41,7 +41,7 @@ struct Device {
 	[[nodiscard]] size_t hash() const {
 		return std::hash<std::string>{}(port) ^ (std::hash<std::string>{}(name) << 1u);
 	}
-} OWL_ALIGN(128);
+};
 
 /**
  * @brief Class DeviceManager.

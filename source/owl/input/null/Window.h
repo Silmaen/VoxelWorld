@@ -117,7 +117,7 @@ private:
 		bool m_VSync = false;
 		/// Event Call back.
 		EventCallback m_eventCallback;
-	} OWL_ALIGN(128);
+	};
 
 	/// The Window's data.
 	WindowData m_windowData{};

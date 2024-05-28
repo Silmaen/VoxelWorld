@@ -145,7 +145,7 @@ private:
 		VkSemaphore renderFinishedSemaphore;
 		VkFence inFlightFence;
 		VkCommandBuffer commandBuffer;
-	} OWL_ALIGN(32);
+	};
 
 	struct Image {
 		VkImage image;
@@ -154,7 +154,7 @@ private:
 		VkSampler imageSampler;
 		VkDescriptorSet descriptorSet;
 		VkDescriptorSetLayout descriptorSetLayout;
-	} OWL_ALIGN(64);
+	};
 
 	std::vector<Sample> m_samples;
 	std::vector<Image> m_images;

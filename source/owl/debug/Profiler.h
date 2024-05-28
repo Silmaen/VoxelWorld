@@ -22,7 +22,7 @@ struct ProfileResult {
 	floatingPointMicroseconds start;///< Data's starting time point.
 	std::chrono::microseconds elapsedTime;///< Data's elapsed time.
 	std::thread::id threadId;///< Data's thread ID.
-} OWL_ALIGN(64);
+};
 
 /**
  * @brief Profile Session Data.
@@ -30,7 +30,7 @@ struct ProfileResult {
 struct ProfileSession {
 	explicit ProfileSession(std::string iName) : name{std::move(iName)} {}
 	std::string name;/// Session's name.
-} OWL_ALIGN(32);
+};
 
 /**
  * @brief class Profiler.
@@ -158,6 +158,8 @@ struct ChangeResult {
  * @param[in] iRemove Pattern to remove.
  * @return The corrected string.
  */
+OWL_DIAG_PUSH
+OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 template<size_t N, size_t K>
 constexpr auto cleanupOutputString(const char (&iExpr)[N], const char (&iRemove)[K]) {
 	ChangeResult<N> result = {};
@@ -171,11 +173,12 @@ constexpr auto cleanupOutputString(const char (&iExpr)[N], const char (&iRemove)
 			matchIndex++;
 		if (matchIndex == K - 1)
 			srcIndex += matchIndex;
-		result.Data[dstIndex++] = iExpr[srcIndex] == '"' ? '\'' : iExpr[srcIndex];
+		result.data[dstIndex++] = iExpr[srcIndex] == '"' ? '\'' : iExpr[srcIndex];
 		srcIndex++;
 	}
 	return result;
 }
+OWL_DIAG_POP
 }// namespace utils
 
 }// namespace owl::debug
@@ -213,7 +216,7 @@ constexpr auto cleanupOutputString(const char (&iExpr)[N], const char (&iRemove)
 #define OWL_PROFILE_END_SESSION() ::owl::debug::Profiler::get().endSession();
 #define OWL_PROFILE_SCOPE_LINE2(name, line)                                                                            \
 	constexpr auto fixedName##line = ::owl::debug::utils::cleanupOutputString(name, "__cdecl ");                       \
-	::owl::debug::ProfileTimer timer##line(fixedName##line.Data);
+	::owl::debug::ProfileTimer timer##line(fixedName##line.data);
 #define OWL_PROFILE_SCOPE_LINE(name, line) OWL_PROFILE_SCOPE_LINE2(name, line)
 #define OWL_PROFILE_SCOPE(name) OWL_PROFILE_SCOPE_LINE(name, __LINE__)
 #define OWL_PROFILE_FUNCTION() OWL_PROFILE_SCOPE(OWL_FUNC_SIG)

@@ -40,6 +40,10 @@ public:
 	 * @brief Destructor.
 	 */
 	~Device() override;
+	Device(const Device&)=delete;
+	Device(Device&&)=delete;
+	Device& operator=(const Device&)=delete;
+	Device& operator=(Device&&)=delete;
 
 	/**
 	 * @brief Open this device.

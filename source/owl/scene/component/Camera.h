@@ -22,6 +22,6 @@ struct OWL_API Camera {
 	bool fixedAspectRatio = false;
 	/// The scene camera.
 	SceneCamera camera;
-} OWL_ALIGN(128);
+};
 
 }// namespace owl::scene::component

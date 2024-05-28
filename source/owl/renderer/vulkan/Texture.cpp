@@ -85,13 +85,12 @@ Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::mov
 		return;
 	}
 
-	m_hasAlpha = true;
-	if (channels == 3)
-		m_hasAlpha = false;
+
 	if ((channels != 4) && (channels != 3)) {
 		OWL_CORE_ERROR("Vulkan Texture: Impossible to load {}, invalid number of channels {}: must be 3 or 4.")
 		return;
 	}
+	m_hasAlpha = channels == 4;
 	m_size = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 	setData(data, m_size.surface() * static_cast<uint32_t>(channels));
 

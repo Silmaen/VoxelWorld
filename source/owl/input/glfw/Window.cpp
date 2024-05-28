@@ -68,7 +68,7 @@ void Window::init(const Properties &iProps) {
 			}
 		}
 #if defined(OWL_DEBUG)
-		if (api == renderer::RenderAPI::Type::OpenGL || api == renderer::RenderAPI::Type::OpenglLegacy)
+		if (api == renderer::RenderAPI::Type::OpenGL)
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 		if (api == renderer::RenderAPI::Type::Vulkan)
@@ -197,8 +197,7 @@ void Window::onUpdate() {
 void Window::setVSync(const bool iEnabled) {
 	OWL_PROFILE_FUNCTION()
 
-	if (const auto api = renderer::RenderCommand::getApi();
-		api == renderer::RenderAPI::Type::OpenGL || api == renderer::RenderAPI::Type::OpenglLegacy) {
+	if (const auto api = renderer::RenderCommand::getApi(); api == renderer::RenderAPI::Type::OpenGL) {
 		if (iEnabled)
 			glfwSwapInterval(1);
 		else

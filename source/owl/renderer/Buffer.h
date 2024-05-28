@@ -118,7 +118,7 @@ struct OWL_API BufferElement {
 		OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
 		return 0;
 	}
-} OWL_ALIGN(64);
+};
 
 /**
  * @brief Class BufferLayout.

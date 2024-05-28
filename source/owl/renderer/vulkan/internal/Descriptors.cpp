@@ -124,17 +124,15 @@ void Descriptors::release() {
 
 void Descriptors::createDescriptors() {
 	const auto &core = VulkanCore::get();
-
 	// Descriptor pools.
 	std::vector<VkDescriptorPoolSize> poolSizes{
-			{.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = static_cast<uint32_t>(g_maxFrameInFlight)},
-			{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			 .descriptorCount = static_cast<uint32_t>(g_maxFrameInFlight)},
+			{.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 32 * g_maxFrameInFlight},
+			{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 32 * g_maxFrameInFlight},
 	};
 	const VkDescriptorPoolCreateInfo poolInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 											  .pNext = nullptr,
 											  .flags = {},
-											  .maxSets = static_cast<uint32_t>(g_maxFrameInFlight),
+											  .maxSets = g_maxFrameInFlight,
 											  .poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
 											  .pPoolSizes = poolSizes.data()};
 	if (const VkResult result = vkCreateDescriptorPool(core.getLogicalDevice(), &poolInfo, nullptr, &m_descriptorPool);
@@ -171,7 +169,7 @@ void Descriptors::createDescriptors() {
 	const VkDescriptorSetAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 												.pNext = nullptr,
 												.descriptorPool = m_descriptorPool,
-												.descriptorSetCount = static_cast<uint32_t>(g_maxFrameInFlight),
+												.descriptorSetCount = g_maxFrameInFlight,
 												.pSetLayouts = layouts.data()};
 	m_descriptorSets.resize(g_maxFrameInFlight);
 	if (const auto result = vkAllocateDescriptorSets(core.getLogicalDevice(), &allocInfo, m_descriptorSets.data());
@@ -298,7 +296,7 @@ void Descriptors::createImguiDescriptorPool() {
 	const VkDescriptorPoolCreateInfo poolInfo{.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 											  .pNext = nullptr,
 											  .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-											  .maxSets = static_cast<uint32_t>(g_maxFrameInFlight),
+											  .maxSets = g_maxFrameInFlight,
 											  .poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
 											  .pPoolSizes = poolSizes.data()};
 	if (const VkResult result =

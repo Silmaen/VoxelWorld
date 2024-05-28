@@ -25,7 +25,7 @@ struct TextureData {
 
 	void freeTrexture();
 	void createDescriptorSet();
-} OWL_ALIGN(64);
+};
 
 /**
  * @brief Class Descriptors.

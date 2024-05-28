@@ -12,7 +12,6 @@
 #include "Renderer.h"
 #include "null/Framebuffer.h"
 #include "opengl/Framebuffer.h"
-#include "opengl_legacy/Framebuffer.h"
 #include "vulkan/Framebuffer.h"
 
 namespace owl::renderer {
@@ -23,8 +22,6 @@ shared<Framebuffer> Framebuffer::create(const FramebufferSpecification &iSpec) {
 			return mkShared<null::Framebuffer>(iSpec);
 		case RenderAPI::Type::OpenGL:
 			return mkShared<opengl::Framebuffer>(iSpec);
-		case RenderAPI::Type::OpenglLegacy:
-			return mkShared<opengl_legacy::Framebuffer>(iSpec);
 		case RenderAPI::Type::Vulkan:
 			return mkShared<vulkan::Framebuffer>(iSpec);
 	}

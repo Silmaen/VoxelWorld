@@ -205,9 +205,13 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 	}
 	std::vector<WPointer<IMFActivate>> devices;
 	{
-		IMFActivate **pDevices;
-		uint32_t count;
+		IMFActivate **pDevices = nullptr;
+		uint32_t count = 0;
 		hr = MFEnumDeviceSources(pConfig.get(), &pDevices, &count);
+		if (FAILED(hr)) {
+			OWL_CORE_ERROR("{}updateList: Unable to Enum Device Sources.", g_baseName)
+			return;
+		}
 		devices.reserve(count);
 		for (uint32_t i = 0; i < count; ++i) devices.emplace_back(pDevices[i]);
 	}
@@ -241,7 +245,7 @@ Device::Device(WPointer<IMFActivate> &iMfa) : video::Device("") {
 	m_devActive.takeOwnershipFrom(iMfa);
 	{
 		wchar_t *fName = nullptr;
-		uint32_t len;
+		uint32_t len = 0;
 		m_devActive->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &fName, &len);
 		std::wstring ws(fName);
 		m_name = std::string(ws.begin(), ws.end());
@@ -249,7 +253,7 @@ Device::Device(WPointer<IMFActivate> &iMfa) : video::Device("") {
 	}
 	{
 		wchar_t *fName = nullptr;
-		uint32_t len;
+		uint32_t len = 0;
 		m_devActive->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, &fName, &len);
 		std::wstring ws(fName);
 		m_busInfo = std::string(ws.begin(), ws.end());
@@ -298,7 +302,7 @@ void Device::open() {
 		close();
 		return;
 	}
-	uint64_t superSize;
+	uint64_t superSize = 0;
 	mediaType->GetUINT64(MF_MT_FRAME_SIZE, &superSize);
 	m_size = {static_cast<uint32_t>((superSize >> 32) & g_mask32), static_cast<uint32_t>(superSize & g_mask32)};
 	OWL_CORE_INFO("Device ({}): Frame size seen: {} {}.", m_name, m_size.getWidth(), m_size.getHeight())
@@ -339,19 +343,19 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 	}
 	// For now only fill with black
 	WPointer<IMFSample> sample;
-	int64_t timestamp;
-	u_long actualIndex, sampleFlags;
-	do {
-		HRESULT hr = m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &actualIndex, &sampleFlags,
-												&timestamp, sample.addr());
+	int64_t timestamp = 0;
+	u_long actualIndex = 0;
+	u_long sampleFlags = MF_SOURCE_READERF_STREAMTICK;
+	while (sampleFlags & MF_SOURCE_READERF_STREAMTICK) {
+		const HRESULT hr = m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &actualIndex,
+													  &sampleFlags, &timestamp, sample.addr());
 		if (FAILED(hr)) {
 			OWL_CORE_WARN("Device ({}): Unable to read sample from device.", m_name)
 			return;
 		}
-	} while (sampleFlags & MF_SOURCE_READERF_STREAMTICK);
-	u_long count;
-	sample->GetBufferCount(&count);
-	if (count == 0) {
+	}
+	u_long count = 0;
+	if (FAILED(sample->GetBufferCount(&count)) || count == 0) {
 		OWL_CORE_WARN("Device ({}): No  buffer found in the sample from device.", m_name)
 		return;
 	}
@@ -360,11 +364,11 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 		OWL_CORE_WARN("Device ({}): Unable to Convert buffer.", m_name)
 		return;
 	}
-	byte *byteBuffer;
+	byte *byteBuffer = nullptr;
 	u_long bCurLen = 0;
 	buffer->Lock(&byteBuffer, nullptr, &bCurLen);
 	std::vector<byte> convertedBuffer = getRgbBuffer(byteBuffer, static_cast<int32_t>(bCurLen));
-	if (m_size.surface() * 3 != convertedBuffer.size()) {
+	if (m_size.surface() * 3ull != convertedBuffer.size()) {
 		OWL_CORE_WARN("Frame size missmatch {} buffer: {}.", m_size.surface() * 3, convertedBuffer.size())
 		buffer->Unlock();
 		return;

@@ -119,7 +119,7 @@ private:
 		bool vSync{false};
 		/// Event Call back.
 		EventCallback eventCallback;
-	} OWL_ALIGN(128);
+	};
 
 	/// The Window's data.
 	WindowData m_windowData{};

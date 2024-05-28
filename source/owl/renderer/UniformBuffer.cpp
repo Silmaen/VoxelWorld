@@ -11,7 +11,6 @@
 #include "UniformBuffer.h"
 #include "null/UniformBuffer.h"
 #include "opengl/UniformBuffer.h"
-#include "opengl_legacy/UniformBuffer.h"
 #include "vulkan/UniformBuffer.h"
 
 namespace owl::renderer {
@@ -22,8 +21,6 @@ shared<UniformBuffer> UniformBuffer::create(uint32_t iSize, uint32_t iBinding, c
 			return mkShared<null::UniformBuffer>(iSize, iBinding);
 		case RenderAPI::Type::OpenGL:
 			return mkShared<opengl::UniformBuffer>(iSize, iBinding);
-		case RenderAPI::Type::OpenglLegacy:
-			return mkShared<opengl_legacy::UniformBuffer>(iSize, iBinding);
 		case RenderAPI::Type::Vulkan:
 			return mkShared<vulkan::UniformBuffer>(iSize, iBinding, iRenderer);
 	}

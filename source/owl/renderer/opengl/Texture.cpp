@@ -39,21 +39,20 @@ Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::mov
 	stbi_set_flip_vertically_on_load(1);
 	stbi_uc *data = nullptr;
 	{
-		OWL_PROFILE_SCOPE("stbi_load - Texture2D::Texture2D(const std::filesystem::path &)")
+		OWL_PROFILE_SCOPE("stbi_load - OpenGL::Texture2D::Texture2D(const std::filesystem::path &)")
 		data = stbi_load(m_path.string().c_str(), &width, &height, &channels, 0);
 	}
 	if (!data) {
-		OWL_CORE_WARN("Failed to load image {}", m_path.string())
+		OWL_CORE_WARN("OpenGL Texture: Failed to load image {}", m_path.string())
 		return;
 	}
 
-	if (channels == 3)
-		m_hasAlpha = false;
 
 	if ((channels != 4) && (channels != 3)) {
-		OWL_CORE_ERROR("Impossible to load {}, invalid number of channels {}: must be 3 or 4.")
+		OWL_CORE_ERROR("OpenGL Texture: Impossible to load {}, invalid number of channels {}: must be 3 or 4.")
 		return;
 	}
+	m_hasAlpha = channels == 4;
 	m_size = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_textureId);

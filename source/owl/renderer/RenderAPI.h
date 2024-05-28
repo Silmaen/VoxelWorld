@@ -22,7 +22,6 @@ public:
 		Null = 0,///< Null Renderer.
 		OpenGL = 1,///< OpenGL Renderer.
 		Vulkan = 2,///< Vulkan renderer API.
-		OpenglLegacy = 3///< OpenGL 2.1 renderer
 	};
 
 	explicit RenderAPI(const Type &iType) : m_type{iType} {}
@@ -111,9 +110,7 @@ public:
 	 * @brief Check if the API type require initializations.
 	 * @return tRue if initialization required.
 	 */
-	[[nodiscard]] bool requireInit() const {
-		return m_type == Type::OpenGL || m_type == Type::OpenglLegacy || m_type == Type::Vulkan;
-	}
+	[[nodiscard]] bool requireInit() const { return m_type == Type::OpenGL || m_type == Type::Vulkan; }
 
 	/**
 	 * @brief Reset value for the frame to render.

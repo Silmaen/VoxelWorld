@@ -13,7 +13,6 @@
 #include "core/Application.h"
 #include "null/Texture.h"
 #include "opengl/Texture.h"
-#include "opengl_legacy/Texture.h"
 #include "vulkan/Texture.h"
 
 namespace owl::renderer {
@@ -61,12 +60,6 @@ shared<Texture2D> Texture2D::create(const std::filesystem::path &iFile) {
 					return texture;
 				return nullptr;
 			}
-		case RenderAPI::Type::OpenglLegacy:
-			{
-				if (auto texture = mkShared<opengl_legacy::Texture2D>(iFile); texture->isLoaded())// No data
-					return texture;
-				return nullptr;
-			}
 		case RenderAPI::Type::Vulkan:
 			{
 				if (auto texture = mkShared<vulkan::Texture2D>(iFile); texture->isLoaded())// No data
@@ -89,8 +82,6 @@ shared<Texture2D> Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWit
 			return mkShared<null::Texture2D>(iWidth, iHeight);
 		case RenderAPI::Type::OpenGL:
 			return mkShared<opengl::Texture2D>(iWidth, iHeight, iWithAlpha);
-		case RenderAPI::Type::OpenglLegacy:
-			return mkShared<opengl_legacy::Texture2D>(iWidth, iHeight, iWithAlpha);
 		case RenderAPI::Type::Vulkan:
 			return mkShared<vulkan::Texture2D>(iWidth, iHeight, iWithAlpha);
 	}
@@ -107,9 +98,6 @@ shared<Texture2D> Texture2D::create(const math::FrameSize &iSize, bool iWithAlph
 			break;
 		case RenderAPI::Type::OpenGL:
 			tex = mkShared<opengl::Texture2D>(iSize, iWithAlpha);
-			break;
-		case RenderAPI::Type::OpenglLegacy:
-			tex = mkShared<opengl_legacy::Texture2D>(iSize, iWithAlpha);
 			break;
 		case RenderAPI::Type::Vulkan:
 			tex = mkShared<vulkan::Texture2D>(iSize, iWithAlpha);

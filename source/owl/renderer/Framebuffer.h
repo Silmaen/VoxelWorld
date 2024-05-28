@@ -42,7 +42,7 @@ struct AttachmentSpecification {
 
 	/// The texture's tiling.
 	Tiling tiling = Tiling::Optimal;
-} OWL_ALIGN(2);
+};
 
 /**
  * @brief Framebuffer specification.
@@ -58,7 +58,7 @@ struct FramebufferSpecification {
 	bool swapChainTarget = false;
 	/// Name that can be use to identify the frame buffer in debug.
 	std::string debugName = "main";
-} OWL_ALIGN(128);
+};
 
 /**
  * @brief Class Framebuffer.
