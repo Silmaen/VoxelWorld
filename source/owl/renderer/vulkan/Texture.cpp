@@ -15,6 +15,8 @@
 
 #include <stb_image.h>
 
+#include <cstddef>
+
 namespace owl::renderer::vulkan {
 
 namespace {
@@ -32,8 +34,8 @@ void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 			.arrayLayers = 1,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
 			.tiling = VK_IMAGE_TILING_OPTIMAL,
-			.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-					 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+			.usage = static_cast<uint32_t>(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT) |
+					 static_cast<uint32_t>(VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT),
 			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 			.queueFamilyIndexCount = 0,
 			.pQueueFamilyIndices = nullptr,
@@ -69,9 +71,11 @@ Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool i
 	: renderer::Texture2D{iWidth, iHeight, iWithAlpha} {}
 
 Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {
-	int width, height, channels;
+	int width = 0;
+	int height = 0;
+	int channels = 0;
 	stbi_set_flip_vertically_on_load(1);
-	stbi_uc *data;
+	stbi_uc *data = nullptr;
 	{
 		OWL_PROFILE_SCOPE("stbi_load - vulkan::Texture2D::Texture2D(const std::filesystem::path &)")
 		data = stbi_load(m_path.string().c_str(), &width, &height, &channels, 0);
@@ -114,14 +118,14 @@ void Texture2D::setData(void *iData, const uint32_t iSize) {
 		OWL_CORE_ERROR("Vulkan Texture {}: Image size missmatch: expect {}, got {}", m_path.string(), expected, iSize)
 		return;
 	}
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
+	VkBuffer stagingBuffer = nullptr;
+	VkDeviceMemory stagingBufferMemory = nullptr;
 
-	const VkDeviceSize imageSize = m_size.surface() * 4;
+	const VkDeviceSize imageSize = m_size.surface() * 4ull;
 	internal::createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 						   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
 						   stagingBufferMemory);
-	void *dataPixel;
+	void *dataPixel = nullptr;
 	vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, imageSize, 0, &dataPixel);
 	if (m_hasAlpha) {
 		// input data already in the right format, just copy

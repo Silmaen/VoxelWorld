@@ -17,11 +17,11 @@ namespace owl::renderer {
  */
 class OWL_API CameraOrtho {
 public:
-	CameraOrtho(const CameraOrtho&) = default;
-	CameraOrtho(CameraOrtho&&) = default;
-	CameraOrtho& operator=(const CameraOrtho&) = default;
-	CameraOrtho& operator=(CameraOrtho&&) = default;
-
+	CameraOrtho(const CameraOrtho &) = default;
+	CameraOrtho(CameraOrtho &&) = default;
+	CameraOrtho &operator=(const CameraOrtho &) = default;
+	CameraOrtho &operator=(CameraOrtho &&) = default;
+	~CameraOrtho() = default;
 	/**
 	 * @brief Create the camera giving coordinates of corners.
 	 * @param[in] iLeft Left of the screen's coordinate.
@@ -46,13 +46,13 @@ public:
 	 * @brief Access to camera's position.
 	 * @return Camera's position.
 	 */
-	[[nodiscard]] const glm::vec3& getPosition() const { return m_position; }
+	[[nodiscard]] const glm::vec3 &getPosition() const { return m_position; }
 
 	/**
 	 * @brief Define camera's position.
 	 * @param[in] iPosition New camera position.
 	 */
-	void setPosition(const glm::vec3& iPosition) {
+	void setPosition(const glm::vec3 &iPosition) {
 		m_position = iPosition;
 		recalculateViewMatrix();
 	}
@@ -76,19 +76,19 @@ public:
 	 * @brief Access to projection matrix.
 	 * @return The projection matrix.
 	 */
-	[[nodiscard]] const glm::mat4& getProjectionMatrix() const { return m_projectionMatrix; }
+	[[nodiscard]] const glm::mat4 &getProjectionMatrix() const { return m_projectionMatrix; }
 
 	/**
 	 * @brief Access to view matrix.
 	 * @return The view matrix.
 	 */
-	[[nodiscard]] const glm::mat4& getViewMatrix() const { return m_viewMatrix; }
+	[[nodiscard]] const glm::mat4 &getViewMatrix() const { return m_viewMatrix; }
 
 	/**
 	 * @brief Access to view projection matrix.
 	 * @return The view position matrix.
 	 */
-	[[nodiscard]] const glm::mat4& getViewProjectionMatrix() const { return m_viewProjectionMatrix; }
+	[[nodiscard]] const glm::mat4 &getViewProjectionMatrix() const { return m_viewProjectionMatrix; }
 
 private:
 	/**
@@ -107,4 +107,4 @@ private:
 	/// Camera's rotation.
 	float m_rotation = 0.0f;
 };
-} // namespace owl::renderer
+}// namespace owl::renderer

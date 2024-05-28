@@ -159,7 +159,7 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 	const auto &vkc = internal::VulkanCore::get();
 	const auto &[format, tiling] = m_specs.attachments[iAttachmentIndex];
 	const uint32_t imgIndex = attToImgIdx(iAttachmentIndex);
-	VkBuffer stagingBuffer;
+	VkBuffer stagingBuffer = nullptr;
 	{
 		const VkBufferCreateInfo bufferCi{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 										  .pNext = nullptr,
@@ -176,7 +176,7 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 			return 0;
 		}
 	}
-	VkDeviceMemory stagingBufferMemory;
+	VkDeviceMemory stagingBufferMemory = nullptr;
 	{
 		VkMemoryRequirements memRequirements;
 		vkGetBufferMemoryRequirements(vkc.getLogicalDevice(), stagingBuffer, &memRequirements);
@@ -207,7 +207,7 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 	internal::transitionImageLayout(m_images[imgIndex].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 									m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 															: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-	void *data;
+	void *data = nullptr;
 	if (const VkResult result = vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0,
 											internal::attachmentFormatToSize(format), 0, &data);
 		result != VK_SUCCESS) {
@@ -215,7 +215,7 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 					   internal::resultString(result))
 		return 0;
 	}
-	int32_t pixel;
+	int32_t pixel = 0;
 	memcpy(&pixel, data, internal::attachmentFormatToSize(format));
 	return pixel;
 }
@@ -226,7 +226,7 @@ void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const int iVa
 		return;
 	}
 	const auto &core = internal::VulkanCore::get();
-	const auto cmd = core.beginSingleTimeCommands();
+	auto *const cmd = core.beginSingleTimeCommands();
 	const uint32_t imgIndex = attToImgIdx(iAttachmentIndex);
 	VkClearColorValue val;
 	val.int32[0] = iValue;
@@ -254,7 +254,7 @@ void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const glm::ve
 		return;
 	}
 	const auto &core = internal::VulkanCore::get();
-	const auto cmd = core.beginSingleTimeCommands();
+	auto *const cmd = core.beginSingleTimeCommands();
 	const uint32_t imgIndex = attToImgIdx(iAttachmentIndex);
 	VkClearColorValue val;
 	val.float32[0] = iColorValue.r;
@@ -280,7 +280,7 @@ void Framebuffer::createImages() {
 	const auto &vkc = internal::VulkanCore::get();
 	m_swapChainImageCount = 0;
 	if (m_specs.swapChainTarget) {
-		const auto gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
+		auto *const gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
 		m_swapChainImageCount = vkc.getImagecount();
 		const auto queueFamilyIndices = vkc.getQueueIndicies();
 		const bool shares = queueFamilyIndices.size() > 1;
@@ -621,9 +621,9 @@ void Framebuffer::createDescriptorSets() {
 			OWL_CORE_ERROR("Vulkan Texture Descriptor: failed to allocate descriptor sets ({})",
 						   internal::resultString(result))
 		}
-		VkDescriptorImageInfo info{.sampler = img.imageSampler,
-								   .imageView = img.imageView,
-								   .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+		const VkDescriptorImageInfo info{.sampler = img.imageSampler,
+										 .imageView = img.imageView,
+										 .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
 		const VkWriteDescriptorSet wrt{.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 									   .pNext = nullptr,
 									   .dstSet = img.descriptorSet,

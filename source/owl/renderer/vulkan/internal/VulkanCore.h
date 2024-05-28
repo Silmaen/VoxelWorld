@@ -63,9 +63,9 @@ struct InstanceInformations {
 	[[nodiscard]] bool hasExtensions(const std::vector<std::string> &iExtensions) const;
 
 	uint32_t version = 0;
-	std::vector<std::string> supportedExtensions{};
-	std::vector<std::string> supportedLayers{};
-};
+	std::vector<std::string> supportedExtensions;
+	std::vector<std::string> supportedLayers;
+} OWL_ALIGN(64);
 
 /**
  * @brief Class VulkanCore.
@@ -132,7 +132,7 @@ public:
 	/**
 	 * @brief The different core states
 	 */
-	enum struct State {
+	enum struct State : uint8_t {
 		/// Just created or reseted.
 		Created,
 		/// Initialized and ready.
@@ -245,7 +245,7 @@ private:
 	VkDebugUtilsMessengerEXT m_debugUtilsMessenger{};
 
 	/// Information about the instance.
-	InstanceInformations m_instanceInfo{};
+	InstanceInformations m_instanceInfo;
 	/// If  validation layer are enabled.
 	bool m_hasValidation = false;
 	/// The internal state.

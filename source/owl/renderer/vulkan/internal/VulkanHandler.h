@@ -55,7 +55,7 @@ public:
 	void release();
 
 	/// List of handler states.
-	enum struct State {
+	enum struct State : uint8_t {
 		/// Not initialized of closed.
 		Uninitialized,
 		/// Initialized and ready.
@@ -121,12 +121,12 @@ public:
 	struct PipeLineData {
 		VkPipeline pipeLine = nullptr;
 		VkPipelineLayout layout = nullptr;
-	};
+	} OWL_ALIGN(16);
 
 	[[nodiscard]] PipeLineData getPipeline(int32_t iId) const;
 
 	int32_t pushPipeline(const std::string &iPipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
-	                     VkPipelineVertexInputStateCreateInfo iVertexInputInfo);
+						 VkPipelineVertexInputStateCreateInfo iVertexInputInfo);
 
 	// Command buffer data
 	bool inBatch = false;
@@ -189,6 +189,5 @@ private:
 
 	/// List of piplines.
 	std::map<int32_t, PipeLineData> m_pipeLines;
-
 };
 }// namespace owl::renderer::vulkan::internal

@@ -23,10 +23,10 @@ public:
 	 * @brief Default constructor.
 	 */
 	SceneCamera();
-	SceneCamera(const SceneCamera&) = default;
-	SceneCamera(SceneCamera&&) = default;
-	SceneCamera& operator=(const SceneCamera&) = default;
-	SceneCamera& operator=(SceneCamera&&) = default;
+	SceneCamera(const SceneCamera &) = default;
+	SceneCamera(SceneCamera &&) = default;
+	SceneCamera &operator=(const SceneCamera &) = default;
+	SceneCamera &operator=(SceneCamera &&) = default;
 
 	/**
 	 * @brief Destructor.
@@ -53,7 +53,7 @@ public:
 	 * @brief Defines the viewport.
 	 * @param[in] iSize Viewport's size.
 	 */
-	void setViewportSize(const math::FrameSize& iSize);
+	void setViewportSize(const math::FrameSize &iSize);
 
 	/**
 	 * @brief Get actual orthographic size.
@@ -73,9 +73,9 @@ public:
 	/**
 	 * @brief Projection types.
 	 */
-	enum struct ProjectionType {
-		Perspective = 0, /// Perspective projection.
-		Orthographic = 1 /// Orthographic projection.
+	enum struct ProjectionType : uint8_t {
+		Perspective = 0,/// Perspective projection.
+		Orthographic = 1/// Orthographic projection.
 	};
 
 	/**
@@ -191,4 +191,4 @@ private:
 	/// Aspect ratio.
 	float m_aspectRatio = 0.0f;
 };
-} // namespace owl::scene
+}// namespace owl::scene

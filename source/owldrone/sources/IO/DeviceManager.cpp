@@ -49,12 +49,12 @@ static void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
 
 namespace drone::IO {
 
-
+namespace {
 /**
  * @brief List The serial Port Available
  * @param ioListToUpdate The device's list to update.
  */
-static void enumerateSerialDevices(DeviceManager::DeviceList &ioListToUpdate) {
+void enumerateSerialDevices(DeviceManager::DeviceList &ioListToUpdate) {
 	if (const std::filesystem::path base{"/dev/serial/by-id"}; exists(base)) {
 		for (const auto &devLink: std::filesystem::directory_iterator(base)) {
 			if (is_symlink(devLink.symlink_status())) {
@@ -69,6 +69,7 @@ static void enumerateSerialDevices(DeviceManager::DeviceList &ioListToUpdate) {
 		OWL_WARN("Unable to list serial devices by Id.")
 	}
 }
+}// namespace
 
 }// namespace drone::IO
 

@@ -63,6 +63,11 @@ public:
 	ScopeUntrack();
 	/// Destructor.
 	~ScopeUntrack();
+
+	ScopeUntrack(const ScopeUntrack &) = delete;
+	ScopeUntrack(ScopeUntrack &&) = delete;
+	ScopeUntrack &operator=(const ScopeUntrack &) = delete;
+	ScopeUntrack &operator=(ScopeUntrack &&) = delete;
 };
 
 /**
@@ -116,7 +121,7 @@ public:
 		 * @return String of the allocation.
 		 */
 		[[nodiscard]] OWL_API std::string toStr() const;
-	};
+	} OWL_ALIGN(16);
 
 	/**
 	 * @brief Result structure of allocation state.
@@ -143,7 +148,7 @@ public:
 		 * @brief Reset the database.
 		 */
 		void reset();
-	};
+	} OWL_ALIGN(64);
 
 	/**
 	 * @brief Reset current memory state monitor and give the previous status.
@@ -179,4 +184,4 @@ private:
 #define OWL_SCOPE_TRACE
 #endif
 
-#define OWL_SCOPE_UNTRACK owl::debug::ScopeUntrack scopeUntrack;
+#define OWL_SCOPE_UNTRACK const owl::debug::ScopeUntrack scopeUntrack;

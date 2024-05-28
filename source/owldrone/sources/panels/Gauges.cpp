@@ -72,7 +72,7 @@ void Gauges::onUpdate(const core::Timestep &) {
 	// Draw into the frame buffer
 	const auto spec = m_framebuffer->getSpecification();
 	const float aspectRatio = m_viewportSize.ratio();
-	float scaling = std::min(aspectRatio, 0.666f);
+	const float scaling = std::min(aspectRatio, 0.666f);
 
 	if (m_viewportSize.surface() > 0 && m_viewportSize != spec.size) {
 		m_framebuffer->resize(m_viewportSize);
@@ -113,6 +113,7 @@ void Gauges::onUpdate(const core::Timestep &) {
 	m_framebuffer->unbind();
 }
 
+// NOLINTBEGIN(performance-no-int-to-ptr)
 void Gauges::onRender() {
 	OWL_PROFILE_FUNCTION()
 
@@ -138,5 +139,6 @@ void Gauges::onRender() {
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
+// NOLINTEND(performance-no-int-to-ptr)
 
 }// namespace drone::panels

@@ -12,7 +12,7 @@ def list_missing_so(binary: Path, has_missing: bool):
     try:
         out = run(f"ldd {binary}", shell=True, stdout=PIPE, stderr=STDOUT)
         if out.returncode != 0:
-            print(f"Error while searching dependencies: {out.returncode}\n{out.stdout}", file=stderr)
+            print(f"Error while searching dependencies: {out.returncode}\n{out.stdout.decode()}", file=stderr)
             exit(1)
         lines = out.stdout.decode().replace("\t", "").splitlines(keepends=False)
         missing_so = []

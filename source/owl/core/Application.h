@@ -18,34 +18,41 @@
 int main(int iArgc, char *iArgv[]);
 
 namespace owl::core {
+
+
+/// Default Windows width.
+constexpr uint32_t gDefaultWindowsWidth{1600};
+/// Default Windows height.
+constexpr uint32_t gDefaultWindowsheight{960};
 /**
  * @brief Parameters to give to the application.
  */
+// NOLINTBEGIN(readability-redundant-member-init)
 struct OWL_API AppParams {
+	/// List of command line argument.
+	char **args{nullptr};
+	/// The frequency for the frame debugging
+	uint64_t frameLogFrequency{0};
 	/// Application's title.
-	std::string name = "Owl Engine";
+	std::string name{"Owl Engine"};
 	/// Application's assets pattern.
-	std::string assetsPattern = "assets";
+	std::string assetsPattern{"assets"};
 	/// Application's icon.
 	std::string icon{};
 	/// Windows width.
-	uint32_t width = 1600;
+	uint32_t width{gDefaultWindowsWidth};
 	/// Windows height.
-	uint32_t height = 960;
-	/// Renderer's type.
-	renderer::RenderAPI::Type renderer = renderer::RenderAPI::Type::OpenGL;
-	/// If the application should use ImGui overlay.
-	bool hasGui = true;
+	uint32_t height{gDefaultWindowsheight};
 	/// Number of command line arguments.
-	int argCount = 0;
-	/// List of command line argument.
-	char **args = nullptr;
+	int argCount{0};
+	/// Renderer's type.
+	renderer::RenderAPI::Type renderer{renderer::RenderAPI::Type::OpenGL};
+	/// If the application should use ImGui overlay.
+	bool hasGui{true};
 	/// If extra debugging symbols should be loaded.
-	bool useDebugging = false;
+	bool useDebugging{false};
 	/// Run application in Dummy mode.
-	bool isDummy = false;
-	/// The frequency for the frame debugging
-	uint64_t frameLogFrequency = 0;
+	bool isDummy{false};
 
 	/**
 	 * @brief Access to the given command line argument.
@@ -71,7 +78,8 @@ struct OWL_API AppParams {
 	 * @param[in] iFile The file to save.
 	 */
 	void saveToFile(const std::filesystem::path &iFile) const;
-};
+} OWL_ALIGN(128);
+// NOLINTEND(readability-redundant-member-init)
 
 /**
  * @brief Root class defining the application to run.
@@ -183,7 +191,7 @@ public:
 	/**
 	 * @brief State of the application.
 	 */
-	enum struct State {
+	enum struct State : uint8_t {
 		Running,/// Application is running.
 		Stopped,/// Application Stopped.
 		Error/// Application in error.

@@ -22,7 +22,7 @@ std::shared_ptr<spdlog::logger> Log::s_coreLogger;
 std::shared_ptr<spdlog::logger> Log::s_clientLogger;
 spdlog::level::level_enum Log::s_verbosity = spdlog::level::trace;
 uint64_t Log::s_frameCounter = 0;
-uint64_t Log::s_frequency = 100;
+uint64_t Log::s_frequency = gDefaultFrequency;
 
 void Log::init(const spdlog::level::level_enum &iLevel, const uint64_t iFrequency) {
 	OWL_SCOPE_UNTRACK

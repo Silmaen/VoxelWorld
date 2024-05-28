@@ -12,6 +12,10 @@
 
 namespace owl::input {
 
+constexpr float sHalfTurn{180.f};
+constexpr float sFullTurn{360.f};
+constexpr float sZoomScroll{0.25f};
+
 CameraOrthoController::CameraOrthoController(const float iAspectRatio, const bool iRotation)
 	: m_aspectRatio{iAspectRatio},
 	  m_camera(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel),
@@ -40,10 +44,10 @@ void CameraOrthoController::onUpdate(const core::Timestep &iTimeStep) {
 			m_cameraRotation += m_cameraRotationSpeed * delta;
 		if (Input::isKeyPressed(key::E))
 			m_cameraRotation -= m_cameraRotationSpeed * delta;
-		if (m_cameraRotation > 180.0f)
-			m_cameraRotation -= 360.0f;
-		else if (m_cameraRotation <= -180.0f)
-			m_cameraRotation += 360.0f;
+		if (m_cameraRotation > sHalfTurn)
+			m_cameraRotation -= sFullTurn;
+		else if (m_cameraRotation <= -sHalfTurn)
+			m_cameraRotation += sFullTurn;
 		m_camera.setRotation(m_cameraRotation);
 	}
 	m_camera.setPosition(m_cameraPosition);
@@ -63,8 +67,8 @@ void CameraOrthoController::onEvent(event::Event &ioEvent) {
 bool CameraOrthoController::onMouseScrolled(const event::MouseScrolledEvent &iEvent) {
 	OWL_PROFILE_FUNCTION()
 
-	m_zoomLevel -= iEvent.getYOff() * 0.25f;
-	m_zoomLevel = std::max(m_zoomLevel, 0.25f);
+	m_zoomLevel -= iEvent.getYOff() * sZoomScroll;
+	m_zoomLevel = std::max(m_zoomLevel, sZoomScroll);
 	m_camera.setProjection(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel);
 	return false;
 }

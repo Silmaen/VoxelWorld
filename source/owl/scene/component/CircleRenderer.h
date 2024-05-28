@@ -20,6 +20,6 @@ struct OWL_API CircleRenderer {
 	float thickness = 1.0f;
 	/// The circle fading.
 	float fade = 0.005f;
-};
+} OWL_ALIGN(32);
 
 }// namespace owl::scene::component

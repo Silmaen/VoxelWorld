@@ -17,14 +17,16 @@ namespace owl::renderer::opengl {
  */
 class OWL_API GraphContext final : public renderer::GraphContext {
 public:
-	GraphContext(const GraphContext&) = delete;
-	GraphContext(GraphContext&&) = delete;
+	GraphContext(const GraphContext &) = delete;
+	GraphContext(GraphContext &&) = delete;
+	GraphContext &operator=(const GraphContext &) = delete;
+	GraphContext &operator=(GraphContext &&) = delete;
 
 	/**
 	 * @brief Default constructor.
 	 * @param[in,out] ioWindow The window into render context.
 	 */
-	explicit GraphContext(GLFWwindow* ioWindow);
+	explicit GraphContext(GLFWwindow *ioWindow);
 
 	/**
 	 * @brief Destructor.
@@ -49,8 +51,8 @@ public:
 
 private:
 	/// Link to the parent window.
-	GLFWwindow* mp_windowHandle;
+	GLFWwindow *mp_windowHandle;
 	/// OpenGL version
 	int m_version = 0;
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

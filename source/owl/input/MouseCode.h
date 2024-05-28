@@ -10,7 +10,7 @@
 
 namespace owl::input {
 /// Wrap to mouse code.
-using MouseCode = uint16_t;
+using MouseCode = uint8_t;
 
 /**
  * @brief Namespace for mouse codes.
@@ -32,5 +32,5 @@ enum : MouseCode {
 	ButtonRight = Button1,
 	ButtonMiddle = Button2
 };
-}
+}// namespace mouse
 }// namespace owl::input

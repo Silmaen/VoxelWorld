@@ -54,7 +54,7 @@ public:
 	/// Id of the last used camera.
 	int32_t cameraId = 1;
 	/// The serial port in use.
-	std::string serialPort{};
+	std::string serialPort;
 
 private:
 	/**

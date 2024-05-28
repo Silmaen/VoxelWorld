@@ -45,12 +45,16 @@ PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice &i
 	if (hasExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME)) {
 		updateSurfaceInformations();
 		uint32_t index = 0;
-		const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
+		auto *const gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
 		for (const auto &qFam: queueFamilies) {
-			if (qFam.queueFlags & VK_QUEUE_GRAPHICS_BIT) { graphicQueueIndex = index; }
-			VkBool32 support;
+			if (qFam.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+				graphicQueueIndex = index;
+			}
+			VkBool32 support = 0;
 			vkGetPhysicalDeviceSurfaceSupportKHR(device, index, gc->getSurface(), &support);
-			if (support) { presentQueueIndex = index; }
+			if (support) {
+				presentQueueIndex = index;
+			}
 			index++;
 		}
 	}
@@ -129,15 +133,15 @@ std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance &iInst
 }
 
 void PhysicalDeviceCapabilities::updateSurfaceInformations() {
-	const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
+	auto *const gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, gc->getSurface(), &surfaceCapabilities);
-	uint32_t formatCount;
+	uint32_t formatCount = 0;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, gc->getSurface(), &formatCount, nullptr);
 	if (formatCount != 0) {
 		surfaceFormats.resize(formatCount);
 		vkGetPhysicalDeviceSurfaceFormatsKHR(device, gc->getSurface(), &formatCount, surfaceFormats.data());
 	}
-	uint32_t presentModeCount;
+	uint32_t presentModeCount = 0;
 	vkGetPhysicalDeviceSurfacePresentModesKHR(device, gc->getSurface(), &presentModeCount, nullptr);
 	if (presentModeCount != 0) {
 		presentModes.resize(presentModeCount);

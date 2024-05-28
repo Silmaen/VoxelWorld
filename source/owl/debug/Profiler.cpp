@@ -11,13 +11,12 @@
 
 namespace owl::debug {
 
-Profiler::Profiler() : m_currentSession(nullptr) {}
+Profiler::Profiler() = default;
 
 Profiler::~Profiler() { endSession(); }
 
-void Profiler::beginSession(const std::string &iName,
-                            const std::string &iFilepath) {
-	std::lock_guard<std::mutex> lock(m_profilerMutex);
+void Profiler::beginSession(const std::string &iName, const std::string &iFilepath) {
+	const std::lock_guard<std::mutex> lock(m_profilerMutex);
 	if (m_currentSession) {
 		// If there is already a current session, then close it before beginning
 		// new one. Subsequent profiling output meant for the original session
@@ -28,14 +27,14 @@ void Profiler::beginSession(const std::string &iName,
 		// before Log::Init()
 		if (core::Log::getCoreLogger()) {
 			OWL_CORE_ERROR("Profiler::BeginSession('{}') when session '{}' already open.", iName,
-			               m_currentSession->name)
+						   m_currentSession->name)
 		}
 		internalEndSession();
 	}
 	m_outputStream.open(iFilepath);
 
 	if (m_outputStream.is_open()) {
-		m_currentSession = new ProfileSession({iName});
+		m_currentSession = mkUniq<ProfileSession>(iName);
 		writeHeader();
 	} else {
 		if (core::Log::getCoreLogger()) {// Edge case: BeginSession() might be  before Log::Init()
@@ -45,7 +44,7 @@ void Profiler::beginSession(const std::string &iName,
 }
 
 void Profiler::endSession() {
-	std::lock_guard<std::mutex> lock(m_profilerMutex);
+	const std::lock_guard<std::mutex> lock(m_profilerMutex);
 	internalEndSession();
 }
 
@@ -63,7 +62,7 @@ void Profiler::writeProfile(const ProfileResult &iResult) {
 	json << "\"ts\":" << iResult.start.count();
 	json << "}";
 
-	std::lock_guard<std::mutex> lock(m_profilerMutex);
+	const std::lock_guard<std::mutex> lock(m_profilerMutex);
 	if (m_currentSession) {
 		m_outputStream << json.str();
 		m_outputStream.flush();
@@ -84,13 +83,12 @@ void Profiler::internalEndSession() {
 	if (m_currentSession) {
 		writeFooter();
 		m_outputStream.close();
-		delete m_currentSession;
+		m_currentSession.reset();
 		m_currentSession = nullptr;
 	}
 }
 
-ProfileTimer::ProfileTimer(const char *iName) : m_name(iName), m_startTimePoint{std::chrono::steady_clock::now()},
-                                                m_stopped(false) {}
+ProfileTimer::ProfileTimer(const char *iName) : m_name(iName), m_startTimePoint{std::chrono::steady_clock::now()} {}
 
 ProfileTimer::~ProfileTimer() {
 	if (!m_stopped)
@@ -99,17 +97,12 @@ ProfileTimer::~ProfileTimer() {
 
 void ProfileTimer::stop() {
 	const auto endTimePoint = std::chrono::steady_clock::now();
-	const auto highResStart =
-			floatingPointMicroseconds{m_startTimePoint.time_since_epoch()};
+	const auto highResStart = floatingPointMicroseconds{m_startTimePoint.time_since_epoch()};
 	const auto elapsedTime =
-			std::chrono::time_point_cast<std::chrono::microseconds>(endTimePoint)
-			.time_since_epoch() -
-			std::chrono::time_point_cast<std::chrono::microseconds>(
-					m_startTimePoint)
-			.time_since_epoch();
+			std::chrono::time_point_cast<std::chrono::microseconds>(endTimePoint).time_since_epoch() -
+			std::chrono::time_point_cast<std::chrono::microseconds>(m_startTimePoint).time_since_epoch();
 
-	Profiler::get().writeProfile(
-			{m_name, highResStart, elapsedTime, std::this_thread::get_id()});
+	Profiler::get().writeProfile({m_name, highResStart, elapsedTime, std::this_thread::get_id()});
 
 	m_stopped = true;
 }

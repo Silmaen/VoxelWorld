@@ -113,8 +113,8 @@ void createBuffer(const VkDeviceSize iSize, const VkBufferUsageFlags iUsage, con
 		OWL_CORE_ERROR("Vulkan vertex buffer: failed to bind memory buffer ({}).", resultString(result))
 }
 
-
-static constexpr VkAccessFlags layoutToAccFlag(const VkImageLayout &iLayout) {
+namespace {
+constexpr VkAccessFlags layoutToAccFlag(const VkImageLayout &iLayout) {
 	if (iLayout == VK_IMAGE_LAYOUT_UNDEFINED)
 		return VK_ACCESS_NONE;
 	if (iLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
@@ -128,7 +128,7 @@ static constexpr VkAccessFlags layoutToAccFlag(const VkImageLayout &iLayout) {
 	return VK_ACCESS_NONE;
 }
 
-static constexpr VkPipelineStageFlags layoutToStgFlag(const VkImageLayout &iLayout) {
+constexpr VkPipelineStageFlags layoutToStgFlag(const VkImageLayout &iLayout) {
 	if (iLayout == VK_IMAGE_LAYOUT_UNDEFINED)
 		return VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 	if (iLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL || iLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
@@ -141,6 +141,7 @@ static constexpr VkPipelineStageFlags layoutToStgFlag(const VkImageLayout &iLayo
 		return VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 	return VK_PIPELINE_STAGE_NONE;
 }
+}// namespace
 
 void transitionImageLayout(const VkImage &iImage, const VkImageLayout iOldLayout, const VkImageLayout iNewLayout) {
 	const auto &core = VulkanCore::get();

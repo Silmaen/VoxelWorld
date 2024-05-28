@@ -13,7 +13,8 @@
 namespace owl::renderer::opengl {
 
 namespace utils {
-static GLenum toGlBaseType(const ShaderDataType &iType) {
+namespace {
+GLenum toGlBaseType(const ShaderDataType &iType) {
 	switch (iType) {
 		case ShaderDataType::Float:
 		case ShaderDataType::Float2:
@@ -36,6 +37,7 @@ static GLenum toGlBaseType(const ShaderDataType &iType) {
 	OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
 	return 0;
 }
+}// namespace
 }// namespace utils
 
 VertexArray::VertexArray() {
@@ -70,6 +72,7 @@ void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
 	glBindVertexArray(m_rendererId);
 	iVertexBuffer->bind();
 
+	// NOLINTBEGIN(performance-no-int-to-ptr)
 	const auto &layout = iVertexBuffer->getLayout();
 	for (const auto &element: layout) {
 		const auto count = static_cast<int32_t>(element.getComponentCount());
@@ -79,48 +82,46 @@ void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
 			case ShaderDataType::Float:
 			case ShaderDataType::Float2:
 			case ShaderDataType::Float3:
-			case ShaderDataType::Float4: {
-				glEnableVertexAttribArray(m_vertexBufferIndex);
-				glVertexAttribPointer(m_vertexBufferIndex,
-									  count, type,
-									  element.normalized ? GL_TRUE : GL_FALSE,
-									  stride,
-									  reinterpret_cast<const void *>(element.offset));
-				m_vertexBufferIndex++;
-				break;
-			}
+			case ShaderDataType::Float4:
+				{
+					glEnableVertexAttribArray(m_vertexBufferIndex);
+					glVertexAttribPointer(m_vertexBufferIndex, count, type, element.normalized ? GL_TRUE : GL_FALSE,
+										  stride, reinterpret_cast<const void *>(element.offset));
+					m_vertexBufferIndex++;
+					break;
+				}
 			case ShaderDataType::Int:
 			case ShaderDataType::Int2:
 			case ShaderDataType::Int3:
 			case ShaderDataType::Int4:
-			case ShaderDataType::Bool: {
-				glEnableVertexAttribArray(m_vertexBufferIndex);
-				glVertexAttribIPointer(m_vertexBufferIndex,
-									   count, type, stride,
-									   reinterpret_cast<const void *>(element.offset));
-				m_vertexBufferIndex++;
-				break;
-			}
-			case ShaderDataType::Mat3:
-			case ShaderDataType::Mat4: {
-				for (int32_t i = 0; i < count; i++) {
+			case ShaderDataType::Bool:
+				{
 					glEnableVertexAttribArray(m_vertexBufferIndex);
-					glVertexAttribPointer(m_vertexBufferIndex,
-										  count, type,
-										  element.normalized ? GL_TRUE : GL_FALSE,
-										  stride,
-										  reinterpret_cast<const void *>(
-											  element.offset + sizeof(float) * static_cast<uint32_t>(count * i)));
-					glVertexAttribDivisor(m_vertexBufferIndex, 1);
+					glVertexAttribIPointer(m_vertexBufferIndex, count, type, stride,
+										   reinterpret_cast<const void *>(element.offset));
 					m_vertexBufferIndex++;
+					break;
 				}
-				break;
-			}
+			case ShaderDataType::Mat3:
+			case ShaderDataType::Mat4:
+				{
+					for (int32_t i = 0; i < count; i++) {
+						glEnableVertexAttribArray(m_vertexBufferIndex);
+						glVertexAttribPointer(
+								m_vertexBufferIndex, count, type, element.normalized ? GL_TRUE : GL_FALSE, stride,
+								reinterpret_cast<const void *>(element.offset +
+															   sizeof(float) * static_cast<uint32_t>(count * i)));
+						glVertexAttribDivisor(m_vertexBufferIndex, 1);
+						m_vertexBufferIndex++;
+					}
+					break;
+				}
 			case ShaderDataType::None:
 				OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
-			break;
+				break;
 		}
 	}
+	// NOLINTEND(performance-no-int-to-ptr)
 	m_vertexBuffers.push_back(iVertexBuffer);
 }
 

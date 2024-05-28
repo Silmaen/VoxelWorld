@@ -22,6 +22,6 @@ struct OWL_API SpriteRenderer {
 	shared<renderer::Texture2D> texture = nullptr;
 	/// Texture's tiling factor.
 	float tilingFactor = 1.0f;
-};
+} OWL_ALIGN(64);
 
 }// namespace owl::scene::component

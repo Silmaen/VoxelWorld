@@ -27,13 +27,13 @@ OWL_DIAG_POP
 
 shared<core::Application> core::createApplication(int argc, char **argv) {
 	return mkShared<OwlNest>(core::AppParams{
+			.args = argv,
 			.name = "Owl Nest - Owl Engine Editor",
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,
 #endif
 			.icon = "icons/logo_owl_icon.png",
 			.argCount = argc,
-			.args = argv,
 	});
 }
 

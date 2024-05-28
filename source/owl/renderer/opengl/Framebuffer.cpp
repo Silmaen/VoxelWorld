@@ -19,29 +19,24 @@ constexpr uint32_t g_maxFramebufferSize = 8192;
 
 namespace utils {
 
-static GLenum textureTarget(const bool iMultisampled) {
-	return iMultisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-}
+namespace {
+GLenum textureTarget(const bool iMultisampled) { return iMultisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D; }
 
-static void createTextures(const bool iMultisampled, uint32_t *oId, const uint32_t iCount) {
+void createTextures(const bool iMultisampled, uint32_t *oId, const uint32_t iCount) {
 	glCreateTextures(textureTarget(iMultisampled), static_cast<GLsizei>(iCount), oId);
 }
 
-static void bindTexture(const bool iMultisampled, const uint32_t iId) {
-	glBindTexture(textureTarget(iMultisampled), iId);
-}
+void bindTexture(const bool iMultisampled, const uint32_t iId) { glBindTexture(textureTarget(iMultisampled), iId); }
 
-static void attachColorTexture(const uint32_t iId, const int iSamples, const GLenum iInternalFormat,
-							   const GLenum iFormat, const uint32_t iWidth,
-							   const uint32_t iHeight, const int iIndex) {
+void attachColorTexture(const uint32_t iId, const int iSamples, const GLenum iInternalFormat, const GLenum iFormat,
+						const uint32_t iWidth, const uint32_t iHeight, const int iIndex) {
 	const bool multisampled = iSamples > 1;
 	if (multisampled) {
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, iSamples, iInternalFormat, static_cast<GLsizei>(iWidth),
 								static_cast<GLsizei>(iHeight), GL_FALSE);
 	} else {
 		glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(iInternalFormat), static_cast<GLsizei>(iWidth),
-					 static_cast<GLsizei>(iHeight), 0,
-					 iFormat, GL_UNSIGNED_BYTE, nullptr);
+					 static_cast<GLsizei>(iHeight), 0, iFormat, GL_UNSIGNED_BYTE, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -51,10 +46,8 @@ static void attachColorTexture(const uint32_t iId, const int iSamples, const GLe
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + iIndex, textureTarget(multisampled), iId, 0);
 }
 
-static void attachDepthTexture(const uint32_t iId, const int iSamples, const GLenum iFormat,
-							   const GLenum iAttachmentType,
-							   const uint32_t iWidth,
-							   const uint32_t iHeight) {
+void attachDepthTexture(const uint32_t iId, const int iSamples, const GLenum iFormat, const GLenum iAttachmentType,
+						const uint32_t iWidth, const uint32_t iHeight) {
 	const bool multisampled = iSamples > 1;
 	if (multisampled) {
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, iSamples, iFormat, static_cast<GLsizei>(iWidth),
@@ -70,7 +63,7 @@ static void attachDepthTexture(const uint32_t iId, const int iSamples, const GLe
 	glFramebufferTexture2D(GL_FRAMEBUFFER, iAttachmentType, textureTarget(multisampled), iId, 0);
 }
 
-static bool isDepthFormat(const AttachmentSpecification::Format iFormat) {
+bool isDepthFormat(const AttachmentSpecification::Format iFormat) {
 	switch (iFormat) {
 		case AttachmentSpecification::Format::Depth24Stencil8:
 			return true;
@@ -83,7 +76,7 @@ static bool isDepthFormat(const AttachmentSpecification::Format iFormat) {
 	return false;
 }
 
-static GLenum FBTextureFormatToGL(const AttachmentSpecification::Format iFormat) {
+GLenum FBTextureFormatToGL(const AttachmentSpecification::Format iFormat) {
 	switch (iFormat) {
 		case AttachmentSpecification::Format::Rgba8:
 		case AttachmentSpecification::Format::Surface:
@@ -97,6 +90,7 @@ static GLenum FBTextureFormatToGL(const AttachmentSpecification::Format iFormat)
 	OWL_CORE_ASSERT(false, "Bad Texture format")
 	return 0;
 }
+}// namespace
 
 }// namespace utils
 
@@ -142,8 +136,8 @@ void Framebuffer::invalidate() {
 				case AttachmentSpecification::Format::Rgba8:
 				case AttachmentSpecification::Format::Surface:
 					utils::attachColorTexture(m_colorAttachments[i], static_cast<int>(m_specs.samples), GL_RGBA8,
-											  GL_RGBA,
-											  m_specs.size.width(), m_specs.size.height(), static_cast<int>(i));
+											  GL_RGBA, m_specs.size.width(), m_specs.size.height(),
+											  static_cast<int>(i));
 					break;
 				case AttachmentSpecification::Format::RedInteger:
 					utils::attachColorTexture(m_colorAttachments[i], static_cast<int>(m_specs.samples), GL_R32I,
@@ -175,9 +169,7 @@ void Framebuffer::invalidate() {
 
 	if (m_colorAttachments.size() > 1) {
 		OWL_CORE_ASSERT(m_colorAttachments.size() <= 4, "Bad color attachment size")
-		constexpr GLenum buffers[4] = {GL_COLOR_ATTACHMENT0,
-									   GL_COLOR_ATTACHMENT1,
-									   GL_COLOR_ATTACHMENT2,
+		constexpr GLenum buffers[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2,
 									   GL_COLOR_ATTACHMENT3};
 		glDrawBuffers(static_cast<GLsizei>(m_colorAttachments.size()), buffers);
 	} else if (m_colorAttachments.empty()) {
@@ -187,7 +179,9 @@ void Framebuffer::invalidate() {
 
 	const bool completeFramebuffer = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	OWL_CORE_ASSERT(completeFramebuffer, "Framebuffer is incomplete!")
-	if (!completeFramebuffer) { OWL_CORE_WARN("Incomplete Framebuffer") }
+	if (!completeFramebuffer) {
+		OWL_CORE_WARN("Incomplete Framebuffer")
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -197,13 +191,11 @@ void Framebuffer::bind() {
 	glViewport(0, 0, static_cast<GLsizei>(m_specs.size.width()), static_cast<GLsizei>(m_specs.size.height()));
 }
 
-void Framebuffer::unbind() {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
+void Framebuffer::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
 void Framebuffer::resize(const math::FrameSize iSize) {
-	if (iSize.getWidth() == 0 || iSize.getHeight() == 0 || iSize.getWidth() > g_maxFramebufferSize || iSize.getHeight()
-		> g_maxFramebufferSize) {
+	if (iSize.getWidth() == 0 || iSize.getHeight() == 0 || iSize.getWidth() > g_maxFramebufferSize ||
+		iSize.getHeight() > g_maxFramebufferSize) {
 		OWL_CORE_WARN("Attempt to resize frame buffer to {} {}", iSize.getWidth(), iSize.getHeight())
 		return;
 	}
@@ -215,7 +207,7 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 	OWL_CORE_ASSERT(iAttachmentIndex < m_colorAttachments.size(), "ReadPixel bad attachment index")
 
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + iAttachmentIndex);
-	int pixelData;
+	int pixelData = 0;
 	glReadPixels(iX, iY, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
 	return pixelData;
 }
@@ -223,8 +215,7 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const int iValue) {
 	OWL_CORE_ASSERT(iAttachmentIndex < m_colorAttachments.size(), "clearAttachment bad attachment index")
 	const auto &spec = m_colorAttachmentSpecifications[iAttachmentIndex];
-	glClearTexImage(m_colorAttachments[iAttachmentIndex], 0,
-					utils::FBTextureFormatToGL(spec.format), GL_INT, &iValue);
+	glClearTexImage(m_colorAttachments[iAttachmentIndex], 0, utils::FBTextureFormatToGL(spec.format), GL_INT, &iValue);
 }
 
 }// namespace owl::renderer::opengl

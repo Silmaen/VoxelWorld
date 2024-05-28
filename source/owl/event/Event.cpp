@@ -31,7 +31,9 @@ std::string KeyTypedEvent::getName() const { return fmt::format("KeyTypedEvent")
 
 uint8_t MouseMovedEvent::getCategoryFlags() const { return Category::Input | Category::Mouse; }
 uint8_t MouseScrolledEvent::getCategoryFlags() const { return Category::Input | Category::Mouse; }
-uint8_t MouseButtonEvent::getCategoryFlags() const { return Category::Input | Category::Mouse | Category::MouseButton; }
+uint8_t MouseButtonEvent::getCategoryFlags() const {
+	return static_cast<uint8_t>(Category::Input | Category::Mouse) | static_cast<uint8_t>(Category::MouseButton);
+}
 std::string MouseButtonPressedEvent::getName() const { return fmt::format("MouseButtonPressedEvent"); }
 std::string MouseButtonReleasedEvent::getName() const { return fmt::format("MouseButtonReleasedEvent"); }
 

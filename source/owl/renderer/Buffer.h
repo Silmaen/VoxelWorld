@@ -14,7 +14,7 @@ namespace owl::renderer {
 /**
  * @brief Type of data.
  */
-enum class ShaderDataType {
+enum class ShaderDataType : uint8_t {
 	None = 0,
 	Float,
 	Float2,
@@ -31,30 +31,30 @@ enum class ShaderDataType {
 
 static uint32_t shaderDataTypeSize(const ShaderDataType iType) {
 	switch (iType) {
-	case ShaderDataType::Float:
-		return 4;
-	case ShaderDataType::Float2:
-		return 4 * 2;
-	case ShaderDataType::Float3:
-		return 4 * 3;
-	case ShaderDataType::Float4:
-		return 4 * 4;
-	case ShaderDataType::Mat3:
-		return 4 * 3 * 3;
-	case ShaderDataType::Mat4:
-		return 4 * 4 * 4;
-	case ShaderDataType::Int:
-		return 4;
-	case ShaderDataType::Int2:
-		return 4 * 2;
-	case ShaderDataType::Int3:
-		return 4 * 3;
-	case ShaderDataType::Int4:
-		return 4 * 4;
-	case ShaderDataType::Bool:
-		return 1;
-	case ShaderDataType::None:
-		return 0;
+		case ShaderDataType::Float:
+			return 4;
+		case ShaderDataType::Float2:
+			return 4 * 2;
+		case ShaderDataType::Float3:
+			return 4 * 3;
+		case ShaderDataType::Float4:
+			return 4 * 4;
+		case ShaderDataType::Mat3:
+			return 4 * 3 * 3;
+		case ShaderDataType::Mat4:
+			return 4 * 4 * 4;
+		case ShaderDataType::Int:
+			return 4;
+		case ShaderDataType::Int2:
+			return 4 * 2;
+		case ShaderDataType::Int3:
+			return 4 * 3;
+		case ShaderDataType::Int4:
+			return 4 * 4;
+		case ShaderDataType::Bool:
+			return 1;
+		case ShaderDataType::None:
+			return 0;
 	}
 	OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
 	return 0;
@@ -69,9 +69,9 @@ struct OWL_API BufferElement {
 	/// Data's type.
 	ShaderDataType type;
 	/// Data's size.
-	uint32_t size = 0;
+	uint32_t size{0};
 	/// Data's offset.
-	uint32_t offset = 0;
+	uint32_t offset{0};
 	/// If data's normalized.
 	bool normalized = false;
 
@@ -81,8 +81,8 @@ struct OWL_API BufferElement {
 	 * @param[in] iType Data's type.
 	 * @param[in] iNormalized If data's normalized.
 	 */
-	BufferElement(std::string&& iName, const ShaderDataType iType, const bool iNormalized = false)
-		: name(std::move(iName)), type(iType), size(shaderDataTypeSize(iType)), offset(0), normalized(iNormalized) {}
+	BufferElement(std::string &&iName, const ShaderDataType iType, const bool iNormalized = false)
+		: name(std::move(iName)), type(iType), size(shaderDataTypeSize(iType)), normalized(iNormalized) {}
 
 	/**
 	 * @brief Get component's count.
@@ -90,35 +90,35 @@ struct OWL_API BufferElement {
 	 */
 	[[nodiscard]] uint32_t getComponentCount() const {
 		switch (type) {
-		case ShaderDataType::Float:
-			return 1;
-		case ShaderDataType::Float2:
-			return 2;
-		case ShaderDataType::Float3:
-			return 3;
-		case ShaderDataType::Float4:
-			return 4;
-		case ShaderDataType::Mat3:
-			return 3 * 3;
-		case ShaderDataType::Mat4:
-			return 4 * 4;
-		case ShaderDataType::Int:
-			return 1;
-		case ShaderDataType::Int2:
-			return 2;
-		case ShaderDataType::Int3:
-			return 3;
-		case ShaderDataType::Int4:
-			return 4;
-		case ShaderDataType::Bool:
-			return 1;
-		case ShaderDataType::None:
-			return 0;
+			case ShaderDataType::Float:
+				return 1;
+			case ShaderDataType::Float2:
+				return 2;
+			case ShaderDataType::Float3:
+				return 3;
+			case ShaderDataType::Float4:
+				return 4;
+			case ShaderDataType::Mat3:
+				return 3 * 3;
+			case ShaderDataType::Mat4:
+				return 4 * 4;
+			case ShaderDataType::Int:
+				return 1;
+			case ShaderDataType::Int2:
+				return 2;
+			case ShaderDataType::Int3:
+				return 3;
+			case ShaderDataType::Int4:
+				return 4;
+			case ShaderDataType::Bool:
+				return 1;
+			case ShaderDataType::None:
+				return 0;
 		}
 		OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
 		return 0;
 	}
-};
+} OWL_ALIGN(64);
 
 /**
  * @brief Class BufferLayout.
@@ -128,12 +128,13 @@ public:
 	using element_type = std::vector<BufferElement>;
 	using iterator = element_type::iterator;
 	using const_iterator = element_type::const_iterator;
+
+	BufferLayout() = default;
 	/**
 	 * @brief Constructor.
 	 * @param[in] iElements Elements in the layout.
 	 */
-	BufferLayout(const std::initializer_list<BufferElement>& iElements)
-		: m_elements(iElements) {
+	BufferLayout(const std::initializer_list<BufferElement> &iElements) : m_elements(iElements) {
 		calculateOffsetsAndStride();
 	}
 
@@ -147,7 +148,7 @@ public:
 	 * @brief Get the buffer Elements.
 	 * @return Buffer elements.
 	 */
-	[[nodiscard]] const std::vector<BufferElement>& getElements() const { return m_elements; }
+	[[nodiscard]] const std::vector<BufferElement> &getElements() const { return m_elements; }
 
 	[[nodiscard]] iterator begin() { return m_elements.begin(); }
 	[[nodiscard]] iterator end() { return m_elements.end(); }
@@ -165,7 +166,7 @@ private:
 	void calculateOffsetsAndStride() {
 		uint32_t offset = 0;
 		m_stride = 0;
-		for (auto& element : m_elements) {
+		for (auto &element: m_elements) {
 			element.offset = offset;
 			offset += element.size;
 			m_stride += element.size;
@@ -178,10 +179,10 @@ private:
  */
 class OWL_API VertexBuffer {
 public:
-	VertexBuffer(const VertexBuffer&) = default;
-	VertexBuffer(VertexBuffer&&) = default;
-	VertexBuffer& operator=(const VertexBuffer&) = default;
-	VertexBuffer& operator=(VertexBuffer&&) = default;
+	VertexBuffer(const VertexBuffer &) = default;
+	VertexBuffer(VertexBuffer &&) = default;
+	VertexBuffer &operator=(const VertexBuffer &) = default;
+	VertexBuffer &operator=(VertexBuffer &&) = default;
 	VertexBuffer() = default;
 	/**
 	 * @brief Destructor.
@@ -203,23 +204,23 @@ public:
 	 * @param[in] iData The raw data.
 	 * @param[in] iSize Number of data.
 	 */
-	virtual void setData(const void* iData, uint32_t iSize) = 0;
+	virtual void setData(const void *iData, uint32_t iSize) = 0;
 
 	/**
 	 * @brief Get the buffer data layout.
 	 * @return Data layout.
 	 */
-	[[nodiscard]] const BufferLayout& getLayout() const { return m_layout; }
+	[[nodiscard]] const BufferLayout &getLayout() const { return m_layout; }
 
 	/**
 	 * @brief Define the data layout.
 	 * @param[in] iLayout New data layout.
 	 */
-	void setLayout(const BufferLayout& iLayout) { m_layout = iLayout; }
+	void setLayout(const BufferLayout &iLayout) { m_layout = iLayout; }
 
 private:
 	/// Data layout description.
-	BufferLayout m_layout{};
+	BufferLayout m_layout;
 };
 
 /**
@@ -227,10 +228,10 @@ private:
  */
 class OWL_API IndexBuffer {
 public:
-	IndexBuffer(const IndexBuffer&) = default;
-	IndexBuffer(IndexBuffer&&) = default;
-	IndexBuffer& operator=(const IndexBuffer&) = default;
-	IndexBuffer& operator=(IndexBuffer&&) = default;
+	IndexBuffer(const IndexBuffer &) = default;
+	IndexBuffer(IndexBuffer &&) = default;
+	IndexBuffer &operator=(const IndexBuffer &) = default;
+	IndexBuffer &operator=(IndexBuffer &&) = default;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -255,4 +256,4 @@ public:
 	 */
 	[[nodiscard]] virtual uint32_t getCount() const = 0;
 };
-} // namespace owl::renderer
+}// namespace owl::renderer

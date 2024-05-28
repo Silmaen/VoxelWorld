@@ -21,10 +21,10 @@ enum : KeyCode {
 	// From glfw3.h
 	Space = 32,
 	Apostrophe = 39, /* ' */
-	Comma = 44,      /* , */
-	Minus = 45,      /* - */
-	Period = 46,     /* . */
-	Slash = 47,      /* / */
+	Comma = 44, /* , */
+	Minus = 45, /* - */
+	Period = 46, /* . */
+	Slash = 47, /* / */
 
 	D0 = 48, /* 0 */
 	D1 = 49, /* 1 */
@@ -38,7 +38,7 @@ enum : KeyCode {
 	D9 = 57, /* 9 */
 
 	Semicolon = 59, /* ; */
-	Equal = 61,     /* = */
+	Equal = 61, /* = */
 
 	A = 65,
 	B = 66,
@@ -67,10 +67,10 @@ enum : KeyCode {
 	Y = 89,
 	Z = 90,
 
-	LeftBracket = 91,  /* [ */
-	Backslash = 92,    /* \ */
+	LeftBracket = 91, /* [ */
+	Backslash = 92, /* \ */
 	RightBracket = 93, /* ] */
-	GraveAccent = 96,  /* ` */
+	GraveAccent = 96, /* ` */
 
 	World1 = 161, /* non-US #1 */
 	World2 = 162, /* non-US #2 */
@@ -150,5 +150,5 @@ enum : KeyCode {
 	RightSuper = 347,
 	Menu = 348
 };
-}
+}//namespace key
 }// namespace owl::input

@@ -25,7 +25,7 @@ struct TextureData {
 
 	void freeTrexture();
 	void createDescriptorSet();
-};
+} OWL_ALIGN(64);
 
 /**
  * @brief Class Descriptors.
@@ -129,4 +129,4 @@ private:
 	void updateDescriptor(size_t iFrame);
 };
 
-}// internal
+}// namespace owl::renderer::vulkan::internal

@@ -28,23 +28,30 @@ public:
 
 	/// The actual entity.
 	Entity entity;
+	// NOLINTBEGIN(performance-trivially-destructible)
 	/**
 	 * @brief Destructor.
 	 */
-	virtual ~ScriptableEntity();
+	~ScriptableEntity();
+	// NOLINTEND(performance-trivially-destructible)
 	/**
 	 * @brief Function called on script creation.
 	 */
-	virtual void onCreate() {}
+	void onCreate() {}
 	/**
 	 * @brief Function called on script destruction.
 	 */
-	virtual void onDestroy() {}
+	void onDestroy() {}
 	/**
 	 * @brief Function called on script update.
 	 * @param[in] iTimeStep Timestamp.
 	 */
-	virtual void onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) {}
+	void onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) {}
+
+	ScriptableEntity(const ScriptableEntity &) = delete;
+	ScriptableEntity(ScriptableEntity &&) = delete;
+	ScriptableEntity &operator=(const ScriptableEntity &) = delete;
+	ScriptableEntity &operator=(ScriptableEntity &&) = delete;
 
 private:
 	/// To access the scene privates.

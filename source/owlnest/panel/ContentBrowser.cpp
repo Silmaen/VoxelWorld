@@ -8,10 +8,13 @@
 
 #include "ContentBrowser.h"
 
+#include <algorithm>
+
 namespace owl::panel {
 
-static std::filesystem::path s_assetPath;
-
+namespace {
+std::filesystem::path s_assetPath;
+}// namespace
 ContentBrowser::ContentBrowser() { OWL_SCOPE_UNTRACK }
 
 
@@ -25,18 +28,23 @@ void ContentBrowser::attach() {
 	currentPath = s_assetPath;
 	if (const auto fileIconPath = s_assetPath / "icons" / "FileIcon.png"; exists(fileIconPath)) {
 		fileIcon = renderer::Texture2D::create(fileIconPath);
-	} else { OWL_CORE_WARN("Unable to find file icon at {}", fileIconPath.string()) }
+	} else {
+		OWL_CORE_WARN("Unable to find file icon at {}", fileIconPath.string())
+	}
 	if (const auto dirIconPath = s_assetPath / "icons" / "DirectoryIcon.png"; exists(dirIconPath)) {
 		dirIcon = renderer::Texture2D::create(dirIconPath);
-	} else { OWL_CORE_WARN("Unable to find directory icon at {}", dirIconPath.string()) }
-
+	} else {
+		OWL_CORE_WARN("Unable to find directory icon at {}", dirIconPath.string())
+	}
 }
 
 void ContentBrowser::onImGuiRender() {
 	ImGui::Begin("Content Browser");
 
 	if (currentPath != std::filesystem::path(s_assetPath)) {
-		if (ImGui::Button("<-")) { currentPath = currentPath.parent_path(); }
+		if (ImGui::Button("<-")) {
+			currentPath = currentPath.parent_path();
+		}
 	}
 
 	static float padding = 30.0f;
@@ -46,26 +54,27 @@ void ContentBrowser::onImGuiRender() {
 	// setup array of icons
 	const float panelWidth = ImGui::GetContentRegionAvail().x;
 	int columnCount = static_cast<int>(panelWidth / cellSize);
-	if (columnCount < 1)
-		columnCount = 1;
+	columnCount = std::max(columnCount, 1);
 	ImGui::Columns(columnCount, nullptr, false);
 
-	for (auto &directoryEntry: std::filesystem::directory_iterator(currentPath)) {
+	for (const auto &directoryEntry: std::filesystem::directory_iterator(currentPath)) {
 		const auto &path = directoryEntry.path();
 		auto relativePath = std::filesystem::relative(path, s_assetPath);
-		std::string filenameString = relativePath.filename().string();
+		const std::string filenameString = relativePath.filename().string();
 		ImGui::PushID(filenameString.c_str());
-		shared<renderer::Texture2D> icon = directoryEntry.is_directory() ? dirIcon : fileIcon;
+		const shared<renderer::Texture2D> icon = directoryEntry.is_directory() ? dirIcon : fileIcon;
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 		uint64_t textureId = 0;
 		if (icon)
 			textureId = icon->getRendererId();
 		if (textureId != 0) {
-			ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureId), {thumbnailSize, thumbnailSize},
-			                   {0, 1}, {1, 0});
+			// NOLINTBEGIN(performance-no-int-to-ptr)
+			ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureId), {thumbnailSize, thumbnailSize}, {0, 1},
+							   {1, 0});
+			// NOLINTEND(performance-no-int-to-ptr)
 			if (ImGui::BeginDragDropSource()) {
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", relativePath.string().c_str(),
-				                          relativePath.string().size() + 1);
+										  relativePath.string().size() + 1);
 				ImGui::EndDragDropSource();
 			}
 
@@ -80,7 +89,7 @@ void ContentBrowser::onImGuiRender() {
 			ImGui::Button(filenameString.c_str(), {thumbnailSize, thumbnailSize});
 			if (ImGui::BeginDragDropSource()) {
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", relativePath.string().c_str(),
-				                          relativePath.string().size() + 1);
+										  relativePath.string().size() + 1);
 				ImGui::EndDragDropSource();
 			}
 

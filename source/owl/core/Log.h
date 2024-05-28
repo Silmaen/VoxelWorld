@@ -21,6 +21,9 @@ OWL_DIAG_POP
  */
 namespace owl::core {
 
+/// Default frequency for frame ooutput.
+constexpr uint64_t gDefaultFrequency{100};
+
 /**
  * @brief Logging system.
  */
@@ -31,7 +34,8 @@ public:
 	 * @param[in] iLevel Verbosity level of the logger.
 	 * @param[in] iFrequency Frequence of frame outputput (number of frames).
 	 */
-	static void init(const spdlog::level::level_enum &iLevel = spdlog::level::trace, uint64_t iFrequency = 100);
+	static void init(const spdlog::level::level_enum &iLevel = spdlog::level::trace,
+					 uint64_t iFrequency = gDefaultFrequency);
 
 	/**
 	 * @brief Access to the logger for the core system.
@@ -104,7 +108,9 @@ private:
  * @return The actualized stream.
  */
 template<typename OStream, glm::length_t L, typename T, glm::qualifier Q>
-OStream &operator<<(OStream &oStream, const glm::vec<L, T, Q> &iVector) { return oStream << glm::to_string(iVector); }
+OStream &operator<<(OStream &oStream, const glm::vec<L, T, Q> &iVector) {
+	return oStream << glm::to_string(iVector);
+}
 
 /**
  * @brief Overload stream operator for matrices.
@@ -132,11 +138,15 @@ OStream &operator<<(OStream &oStream, const glm::mat<C, R, T, Q> &iMatrix) {
  * @return The actualized stream.
  */
 template<typename OStream, typename T, glm::qualifier Q>
-OStream &operator<<(OStream &oStream, glm::qua<T, Q> iQuaternion) { return oStream << glm::to_string(iQuaternion); }
+OStream &operator<<(OStream &oStream, glm::qua<T, Q> iQuaternion) {
+	return oStream << glm::to_string(iQuaternion);
+}
 
 // Core log macros;
-#define OWL_CORE_FRAME_TRACE(...) \
-	if (::owl::core::Log::frameLog()) { ::owl::core::Log::getCoreLogger()->trace(__VA_ARGS__); }
+#define OWL_CORE_FRAME_TRACE(...)                                                                                      \
+	if (::owl::core::Log::frameLog()) {                                                                                \
+		::owl::core::Log::getCoreLogger()->trace(__VA_ARGS__);                                                         \
+	}
 #define OWL_CORE_FRAME_ADVANCE ::owl::core::Log::newFrame();
 
 #define OWL_CORE_TRACE(...) ::owl::core::Log::getCoreLogger()->trace(__VA_ARGS__);

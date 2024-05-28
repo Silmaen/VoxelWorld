@@ -17,6 +17,7 @@ namespace owl::renderer {
 
 namespace utils {
 
+namespace {
 constexpr uint32_t g_maxQuads = 20000;
 constexpr size_t g_quadVertexCount = 4;
 constexpr uint32_t g_maxVertices = g_maxQuads * g_quadVertexCount;
@@ -27,7 +28,8 @@ constexpr glm::vec4 g_quadVertexPositions[] = {{-0.5f, -0.5f, 0.0f, 1.0f},
 											   {0.5f, 0.5f, 0.0f, 1.0f},
 											   {-0.5f, 0.5f, 0.0f, 1.0f}};
 
-static uint32_t g_maxTextureSlots = 0;
+uint32_t g_maxTextureSlots = 0;
+}// namespace
 
 /**
  * @brief Structure holding quad vertex information.
@@ -39,7 +41,7 @@ struct QuadVertex {
 	float texIndex;
 	float tilingFactor;
 	int entityID;
-};
+} OWL_ALIGN(64);
 
 /**
  * @brief Structure holding circle vertex information.
@@ -51,7 +53,7 @@ struct CircleVertex {
 	float thickness;
 	float fade;
 	int entityID;
-};
+} OWL_ALIGN(64);
 
 /**
  * @brief Structure holding line vertex information.
@@ -60,7 +62,7 @@ struct LineVertex {
 	glm::vec3 position;
 	glm::vec4 color;
 	int entityID;
-};
+} OWL_ALIGN(32);
 
 /**
  * @brief Base structure for rendering an object type
@@ -69,53 +71,53 @@ template<typename VertexType>
 struct VertexData {
 	uint32_t indexCount = 0;
 	std::vector<VertexType> vertexBuf;
-};
+} OWL_ALIGN(32);
 
+namespace {
 template<typename VertexType>
-static void resetDrawData(VertexData<VertexType> &iData) {
+void resetDrawData(VertexData<VertexType> &iData) {
 	iData.indexCount = 0;
 	iData.vertexBuf.clear();
 	iData.vertexBuf.reserve(utils::g_maxVertices);
 }
+}// namespace
 
 /**
  * @brief Structure holding static internal g_data
  */
 struct internalData {
-	/// Quad Data
-	VertexData<QuadVertex> quad;
-	shared<DrawData> drawQuad;
-	/// Circle Data
-	VertexData<CircleVertex> circle;
-	shared<DrawData> drawCircle;
-	/// Line Data
-	VertexData<LineVertex> line;
-	shared<DrawData> drawLine;
-	float lineWidth = 2.0f;
-	/// Debug Triangle
-	shared<DrawData> drawDataTriangle;
-	bool doTriangleDraw = false;
-
-	// Textures Data
-	/// One white texture for coloring
-	shared<Texture2D> whiteTexture;
-	/// Array of textures
-	std::vector<shared<Texture2D>> textureSlots;
-	/// next texture index
-	uint32_t textureSlotIndex = 1;// 0 = white texture
-
-	/// Statistics
-	Renderer2D::Statistics stats;
-
 	/// Camera Data
 	struct CameraData {
 		/// Camera projection
 		glm::mat4 viewProjection;
-	};
-
+	} OWL_ALIGN(64);
 	CameraData cameraBuffer{};
+	/// Quad Data
+	VertexData<QuadVertex> quad;
+	/// Circle Data
+	VertexData<CircleVertex> circle;
+	/// Line Data
+	VertexData<LineVertex> line;
+	/// Statistics
+	Renderer2D::Statistics stats;
+	shared<DrawData> drawQuad;
+	shared<DrawData> drawCircle;
+	shared<DrawData> drawLine;
+	/// Debug Triangle
+	shared<DrawData> drawDataTriangle;
+	// Textures Data
+	/// One white texture for coloring
+	shared<Texture2D> whiteTexture;
+
 	shared<UniformBuffer> cameraUniformBuffer;
-};
+	/// Array of textures
+	std::vector<shared<Texture2D>> textureSlots;
+	float lineWidth = 2.0f;
+	/// next texture index
+	uint32_t textureSlotIndex = 1;// 0 = white texture
+	bool doTriangleDraw = false;
+
+} OWL_ALIGN(128);
 
 glm::mat4 toTransform(const PRS &iTransform) {
 	if (RenderCommand::getApi() == RenderAPI::Type::Vulkan) {
@@ -130,7 +132,9 @@ glm::mat4 toTransform(const PRS &iTransform) {
 
 }// namespace utils
 
-static shared<utils::internalData> g_data;
+namespace {
+shared<utils::internalData> g_data;
+}// namespace
 
 void Renderer2D::init() {
 	OWL_PROFILE_FUNCTION()
@@ -355,7 +359,7 @@ void Renderer2D::drawPolyLine(const PolyLineData &iLineData) {
 void Renderer2D::drawCircle(const CircleData &iCircleData) {
 	OWL_PROFILE_FUNCTION()
 
-	// TODO: implement for circles
+	// TODO(Silmaen): implement for circles
 	// if (g_data->circleIndexCount >= utils::maxIndices)
 	// 	nextBatch();
 

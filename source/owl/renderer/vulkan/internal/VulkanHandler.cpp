@@ -74,18 +74,19 @@ void VulkanHandler::release() {
 	m_state = State::Uninitialized;
 }
 
-static void func(const VkResult iResult) {
+namespace {
+void func(const VkResult iResult) {
 	if (iResult != VK_SUCCESS)
 		OWL_CORE_ERROR("Vulkan Imgui: Error detected: {}", resultString(iResult))
 }
+}// namespace
 
 ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo(std::vector<VkFormat> &ioFormats) {
 	const auto &core = VulkanCore::get();
 	auto &vkd = Descriptors::get();
 	vkd.createImguiDescriptorPool();
 	ioFormats = m_swapChain->getColorAttachmentformats();
-	return {
-			.Instance = core.getInstance(),
+	return {.Instance = core.getInstance(),
 			.PhysicalDevice = core.getPhysicalDevice(),
 			.Device = core.getLogicalDevice(),
 			.QueueFamily = core.getGraphQueueFamilyIndex(),
@@ -98,18 +99,16 @@ ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo(std::vector<VkFormat> &ioFo
 			.PipelineCache = VK_NULL_HANDLE,
 			.Subpass = 0,
 			.UseDynamicRendering = false,
-			.PipelineRenderingCreateInfo = {
-					.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
-					.pNext = nullptr,
-					.viewMask = 0,
-					.colorAttachmentCount = static_cast<uint32_t>(ioFormats.size()),
-					.pColorAttachmentFormats = ioFormats.data(),
-					.depthAttachmentFormat = VK_FORMAT_UNDEFINED,
-					.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
-			},
+			.PipelineRenderingCreateInfo = {.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
+											.pNext = nullptr,
+											.viewMask = 0,
+											.colorAttachmentCount = static_cast<uint32_t>(ioFormats.size()),
+											.pColorAttachmentFormats = ioFormats.data(),
+											.depthAttachmentFormat = VK_FORMAT_UNDEFINED,
+											.stencilAttachmentFormat = VK_FORMAT_UNDEFINED},
 			.Allocator = nullptr,
 			.CheckVkResultFn = func,
-			.MinAllocationSize = 1024 * 1024};
+			.MinAllocationSize = 1048576u};
 }
 
 void VulkanHandler::createCore() {
@@ -123,14 +122,13 @@ void VulkanHandler::createSwapChain() {
 	const auto &core = VulkanCore::get();
 	m_swapChain = mkUniq<Framebuffer>(FramebufferSpecification{
 			.size = core.getCurrentSize(),
-			.attachments = {
-					{AttachmentSpecification::Format::Surface,
-					 AttachmentSpecification::Tiling::Optimal},
-					{AttachmentSpecification::Format::RedInteger,
-					 AttachmentSpecification::Tiling::Optimal},
-					//{AttachmentSpecification::Format::Depth24Stencil8,
-					// AttachmentSpecification::Tiling::Optimal}
-			},
+			.attachments =
+					{
+							{AttachmentSpecification::Format::Surface, AttachmentSpecification::Tiling::Optimal},
+							{AttachmentSpecification::Format::RedInteger, AttachmentSpecification::Tiling::Optimal},
+							//{AttachmentSpecification::Format::Depth24Stencil8,
+							// AttachmentSpecification::Tiling::Optimal}
+					},
 			.samples = 2,
 			.swapChainTarget = true,
 	});
@@ -148,20 +146,19 @@ VkCommandBuffer VulkanHandler::getCurrentCommandBuffer() const {
 }
 
 int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
-                                    std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
-                                    VkPipelineVertexInputStateCreateInfo iVertexInputInfo) {
+									std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
+									VkPipelineVertexInputStateCreateInfo iVertexInputInfo) {
 	const auto &core = VulkanCore::get();
 	auto &vkd = Descriptors::get();
 	PipeLineData pData;
 	// PipeLine Layout
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.setLayoutCount = 1,
-			.pSetLayouts = vkd.getDescriptorSetLayout(),
-			.pushConstantRangeCount = 0,
-			.pPushConstantRanges = nullptr};
+	const VkPipelineLayoutCreateInfo pipelineLayoutInfo{.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+														.pNext = nullptr,
+														.flags = {},
+														.setLayoutCount = 1,
+														.pSetLayouts = vkd.getDescriptorSetLayout(),
+														.pushConstantRangeCount = 0,
+														.pPushConstantRanges = nullptr};
 	if (const VkResult result =
 				vkCreatePipelineLayout(core.getLogicalDevice(), &pipelineLayoutInfo, nullptr, &pData.layout);
 		result != VK_SUCCESS) {
@@ -170,13 +167,13 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 		return -1;
 	}
 
-	VkPipelineInputAssemblyStateCreateInfo inputAssembly{
+	constexpr VkPipelineInputAssemblyStateCreateInfo inputAssembly{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
 			.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
 			.primitiveRestartEnable = VK_FALSE};
-	VkPipelineViewportStateCreateInfo viewportState{
+	constexpr VkPipelineViewportStateCreateInfo viewportState{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
@@ -184,7 +181,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.pViewports = nullptr,
 			.scissorCount = 1,
 			.pScissors = nullptr};
-	VkPipelineRasterizationStateCreateInfo rasterizer{
+	constexpr VkPipelineRasterizationStateCreateInfo rasterizer{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
@@ -198,7 +195,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.depthBiasClamp = 0.0,
 			.depthBiasSlopeFactor = 0.0f,
 			.lineWidth = 1.0f};
-	VkPipelineMultisampleStateCreateInfo multisampling{
+	constexpr VkPipelineMultisampleStateCreateInfo multisampling{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
@@ -209,27 +206,25 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.alphaToCoverageEnable = VK_FALSE,
 			.alphaToOneEnable = VK_FALSE};
 	std::vector<VkPipelineColorBlendAttachmentState> att = {
-			{
-					.blendEnable = VK_TRUE,
-					.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-					.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-					.colorBlendOp = VK_BLEND_OP_ADD,
-					.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
-					.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
-					.alphaBlendOp = VK_BLEND_OP_ADD,
-					.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
-					                  VK_COLOR_COMPONENT_A_BIT},
-			{
-					.blendEnable = VK_FALSE,
-					.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-					.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-					.colorBlendOp = VK_BLEND_OP_ADD,
-					.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
-					.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
-					.alphaBlendOp = VK_BLEND_OP_ADD,
-					.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
-					                  VK_COLOR_COMPONENT_A_BIT}};
-	VkPipelineColorBlendStateCreateInfo colorBlending{
+			{.blendEnable = VK_TRUE,
+			 .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+			 .dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+			 .colorBlendOp = VK_BLEND_OP_ADD,
+			 .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+			 .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+			 .alphaBlendOp = VK_BLEND_OP_ADD,
+			 .colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+							   VK_COLOR_COMPONENT_A_BIT},
+			{.blendEnable = VK_FALSE,
+			 .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+			 .dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+			 .colorBlendOp = VK_BLEND_OP_ADD,
+			 .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+			 .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+			 .alphaBlendOp = VK_BLEND_OP_ADD,
+			 .colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+							   VK_COLOR_COMPONENT_A_BIT}};
+	const VkPipelineColorBlendStateCreateInfo colorBlending{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
@@ -238,16 +233,13 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.attachmentCount = static_cast<uint32_t>(att.size()),
 			.pAttachments = att.data(),
 			.blendConstants = {0.f, 0.f, 0.f, 0.f}};
-	VkDynamicState dynamicStates[] = {
-			VK_DYNAMIC_STATE_VIEWPORT,
-			VK_DYNAMIC_STATE_SCISSOR};
-	VkPipelineDynamicStateCreateInfo dynamicState{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.dynamicStateCount = 2,
-			.pDynamicStates = dynamicStates};
-	VkPipelineDepthStencilStateCreateInfo depthStensil{
+	const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+	const VkPipelineDynamicStateCreateInfo dynamicState{.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+														.pNext = nullptr,
+														.flags = {},
+														.dynamicStateCount = 2,
+														.pDynamicStates = dynamicStates};
+	constexpr VkPipelineDepthStencilStateCreateInfo depthStensil{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
@@ -260,30 +252,30 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.back = {},
 			.minDepthBounds = 0.0f,
 			.maxDepthBounds = 1.0f};
-	VkGraphicsPipelineCreateInfo pipelineInfo{
-			.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.stageCount = static_cast<uint32_t>(iShaderStages.size()),
-			.pStages = iShaderStages.data(),
-			.pVertexInputState = &iVertexInputInfo,
-			.pInputAssemblyState = &inputAssembly,
-			.pTessellationState = nullptr,
-			.pViewportState = &viewportState,
-			.pRasterizationState = &rasterizer,
-			.pMultisampleState = &multisampling,
-			.pDepthStencilState = &depthStensil,
-			.pColorBlendState = &colorBlending,
-			.pDynamicState = &dynamicState,
-			.layout = pData.layout,
-			.renderPass = m_currentframebuffer->getRenderPass(),
-			.subpass = 0,
-			.basePipelineHandle = VK_NULL_HANDLE,
-			.basePipelineIndex = 0};
+	const VkGraphicsPipelineCreateInfo pipelineInfo{.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+													.pNext = nullptr,
+													.flags = {},
+													.stageCount = static_cast<uint32_t>(iShaderStages.size()),
+													.pStages = iShaderStages.data(),
+													.pVertexInputState = &iVertexInputInfo,
+													.pInputAssemblyState = &inputAssembly,
+													.pTessellationState = nullptr,
+													.pViewportState = &viewportState,
+													.pRasterizationState = &rasterizer,
+													.pMultisampleState = &multisampling,
+													.pDepthStencilState = &depthStensil,
+													.pColorBlendState = &colorBlending,
+													.pDynamicState = &dynamicState,
+													.layout = pData.layout,
+													.renderPass = m_currentframebuffer->getRenderPass(),
+													.subpass = 0,
+													.basePipelineHandle = VK_NULL_HANDLE,
+													.basePipelineIndex = 0};
 
 	OWL_CORE_TRACE("Vulkan pipeline: vkCreateGraphicsPipelines")
 	if (const VkResult result = vkCreateGraphicsPipelines(core.getLogicalDevice(), VK_NULL_HANDLE, 1, &pipelineInfo,
-	                                                      nullptr, &pData.pipeLine); result != VK_SUCCESS) {
+														  nullptr, &pData.pipeLine);
+		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create graphics pipeline for {} ({})", iPipeLineName, resultString(result))
 		m_state = State::ErrorCreatingPipeline;
 		return -1;
@@ -329,11 +321,10 @@ void VulkanHandler::beginFrame() {
 	m_currentframebuffer->resetBatch();
 	vkWaitForFences(core.getLogicalDevice(), 1, m_currentframebuffer->getCurrentFence(), VK_TRUE, UINT64_MAX);
 	uint32_t imageIndex = 0;
-	if (const VkResult result = vkAcquireNextImageKHR(core.getLogicalDevice(), m_currentframebuffer->getSwapChain(),
-	                                                  UINT64_MAX,
-	                                                  m_currentframebuffer->getCurrentImageAvailableSemaphore(),
-	                                                  VK_NULL_HANDLE,
-	                                                  &imageIndex); result != VK_SUCCESS) {
+	if (const VkResult result = vkAcquireNextImageKHR(
+				core.getLogicalDevice(), m_currentframebuffer->getSwapChain(), UINT64_MAX,
+				m_currentframebuffer->getCurrentImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+		result != VK_SUCCESS) {
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 			m_currentframebuffer->resize(toFrameSize(core.getCurrentExtent()));
 			return;
@@ -370,11 +361,10 @@ void VulkanHandler::beginBatch() {
 		m_state = State::ErrorResetCommandBuffer;
 		return;
 	}
-	constexpr VkCommandBufferBeginInfo beginInfo{
-			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-			.pNext = nullptr,
-			.flags = {},
-			.pInheritanceInfo = nullptr};
+	constexpr VkCommandBufferBeginInfo beginInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+												 .pNext = nullptr,
+												 .flags = {},
+												 .pInheritanceInfo = nullptr};
 	if (const VkResult result = vkBeginCommandBuffer(getCurrentCommandBuffer(), &beginInfo); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to begin recording command buffer ({}).", resultString(result))
 		m_state = State::ErrorBeginCommandBuffer;
@@ -386,23 +376,18 @@ void VulkanHandler::beginBatch() {
 			.pNext = nullptr,
 			.renderPass = m_currentframebuffer->getRenderPass(),
 			.framebuffer = m_currentframebuffer->getCurrentFramebuffer(),
-			.renderArea = {
-					.offset = {0, 0},
-					.extent = toExtent(m_currentframebuffer->getSpecification().size)},
+			.renderArea = {.offset = {0, 0}, .extent = toExtent(m_currentframebuffer->getSpecification().size)},
 			.clearValueCount = 0,
 			.pClearValues = nullptr};
 	vkCmdBeginRenderPass(getCurrentCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	const VkViewport viewport{
-			.x = 0.0f,
-			.y = 0.0f,
-			.width = static_cast<float>(m_currentframebuffer->getSpecification().size.getWidth()),
-			.height = static_cast<float>(m_currentframebuffer->getSpecification().size.getHeight()),
-			.minDepth = 0.0f,
-			.maxDepth = 1.0f};
+	const VkViewport viewport{.x = 0.0f,
+							  .y = 0.0f,
+							  .width = static_cast<float>(m_currentframebuffer->getSpecification().size.getWidth()),
+							  .height = static_cast<float>(m_currentframebuffer->getSpecification().size.getHeight()),
+							  .minDepth = 0.0f,
+							  .maxDepth = 1.0f};
 	vkCmdSetViewport(getCurrentCommandBuffer(), 0, 1, &viewport);
-	const VkRect2D scissor{
-			.offset = {0, 0},
-			.extent = toExtent(m_currentframebuffer->getSpecification().size)};
+	const VkRect2D scissor{.offset = {0, 0}, .extent = toExtent(m_currentframebuffer->getSpecification().size)};
 	vkCmdSetScissor(getCurrentCommandBuffer(), 0, 1, &scissor);
 }
 
@@ -416,20 +401,20 @@ void VulkanHandler::endBatch() {
 	const VkSemaphore waitSemaphores[] = {m_currentframebuffer->getCurrentFinishedSemaphore()};
 	constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 	const VkSemaphore signalSemaphores[] = {m_currentframebuffer->getCurrentFinishedSemaphore()};
-	const VkSubmitInfo submitInfo{
-			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-			.pNext = nullptr,
-			.waitSemaphoreCount = 1u,
-			.pWaitSemaphores = m_currentframebuffer->isFirstBatch() ? waitSemaphoresStart : waitSemaphores,
-			.pWaitDstStageMask = waitStages,
-			.commandBufferCount = 1,
-			.pCommandBuffers = m_currentframebuffer->getCurrentCommandbuffer(),
-			.signalSemaphoreCount = 1,
-			.pSignalSemaphores = signalSemaphores};
+	const VkSubmitInfo submitInfo{.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+								  .pNext = nullptr,
+								  .waitSemaphoreCount = 1u,
+								  .pWaitSemaphores =
+										  m_currentframebuffer->isFirstBatch() ? waitSemaphoresStart : waitSemaphores,
+								  .pWaitDstStageMask = waitStages,
+								  .commandBufferCount = 1,
+								  .pCommandBuffers = m_currentframebuffer->getCurrentCommandbuffer(),
+								  .signalSemaphoreCount = 1,
+								  .pSignalSemaphores = signalSemaphores};
 
 	const auto &core = VulkanCore::get();
-	if (const VkResult result = vkQueueSubmit(core.getGraphicQueue(), 1, &submitInfo,
-	                                          *m_currentframebuffer->getCurrentFence());
+	if (const VkResult result =
+				vkQueueSubmit(core.getGraphicQueue(), 1, &submitInfo, *m_currentframebuffer->getCurrentFence());
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to submit draw command buffer ({}).", resultString(result))
 		m_state = State::ErrorSubmitingDrawCommand;
@@ -447,15 +432,14 @@ void VulkanHandler::swapFrame() {
 	const VkSemaphore signalSemaphores[] = {m_currentframebuffer->getCurrentFinishedSemaphore()};
 	const VkSwapchainKHR swapChains[] = {m_currentframebuffer->getSwapChain()};
 
-	const VkPresentInfoKHR presentInfo{
-			.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-			.pNext = nullptr,
-			.waitSemaphoreCount = 1,
-			.pWaitSemaphores = signalSemaphores,
-			.swapchainCount = 1,
-			.pSwapchains = swapChains,
-			.pImageIndices = m_currentframebuffer->getCurrentImage(),
-			.pResults = nullptr};
+	const VkPresentInfoKHR presentInfo{.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+									   .pNext = nullptr,
+									   .waitSemaphoreCount = 1,
+									   .pWaitSemaphores = signalSemaphores,
+									   .swapchainCount = 1,
+									   .pSwapchains = swapChains,
+									   .pImageIndices = m_currentframebuffer->getCurrentImage(),
+									   .pResults = nullptr};
 	const auto &core = VulkanCore::get();
 	if (const VkResult result = vkQueuePresentKHR(core.getPresentQueue(), &presentInfo); result != VK_SUCCESS) {
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_resize) {
@@ -479,7 +463,7 @@ void VulkanHandler::bindPipeline(const int32_t iId) {
 	auto &vkd = Descriptors::get();
 	vkCmdBindPipeline(getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeLines[iId].pipeLine);
 	vkCmdBindDescriptorSets(getCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeLines[iId].layout, 0, 1,
-	                        vkd.getDescriptorSet(getCurrentFrameIndex()), 0, nullptr);
+							vkd.getDescriptorSet(getCurrentFrameIndex()), 0, nullptr);
 }
 
 void VulkanHandler::setResize() {

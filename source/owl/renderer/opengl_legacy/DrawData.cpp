@@ -81,6 +81,7 @@ void DrawData::setShader(const std::string &iShaderName, const std::string &iRen
 void DrawData::applyLayout() const {
 	OWL_PROFILE_FUNCTION()
 
+	// NOLINTBEGIN(performance-no-int-to-ptr)
 	const uint32_t program = mp_shader->getBindId();
 	for (const auto &layout = mp_vertexBuffer->getLayout(); const auto &element: layout) {
 		if (element.type == ShaderDataType::None)
@@ -94,27 +95,18 @@ void DrawData::applyLayout() const {
 			case ShaderDataType::Float2:
 			case ShaderDataType::Float3:
 			case ShaderDataType::Float4:
-				glVertexAttribPointer(location,
-									  count, GL_FLOAT,
-									  element.normalized ? GL_TRUE : GL_FALSE,
-									  stride,
+				glVertexAttribPointer(location, count, GL_FLOAT, element.normalized ? GL_TRUE : GL_FALSE, stride,
 									  reinterpret_cast<const void *>(element.offset));
 				break;
 			case ShaderDataType::Int:
 			case ShaderDataType::Int2:
 			case ShaderDataType::Int3:
 			case ShaderDataType::Int4:
-				glVertexAttribPointer(location,
-									  count, GL_INT,
-									  GL_FALSE,
-									  stride,
+				glVertexAttribPointer(location, count, GL_INT, GL_FALSE, stride,
 									  reinterpret_cast<const void *>(element.offset));
 				break;
 			case ShaderDataType::Bool:
-				glVertexAttribPointer(location,
-									  count, GL_BOOL,
-									  GL_FALSE,
-									  stride,
+				glVertexAttribPointer(location, count, GL_BOOL, GL_FALSE, stride,
 									  reinterpret_cast<const void *>(element.offset));
 				break;
 			case ShaderDataType::Mat3:
@@ -126,6 +118,7 @@ void DrawData::applyLayout() const {
 				break;
 		}
 	}
+	// NOLINTEND(performance-no-int-to-ptr)
 }
 
 void DrawData::unApplyLayout() const {

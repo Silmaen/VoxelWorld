@@ -76,7 +76,7 @@ public:
 	/**
 	 * @brief list of PixelFormat
 	 */
-	enum struct PixelFormat {
+	enum struct PixelFormat : uint8_t {
 		Rgb24,///< R8G8B8 format
 		Nv12,///< NV12 pixel format.
 		YuYv,///< YUYV pixel format.
@@ -98,14 +98,16 @@ public:
 	[[nodiscard]] static bool isPixelFormatSupported(const PixelFormat &iPixFormat);
 
 protected:
+	// NOLINTBEGIN(readability-redundant-member-init)
 	/// Bus info of the device, this is unique.
-	std::string m_busInfo;
+	std::string m_busInfo{};
 	/// Name of the device.
 	std::string m_name;
 	/// The pixel format.
 	PixelFormat m_pixFormat = PixelFormat::Unknwon;
 	/// The size of the frame.
 	math::FrameSize m_size;
+	// NOLINTEND(readability-redundant-member-init)
 
 	/**
 	 * @brief Convert a raw buffer of pixel to RGB24 format.

@@ -18,8 +18,9 @@
 namespace owl::renderer::vulkan {
 
 namespace utils {
-
-[[maybe_unused]] static VkShaderStageFlagBits shaderStageToVkStageBit(const ShaderType &iStage) {
+namespace {
+// NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange)
+[[maybe_unused]] VkShaderStageFlagBits shaderStageToVkStageBit(const ShaderType &iStage) {
 	switch (iStage) {
 		case ShaderType::Vertex:
 			return VK_SHADER_STAGE_VERTEX_BIT;
@@ -34,14 +35,15 @@ namespace utils {
 	}
 	return static_cast<VkShaderStageFlagBits>(0);
 }
+// NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange)
 
 
-static VkShaderModule createShaderModule(const VkDevice &iLogicalDevice, const std::vector<uint32_t> &iCode) {
+VkShaderModule createShaderModule(const VkDevice &iLogicalDevice, const std::vector<uint32_t> &iCode) {
 	VkShaderModuleCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.codeSize = iCode.size() * sizeof(uint32_t);
 	createInfo.pCode = iCode.data();
-	VkShaderModule shaderModule;
+	VkShaderModule shaderModule = nullptr;
 	if (const VkResult result = vkCreateShaderModule(iLogicalDevice, &createInfo, nullptr, &shaderModule);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("failed to create shader module ({}).", internal::resultString(result))
@@ -49,26 +51,29 @@ static VkShaderModule createShaderModule(const VkDevice &iLogicalDevice, const s
 	}
 	return shaderModule;
 }
+}// namespace
 
 }// namespace utils
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer, const std::string &iVertexSrc,
-			   const std::string &iFragmentSrc) : renderer::Shader{iShaderName, iRenderer} {
+			   const std::string &iFragmentSrc)
+	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 
 	createShader({{ShaderType::Vertex, iVertexSrc}, {ShaderType::Fragment, iFragmentSrc}});
 }
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer,
-			   const std::unordered_map<ShaderType, std::string> &iSources) : renderer::Shader{
-		iShaderName, iRenderer} {
+			   const std::unordered_map<ShaderType, std::string> &iSources)
+	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 
 	createShader(iSources);
 }
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer,
-			   const std::vector<std::filesystem::path> &iSources) : renderer::Shader{iShaderName, iRenderer} {
+			   const std::vector<std::filesystem::path> &iSources)
+	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 	std::unordered_map<ShaderType, std::string> strSources;
 
@@ -117,8 +122,8 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &iSo
 	compileOrGetVulkanBinaries(iSources);
 
 	const auto timer = std::chrono::steady_clock::now() - start;
-	double duration = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) /
-					  1000.0;
+	double duration =
+			static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) / 1000.0;
 	OWL_CORE_INFO("Compilation of shader {} in {} ms", getName(), duration)
 }
 
@@ -129,15 +134,13 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 	options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_0);
 	options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-	std::filesystem::path cacheDirectory = renderer::utils::getCacheDirectory(getRenderer(), "vulkan");
-
 	auto &shaderData = m_vulkanSpirv;
 	shaderData.clear();
 	for (auto &&[stage, source]: iSources) {
-		std::filesystem::path basePath = renderer::utils::getShaderPath(getName(), getRenderer(), "vulkan", stage);
-		std::filesystem::path cachedPath = renderer::utils::getShaderCachedPath(
-				getName(), getRenderer(), "vulkan", stage);
-
+		const std::filesystem::path basePath =
+				renderer::utils::getShaderPath(getName(), getRenderer(), "vulkan", stage);
+		const std::filesystem::path cachedPath =
+				renderer::utils::getShaderCachedPath(getName(), getRenderer(), "vulkan", stage);
 		if (exists(cachedPath) && (last_write_time(cachedPath) > last_write_time(basePath))) {
 			// Cache exists: read it
 			OWL_CORE_INFO("Using cached Vulkan Shader {}-{}", getName(), magic_enum::enum_name(stage))
@@ -147,12 +150,11 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 				OWL_CORE_INFO("Origin file newer than cached one, Recompiling.")
 			OWL_CORE_TRACE("Compile shader file: {}",
 						   renderer::utils::getRelativeShaderPath(getName(), getRenderer(), "vulkan", stage).string())
-			shaderc::Compiler compiler;
-			auto module = compiler.CompileGlslToSpv(source,
-													renderer::utils::shaderStageToShaderC(stage),
-													renderer::utils::getShaderPath(
-															getName(), getRenderer(), "vulkan", stage).string().c_str(),
-													options);
+			const shaderc::Compiler compiler;
+			const auto module = compiler.CompileGlslToSpv(
+					source, renderer::utils::shaderStageToShaderC(stage),
+					renderer::utils::getShaderPath(getName(), getRenderer(), "vulkan", stage).string().c_str(),
+					options);
 			if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
 				OWL_CORE_ERROR(module.GetErrorMessage())
 				OWL_CORE_ASSERT(false, "Failed Compilation")

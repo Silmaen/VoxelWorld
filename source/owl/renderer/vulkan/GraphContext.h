@@ -17,14 +17,16 @@ namespace owl::renderer::vulkan {
  */
 class OWL_API GraphContext final : public ::owl::renderer::GraphContext {
 public:
-	GraphContext(const GraphContext&) = delete;
-	GraphContext(GraphContext&&) = delete;
+	GraphContext(const GraphContext &) = delete;
+	GraphContext(GraphContext &&) = delete;
+	GraphContext &operator=(const GraphContext &) = delete;
+	GraphContext &operator=(GraphContext &&) = delete;
 
 	/**
 	 * @brief Default constructor.
 	 * @param[in] ioWindow The windows draw surface.
 	 */
-	explicit GraphContext(GLFWwindow* ioWindow);
+	explicit GraphContext(GLFWwindow *ioWindow);
 
 	/**
 	 * @brief Destructor.
@@ -51,13 +53,13 @@ public:
 	 * @param[in] iInstance The Vulkan instance
 	 * @return The operation result.
 	 */
-	VkResult createSurface(const VkInstance& iInstance);
+	VkResult createSurface(const VkInstance &iInstance);
 
 	/**
 	 * @brief Destroy the Window surface.
 	 * @param[in] iInstance The Vulkan instance
 	 */
-	void destroySurface(const VkInstance& iInstance);
+	void destroySurface(const VkInstance &iInstance);
 
 	/**
 	 * \brief Access to the vulkn surface.
@@ -71,8 +73,8 @@ public:
 
 private:
 	/// The window.
-	GLFWwindow* mp_wnd = nullptr;
+	GLFWwindow *mp_wnd = nullptr;
 	/// the presenttin surface.
 	VkSurfaceKHR m_surface = nullptr;
 };
-} // namespace owl::renderer::vulkan
+}// namespace owl::renderer::vulkan

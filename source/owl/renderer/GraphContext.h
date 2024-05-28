@@ -17,10 +17,10 @@ namespace owl::renderer {
 class OWL_API GraphContext {
 public:
 	GraphContext() = default;
-	GraphContext(const GraphContext&) = delete;
-	GraphContext(GraphContext&&) = delete;
-	GraphContext& operator=(const GraphContext&) = delete;
-	GraphContext& operator=(GraphContext&&) = delete;
+	GraphContext(const GraphContext &) = delete;
+	GraphContext(GraphContext &&) = delete;
+	GraphContext &operator=(const GraphContext &) = delete;
+	GraphContext &operator=(GraphContext &&) = delete;
 
 	/**
 	 * @brief Destructor.
@@ -45,20 +45,20 @@ public:
 	 * @param[in,out] ioWindow The window into render context.
 	 * @return The created context.
 	 */
-	static uniq<GraphContext> create(void* ioWindow);
+	static uniq<GraphContext> create(void *ioWindow);
 
 	/**
 	 * @brief Structure for holding version number.
 	 */
 	struct Version {
-		int major; ///< major version number.
-		int minor; ///< minor version number.
+		int major;///< major version number.
+		int minor;///< minor version number.
 		/**
 		 * @brief Check version order
 		 * @param[in] iOther Version to compare
 		 * @return True if this is equal.
 		 */
-		[[nodiscard]] bool operator==(const Version& iOther) const {
+		[[nodiscard]] bool operator==(const Version &iOther) const {
 			return major == iOther.major && minor == iOther.minor;
 		}
 
@@ -67,7 +67,7 @@ public:
 		 * @param[in] iOther Version to compare
 		 * @return True if this is lower.
 		 */
-		[[nodiscard]] bool operator<(const Version& iOther) const {
+		[[nodiscard]] bool operator<(const Version &iOther) const {
 			return major < iOther.major || (major == iOther.major && minor < iOther.minor);
 		}
 
@@ -76,10 +76,10 @@ public:
 		 * @param[in] iOther Version to compare
 		 * @return True if this is lower.
 		 */
-		[[nodiscard]] bool operator<=(const Version& iOther) const {
+		[[nodiscard]] bool operator<=(const Version &iOther) const {
 			return major <= iOther.major || (major == iOther.major && minor <= iOther.minor);
 		}
-	};
+	} OWL_ALIGN(8);
 
 	/**
 	 * @brief Get version number of the backend API.
@@ -87,4 +87,4 @@ public:
 	 */
 	[[nodiscard]] virtual Version getVersion() const = 0;
 };
-} // namespace owl::renderer
+}// namespace owl::renderer

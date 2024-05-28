@@ -17,6 +17,7 @@
  * @param[in] iArgv List of arguments.
  * @return Execution code.
  */
+// NOLINTBEGIN(misc-definitions-in-headers)
 int main(int iArgc, char *iArgv[]) {
 	OWL_SCOPE_TRACE
 	owl::core::Log::init();
@@ -43,11 +44,10 @@ int main(int iArgc, char *iArgv[]) {
 				OWL_CORE_TRACE("Leak Detected during App release")
 				OWL_CORE_TRACE("-----------------------------------")
 				OWL_CORE_TRACE("")
-				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory, memState.allocs.size())
+				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory,
+							   memState.allocs.size())
 #if OWL_TRACKER_VERBOSITY >= 2
-				for (const auto &chunk: memState.allocs) {
-					OWL_CORE_TRACE(" ** {}", chunk.toStr())
-				}
+				for (const auto &chunk: memState.allocs) { OWL_CORE_TRACE(" ** {}", chunk.toStr()) }
 #endif
 				OWL_CORE_TRACE("----------------------------------")
 				OWL_CORE_TRACE("")
@@ -61,7 +61,7 @@ int main(int iArgc, char *iArgv[]) {
 		// ==================== Print Memory informations ========================
 #if OWL_TRACKER_VERBOSITY >= 1
 		OWL_CORE_INFO("Memory State at the end of execution:")
-		auto &memoryState = owl::debug::Tracker::get().globals();
+		const auto &memoryState = owl::debug::Tracker::get().globals();
 		OWL_CORE_INFO("Residual memory          : {}", memoryState.allocatedMemory)
 		OWL_CORE_INFO("Memory peek              : {}", memoryState.memoryPeek)
 		OWL_CORE_INFO("Total Allocation calls   : {}", memoryState.allocationCalls)
@@ -69,9 +69,7 @@ int main(int iArgc, char *iArgv[]) {
 #if OWL_TRACKER_VERBOSITY >= 2
 		if (memoryState.allocationCalls > memoryState.deallocationCalls) {
 			OWL_CORE_INFO("Remaining memory chunks  :", memoryState.allocationCalls)
-			for (const auto &alloc: memoryState.allocs) {
-				OWL_CORE_INFO("* {}", alloc.toStr())
-			}
+			for (const auto &alloc: memoryState.allocs) { OWL_CORE_INFO("* {}", alloc.toStr()) }
 		}
 #endif
 #endif
@@ -80,3 +78,4 @@ int main(int iArgc, char *iArgv[]) {
 	owl::core::Log::invalidate();
 	return 0;
 }
+// NOLINTEND(misc-definitions-in-headers)

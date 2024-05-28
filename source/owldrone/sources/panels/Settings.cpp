@@ -16,9 +16,9 @@ Settings::Settings() = default;
 
 Settings::~Settings() = default;
 
-void Settings::onUpdate(const owl::core::Timestep &) {
-}
+void Settings::onUpdate(const owl::core::Timestep &) {}
 
+// NOLINTBEGIN(misc-const-correctness)
 void Settings::onRender() {
 	auto &settings = IO::DroneSettings::get();
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
@@ -78,7 +78,8 @@ void Settings::onRender() {
 			if (ImGui::BeginCombo("Serial port", fmt::format("Serial {} ({})", cName, cPort).c_str())) {
 				for (const auto &dev: devices) {
 					const bool isSelected = (dev.port == cPort);
-					if (ImGui::Selectable(fmt::format("Serial {} ({})", dev.getFriendlyName(), dev.port).c_str(), isSelected))
+					if (ImGui::Selectable(fmt::format("Serial {} ({})", dev.getFriendlyName(), dev.port).c_str(),
+										  isSelected))
 						cPort = dev.port;
 					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
 					if (isSelected)
@@ -100,5 +101,6 @@ void Settings::onRender() {
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
+// NOLINTEND(misc-const-correctness)
 
 }// namespace drone::panels

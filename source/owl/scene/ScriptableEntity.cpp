@@ -9,8 +9,8 @@
 
 #include "ScriptableEntity.h"
 
-namespace owl::scene{
+namespace owl::scene {
 
-ScriptableEntity::~ScriptableEntity() =default;
+ScriptableEntity::~ScriptableEntity() = default;
 
-}
+}// namespace owl::scene

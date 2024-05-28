@@ -15,20 +15,20 @@ namespace owl::renderer::opengl_legacy {
  */
 class UniformBindingLibrary {
 public:
-	static UniformBindingLibrary& get() {
+	static UniformBindingLibrary &get() {
 		static UniformBindingLibrary instance;
 		return instance;
 	}
 
-	const UniformBuffer* getUniformBuffer(uint32_t iBinding);
+	const UniformBuffer *getUniformBuffer(uint32_t iBinding);
 
-	void addUniformBuffer(const UniformBuffer* iBuffer);
+	void addUniformBuffer(const UniformBuffer *iBuffer);
 
 	void removeUniformBuffer(uint32_t iBinding);
 
 private:
 	UniformBindingLibrary() = default;
 
-	std::vector<const UniformBuffer*> m_uniforms{};
+	std::vector<const UniformBuffer *> m_uniforms;
 };
-} // namespace owl::renderer::opengl_legacy
+}// namespace owl::renderer::opengl_legacy

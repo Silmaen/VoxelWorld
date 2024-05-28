@@ -12,10 +12,9 @@
 #include "core/external/opengl46.h"
 
 namespace owl::renderer::opengl {
-
-[[maybe_unused]] static void messageCallback(unsigned iSource, unsigned iType, unsigned iId, const unsigned iSeverity,
-											 [[maybe_unused]] int iLength, const char *iMessage,
-											 const void *iUserParam) {
+namespace {
+[[maybe_unused]] void messageCallback(unsigned iSource, unsigned iType, unsigned iId, const unsigned iSeverity,
+									  [[maybe_unused]] int iLength, const char *iMessage, const void *iUserParam) {
 	switch (iSeverity) {
 		case GL_DEBUG_SEVERITY_HIGH:
 			OWL_CORE_CRITICAL("OpenGL: {}({})-{} : {} / {}", iSource, iType, iId, iMessage, iUserParam)
@@ -35,15 +34,16 @@ namespace owl::renderer::opengl {
 
 	OWL_CORE_ASSERT(false, "Unknown severity level!")
 }
+}// namespace
 
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
 
-	auto [major,minor] = core::Application::get().getWindow().getGraphContext()->getVersion();
+	auto [major, minor] = core::Application::get().getWindow().getGraphContext()->getVersion();
 	if (const bool goodVersion = major > 4 || (major == 4 && minor >= 5); !goodVersion) {
 		setState(State::Error);
-		OWL_CORE_ERROR("Owl Engine OpenGL Renderer requires at least OpenGL version 4.5 but version {}.{} found",
-					   major, minor)
+		OWL_CORE_ERROR("Owl Engine OpenGL Renderer requires at least OpenGL version 4.5 but version {}.{} found", major,
+					   minor)
 	}
 
 	if (getState() != State::Created)
@@ -71,13 +71,9 @@ void RenderAPI::setViewport(const uint32_t iX, const uint32_t iY, const uint32_t
 			   static_cast<int32_t>(iHeight));
 }
 
-void RenderAPI::setClearColor(const glm::vec4 &iColor) {
-	glClearColor(iColor.r, iColor.g, iColor.b, iColor.a);
-}
+void RenderAPI::setClearColor(const glm::vec4 &iColor) { glClearColor(iColor.r, iColor.g, iColor.b, iColor.a); }
 
-void RenderAPI::clear() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
+void RenderAPI::clear() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
 void RenderAPI::drawData(const shared<DrawData> &iData, const uint32_t iIndexCount) {
 	iData->bind();
@@ -85,12 +81,10 @@ void RenderAPI::drawData(const shared<DrawData> &iData, const uint32_t iIndexCou
 	glDrawElements(GL_TRIANGLES, static_cast<int32_t>(count), GL_UNSIGNED_INT, nullptr);
 }
 
-void RenderAPI::setLineWidth(const float iWidth) {
-	glLineWidth(iWidth);
-}
+void RenderAPI::setLineWidth(const float iWidth) { glLineWidth(iWidth); }
 
 uint32_t RenderAPI::getMaxTextureSlots() const {
-	int32_t textureUnits;
+	int32_t textureUnits = 0;
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &textureUnits);
 	return std::min(32u, static_cast<uint32_t>(textureUnits));
 }

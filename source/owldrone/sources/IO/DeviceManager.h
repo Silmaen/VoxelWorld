@@ -17,12 +17,14 @@ static const std::string s_deviceFriendlyName{"unknown"};
  * @brief Description of a device
  */
 struct Device {
+	// NOLINTBEGIN(readability-redundant-member-init)
 	/// The port of the device.
-	std::string port{};
+	std::string port;
 	/// Devine Name
-	std::string name{};
+	std::string name;
 	/// Devine Name
 	std::string busInfo{};
+	// NOLINTEND(readability-redundant-member-init)
 	/**
 	 * @brief Access to a friendly name for the device
 	 * @return Friendly name of the device.
@@ -36,8 +38,10 @@ struct Device {
 	 * @brief Hashing function.
 	 * @return Device's hash.
 	 */
-	[[nodiscard]] size_t hash() const { return std::hash<std::string>{}(port) ^ (std::hash<std::string>{}(name) << 1); }
-};
+	[[nodiscard]] size_t hash() const {
+		return std::hash<std::string>{}(port) ^ (std::hash<std::string>{}(name) << 1u);
+	}
+} OWL_ALIGN(128);
 
 /**
  * @brief Class DeviceManager.

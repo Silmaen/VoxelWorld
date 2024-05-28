@@ -11,9 +11,9 @@
 
 namespace owl::renderer::null {
 
-VertexBuffer::VertexBuffer(uint32_t) {}
+VertexBuffer::VertexBuffer([[maybe_unused]] uint32_t iSize) {}
 
-VertexBuffer::VertexBuffer(float *, uint32_t) {}
+VertexBuffer::VertexBuffer([[maybe_unused]] float *iVertices, [[maybe_unused]] uint32_t iSize) {}
 
 VertexBuffer::~VertexBuffer() = default;
 
@@ -21,9 +21,9 @@ void VertexBuffer::bind() const {}
 
 void VertexBuffer::unbind() const {}
 
-void VertexBuffer::setData(const void *, uint32_t) {}
+void VertexBuffer::setData([[maybe_unused]] const void *iData, [[maybe_unused]] uint32_t iSize) {}
 
-IndexBuffer::IndexBuffer(uint32_t *, const uint32_t iCount) : m_count(iCount) {}
+IndexBuffer::IndexBuffer([[maybe_unused]] uint32_t *iIndices, const uint32_t iCount) : m_count(iCount) {}
 
 IndexBuffer::~IndexBuffer() = default;
 

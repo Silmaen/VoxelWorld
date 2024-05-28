@@ -22,14 +22,15 @@ struct ProfileResult {
 	floatingPointMicroseconds start;///< Data's starting time point.
 	std::chrono::microseconds elapsedTime;///< Data's elapsed time.
 	std::thread::id threadId;///< Data's thread ID.
-};
+} OWL_ALIGN(64);
 
 /**
  * @brief Profile Session Data.
  */
 struct ProfileSession {
+	explicit ProfileSession(std::string iName) : name{std::move(iName)} {}
 	std::string name;/// Session's name.
-};
+} OWL_ALIGN(32);
 
 /**
  * @brief class Profiler.
@@ -46,8 +47,7 @@ public:
 	 * @param[in] iName Session's name.
 	 * @param[in] iFilepath Session File path to store information.
 	 */
-	void beginSession(const std::string &iName,
-	                  const std::string &iFilepath = "results.json");
+	void beginSession(const std::string &iName, const std::string &iFilepath = "results.json");
 
 	/**
 	 * @brief Terminate profile session.
@@ -98,7 +98,7 @@ private:
 	void internalEndSession();
 
 	std::mutex m_profilerMutex;/// Mutex.
-	ProfileSession *m_currentSession;/// actual running session.
+	uniq<ProfileSession> m_currentSession{nullptr};/// actual running session.
 	std::ofstream m_outputStream;/// output file stream.
 };
 
@@ -113,6 +113,10 @@ public:
 	 */
 	explicit ProfileTimer(const char *iName);
 
+	ProfileTimer(const ProfileTimer &) = delete;
+	ProfileTimer(ProfileTimer &&) = delete;
+	ProfileTimer &operator=(const ProfileTimer &) = delete;
+	ProfileTimer &operator=(ProfileTimer &&) = delete;
 	/**
 	 * @brief Destructor.
 	 */
@@ -129,7 +133,7 @@ private:
 	/// Timer starting point.
 	std::chrono::time_point<std::chrono::steady_clock> m_startTimePoint;
 	/// Timer state, true if not running.
-	bool m_stopped;
+	bool m_stopped{false};
 };
 
 /**
@@ -155,8 +159,7 @@ struct ChangeResult {
  * @return The corrected string.
  */
 template<size_t N, size_t K>
-constexpr auto cleanupOutputString(const char (&iExpr)[N],
-                                   const char (&iRemove)[K]) {
+constexpr auto cleanupOutputString(const char (&iExpr)[N], const char (&iRemove)[K]) {
 	ChangeResult<N> result = {};
 
 	size_t srcIndex = 0;
@@ -164,7 +167,7 @@ constexpr auto cleanupOutputString(const char (&iExpr)[N],
 	while (srcIndex < N) {
 		size_t matchIndex = 0;
 		while (matchIndex < K - 1 && srcIndex + matchIndex < N - 1 &&
-		       iExpr[srcIndex + matchIndex] == iRemove[matchIndex])
+			   iExpr[srcIndex + matchIndex] == iRemove[matchIndex])
 			matchIndex++;
 		if (matchIndex == K - 1)
 			srcIndex += matchIndex;
@@ -187,15 +190,14 @@ constexpr auto cleanupOutputString(const char (&iExpr)[N],
 // Resolve which function signature macro will be used. Note that this only
 // is resolved when the (pre)compiler starts, so the syntax highlighting
 // could mark the wrong one in your editor!
-#if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || \
-		(defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
+#if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) ||      \
+		defined(__ghs__)
 #define OWL_FUNC_SIG __PRETTY_FUNCTION__
 #elif defined(__DMC__) && (__DMC__ >= 0x810)
 #define OWL_FUNC_SIG __PRETTY_FUNCTION__
 #elif (defined(__FUNCSIG__) || (_MSC_VER))
 #define OWL_FUNC_SIG __FUNCSIG__
-#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || \
-		(defined(__IBMCPP__) && (__IBMCPP__ >= 500))
+#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
 #define OWL_FUNC_SIG __FUNCTION__
 #elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
 #define OWL_FUNC_SIG __FUNC__
@@ -207,12 +209,10 @@ constexpr auto cleanupOutputString(const char (&iExpr)[N],
 #define OWL_FUNC_SIG "OWL_FUNC_SIG unknown!"
 #endif
 
-#define OWL_PROFILE_BEGIN_SESSION(name, filepath) \
-	::owl::debug::Profiler::get().beginSession(name, filepath);
+#define OWL_PROFILE_BEGIN_SESSION(name, filepath) ::owl::debug::Profiler::get().beginSession(name, filepath);
 #define OWL_PROFILE_END_SESSION() ::owl::debug::Profiler::get().endSession();
-#define OWL_PROFILE_SCOPE_LINE2(name, line)                             \
-	constexpr auto fixedName##line =                                    \
-			::owl::debug::utils::cleanupOutputString(name, "__cdecl "); \
+#define OWL_PROFILE_SCOPE_LINE2(name, line)                                                                            \
+	constexpr auto fixedName##line = ::owl::debug::utils::cleanupOutputString(name, "__cdecl ");                       \
 	::owl::debug::ProfileTimer timer##line(fixedName##line.Data);
 #define OWL_PROFILE_SCOPE_LINE(name, line) OWL_PROFILE_SCOPE_LINE2(name, line)
 #define OWL_PROFILE_SCOPE(name) OWL_PROFILE_SCOPE_LINE(name, __LINE__)
