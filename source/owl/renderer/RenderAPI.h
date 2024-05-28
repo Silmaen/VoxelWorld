@@ -18,14 +18,14 @@ namespace owl::renderer {
 class OWL_API RenderAPI {
 public:
 	/// Render API types.
-	enum struct Type {
+	enum struct Type : uint8_t {
 		Null = 0,///< Null Renderer.
 		OpenGL = 1,///< OpenGL Renderer.
 		Vulkan = 2,///< Vulkan renderer API.
 		OpenglLegacy = 3///< OpenGL 2.1 renderer
 	};
 
-	explicit RenderAPI(const Type &iType): m_type{iType} {}
+	explicit RenderAPI(const Type &iType) : m_type{iType} {}
 	RenderAPI(const RenderAPI &) = delete;
 	RenderAPI(RenderAPI &&) = delete;
 	RenderAPI &operator=(const RenderAPI &) = delete;
@@ -82,7 +82,7 @@ public:
 
 
 	/// Render API states.
-	enum struct State {
+	enum struct State : uint8_t {
 		Created,///< Just created.
 		Ready,///< Ready to work.
 		Error///< in error.

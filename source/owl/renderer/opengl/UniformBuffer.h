@@ -16,8 +16,10 @@ namespace owl::renderer::opengl {
 class UniformBuffer final : public renderer::UniformBuffer {
 public:
 	UniformBuffer() = delete;
-	UniformBuffer(const UniformBuffer&) = default;
-	UniformBuffer(UniformBuffer&&) = default;
+	UniformBuffer(const UniformBuffer &) = default;
+	UniformBuffer(UniformBuffer &&) = default;
+	UniformBuffer &operator=(const UniformBuffer &) = default;
+	UniformBuffer &operator=(UniformBuffer &&) = default;
 
 	/**
 	 * @brief Constructor.
@@ -41,10 +43,10 @@ public:
 	 * @param[in] iSize The data size.
 	 * @param[in] iOffset The offset to start.
 	 */
-	void setData(const void* iData, uint32_t iSize, uint32_t iOffset) override;
+	void setData(const void *iData, uint32_t iSize, uint32_t iOffset) override;
 
 private:
 	/// The renderer's ID.
 	uint32_t m_rendererId = 0;
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

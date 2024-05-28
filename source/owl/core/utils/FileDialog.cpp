@@ -13,10 +13,10 @@
 #include <nfd.hpp>
 
 namespace owl::core::utils {
-
+namespace {
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
-static std::vector<std::string_view> split(const std::string_view iString, const char iDelimiter = '\n') {
+std::vector<std::string_view> split(const std::string_view iString, const char iDelimiter = '\n') {
 	std::vector<std::string_view> result;
 	int indexCommaToRightOfColumn = -1;
 	for (uint32_t i = 0; i < iString.size(); i++) {
@@ -25,7 +25,7 @@ static std::vector<std::string_view> split(const std::string_view iString, const
 			indexCommaToRightOfColumn = static_cast<int>(i);
 			const int32_t index = indexCommaToLeftOfColumn + 1;
 			const auto length = static_cast<uint32_t>(indexCommaToRightOfColumn - index);
-			std::string_view column(iString.data() + index, length);
+			const std::string_view column(iString.data() + index, length);
 			result.push_back(column);
 		}
 	}
@@ -36,7 +36,7 @@ static std::vector<std::string_view> split(const std::string_view iString, const
 }
 OWL_DIAG_POP
 
-static std::vector<nfdu8filteritem_t> parseFilter(const std::string &iFilter) {
+std::vector<nfdu8filteritem_t> parseFilter(const std::string &iFilter) {
 	std::vector<nfdu8filteritem_t> filters;
 	for (const auto filterStr = split(iFilter); auto str: filterStr) {
 		if (str.empty())
@@ -50,10 +50,11 @@ static std::vector<nfdu8filteritem_t> parseFilter(const std::string &iFilter) {
 	}
 	return filters;
 }
+}// namespace
 
 std::filesystem::path FileDialog::openFile(const std::string &iFilter) {
 	NFD::Init();
-	nfdu8char_t *outPath;
+	nfdu8char_t *outPath = nullptr;
 	std::filesystem::path resultPath;
 	const std::string &filters{iFilter};
 	const auto ff = parseFilter(filters);
@@ -76,7 +77,7 @@ std::filesystem::path FileDialog::openFile(const std::string &iFilter) {
 
 std::filesystem::path FileDialog::saveFile([[maybe_unused]] const std::string &iFilter) {
 	NFD::Init();
-	nfdu8char_t *outPath;
+	nfdu8char_t *outPath = nullptr;
 	std::filesystem::path resultPath;
 	const std::string &filters{iFilter};
 	const auto ff = parseFilter(filters);

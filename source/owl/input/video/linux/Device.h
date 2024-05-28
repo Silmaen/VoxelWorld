@@ -33,6 +33,10 @@ public:
 	 * @param[in] iFile The file to read.
 	 */
 	explicit Device(std::string iFile);
+	Device(Device &&) = delete;
+	Device(const Device &) = delete;
+	Device &operator=(Device &&) = delete;
+	Device &operator=(const Device &) = delete;
 
 	/**
 	 * @brief Destructor.

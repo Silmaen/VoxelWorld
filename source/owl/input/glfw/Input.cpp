@@ -27,9 +27,10 @@ bool Input::isMouseButtonPressed_impl(const MouseCode iMouseCode) {
 
 glm::vec2 Input::getMousePos_impl() {
 	auto *windows = static_cast<GLFWwindow *>(core::Application::get().getWindow().getNativeWindow());
-	double x, y;
-	glfwGetCursorPos(windows, &x, &y);
-	return {x, y};
+	double xPos{0};
+	double yPos{0};
+	glfwGetCursorPos(windows, &xPos, &yPos);
+	return {xPos, yPos};
 }
 
 }// namespace owl::input::glfw

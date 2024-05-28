@@ -18,7 +18,7 @@ namespace owl::event {
 /**
  * @brief Type of events.
  */
-enum class Type {
+enum class Type : uint8_t {
 	None = 0,/// No type.
 
 	WindowClose,/// Window close.
@@ -44,13 +44,13 @@ enum class Type {
 /**
  * @brief Event categories.
  */
-enum Category {
+enum Category : uint8_t {
 	None = 0,/// No category.
-	Application = 1,/// Application event.
-	Input = 2,/// Input event.
-	Keyboard = 4,/// Keyboard event.
-	Mouse = 8,/// Mouse event.
-	MouseButton = 16/// Mouse button.
+	Application = 1u,/// Application event.
+	Input = 2u,/// Input event.
+	Keyboard = 4u,/// Keyboard event.
+	Mouse = 8u,/// Mouse event.
+	MouseButton = 16u/// Mouse button.
 };
 
 /**

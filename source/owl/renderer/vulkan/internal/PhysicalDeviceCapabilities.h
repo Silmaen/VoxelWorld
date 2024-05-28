@@ -20,23 +20,23 @@ public:
 	 * @brief Default Constructor.
 	 * @param[in] iDev The physical device to analyse.
 	 */
-	explicit PhysicalDeviceCapabilities(const VkPhysicalDevice& iDev = nullptr);
+	explicit PhysicalDeviceCapabilities(const VkPhysicalDevice &iDev = nullptr);
 	/**
 	 * @brief Copy Constructor.
 	 */
-	PhysicalDeviceCapabilities(const PhysicalDeviceCapabilities&) = default;
+	PhysicalDeviceCapabilities(const PhysicalDeviceCapabilities &) = default;
 	/**
 	 * @brief Move Constructor.
 	 */
-	PhysicalDeviceCapabilities(PhysicalDeviceCapabilities&&) = default;
+	PhysicalDeviceCapabilities(PhysicalDeviceCapabilities &&) = default;
 	/**
 	 * @brief Copy assignation.
 	 */
-	PhysicalDeviceCapabilities& operator=(const PhysicalDeviceCapabilities&) = default;
+	PhysicalDeviceCapabilities &operator=(const PhysicalDeviceCapabilities &) = default;
 	/**
 	 * @brief Move assignation.
 	 */
-	PhysicalDeviceCapabilities& operator=(PhysicalDeviceCapabilities&&) = default;
+	PhysicalDeviceCapabilities &operator=(PhysicalDeviceCapabilities &&) = default;
 
 	/**
 	 * @brief Destructor.
@@ -53,25 +53,25 @@ public:
 	 * @param[in] iLayer The layer name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasLayer(const std::string& iLayer) const;
+	[[nodiscard]] bool hasLayer(const std::string &iLayer) const;
 	/**
 	 * @brief Check if an extension is available on this device.
 	 * @param[in] iExtension The extension name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasExtension(const std::string& iExtension) const;
+	[[nodiscard]] bool hasExtension(const std::string &iExtension) const;
 	/**
 	 * @brief Check if some layers are available on this device.
 	 * @param[in] iLayers The layer's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasLayers(const std::vector<std::string>& iLayers) const;
+	[[nodiscard]] bool hasLayers(const std::vector<std::string> &iLayers) const;
 	/**
 	 * @brief Check if some extensions are available on this device.
 	 * @param[in] iExtensions The extension's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasExtensions(const std::vector<std::string>& iExtensions) const;
+	[[nodiscard]] bool hasExtensions(const std::vector<std::string> &iExtensions) const;
 
 
 	/**
@@ -82,9 +82,9 @@ public:
 	/// The physical device.
 	VkPhysicalDevice device = nullptr;
 	/// Available layers.
-	std::vector<VkLayerProperties> supportedLayers{};
+	std::vector<VkLayerProperties> supportedLayers;
 	/// Available extensions.
-	std::vector<VkExtensionProperties> supportedExtensions{};
+	std::vector<VkExtensionProperties> supportedExtensions;
 	/// The physical device properties.
 	VkPhysicalDeviceProperties properties{};
 	/// Features available on the selected physical device (for e.g. checking if a feature is available).
@@ -92,13 +92,13 @@ public:
 	/// Available memory (type) properties for the physical device
 	VkPhysicalDeviceMemoryProperties memoryProperties{};
 	/// List of queue families.
-	std::vector<VkQueueFamilyProperties> queueFamilies{};
+	std::vector<VkQueueFamilyProperties> queueFamilies;
 	/// Capability of the physical surface
 	VkSurfaceCapabilitiesKHR surfaceCapabilities{};
 	/// List of supported surface format.
-	std::vector<VkSurfaceFormatKHR> surfaceFormats{};
+	std::vector<VkSurfaceFormatKHR> surfaceFormats;
 	/// List of supported presentation modes.
-	std::vector<VkPresentModeKHR> presentModes{};
+	std::vector<VkPresentModeKHR> presentModes;
 
 	/// Index of the graphic queue.
 	uint32_t graphicQueueIndex = std::numeric_limits<uint32_t>::max();
@@ -111,5 +111,5 @@ public:
  * @param[in] iInstance The vulkan instance.
  * @return List of physical devices sorted by decreasing score.
  */
-std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance& iInstance);
-} // namespace owl::renderer::vulkan::internal
+std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance &iInstance);
+}// namespace owl::renderer::vulkan::internal

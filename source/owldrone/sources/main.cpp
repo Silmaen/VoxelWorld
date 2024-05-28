@@ -25,12 +25,12 @@ OWL_DIAG_POP
 
 owl::shared<owl::core::Application> owl::core::createApplication(int argc, char **argv) {
 	return mkShared<OwlNest>(core::AppParams{
+			.args = argv,
 			.name = "Owl Drone - Navigator for drone",
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,
 #endif
 			.icon = "icons/logo_drone.png",
 			.argCount = argc,
-			.args = argv,
 	});
 }

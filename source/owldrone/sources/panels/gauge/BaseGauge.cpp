@@ -8,8 +8,9 @@
 #include "BaseGauge.h"
 
 namespace drone::panels::gauge {
-
-static const char *texName = "textures/GaugeCover";
+namespace {
+const char *texName = "textures/GaugeCover";
+}// namespace
 
 BaseGauge::BaseGauge() {
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
@@ -20,9 +21,6 @@ BaseGauge::BaseGauge() {
 
 BaseGauge::~BaseGauge() = default;
 
-void BaseGauge::drawCover() {
-	owl::renderer::Renderer2D::drawQuad({.transform = transform,
-										 .texture = coverTexture});
-}
+void BaseGauge::drawCover() { owl::renderer::Renderer2D::drawQuad({.transform = transform, .texture = coverTexture}); }
 
 }// namespace drone::panels::gauge

@@ -17,14 +17,16 @@ namespace owl::renderer::null {
  */
 class OWL_API GraphContext final : public ::owl::renderer::GraphContext {
 public:
-	GraphContext(const GraphContext&) = delete;
-	GraphContext(GraphContext&&) = delete;
+	GraphContext(const GraphContext &) = delete;
+	GraphContext(GraphContext &&) = delete;
+	GraphContext &operator=(const GraphContext &) = delete;
+	GraphContext &operator=(GraphContext &&) = delete;
 
 	/**
 	 * @brief Default constructor.
 	 * @param[in,out] ioWindow The window into render context.
 	 */
-	explicit GraphContext(GLFWwindow* ioWindow);
+	explicit GraphContext(GLFWwindow *ioWindow);
 
 	/**
 	 * @brief Destructor.
@@ -46,4 +48,4 @@ public:
 	 */
 	[[nodiscard]] Version getVersion() const override { return {0, 0}; }
 };
-} // namespace owl::renderer::null
+}// namespace owl::renderer::null

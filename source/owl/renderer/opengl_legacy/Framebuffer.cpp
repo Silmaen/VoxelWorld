@@ -12,12 +12,10 @@
 
 namespace owl::renderer::opengl_legacy {
 
-Framebuffer::Framebuffer(FramebufferSpecification iSpec) : m_specs{std::move(iSpec)} {
-	OWL_CORE_ERROR("Legacy OpenGL has no frame buffer support.")
-	m_rendererId = 0;
-}
+Framebuffer::Framebuffer(FramebufferSpecification iSpec)
+	: m_specs{std::move(iSpec)} {OWL_CORE_ERROR("Legacy OpenGL has no frame buffer support.")}
 
-Framebuffer::~Framebuffer() = default;
+	  Framebuffer::~Framebuffer() = default;
 
 void Framebuffer::invalidate() {}
 

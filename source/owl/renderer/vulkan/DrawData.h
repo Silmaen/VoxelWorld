@@ -17,10 +17,10 @@ namespace owl::renderer::vulkan {
  */
 class OWL_API DrawData final : public owl::renderer::DrawData {
 public:
-	DrawData(const DrawData&) = default;
-	DrawData(DrawData&&) = default;
-	DrawData& operator=(const DrawData&) = default;
-	DrawData& operator=(DrawData&&) = default;
+	DrawData(const DrawData &) = default;
+	DrawData(DrawData &&) = default;
+	DrawData &operator=(const DrawData &) = default;
+	DrawData &operator=(DrawData &&) = default;
 	DrawData() = default;
 	/**
 	 * @brief Destructor.
@@ -34,8 +34,8 @@ public:
 	 * @param[in] iIndices List of vertex indices.
 	 * @param[in] iShaderName The shader name.
 	 */
-	void init(const BufferLayout& iLayout, const std::string& iRenderer, std::vector<uint32_t>& iIndices,
-			  const std::string& iShaderName) override;
+	void init(const BufferLayout &iLayout, const std::string &iRenderer, std::vector<uint32_t> &iIndices,
+			  const std::string &iShaderName) override;
 
 	/**
 	 * @brief Bind this draw data.
@@ -52,7 +52,7 @@ public:
 	 * @param[in] iData The raw vertices data
 	 * @param[in] iSize The size of the raw data.
 	 */
-	void setVertexData(const void* iData, uint32_t iSize) override;
+	void setVertexData(const void *iData, uint32_t iSize) override;
 
 	/**
 	 * @brief Get the number of vertex to draw.
@@ -65,7 +65,7 @@ public:
 	 * @param[in] iShaderName The shader name.
 	 * @param[in] iRenderer Name of the shader's related renderer.
 	 */
-	void setShader(const std::string& iShaderName, const std::string& iRenderer) override;
+	void setShader(const std::string &iShaderName, const std::string &iRenderer) override;
 
 	[[nodiscard]] std::string getName() const { return fmt::format("{}_{}", m_renderer, m_shaderName); }
 
@@ -78,7 +78,9 @@ private:
 	shared<VertexBuffer> mp_vertexBuffer;
 	/// Pointer to the index buffer.
 	shared<IndexBuffer> mp_indexBuffer;
-	std::string m_shaderName{};
-	std::string m_renderer{};
+	/// Name of the shader
+	std::string m_shaderName;
+	/// Name of the renderer
+	std::string m_renderer;
 };
-} // namespace owl::renderer::vulkan
+}// namespace owl::renderer::vulkan

@@ -13,10 +13,10 @@
 #include "debug/Profiler.h"
 
 namespace owl::input::null {
-
-static uint8_t s_WinCount = 0;
-
-Window::Window(const Properties &iProps) : ::owl::input::Window() {
+namespace {
+uint8_t s_WinCount = 0;
+}// namespace
+Window::Window(const Properties &iProps) {
 	OWL_PROFILE_FUNCTION()
 	init(iProps);
 }
@@ -33,8 +33,7 @@ void Window::init(const Properties &iProps) {
 	m_windowData.m_width = iProps.width;
 	m_windowData.m_height = iProps.height;
 
-	OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width,
-				  iProps.height)
+	OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width, iProps.height)
 	++s_WinCount;
 	setVSync(true);
 }
@@ -45,9 +44,7 @@ void Window::shutdown() {
 }
 
 
-void Window::onUpdate() {
-	OWL_PROFILE_FUNCTION()
-}
+void Window::onUpdate() { OWL_PROFILE_FUNCTION() }
 
 void Window::setVSync(bool iEnabled) {
 	OWL_PROFILE_FUNCTION()

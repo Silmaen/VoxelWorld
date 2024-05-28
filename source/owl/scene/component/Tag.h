@@ -18,6 +18,6 @@ namespace owl::scene::component {
 struct OWL_API Tag {
 	/// The tag name.
 	std::string tag;
-};
+} OWL_ALIGN(32);
 
 }// namespace owl::scene::component

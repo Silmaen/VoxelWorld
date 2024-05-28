@@ -90,7 +90,7 @@ void VulkanCore::init(const VulkanConfiguraton &iConfiguration) {
 		if (m_state == State::Error)
 			return;
 	}
-	const auto gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
+	auto *const gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
 	if (const VkResult result = gc->createSurface(m_instance); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create window surface ({})", resultString(result))
 		m_state = State::Error;
@@ -118,7 +118,7 @@ void VulkanCore::release() {
 		OWL_CORE_TRACE("Vulkan: logicalDevice destroyed.")
 	}
 	{
-		const auto gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
+		auto *const gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
 		gc->destroySurface(m_instance);
 		OWL_CORE_TRACE("Vulkan: Surface destroyed.")
 	}
@@ -226,15 +226,14 @@ void VulkanCore::selectPhysicalDevice() {
 
 void VulkanCore::createLogicalDevice() {
 	std::vector<VkDeviceQueueCreateInfo> deviceQueuesCi;
-	float queuePriority = 1.0f;
+	constexpr float queuePriority = 1.0f;
 	for (const uint32_t queue: std::set{m_phyProps.graphicQueueIndex, m_phyProps.presentQueueIndex}) {
-		VkDeviceQueueCreateInfo deviceQueueCi{.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-											  .pNext = nullptr,
-											  .flags = {},
-											  .queueFamilyIndex = queue,
-											  .queueCount = 1,
-											  .pQueuePriorities = &queuePriority};
-		deviceQueuesCi.push_back(deviceQueueCi);
+		deviceQueuesCi.push_back({.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+								  .pNext = nullptr,
+								  .flags = {},
+								  .queueFamilyIndex = queue,
+								  .queueCount = 1,
+								  .pQueuePriorities = &queuePriority});
 	}
 	const std::vector layerNames = {"VK_LAYER_KHRONOS_validation"};
 	const std::vector extensionNames = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -424,7 +423,7 @@ VkCommandBuffer VulkanCore::beginSingleTimeCommands() const {
 												.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 												.commandBufferCount = 1};
 
-	VkCommandBuffer commandBuffer;
+	VkCommandBuffer commandBuffer = nullptr;
 	if (const VkResult result = vkAllocateCommandBuffers(core.getLogicalDevice(), &allocInfo, &commandBuffer);
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to create command buffer for buffer copy.")
@@ -474,7 +473,7 @@ void VulkanCore::endSingleTimeCommands(VkCommandBuffer iCommandBuffer) const {
 
 
 [[nodiscard]] VkCommandBuffer VulkanCore::createCommandBuffer() const {
-	VkCommandBuffer cmd;
+	VkCommandBuffer cmd = nullptr;
 	const VkCommandBufferAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 												.pNext = nullptr,
 												.commandPool = m_commandPool,

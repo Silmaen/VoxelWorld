@@ -13,7 +13,7 @@ using namespace owl::renderer;
 
 TEST(RenderAPI, RenderComamand) {
 	owl::core::Log::init(spdlog::level::off);
-	RenderCommand::create(RenderAPI::Type{-1});
+	RenderCommand::create(RenderAPI::Type{255});
 	EXPECT_EQ(RenderCommand::getState(), RenderAPI::State::Error);
 	RenderCommand::create(RenderAPI::Type::Null);
 	EXPECT_EQ(RenderCommand::getState(), RenderAPI::State::Created);
@@ -32,7 +32,7 @@ TEST(RenderAPI, RenderComamand) {
 TEST(RenderAPI, badCreation) {
 	// bad Type value
 	owl::core::Log::init(spdlog::level::off);
-	const owl::uniq<RenderAPI> api = RenderAPI::create(RenderAPI::Type{-1});
+	const owl::uniq<RenderAPI> api = RenderAPI::create(RenderAPI::Type{255});
 	const auto gf = GraphContext::create(nullptr);
 	const auto fb = Framebuffer::create({});
 	const auto ub = UniformBuffer::create(0, 0, "Renderer2D");

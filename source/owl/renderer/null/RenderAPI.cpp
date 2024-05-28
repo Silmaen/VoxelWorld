@@ -21,14 +21,15 @@ void RenderAPI::init() {
 	setState(State::Ready);
 }
 
-void RenderAPI::setViewport(uint32_t, uint32_t, uint32_t, uint32_t) {}
+void RenderAPI::setViewport([[maybe_unused]] const uint32_t iX, [[maybe_unused]] const uint32_t iY,
+							[[maybe_unused]] const uint32_t iWidth, [[maybe_unused]] const uint32_t iHeight) {}
 
-void RenderAPI::setClearColor(const glm::vec4 &) {}
+void RenderAPI::setClearColor([[maybe_unused]] const glm::vec4 &iColor) {}
 
 void RenderAPI::clear() {}
 
-void RenderAPI::drawData(const shared<DrawData> &, uint32_t) {}
+void RenderAPI::drawData([[maybe_unused]]const shared<DrawData> &iData,[[maybe_unused]] uint32_t iIndexCount) {}
 
-void RenderAPI::setLineWidth(float) {}
+void RenderAPI::setLineWidth([[maybe_unused]]float iWidth) {}
 
 }// namespace owl::renderer::null

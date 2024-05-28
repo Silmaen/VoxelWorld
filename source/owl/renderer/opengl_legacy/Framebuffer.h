@@ -84,7 +84,7 @@ public:
 
 private:
 	/// The renderer ID.
-	uint32_t m_rendererId = 0;
+	[[maybe_unused]] uint32_t m_rendererId = 0;
 	/// The specs.
 	FramebufferSpecification m_specs;
 };

@@ -87,9 +87,9 @@ std::string unFourCC(const uint32_t pixelFormat) {
 	constexpr uint32_t mmask = 0xff;
 	char fcc[4];
 	fcc[0] = static_cast<char>(pixelFormat & mmask);
-	fcc[1] = static_cast<char>((pixelFormat >> 8) & mmask);
-	fcc[2] = static_cast<char>((pixelFormat >> 16) & mmask);
-	fcc[3] = static_cast<char>((pixelFormat >> 24) & mmask);
+	fcc[1] = static_cast<char>((pixelFormat >> 8u) & mmask);
+	fcc[2] = static_cast<char>((pixelFormat >> 16u) & mmask);
+	fcc[3] = static_cast<char>((pixelFormat >> 24u) & mmask);
 	return fcc;
 }
 OWL_DIAG_POP
@@ -151,7 +151,7 @@ Device::Device(std::string iFile) : video::Device{""}, m_file{std::move(iFile)} 
 	if (!exists(std::filesystem::path(m_file)))
 		return;
 
-	const int fd = ::open(m_file.c_str(), O_RDONLY);
+	const int fd = ::open(m_file.c_str(), O_RDONLY | O_CLOEXEC);
 	if (!fd) {
 		OWL_CORE_WARN("Unable to open device file {}", m_file)
 		return;
@@ -188,7 +188,7 @@ Device::~Device() { close(); };
 void Device::open() {
 	OWL_CORE_INFO("Opening device ({}): {}", m_file, m_name)
 	close();
-	m_fileHandler = ::open(m_file.c_str(), O_RDWR);
+	m_fileHandler = ::open(m_file.c_str(), O_RDWR | O_CLOEXEC);
 	if (m_fileHandler <= 0) {
 		OWL_CORE_WARN("({}) Unable to open the device.", m_file)
 		return;
@@ -316,7 +316,7 @@ void Device::fillFrame(shared<renderer::Texture> &ioFrame) {
 			getRgbBuffer(static_cast<const uint8_t *>(mp_buffer), static_cast<int32_t>(m_bufferInfo.bytesused));
 	// frames are written after dequeing the buffer
 	if (!convertedBuffer.empty()) {
-		if (m_size.surface() * 3 != convertedBuffer.size()) {
+		if (static_cast<size_t>(m_size.surface()) * 3ull != convertedBuffer.size()) {
 			OWL_CORE_WARN("Device ({}) buffer size missmatch: {}, expecting {}.", m_file, m_bufferInfo.bytesused,
 						  m_size.surface() * 3)
 		} else {
@@ -345,7 +345,7 @@ bool Device::isValid() const {
 	// check if still exists and still a video source.
 	if (!exists(std::filesystem::path(m_file)))
 		return false;
-	const int fd = ::open(m_file.c_str(), O_RDWR);
+	const int fd = ::open(m_file.c_str(), O_RDWR | O_CLOEXEC);
 	if (!fd)
 		return false;
 	// check have supported capabilities
@@ -384,7 +384,7 @@ bool Device::isValid() const {
 void Device::printSupportedFormat() const {
 	if (!exists(std::filesystem::path(m_file)))
 		return;
-	const int fd = ::open(m_file.c_str(), O_RDWR);
+	const int fd = ::open(m_file.c_str(), O_RDWR | O_CLOEXEC);
 	if (!fd)
 		return;
 	// Structure pour interroger les formats de pixel

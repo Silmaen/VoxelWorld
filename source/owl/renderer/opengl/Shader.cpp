@@ -23,8 +23,8 @@ OWL_DIAG_POP
 namespace owl::renderer::opengl {
 
 namespace utils {
-
-static uint32_t shaderStageToGlShader(const ShaderType &iStage) {
+namespace {
+uint32_t shaderStageToGlShader(const ShaderType &iStage) {
 	switch (iStage) {
 		case ShaderType::Vertex:
 			return GL_VERTEX_SHADER;
@@ -40,20 +40,25 @@ static uint32_t shaderStageToGlShader(const ShaderType &iStage) {
 	OWL_CORE_ASSERT(false, "Unsupported Shader Type")
 	return 0;
 }
+}// namespace
 
 }// namespace utils
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer, const std::string &iVertexSrc,
-			   const std::string &iFragmentSrc) : renderer::Shader{iShaderName, iRenderer} {
+			   const std::string &iFragmentSrc)
+	: renderer::Shader{iShaderName, iRenderer} {
 	compile({{ShaderType::Vertex, iVertexSrc}, {ShaderType::Fragment, iFragmentSrc}});
 }
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer,
-			   const std::unordered_map<ShaderType, std::string> &iSources) : renderer::Shader{
-		iShaderName, iRenderer} { compile(iSources); }
+			   const std::unordered_map<ShaderType, std::string> &iSources)
+	: renderer::Shader{iShaderName, iRenderer} {
+	compile(iSources);
+}
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer,
-			   const std::vector<std::filesystem::path> &iSources) : renderer::Shader{iShaderName, iRenderer} {
+			   const std::vector<std::filesystem::path> &iSources)
+	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 
 	std::unordered_map<ShaderType, std::string> strSources;
@@ -92,8 +97,8 @@ void Shader::compile(const std::unordered_map<ShaderType, std::string> &iSources
 	createProgram();
 
 	const auto timer = std::chrono::steady_clock::now() - start;
-	double duration = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) /
-					  1000.0;
+	double duration =
+			static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) / 1000.0;
 	OWL_CORE_INFO("Compilation of shader {} in {} ms", getName(), duration)
 }
 
@@ -104,14 +109,13 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 	options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
 	options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-	std::filesystem::path cacheDirectory = renderer::utils::getCacheDirectory(getRenderer(), "opengl_vulkan");
-
 	auto &shaderData = m_vulkanSpirv;
 	shaderData.clear();
 	for (auto &&[stage, source]: iSources) {
-		std::filesystem::path basePath = renderer::utils::getShaderPath(getName(), getRenderer(), "opengl", stage);
-		std::filesystem::path cachedPath = renderer::utils::getShaderCachedPath(
-				getName(), getRenderer(), "opengl_vulkan", stage);
+		const std::filesystem::path basePath =
+				renderer::utils::getShaderPath(getName(), getRenderer(), "opengl", stage);
+		const std::filesystem::path cachedPath =
+				renderer::utils::getShaderCachedPath(getName(), getRenderer(), "opengl_vulkan", stage);
 
 		if (exists(cachedPath) && (last_write_time(cachedPath) > last_write_time(basePath))) {
 			// Cache exists: read it
@@ -120,14 +124,11 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 		} else {
 			if (exists(cachedPath))
 				OWL_CORE_INFO("Origin file newer than cached one, Recompiling.")
-			shaderc::Compiler compiler;
-			shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source,
-																			 renderer::utils::shaderStageToShaderC(
-																					 stage),
-																			 renderer::utils::getShaderPath(
-																					 getName(), getRenderer(), "opengl",
-																					 stage).string().c_str(),
-																			 options);
+			const shaderc::Compiler compiler;
+			const shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(
+					source, renderer::utils::shaderStageToShaderC(stage),
+					renderer::utils::getShaderPath(getName(), getRenderer(), "opengl", stage).string().c_str(),
+					options);
 			if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
 				OWL_CORE_ERROR(module.GetErrorMessage())
 				OWL_CORE_ASSERT(false, "Failed Compilation")
@@ -149,14 +150,13 @@ void Shader::compileOrGetOpenGlBinaries() {
 	options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
 	options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-	std::filesystem::path cacheDirectory = renderer::utils::getCacheDirectory(getRenderer(), "opengl");
 	shaderData.clear();
 	m_openGlSource.clear();
 	for (auto &&[stage, spirv]: m_vulkanSpirv) {
-		std::filesystem::path basePath = renderer::utils::getShaderCachedPath(
-				getName(), getRenderer(), "opengl_vulkan", stage);
-		std::filesystem::path cachedPath = renderer::utils::getShaderCachedPath(
-				getName(), getRenderer(), "opengl", stage);
+		const std::filesystem::path basePath =
+				renderer::utils::getShaderCachedPath(getName(), getRenderer(), "opengl_vulkan", stage);
+		const std::filesystem::path cachedPath =
+				renderer::utils::getShaderCachedPath(getName(), getRenderer(), "opengl", stage);
 		if (exists(cachedPath) && (last_write_time(cachedPath) > last_write_time(basePath))) {
 			OWL_CORE_INFO("Using cached OpenGL Shader {}-{}", getName(), magic_enum::enum_name(stage))
 			shaderData[stage] = renderer::utils::readCachedShader(cachedPath);
@@ -166,13 +166,10 @@ void Shader::compileOrGetOpenGlBinaries() {
 			spirv_cross::CompilerGLSL glslCompiler(spirv);
 			m_openGlSource[stage] = glslCompiler.compile();
 			auto &source = m_openGlSource[stage];
-			shaderc::Compiler compiler;
-			shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source,
-																			 renderer::utils::shaderStageToShaderC(
-																					 stage),
-																			 renderer::utils::getShaderPath(
-																					 getName(), getRenderer(), "opengl",
-																					 stage).string().c_str());
+			const shaderc::Compiler compiler;
+			const shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(
+					source, renderer::utils::shaderStageToShaderC(stage),
+					renderer::utils::getShaderPath(getName(), getRenderer(), "opengl", stage).string().c_str());
 			if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
 				OWL_CORE_ERROR(module.GetErrorMessage())
 				OWL_CORE_ASSERT(false, "Compilation error")
@@ -189,7 +186,7 @@ void Shader::createProgram() {
 	// list of shader's id
 	std::vector<GLuint> shaderIDs;
 	for (auto &&[stage, spirv]: m_openGlSpirv) {
-		GLuint shaderId = shaderIDs.emplace_back(glCreateShader(utils::shaderStageToGlShader(stage)));
+		const GLuint shaderId = shaderIDs.emplace_back(glCreateShader(utils::shaderStageToGlShader(stage)));
 		OWL_CORE_ASSERT(!spirv.empty(), "Empty shader data")
 		glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(),
 					   static_cast<GLsizei>(spirv.size() * sizeof(uint32_t)));
@@ -197,11 +194,11 @@ void Shader::createProgram() {
 		glAttachShader(program, shaderId);
 	}
 	glLinkProgram(program);
-	GLint isLinked;
+	GLint isLinked = 0;
 	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
 	if (isLinked == GL_FALSE) {
 		OWL_CORE_ERROR("Shader linking failed ({})", getName())
-		GLint maxLength;
+		GLint maxLength = 0;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 		if (maxLength > 0) {
 			std::vector<GLchar> infoLog(static_cast<size_t>(maxLength));
@@ -209,8 +206,7 @@ void Shader::createProgram() {
 			OWL_CORE_ERROR("     Details: {}", infoLog.data())
 		}
 		glDeleteProgram(program);
-		for (const auto id: shaderIDs)
-			glDeleteShader(id);
+		for (const auto id: shaderIDs) glDeleteShader(id);
 		OWL_CORE_ASSERT(false, fmt::format("Failed to create shader {}", getName()))
 		return;
 	}

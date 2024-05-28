@@ -20,57 +20,32 @@ OWL_DIAG_POP
 namespace owl::renderer::opengl_legacy {
 
 static const std::vector<std::string> g_texUniforms = {
-		"u_Texture0",
-		"u_Texture1",
-		"u_Texture2",
-		"u_Texture3",
-		"u_Texture4",
-		"u_Texture5",
-		"u_Texture6",
-		"u_Texture7",
-		"u_Texture8",
-		"u_Texture9",
-		"u_Texture10",
-		"u_Texture11",
-		"u_Texture12",
-		"u_Texture13",
-		"u_Texture14",
-		"u_Texture15",
-		"u_Texture16",
-		"u_Texture17",
-		"u_Texture18",
-		"u_Texture19",
-		"u_Texture20",
-		"u_Texture21",
-		"u_Texture22",
-		"u_Texture23",
-		"u_Texture24",
-		"u_Texture25",
-		"u_Texture26",
-		"u_Texture27",
-		"u_Texture28",
-		"u_Texture29",
-		"u_Texture30",
-		"u_Texture31",
+		"u_Texture0",  "u_Texture1",  "u_Texture2",  "u_Texture3",  "u_Texture4",  "u_Texture5",  "u_Texture6",
+		"u_Texture7",  "u_Texture8",  "u_Texture9",  "u_Texture10", "u_Texture11", "u_Texture12", "u_Texture13",
+		"u_Texture14", "u_Texture15", "u_Texture16", "u_Texture17", "u_Texture18", "u_Texture19", "u_Texture20",
+		"u_Texture21", "u_Texture22", "u_Texture23", "u_Texture24", "u_Texture25", "u_Texture26", "u_Texture27",
+		"u_Texture28", "u_Texture29", "u_Texture30", "u_Texture31",
 };
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer, const std::string &iVertexSrc,
-			   const std::string &iFragmentSrc) : ::owl::renderer::Shader{iShaderName, iRenderer} {
+			   const std::string &iFragmentSrc)
+	: ::owl::renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 
 	createShader({{ShaderType::Vertex, iVertexSrc}, {ShaderType::Fragment, iFragmentSrc}});
 }
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer,
-			   const std::unordered_map<ShaderType, std::string> &iSources) : renderer::Shader{
-		iShaderName, iRenderer} {
+			   const std::unordered_map<ShaderType, std::string> &iSources)
+	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 
 	createShader(iSources);
 }
 
 Shader::Shader(const std::string &iShaderName, const std::string &iRenderer,
-			   const std::vector<std::filesystem::path> &iSources) : renderer::Shader{iShaderName, iRenderer} {
+			   const std::vector<std::filesystem::path> &iSources)
+	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 	std::unordered_map<ShaderType, std::string> strSources;
 
@@ -101,9 +76,7 @@ void Shader::bind() const {
 	glUseProgram(programId);
 
 	// upload uniforms
-	auto ubl = UniformBindingLibrary::get();
-	auto ub = ubl.getUniformBuffer(0);
-	if (ub != nullptr) {
+	if (const auto *ub = UniformBindingLibrary::get().getUniformBuffer(0); ub != nullptr) {
 		glm::mat4 uViewProjection;
 		memcpy(&uViewProjection, ub->getData(), sizeof(glm::mat4));
 		uploadMat4("u_ViewProjection", uViewProjection);
@@ -169,11 +142,11 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &iSo
 			OWL_CORE_ERROR("Shader {} does not contains Vertex shader.", getName())
 			return;
 		}
-		const auto src = iSources.at(ShaderType::Vertex).c_str();
+		const auto *const src = iSources.at(ShaderType::Vertex).c_str();
 		glShaderSource(vtxShader, 1, &src, nullptr);
 		glCompileShader(vtxShader);
 		// Check Compilation
-		GLint vertexCompiled;
+		GLint vertexCompiled = 0;
 		glGetShaderiv(vtxShader, GL_COMPILE_STATUS, &vertexCompiled);
 		if (vertexCompiled != GL_TRUE) {
 			GLsizei logLength = 0;
@@ -193,11 +166,11 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &iSo
 			OWL_CORE_ERROR("Shader {} does not contains Fragment shader.", getName())
 			return;
 		}
-		const auto src = iSources.at(ShaderType::Fragment).c_str();
+		const auto *const src = iSources.at(ShaderType::Fragment).c_str();
 		glShaderSource(fragShader, 1, &src, nullptr);
 		glCompileShader(fragShader);
 		// Check Compilation
-		GLint fragmentCompiled;
+		GLint fragmentCompiled = 0;
 		glGetShaderiv(fragShader, GL_COMPILE_STATUS, &fragmentCompiled);
 		if (fragmentCompiled != GL_TRUE) {
 			GLsizei logLength = 0;
@@ -216,7 +189,7 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &iSo
 		glAttachShader(programId, vtxShader);
 		glAttachShader(programId, fragShader);
 		glLinkProgram(programId);
-		GLint programLinked;
+		GLint programLinked = 0;
 		glGetProgramiv(programId, GL_LINK_STATUS, &programLinked);
 		if (programLinked != GL_TRUE) {
 			GLsizei logLength = 0;
@@ -235,8 +208,8 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &iSo
 	}
 	// print timing
 	const auto timer = std::chrono::steady_clock::now() - start;
-	double duration = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) /
-					  1000.0;
+	double duration =
+			static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(timer).count()) / 1000.0;
 	OWL_CORE_INFO("Compilation of shader {} in {} ms", getName(), duration)
 }
 

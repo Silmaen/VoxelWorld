@@ -15,15 +15,17 @@ namespace owl::renderer {
 
 Camera::~Camera() = default;
 
-CameraEditor::CameraEditor(const float iFov, const float iAspectRatio, const float iNearClip, const float iFarClip) :
-	Camera(glm::perspective(glm::radians(iFov), iAspectRatio, iNearClip, iFarClip)),
-	m_fov(iFov), m_aspectRatio(iAspectRatio), m_nearClip(iNearClip), m_farClip(iFarClip) { updateView(); }
+CameraEditor::CameraEditor(const float iFov, const float iAspectRatio, const float iNearClip, const float iFarClip)
+	: Camera(glm::perspective(glm::radians(iFov), iAspectRatio, iNearClip, iFarClip)), m_fov(iFov),
+	  m_aspectRatio(iAspectRatio), m_nearClip(iNearClip), m_farClip(iFarClip) {
+	updateView();
+}
 
 CameraEditor::~CameraEditor() = default;
 
 void CameraEditor::onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) {
 	if (input::Input::isKeyPressed(input::key::LeftAlt)) {
-		const glm::vec2 &mouse{input::Input::getMouseX(), input::Input::getMouseY()};
+		const glm::vec2 mouse{input::Input::getMouseX(), input::Input::getMouseY()};
 		const glm::vec2 delta = (mouse - m_initialMousePosition) * 0.003f;
 		m_initialMousePosition = mouse;
 		if (input::Input::isMouseButtonPressed(input::mouse::ButtonMiddle))
@@ -97,15 +99,16 @@ glm::vec3 CameraEditor::calculatePosition() const { return m_focalPoint - getFor
 
 std::pair<float, float> CameraEditor::panSpeed() const {
 	const float x = std::min(static_cast<float>(m_viewportSize.getWidth()) / 1000.0f, 2.4f);// max = 2.4f
-	float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
+	const float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 
 	const float y = std::min(static_cast<float>(m_viewportSize.getHeight()) / 1000.0f, 2.4f);// max = 2.4f
-	float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
+	const float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
 
 	return {xFactor, yFactor};
 }
-
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 float CameraEditor::rotationSpeed() const { return 0.8f; }
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 float CameraEditor::zoomSpeed() const {
 	const float distance = std::max(m_distance * 0.2f, 0.0f);

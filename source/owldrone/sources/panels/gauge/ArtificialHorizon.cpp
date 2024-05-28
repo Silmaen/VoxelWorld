@@ -10,7 +10,7 @@
 
 namespace drone::panels::gauge {
 
-constexpr float deg2rad = 3.14159f / 180.f;
+constexpr float deg2rad = std::numbers::pi_v<float> / 180.f;
 
 ArtificialHorizon::ArtificialHorizon() {
 
@@ -28,33 +28,23 @@ ArtificialHorizon::ArtificialHorizon() {
 ArtificialHorizon::~ArtificialHorizon() = default;
 
 void ArtificialHorizon::drawBack() {
-	owl::renderer::utils::PRS tran{
-			.position = getTransform().position,
-			.rotation = -roll,
-			.size = getTransform().size};
+	owl::renderer::utils::PRS tran{.position = getTransform().position, .rotation = -roll, .size = getTransform().size};
 	tran.position.z = -0.1f;
-	owl::renderer::Renderer2D::drawQuad({.transform = tran,
-										 .texture = background});
+	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = background});
 }
 
 void ArtificialHorizon::drawCursors() {
-	owl::renderer::utils::PRS tran{
-			.position = getTransform().position,
-			.rotation = -roll,
-			.size = getTransform().size};
+	owl::renderer::utils::PRS tran{.position = getTransform().position, .rotation = -roll, .size = getTransform().size};
 	tran.position.z = -0.08f;
 	tran.position.x = tran.position.x - std::sin(roll * deg2rad) * std::clamp(pitch, -30.f, 30.f) / 30.f * 0.086f;
 	tran.position.y = tran.position.y - std::cos(roll * deg2rad) * std::clamp(pitch, -30.f, 30.f) / 30.f * 0.086f;
-	owl::renderer::Renderer2D::drawQuad({.transform = tran,
-										 .texture = olivePitch});
+	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = olivePitch});
 	tran.position = getTransform().position;
 	tran.position.z = -0.07f;
-	owl::renderer::Renderer2D::drawQuad({.transform = tran,
-										 .texture = rollRing});
+	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = rollRing});
 	tran.position.z = -0.06f;
 	tran.rotation = 0;
-	owl::renderer::Renderer2D::drawQuad({.transform = tran,
-										 .texture = cursor});
+	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor});
 }
 
 }// namespace drone::panels::gauge

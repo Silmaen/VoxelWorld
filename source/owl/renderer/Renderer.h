@@ -52,7 +52,7 @@ public:
 	/**
 	 * @brief The state of the renderer.
 	 */
-	enum struct State {
+	enum struct State : uint8_t {
 		Created,///< Renderer just created.
 		Running,///< Renderer in stable state.
 		Stopped,///< Renderer stopped.
@@ -101,7 +101,7 @@ private:
 	struct SceneData {
 		/// View projection Matrix.
 		glm::mat4 viewProjectionMatrix;
-	};
+	} OWL_ALIGN(64);
 
 	/// The actual sceneData.
 	static shared<SceneData> m_sceneData;

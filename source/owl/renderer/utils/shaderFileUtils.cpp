@@ -23,8 +23,8 @@ std::filesystem::path getCacheDirectory(const std::string &iRenderer, const std:
 }
 
 void createCacheDirectoryIfNeeded(const std::string &iRenderer, const std::string &iRendererApi) {
-	if (const std::filesystem::path cacheDirectory = getCacheDirectory(iRenderer, iRendererApi); !
-		exists(cacheDirectory)) {
+	if (const std::filesystem::path cacheDirectory = getCacheDirectory(iRenderer, iRendererApi);
+		!exists(cacheDirectory)) {
 		create_directories(cacheDirectory);
 		if (!exists(cacheDirectory))
 			OWL_CORE_ERROR("Cannot Create directory {}.", cacheDirectory.string())
@@ -32,32 +32,32 @@ void createCacheDirectoryIfNeeded(const std::string &iRenderer, const std::strin
 }
 
 std::filesystem::path getShaderCachedPath(const std::string &iShaderName, const std::string &iRenderer,
-                                          const std::string &iRendererApi, const ShaderType &iType) {
+										  const std::string &iRendererApi, const ShaderType &iType) {
 	return getCacheDirectory(iRenderer, iRendererApi) / (iShaderName + getCacheExtension(iType));
 }
 
 std::filesystem::path getShaderPath(const std::string &iShaderName, const std::string &iRenderer,
-                                    const std::string &iRendererApi, const ShaderType &iType) {
-	return core::Application::get().getAssetDirectory() / "shaders" / iRenderer / iRendererApi / (
-		       iShaderName + getExtension(iType));
+									const std::string &iRendererApi, const ShaderType &iType) {
+	return core::Application::get().getAssetDirectory() / "shaders" / iRenderer / iRendererApi /
+		   (iShaderName + getExtension(iType));
 }
 
 std::filesystem::path getRelativeShaderPath(const std::string &iShaderName, const std::string &iRenderer,
-                                            const std::string &iRendererApi, const ShaderType &iType) {
+											const std::string &iRendererApi, const ShaderType &iType) {
 	return std::filesystem::path("shaders") / iRenderer / iRendererApi / (iShaderName + getExtension(iType));
 }
 
 std::string getExtension(const ShaderType &iStage) {
 	auto ext = fmt::format(".{}", magic_enum::enum_name(iStage).substr(0, 4));
 	std::ranges::transform(ext.begin(), ext.end(), ext.begin(),
-	                       [](const unsigned char iChar) { return std::tolower(iChar); });
+						   [](const unsigned char iChar) { return std::tolower(iChar); });
 	return ext;
 }
 
 std::string getCacheExtension(const ShaderType &iStage) {
 	auto ext = fmt::format(".{}.spv", magic_enum::enum_name(iStage).substr(0, 4));
 	std::ranges::transform(ext.begin(), ext.end(), ext.begin(),
-	                       [](const unsigned char iChar) { return std::tolower(iChar); });
+						   [](const unsigned char iChar) { return std::tolower(iChar); });
 	return ext;
 }
 
@@ -83,8 +83,7 @@ bool writeCachedShader(const std::filesystem::path &iFile, const std::vector<uin
 		OWL_CORE_WARN("Cache directory {} does not exists, creating.", iFile.parent_path().string())
 
 	if (out.is_open()) {
-		out.write(reinterpret_cast<const char *>(iData.data()),
-		          static_cast<long long>(iData.size() * sizeof(uint32_t)));
+		out.write(reinterpret_cast<const char *>(iData.data()), static_cast<int64_t>(iData.size() * sizeof(uint32_t)));
 		out.flush();
 		out.close();
 		return true;
@@ -111,15 +110,16 @@ shaderc_shader_kind shaderStageToShaderC(const ShaderType &iStage) {
 }
 
 void shaderReflect(const std::string &iShaderName, const std::string &iRenderer, const std::string &iRendererApi,
-                   const ShaderType iStage, const std::vector<uint32_t> &iShaderData) {
+				   const ShaderType iStage, const std::vector<uint32_t> &iShaderData) {
 	const spirv_cross::Compiler compiler(iShaderData);
-	spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+	const spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-	OWL_CORE_TRACE("Shader reflect - {0} : <assets>/{1}",
-	               magic_enum::enum_name(iStage),
-	               renderer::utils::getRelativeShaderPath(iShaderName, iRenderer, iRendererApi, iStage).string())
+	OWL_CORE_TRACE("Shader reflect - {0} : <assets>/{1}", magic_enum::enum_name(iStage),
+				   renderer::utils::getRelativeShaderPath(iShaderName, iRenderer, iRendererApi, iStage).string())
 	OWL_CORE_TRACE("    {} resources", resources.sampled_images.size())
-	if (resources.uniform_buffers.empty()) { OWL_CORE_TRACE("  No Uniform buffer") } else {
+	if (resources.uniform_buffers.empty()) {
+		OWL_CORE_TRACE("  No Uniform buffer")
+	} else {
 		OWL_CORE_TRACE("  Uniform buffers:")
 		for (const auto &resource: resources.uniform_buffers) {
 			const auto &bufferType = compiler.get_type(resource.base_type_id);

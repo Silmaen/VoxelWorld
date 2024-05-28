@@ -64,6 +64,7 @@ struct convert<glm::vec4> {
 	}
 };
 
+// NOLINTBEGIN(misc-use-anonymous-namespace)
 static Emitter &operator<<(Emitter &out, const glm::vec3 &v) {
 	out << Flow;
 	out << BeginSeq << v.x << v.y << v.z << EndSeq;
@@ -75,14 +76,15 @@ static Emitter &operator<<(Emitter &out, const glm::vec4 &v) {
 	out << BeginSeq << v.x << v.y << v.z << v.w << EndSeq;
 	return out;
 }
+// NOLINTEND(misc-use-anonymous-namespace)
 
 }// namespace YAML
 
 namespace owl::scene {
-
 SceneSerializer::SceneSerializer(const shared<Scene> &iScene) : mp_scene(iScene) {}
 
-static void serializeEntity(YAML::Emitter &out, const Entity &iEntity) {
+namespace {
+void serializeEntity(YAML::Emitter &out, const Entity &iEntity) {
 	out << YAML::BeginMap;// Entity
 	out << YAML::Key << "Entity" << YAML::Value << iEntity.getUUID();
 
@@ -111,8 +113,8 @@ static void serializeEntity(YAML::Emitter &out, const Entity &iEntity) {
 		const auto &camera = cameraComponent.camera;
 		out << YAML::Key << "camera" << YAML::Value;
 		out << YAML::BeginMap;// Camera
-		out << YAML::Key << "projectionType" << YAML::Value << std::string(
-				magic_enum::enum_name(camera.getProjectionType()));
+		out << YAML::Key << "projectionType" << YAML::Value
+			<< std::string(magic_enum::enum_name(camera.getProjectionType()));
 		out << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
 		out << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
 		out << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
@@ -148,6 +150,7 @@ static void serializeEntity(YAML::Emitter &out, const Entity &iEntity) {
 
 	out << YAML::EndMap;// Entity
 }
+}// namespace
 
 void SceneSerializer::serialize(const std::filesystem::path &iFilepath) const {
 	YAML::Emitter out;

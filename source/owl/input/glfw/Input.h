@@ -19,6 +19,9 @@ class OWL_API Input final : public input::Input {
 public:
 	Input(const Input &) = delete;
 	Input(Input &&) = delete;
+	Input &operator=(const Input &) = delete;
+	Input &operator=(Input &&) = delete;
+
 
 	/**
 	 * @brief Default constructor.

@@ -115,7 +115,7 @@ void EditorLayer::onUpdate(const core::Timestep &iTimeStep) {
 
 	if (mouseX >= 0 && mouseY >= 0 && mouseX < static_cast<int>(viewportSizeInternal.x) &&
 		mouseY < static_cast<int>(viewportSizeInternal.y)) {
-		int pixelData = m_framebuffer->readPixel(1, mouseX, mouseY);
+		const int pixelData = m_framebuffer->readPixel(1, mouseX, mouseY);
 		m_hoveredEntity = pixelData == -1 ? scene::Entity()
 										  : scene::Entity(static_cast<entt::entity>(pixelData), m_activeScene.get());
 	}
@@ -196,8 +196,10 @@ void EditorLayer::renderViewport() {
 	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	m_viewportSize = {static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y)};
 
+	// NOLINTBEGIN(performance-no-int-to-ptr)
 	if (const uint64_t textureId = m_framebuffer->getColorAttachmentRendererId(0); textureId != 0)
 		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
+	// NOLINTEND(performance-no-int-to-ptr)
 
 	if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -256,7 +258,9 @@ void EditorLayer::renderGizmo() {
 							 nullptr, snap ? snapValues : nullptr);
 
 		if (ImGuizmo::IsUsing()) {
-			glm::vec3 translation, rotation, scale;
+			glm::vec3 translation;
+			glm::vec3 rotation;
+			glm::vec3 scale;
 			math::decomposeTransform(transform, translation, rotation, scale);
 
 			const glm::vec3 deltaRotation = rotation - tc.rotation;
@@ -310,6 +314,8 @@ void EditorLayer::renderToolbar() {
 	if (icon)
 		textureId = icon->getRendererId();
 	if (textureId != 0) {
+
+		// NOLINTBEGIN(performance-no-int-to-ptr)
 		if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureId), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1),
 							   0)) {
 			if (m_state == State::Edit)
@@ -317,6 +323,7 @@ void EditorLayer::renderToolbar() {
 			else if (m_state == State::Play)
 				onSceneStop();
 		}
+		// NOLINTEND(performance-no-int-to-ptr)
 	} else {
 		if (m_state == State::Edit) {
 			if (ImGui::Button("play", ImVec2(size, size)))

@@ -38,9 +38,11 @@ Texture2D::Texture2D(uint32_t iWidth, uint32_t iHeight, const bool iWithAlpha)
 Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {
 	OWL_PROFILE_FUNCTION()
 
-	int width, height, channels;
+	int width = 0;
+	int height = 0;
+	int channels = 0;
 	stbi_set_flip_vertically_on_load(1);
-	stbi_uc *data;
+	stbi_uc *data = nullptr;
 	{
 		OWL_PROFILE_SCOPE("stbi_load - Texture2D::Texture2D(const std::filesystem::path &)")
 		data = stbi_load(m_path.string().c_str(), &width, &height, &channels, 0);

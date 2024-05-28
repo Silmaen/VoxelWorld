@@ -97,7 +97,9 @@ public:
 	static RenderAPI::Type getApi() {
 		if (mu_renderAPI)
 			return mu_renderAPI->getApi();
+		// NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange)
 		return static_cast<RenderAPI::Type>(-1);
+		// NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange)
 	}
 
 	/**

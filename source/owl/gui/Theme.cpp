@@ -10,6 +10,4 @@
 
 #include "Theme.h"
 
-namespace owl::gui {
-
-}
+namespace owl::gui {}// namespace owl::gui

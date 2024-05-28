@@ -74,9 +74,9 @@ void TextureData::createDescriptorSet() {
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Texture Descriptor: failed to allocate descriptor sets ({})", resultString(result))
 	}
-	VkDescriptorImageInfo info{.sampler = textureSampler,
-							   .imageView = textureImageView,
-							   .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+	const VkDescriptorImageInfo info{.sampler = textureSampler,
+									 .imageView = textureImageView,
+									 .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
 	const VkWriteDescriptorSet wrt{.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 								   .pNext = nullptr,
 								   .dstSet = textureDescriptorSet,

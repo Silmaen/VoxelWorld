@@ -22,6 +22,8 @@ class OWL_API Window final : public ::owl::input::Window {
 public:
 	Window(const Window &) = delete;
 	Window(Window &&) = delete;
+	Window &operator=(const Window &) = delete;
+	Window &operator=(Window &&) = delete;
 
 	/**
 	 * @brief Default constructor.
@@ -67,9 +69,7 @@ public:
 	 * @brief Define the Event Callback function.
 	 * @param[in] iCallback The new callback function.
 	 */
-	void setEventCallback(const EventCallback &iCallback) override {
-		m_windowData.m_eventCallback = iCallback;
-	}
+	void setEventCallback(const EventCallback &iCallback) override { m_windowData.m_eventCallback = iCallback; }
 	/**
 	 * @brief St the VSync.
 	 * @param[in] iEnabled Should VSync enabled.
@@ -108,7 +108,7 @@ private:
 	 */
 	struct WindowData {
 		/// Window's title.
-		std::string m_title{};
+		std::string m_title;
 		/// Window's width.
 		uint32_t m_width = 0;
 		/// Window's height.
@@ -116,8 +116,8 @@ private:
 		/// Window's VSync property.
 		bool m_VSync = false;
 		/// Event Call back.
-		EventCallback m_eventCallback{};
-	};
+		EventCallback m_eventCallback;
+	} OWL_ALIGN(128);
 
 	/// The Window's data.
 	WindowData m_windowData{};

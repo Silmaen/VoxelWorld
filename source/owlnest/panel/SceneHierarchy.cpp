@@ -48,12 +48,13 @@ void SceneHierarchy::onImGuiRender() {
 	ImGui::End();
 }
 
+// NOLINTBEGIN(performance-no-int-to-ptr)
 void SceneHierarchy::drawEntityNode(scene::Entity &ioEntity) {
 	const auto &tag = ioEntity.getComponent<scene::component::Tag>().tag;
 
-	ImGuiTreeNodeFlags flags =
-			((m_selection == ioEntity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+	const auto flags = static_cast<ImGuiTreeNodeFlags>(
+			((m_selection == ioEntity) ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags_None) |
+			ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth);
 	const bool opened = ImGui::TreeNodeEx(
 			reinterpret_cast<void *>(static_cast<uint64_t>(static_cast<uint32_t>(ioEntity))), flags, "%s", tag.c_str());
 	if (ImGui::IsItemClicked()) {
@@ -80,11 +81,13 @@ void SceneHierarchy::drawEntityNode(scene::Entity &ioEntity) {
 			m_selection = {};
 	}
 }
+// NOLINTEND(performance-no-int-to-ptr)
 
-static void drawVec3Control(const std::string &iLabel, glm::vec3 &iValues, const float iResetValue = 0.0f,
-							const float iColumnWidth = 100.0f) {
+namespace {
+void drawVec3Control(const std::string &iLabel, glm::vec3 &iValues, const float iResetValue = 0.0f,
+					 const float iColumnWidth = 100.0f) {
 	const ImGuiIO &io = ImGui::GetIO();
-	const auto boldFont = io.Fonts->Fonts[0];
+	auto *const boldFont = io.Fonts->Fonts[0];
 	ImGui::PushID(iLabel.c_str());
 
 	ImGui::Columns(2);
@@ -146,8 +149,9 @@ static void drawVec3Control(const std::string &iLabel, glm::vec3 &iValues, const
 	ImGui::PopID();
 }
 
+// NOLINTBEGIN(performance-no-int-to-ptr)
 template<typename T, typename UIFunction>
-static void drawComponent(const std::string &iName, scene::Entity &ioEntity, UIFunction iUiFunction) {
+void drawComponent(const std::string &iName, scene::Entity &ioEntity, UIFunction iUiFunction) {
 	constexpr ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
 												 ImGuiTreeNodeFlags_SpanAvailWidth |
 												 ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
@@ -178,6 +182,8 @@ static void drawComponent(const std::string &iName, scene::Entity &ioEntity, UIF
 			ioEntity.removeComponent<T>();
 	}
 }
+// NOLINTEND(performance-no-int-to-ptr)
+}// namespace
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
@@ -273,7 +279,7 @@ void SceneHierarchy::drawComponents(scene::Entity &ioEntity) {
 		ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-				const auto path = static_cast<const char *>(payload->Data);
+				const auto *const path = static_cast<const char *>(payload->Data);
 				const std::filesystem::path texturePath = core::Application::get().getAssetDirectory() / path;
 				component.texture = renderer::Texture2D::create(texturePath);
 			}

@@ -54,12 +54,14 @@ void UiLayer::onAttach() {
 	// Better fonts
 	ImFontConfig fontConfig;
 	fontConfig.FontDataOwnedByAtlas = false;
+	// NOLINTBEGIN(cppcoreguidelines-pro-type-const-cast)
 	ImFont *robotoFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoRegular)),
 														sizeof(g_RobotoRegular), 20.0f, &fontConfig);
 	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoBold)), sizeof(g_RobotoBold),
 								   20.0f, &fontConfig);
 	io.Fonts->AddFontFromMemoryTTF(const_cast<void *>(static_cast<const void *>(g_RobotoItalic)),
 								   sizeof(g_RobotoItalic), 20.0f, &fontConfig);
+	// NOLINTEND(cppcoreguidelines-pro-type-const-cast)
 	io.FontDefault = robotoFont;
 
 	setTheme();
@@ -262,9 +264,9 @@ OWL_DIAG_POP
 
 void UiLayer::initializeDocking() {
 	static bool dockSpaceOpen = true;
-	static bool optFullScreenPersistant = true;
-	const bool optFullScreen = optFullScreenPersistant;
-	static ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_None;
+	static constexpr bool optFullScreenPersistant = true;
+	constexpr bool optFullScreen = optFullScreenPersistant;
+	static constexpr ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_None;
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 	// because it would be confusing to have two docking targets within each others.
 	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;

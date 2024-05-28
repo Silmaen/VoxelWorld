@@ -242,6 +242,7 @@ void droneLayer::renderToolbar() {
 
 	auto &textureLib = renderer::Renderer::getTextureLibrary();
 
+	// NOLINTBEGIN(performance-no-int-to-ptr)
 	ImGui::SetCursorPos(ImVec2(posX, padding));
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureLib.get("icons/settings")->getRendererId()), vsize,
 						   ImVec2(0, 0), ImVec2(1, 1), 0)) {
@@ -265,6 +266,7 @@ void droneLayer::renderToolbar() {
 						   ImVec2(0, 1), ImVec2(1, 0), 0)) {
 		owl::core::Application::get().close();
 	}
+	// NOLINTEND(performance-no-int-to-ptr)
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor(3);
 	ImGui::End();

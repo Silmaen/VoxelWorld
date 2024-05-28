@@ -24,11 +24,11 @@ OWL_DIAG_POP
 
 owl::shared<owl::core::Application> owl::core::createApplication(int argc, char **argv) {
 	return owl::mkShared<Sandbox>(core::AppParams{
+			.args = argv,
 			.name = "Sandbox",
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,
 #endif
 			.argCount = argc,
-			.args = argv,
 	});
 }

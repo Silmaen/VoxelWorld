@@ -21,6 +21,10 @@ public:
 	 * @brief Default constructor.
 	 */
 	base2D();
+	base2D(const base2D &) = delete;
+	base2D(base2D &&) = delete;
+	base2D &operator=(const base2D &) = delete;
+	base2D &operator=(base2D &&) = delete;
 	/**
 	 * @brief Destructor.
 	 */

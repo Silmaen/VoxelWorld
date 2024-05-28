@@ -11,12 +11,15 @@
 #include "math/simpleFunctions.h"
 #include <stb_image.h>
 
+#include <cstddef>
+
 namespace owl::input::video {
 
 namespace {
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
+// NOLINTBEGIN(*-magic-numbers)
 void convertNv12ToRgb24(const uint8_t *iNv12Buffer, const math::FrameSize &iFrameSize, uint8_t *oRgb24Buffer) {
 	// Chaque composant Y occupe width * height octets
 	const uint32_t ySize = iFrameSize.surface();
@@ -31,7 +34,7 @@ void convertNv12ToRgb24(const uint8_t *iNv12Buffer, const math::FrameSize &iFram
 		for (uint32_t j = 0; j < iFrameSize.getWidth(); j++) {
 			// Indices dans le tampon NV12
 			const uint32_t yIndex = i * iFrameSize.getWidth() + j;
-			const uint32_t uvIndex = i / 2 * iFrameSize.getWidth() + (j & ~1ull);
+			const uint32_t uvIndex = (i / 2ul * iFrameSize.getWidth()) + (j & ~1ul);
 			// Indices dans le tampon RGB24
 			const uint32_t rgbIndex = ((i + 1) * iFrameSize.getWidth() - j - 1) * 3;
 			// Conversion YUV vers RGB
@@ -77,7 +80,9 @@ void convertYuYvToRgb24(const uint8_t *iYuYvBuffer, const math::FrameSize &iFram
 
 void convertMJpegToRgb24(const uint8_t *iJpegBuffer, const int32_t iJpegSize, const math::FrameSize &iFrameSize,
 						 uint8_t *oRgb24Buffer) {
-	int comp, width, height;
+	int comp = 0;
+	int width = 0;
+	int height = 0;
 	stbi_set_flip_vertically_on_load(0);
 	uint8_t *buffer = stbi_load_from_memory(iJpegBuffer, iJpegSize, &width, &height, &comp, 3);
 	if (buffer == nullptr) {
@@ -106,6 +111,7 @@ void convertMJpegToRgb24(const uint8_t *iJpegBuffer, const int32_t iJpegSize, co
 	//std::memcpy(rgb24Buffer, buffer, frameSize.surface() * 3);
 	stbi_image_free(buffer);
 }
+// NOLINTEND(*-magic-numbers)
 OWL_DIAG_POP
 
 }// namespace
@@ -117,16 +123,16 @@ Device::~Device() = default;
 std::vector<uint8_t> Device::getRgbBuffer(const uint8_t *iInputBuffer, const int32_t iBufferSize) const {
 	std::vector<uint8_t> output;
 	if (m_pixFormat == PixelFormat::Nv12) {
-		output.resize(3 * m_size.surface());
+		output.resize(3ull * m_size.surface());
 		convertNv12ToRgb24(iInputBuffer, m_size, output.data());
 	} else if (m_pixFormat == PixelFormat::Rgb24) {
-		output.resize(3 * m_size.surface());
+		output.resize(3ull * m_size.surface());
 		memcpy(output.data(), iInputBuffer, output.size());
 	} else if (m_pixFormat == PixelFormat::YuYv) {
-		output.resize(3 * m_size.surface());
+		output.resize(3ull * m_size.surface());
 		convertYuYvToRgb24(iInputBuffer, m_size, output.data());
 	} else if (m_pixFormat == PixelFormat::MJpeg) {
-		output.resize(3 * m_size.surface());
+		output.resize(3ull * m_size.surface());
 		convertMJpegToRgb24(iInputBuffer, iBufferSize, m_size, output.data());
 	} else {
 		OWL_CORE_WARN("Unkown or unsupported pixel format, empty output buffer.")

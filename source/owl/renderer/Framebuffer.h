@@ -17,7 +17,7 @@ namespace owl::renderer {
  */
 struct AttachmentSpecification {
 	/// Format for the texture frame buffer.
-	enum class Format {
+	enum class Format : uint8_t {
 		None = 0,
 		/// Color.
 		Rgba8,
@@ -33,7 +33,7 @@ struct AttachmentSpecification {
 	Format format = Format::None;
 
 	/// The tiling attributes.
-	enum class Tiling {
+	enum class Tiling : uint8_t {
 		/// Linear tiling.
 		Linear,
 		/// Optimal tiling.
@@ -42,7 +42,7 @@ struct AttachmentSpecification {
 
 	/// The texture's tiling.
 	Tiling tiling = Tiling::Optimal;
-};
+} OWL_ALIGN(2);
 
 /**
  * @brief Framebuffer specification.
@@ -58,7 +58,7 @@ struct FramebufferSpecification {
 	bool swapChainTarget = false;
 	/// Name that can be use to identify the frame buffer in debug.
 	std::string debugName = "main";
-};
+} OWL_ALIGN(128);
 
 /**
  * @brief Class Framebuffer.

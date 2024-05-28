@@ -61,7 +61,7 @@ private:
 
 	input::CameraOrthoController m_cameraController;
 
-	enum class State { Edit, Play };
+	enum struct State : uint8_t { Edit, Play };
 
 	State m_state = State::Edit;
 
@@ -79,7 +79,7 @@ private:
 	shared<scene::Scene> m_editorScene;
 
 	int m_gizmoType = -1;
-	std::filesystem::path m_currentScenePath{};
+	std::filesystem::path m_currentScenePath;
 
 	// Panels
 	panel::SceneHierarchy m_sceneHierarchy;

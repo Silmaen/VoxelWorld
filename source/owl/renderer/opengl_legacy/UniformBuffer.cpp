@@ -13,8 +13,7 @@
 
 namespace owl::renderer::opengl_legacy {
 
-UniformBuffer::UniformBuffer(const uint32_t iSize, const uint32_t iBinding) {
-	m_internalBinding = iBinding;
+UniformBuffer::UniformBuffer(const uint32_t iSize, const uint32_t iBinding) : m_internalBinding{iBinding} {
 	m_internalData.resize(iSize);
 	UniformBindingLibrary::get().addUniformBuffer(this);
 }

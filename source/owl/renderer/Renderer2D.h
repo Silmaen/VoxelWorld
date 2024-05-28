@@ -30,7 +30,7 @@ struct PRS {
 	float rotation = 0.f;
 	/// The size.
 	glm::vec2 size = glm::vec2{1.f, 1.f};
-};
+} OWL_ALIGN(32);
 
 /**
  * @brief Convert PRS structure int transformation matrix.
@@ -46,6 +46,7 @@ struct Transform2D {
 	Transform2D() = delete;
 
 	// NOLINTBEGIN(google-explicit-constructor)
+	// NOLINTBEGIN(hicpp-explicit-conversions)
 	/**
 	 * @brief Constructor by transformation matrix.
 	 * @param[in] iMatrix Input transformation matrix.
@@ -57,11 +58,12 @@ struct Transform2D {
 	 * @param[in] iTransform Input PRS.
 	 */
 	Transform2D(const PRS &iTransform) : transform{toTransform(iTransform)} {}
+	// NOLINTEND(hicpp-explicit-conversions)
 	// NOLINTEND(google-explicit-constructor)
 
 	/// The transformation matrix.
 	glm::mat4 transform;
-};
+} OWL_ALIGN(64);
 }// namespace utils
 
 /**
@@ -78,7 +80,7 @@ struct OWL_API Quad2DData {
 	float tilingFactor = 1.f;
 	/// unique ID for the entity.
 	int entityID = -1;
-};
+} OWL_ALIGN(128);
 
 /**
  * @brief Data for drawing a circle.
@@ -94,7 +96,7 @@ struct OWL_API CircleData {
 	float fade = 0.005f;
 	/// unique ID for the entity.
 	int entityID = -1;
-};
+} OWL_ALIGN(128);
 
 /**
  * @brief Data for drawing a line.
@@ -108,7 +110,7 @@ struct OWL_API LineData {
 	glm::vec4 color = glm::vec4{1.f, 1.f, 1.f, 1.f};
 	/// unique ID for the entity.
 	int entityID = -1;
-};
+} OWL_ALIGN(64);
 
 /**
  * @brief Data for drawing a rectangle.
@@ -120,7 +122,7 @@ struct OWL_API RectData {
 	glm::vec4 color = glm::vec4{1.f, 1.f, 1.f, 1.f};
 	/// unique ID for the entity.
 	int entityID = -1;
-};
+} OWL_ALIGN(128);
 
 /**
  * @brief Data for drawing a polyline.
@@ -136,7 +138,7 @@ struct OWL_API PolyLineData {
 	glm::vec4 color = glm::vec4{1.f, 1.f, 1.f, 1.f};
 	/// unique ID for the entity.
 	int entityID = -1;
-};
+} OWL_ALIGN(128);
 
 /**
  * @brief Class Renderer2D.
@@ -260,7 +262,7 @@ public:
 		[[nodiscard]] uint32_t getTotalVertexCount() const { return quadCount * 4; }
 		/// Compute the amount of indices.
 		[[nodiscard]] uint32_t getTotalIndexCount() const { return quadCount * 6; }
-	};
+	} OWL_ALIGN(8);
 
 	/**
 	 * @brief Reset the statistics data.

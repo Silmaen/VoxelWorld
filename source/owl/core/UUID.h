@@ -16,10 +16,10 @@ namespace owl::core {
  */
 class OWL_API UUID {
 public:
-	UUID(const UUID&) = default;
-	UUID(UUID&&) = default;
-	UUID& operator=(const UUID&) = default;
-	UUID& operator=(UUID&&) = default;
+	UUID(const UUID &) = default;
+	UUID(UUID &&) = default;
+	UUID &operator=(const UUID &) = default;
+	UUID &operator=(UUID &&) = default;
 
 	/**
 	 * @brief Default constructor.
@@ -27,6 +27,7 @@ public:
 	UUID();
 
 	// NOLINTBEGIN(google-explicit-constructor)
+	// NOLINTBEGIN(hicpp-explicit-conversions)
 	/**
 	 * @brief Default constructor.
 	 * @param[in] iUuid The uuid to initialize.
@@ -43,22 +44,23 @@ public:
 	 * @return Access const to internal ID.
 	 */
 	operator uint64_t() const { return m_uuid; }
+	// NOLINTEND(hicpp-explicit-conversions)
 	// NOLINTEND(google-explicit-constructor)
 
 private:
 	/// The uuid code.
 	uint64_t m_uuid;
 };
-} // namespace owl::core
+}// namespace owl::core
 
 /// @cond
 
 /**
  * @brief Hash function for the UUID object.
  */
-template <>
+template<>
 struct std::hash<owl::core::UUID> {
-	std::size_t operator()(const owl::core::UUID& iUuid) const noexcept {
+	std::size_t operator()(const owl::core::UUID &iUuid) const noexcept {
 		return hash<uint64_t>()(static_cast<uint64_t>(iUuid));
 	}
 };

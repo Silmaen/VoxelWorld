@@ -17,7 +17,7 @@ namespace owl::input {
 /**
  * @brief Types of input Manager.
  */
-enum struct Type {
+enum struct Type : uint8_t {
 	Null,/// Windows null
 	GLFW/// Windows managed by Glfw library.
 };
@@ -36,7 +36,7 @@ struct Properties {
 	uint32_t width = 1600;
 	/// Height.
 	uint32_t height = 900;
-};
+} OWL_ALIGN(128);
 
 /**
  * @brief Abstract Window class.

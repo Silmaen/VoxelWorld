@@ -70,6 +70,7 @@ void Viewport::onUpdate(const core::Timestep &iTimeStep) {
 	mp_framebuffer->unbind();
 }
 
+// NOLINTBEGIN(performance-no-int-to-ptr)
 void Viewport::onRender() {
 	OWL_PROFILE_FUNCTION()
 
@@ -92,7 +93,7 @@ void Viewport::onRender() {
 
 	if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-			const auto path = static_cast<const char *>(payload->Data);
+			const auto *const path = static_cast<const char *>(payload->Data);
 			const std::filesystem::path scenePath = core::Application::get().getAssetDirectory() / path;
 			OWL_CORE_WARN("Could not load file {}: unsupported format.", scenePath.string())
 		}
@@ -102,6 +103,6 @@ void Viewport::onRender() {
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
-
+// NOLINTEND(performance-no-int-to-ptr)
 
 }// namespace drone::panels
