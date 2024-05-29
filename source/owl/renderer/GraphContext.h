@@ -79,7 +79,7 @@ public:
 		[[nodiscard]] bool operator<=(const Version &iOther) const {
 			return major <= iOther.major || (major == iOther.major && minor <= iOther.minor);
 		}
-	} OWL_ALIGN(8);
+	};
 
 	/**
 	 * @brief Get version number of the backend API.

@@ -43,8 +43,6 @@
 #endif
 #endif
 
-#define OWL_ALIGN(X) __attribute__((aligned(X)))
-
 #include <memory>
 
 /**

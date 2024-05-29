@@ -4,6 +4,7 @@ WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 Checks: '*,
   -altera-id-dependent-backward-branch,
+  -altera-struct-pack-align,
   -altera-unroll-loops,
   -bugprone-easily-swappable-parameters,
   -cert-err58-cpp,

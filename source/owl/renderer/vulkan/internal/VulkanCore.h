@@ -16,7 +16,7 @@
  */
 namespace owl::renderer::vulkan::internal {
 
-constexpr int g_maxFrameInFlight = 2;
+constexpr uint32_t g_maxFrameInFlight = 2;
 
 /**
  * @brief Simple struct to gather the vulkan configurations.
@@ -65,7 +65,7 @@ struct InstanceInformations {
 	uint32_t version = 0;
 	std::vector<std::string> supportedExtensions;
 	std::vector<std::string> supportedLayers;
-} OWL_ALIGN(64);
+};
 
 /**
  * @brief Class VulkanCore.

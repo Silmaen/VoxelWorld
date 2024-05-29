@@ -11,7 +11,6 @@
 #include "Renderer.h"
 #include "null/DrawData.h"
 #include "opengl/DrawData.h"
-#include "opengl_legacy/DrawData.h"
 #include "vulkan/DrawData.h"
 
 namespace owl::renderer {
@@ -24,8 +23,6 @@ shared<DrawData> DrawData::create() {
 			return mkShared<null::DrawData>();
 		case RenderAPI::Type::OpenGL:
 			return mkShared<opengl::DrawData>();
-		case RenderAPI::Type::OpenglLegacy:
-			return mkShared<opengl_legacy::DrawData>();
 		case RenderAPI::Type::Vulkan:
 			return mkShared<vulkan::DrawData>();
 	}

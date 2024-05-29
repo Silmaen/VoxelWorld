@@ -43,5 +43,5 @@ struct OWL_API NativeScript {
 		};
 	}
 	// NOLINTEND(cppcoreguidelines-owning-memory)
-} OWL_ALIGN(32);
+};
 }// namespace owl::scene::component

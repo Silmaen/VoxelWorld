@@ -121,12 +121,12 @@ public:
 	struct PipeLineData {
 		VkPipeline pipeLine = nullptr;
 		VkPipelineLayout layout = nullptr;
-	} OWL_ALIGN(16);
+	};
 
 	[[nodiscard]] PipeLineData getPipeline(int32_t iId) const;
 
 	int32_t pushPipeline(const std::string &iPipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
-						 VkPipelineVertexInputStateCreateInfo iVertexInputInfo);
+						 VkPipelineVertexInputStateCreateInfo iVertexInputInfo, bool iDoubleSided = true);
 
 	// Command buffer data
 	bool inBatch = false;

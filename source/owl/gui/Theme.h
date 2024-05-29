@@ -24,7 +24,7 @@ struct Theme {
 	glm::vec4 highlight{0.153f, 0.725f, 0.949f, 1.0f};
 	glm::vec4 background{0.141f, 0.141f, 0.141f, 1.0f};
 	glm::vec4 backgroundPopup{0.196f, 0.196f, 0.196f, 1.0f};
-} OWL_ALIGN(128);
+};
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
 }// namespace owl::gui

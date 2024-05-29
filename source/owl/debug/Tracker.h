@@ -121,7 +121,7 @@ public:
 		 * @return String of the allocation.
 		 */
 		[[nodiscard]] OWL_API std::string toStr() const;
-	} OWL_ALIGN(16);
+	};
 
 	/**
 	 * @brief Result structure of allocation state.
@@ -148,7 +148,7 @@ public:
 		 * @brief Reset the database.
 		 */
 		void reset();
-	} OWL_ALIGN(64);
+	};
 
 	/**
 	 * @brief Reset current memory state monitor and give the previous status.

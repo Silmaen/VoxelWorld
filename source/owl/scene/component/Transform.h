@@ -30,6 +30,6 @@ struct OWL_API Transform {
 		return glm::translate(glm::mat4(1.0f), translation) * glm::toMat4(glm::quat(rotation)) *
 			   glm::scale(glm::mat4(1.f), scale);
 	}
-} OWL_ALIGN(64);
+};
 
 }// namespace owl::scene::component

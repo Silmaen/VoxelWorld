@@ -78,7 +78,7 @@ struct OWL_API AppParams {
 	 * @param[in] iFile The file to save.
 	 */
 	void saveToFile(const std::filesystem::path &iFile) const;
-} OWL_ALIGN(128);
+};
 // NOLINTEND(readability-redundant-member-init)
 
 /**

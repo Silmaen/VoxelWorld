@@ -101,7 +101,7 @@ private:
 	struct SceneData {
 		/// View projection Matrix.
 		glm::mat4 viewProjectionMatrix;
-	} OWL_ALIGN(64);
+	};
 
 	/// The actual sceneData.
 	static shared<SceneData> m_sceneData;

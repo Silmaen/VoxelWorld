@@ -12,7 +12,6 @@
 #include "core/Application.h"
 #include "null/Shader.h"
 #include "opengl/Shader.h"
-#include "opengl_legacy/Shader.h"
 #include "vulkan/Shader.h"
 
 namespace owl::renderer {
@@ -26,8 +25,6 @@ shared<Shader> Shader::create(const std::string &iShaderName, const std::string 
 			shaderDir /= iRenderer;
 			if (type == RenderAPI::Type::OpenGL)
 				shaderDir /= "opengl";
-			else if (type == RenderAPI::Type::OpenglLegacy)
-				shaderDir /= "opengl_legacy";
 			else if (type == RenderAPI::Type::Vulkan)
 				shaderDir /= "vulkan";
 		}
@@ -56,8 +53,6 @@ shared<Shader> Shader::create(const std::string &iShaderName, const std::string 
 			return mkShared<null::Shader>(iShaderName, iRenderer, sources);
 		case RenderAPI::Type::OpenGL:
 			return mkShared<opengl::Shader>(iShaderName, iRenderer, sources);
-		case RenderAPI::Type::OpenglLegacy:
-			return mkShared<opengl_legacy::Shader>(iShaderName, iRenderer, sources);
 		case RenderAPI::Type::Vulkan:
 			return mkShared<vulkan::Shader>(iShaderName, iRenderer, sources);
 	}

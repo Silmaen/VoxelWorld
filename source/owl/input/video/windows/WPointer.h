@@ -50,13 +50,13 @@ public:
 	 */
 	Ptr* operator->() { return mp_object; }
 
-	// NOLINTBEGIN(google-explicit-constructor)
+	// NOLINTBEGIN(google-explicit-constructor,hicpp-explicit-conversions)
 	/**
 	 * @brief Explicit type casting to bool.
 	 * @return True if pointer is non-void.
 	 */
 	operator bool() const { return mp_object != nullptr; }
-	// NOLINTEND(google-explicit-constructor)
+	// NOLINTEND(google-explicit-constructor,hicpp-explicit-conversions)
 
 	/**
 	 * @brief Direct access to the pointer.

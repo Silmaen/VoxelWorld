@@ -42,7 +42,7 @@ The section [coding style](doc/CodingStyle.md) describes the guidelines to follo
 
 ### Update to latest
 
-To automatically update the dependencies, you an run `python3 -u ci/DependencyCheck.py` that will communicate with the
+To automatically update the dependencies, you can run `python3 -u ci/DependencyCheck.py` that will communicate with the
 remote server to get the latest dependencies according to the current platform.
 
 The description of dependencies is located in [depmanager.yml](depmanager.yml).

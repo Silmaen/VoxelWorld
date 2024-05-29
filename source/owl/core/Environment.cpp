@@ -14,13 +14,15 @@ namespace owl::core {
 
 std::string getEnv(const std::string &iKey) {
 #ifdef OWL_PLATFORM_WINDOWS
-	size_t requiredSize;
-	getenv_s(&requiredSize, nullptr, 0, iKey.c_str());
-	if (requiredSize == 0)
+	size_t requiredSize = 0;
+	auto err = getenv_s(&requiredSize, nullptr, 0, iKey.c_str());
+	if (requiredSize == 0u or err != 0u)
 		return "";
 	std::string buffer;
 	buffer.resize(requiredSize);
-	getenv_s(&requiredSize, buffer.data(), requiredSize, iKey.c_str());
+	err = getenv_s(&requiredSize, buffer.data(), requiredSize, iKey.c_str());
+	if (err != 0)
+		return "";
 	return buffer;
 #else
 	const char *oldPath = getenv(iKey.c_str());

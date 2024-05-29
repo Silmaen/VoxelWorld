@@ -147,7 +147,7 @@ VkCommandBuffer VulkanHandler::getCurrentCommandBuffer() const {
 
 int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 									std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
-									VkPipelineVertexInputStateCreateInfo iVertexInputInfo) {
+									VkPipelineVertexInputStateCreateInfo iVertexInputInfo, bool iDoubleSided) {
 	const auto &core = VulkanCore::get();
 	auto &vkd = Descriptors::get();
 	PipeLineData pData;
@@ -181,14 +181,15 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.pViewports = nullptr,
 			.scissorCount = 1,
 			.pScissors = nullptr};
-	constexpr VkPipelineRasterizationStateCreateInfo rasterizer{
+	const VkCullModeFlags cullMode = iDoubleSided ? VK_CULL_MODE_NONE : VK_CULL_MODE_BACK_BIT;
+	const VkPipelineRasterizationStateCreateInfo rasterizer{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
 			.depthClampEnable = VK_FALSE,
 			.rasterizerDiscardEnable = VK_FALSE,
 			.polygonMode = VK_POLYGON_MODE_FILL,
-			.cullMode = VK_CULL_MODE_BACK_BIT,
+			.cullMode = cullMode,
 			.frontFace = VK_FRONT_FACE_CLOCKWISE,
 			.depthBiasEnable = VK_FALSE,
 			.depthBiasConstantFactor = 0.0f,
@@ -392,26 +393,29 @@ void VulkanHandler::beginBatch() {
 }
 
 void VulkanHandler::endBatch() {
+	static bool alreadyRun = false;
 	vkCmdEndRenderPass(getCurrentCommandBuffer());
 	if (const VkResult result = vkEndCommandBuffer(getCurrentCommandBuffer()); result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan: failed to end command buffer ({}).", resultString(result))
 		m_state = State::ErrorEndCommandBuffer;
 	}
-	const VkSemaphore waitSemaphoresStart[] = {m_currentframebuffer->getCurrentImageAvailableSemaphore()};
-	const VkSemaphore waitSemaphores[] = {m_currentframebuffer->getCurrentFinishedSemaphore()};
 	constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 	const VkSemaphore signalSemaphores[] = {m_currentframebuffer->getCurrentFinishedSemaphore()};
+	VkSemaphore *waiter = nullptr;
+	if (alreadyRun) {
+		VkSemaphore waitSemaphoresStart = m_currentframebuffer->getCurrentImageAvailableSemaphore();
+		VkSemaphore waitSemaphores = m_currentframebuffer->getCurrentFinishedSemaphore();
+		waiter = m_currentframebuffer->isFirstBatch() ? &waitSemaphoresStart : &waitSemaphores;
+	}
 	const VkSubmitInfo submitInfo{.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 								  .pNext = nullptr,
-								  .waitSemaphoreCount = 1u,
-								  .pWaitSemaphores =
-										  m_currentframebuffer->isFirstBatch() ? waitSemaphoresStart : waitSemaphores,
+								  .waitSemaphoreCount = alreadyRun ? 1u : 0u,
+								  .pWaitSemaphores = waiter,
 								  .pWaitDstStageMask = waitStages,
 								  .commandBufferCount = 1,
 								  .pCommandBuffers = m_currentframebuffer->getCurrentCommandbuffer(),
 								  .signalSemaphoreCount = 1,
 								  .pSignalSemaphores = signalSemaphores};
-
 	const auto &core = VulkanCore::get();
 	if (const VkResult result =
 				vkQueueSubmit(core.getGraphicQueue(), 1, &submitInfo, *m_currentframebuffer->getCurrentFence());
@@ -421,6 +425,11 @@ void VulkanHandler::endBatch() {
 		return;
 	}
 	inBatch = false;
+#ifdef OWL_DEBUG
+	// TODO(Silmaen) Investigate why we got a crash in release with wait semaphore
+	if (!alreadyRun)
+		alreadyRun = true;
+#endif
 	m_currentframebuffer->batchTouch();
 }
 

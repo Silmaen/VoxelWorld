@@ -36,7 +36,7 @@ struct Properties {
 	uint32_t width = 1600;
 	/// Height.
 	uint32_t height = 900;
-} OWL_ALIGN(128);
+};
 
 /**
  * @brief Abstract Window class.

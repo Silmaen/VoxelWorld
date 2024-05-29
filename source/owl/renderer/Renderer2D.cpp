@@ -41,7 +41,7 @@ struct QuadVertex {
 	float texIndex;
 	float tilingFactor;
 	int entityID;
-} OWL_ALIGN(64);
+};
 
 /**
  * @brief Structure holding circle vertex information.
@@ -53,7 +53,7 @@ struct CircleVertex {
 	float thickness;
 	float fade;
 	int entityID;
-} OWL_ALIGN(64);
+};
 
 /**
  * @brief Structure holding line vertex information.
@@ -62,7 +62,7 @@ struct LineVertex {
 	glm::vec3 position;
 	glm::vec4 color;
 	int entityID;
-} OWL_ALIGN(32);
+};
 
 /**
  * @brief Base structure for rendering an object type
@@ -71,7 +71,7 @@ template<typename VertexType>
 struct VertexData {
 	uint32_t indexCount = 0;
 	std::vector<VertexType> vertexBuf;
-} OWL_ALIGN(32);
+};
 
 namespace {
 template<typename VertexType>
@@ -90,7 +90,7 @@ struct internalData {
 	struct CameraData {
 		/// Camera projection
 		glm::mat4 viewProjection;
-	} OWL_ALIGN(64);
+	};
 	CameraData cameraBuffer{};
 	/// Quad Data
 	VertexData<QuadVertex> quad;
@@ -116,8 +116,7 @@ struct internalData {
 	/// next texture index
 	uint32_t textureSlotIndex = 1;// 0 = white texture
 	bool doTriangleDraw = false;
-
-} OWL_ALIGN(128);
+};
 
 glm::mat4 toTransform(const PRS &iTransform) {
 	if (RenderCommand::getApi() == RenderAPI::Type::Vulkan) {
