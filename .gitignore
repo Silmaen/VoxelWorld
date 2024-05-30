@@ -42,3 +42,4 @@ cache
 
 # cmake presets
 /CMakeUserPresets.json
+api.py

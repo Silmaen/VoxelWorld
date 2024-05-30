@@ -32,6 +32,24 @@
     },
     "linux-clang-debug-shared": {
       "image": "builder-clang15-ubuntu2204"
+    },
+    "package-engine-shared": {
+      "image": "builder-clang15-ubuntu2204"
+    },
+    "package-engine-static": {
+      "image": "builder-clang15-ubuntu2204"
+    },
+    "package-app-nest-shared": {
+      "image": "builder-clang15-ubuntu2204"
+    },
+    "package-app-nest-static": {
+      "image": "builder-clang15-ubuntu2204"
+    },
+    "package-app-drone-shared": {
+      "image": "builder-clang15-ubuntu2204"
+    },
+    "package-app-drone-static": {
+      "image": "builder-clang15-ubuntu2204"
     }
   }
 }

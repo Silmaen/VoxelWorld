@@ -21,6 +21,7 @@ packagePath = sourcePath / "output" / "package"
 system_name = ""
 architecture = ""
 distribution = ""
+build_hash = ""
 env = environ.copy()
 env.pop('SDKROOT', None)
 env.pop('CPATH', None)
@@ -44,7 +45,7 @@ def host_system_introspection():
     if system_name == "darwin":
         system_name = "macos"
     mamac = machine()
-    if mamac not in ["x86_64", "AMD64"] and system_name != "macos":
+    if mamac not in ["x86_64", "AMD64"] and system_name == "macos":
         print("Error: Packaging only runs on x86_64 machines or MacOS", file=stderr)
         exit(-666)
 
@@ -104,6 +105,8 @@ def configure(preset: str, clean: bool):
     command = F'cmake --preset {preset}'
     if not is_mobile_compilation(preset) and distribution not in ["", None]:
         command += F' -DOWL_DISTRIBUTION="{distribution}"'
+    if build_hash not in ["", None]:
+        command += F' -DOWL_GIT_HASH="{build_hash}"'
     try:
         if "ios" in preset:
             res = run(command, shell=True, env=env)
@@ -217,11 +220,13 @@ def main():
     """
     Main entry point
     """
+    global build_hash
     host_system_introspection()
     parser = ArgumentParser()
     parser.add_argument("--preset", type=str, help="The preset name")
     parser.add_argument("--no-clean", "-n", action="store_true", help="Do not delete the build folder")
     parser.add_argument("--install-only", "-i", action="store_true", help="Only do a install no package")
+    parser.add_argument("--hash", type=str, help="The current git hash.")
     args = parser.parse_args()
 
     if args.preset in [None, ""]:
@@ -239,6 +244,8 @@ def main():
     packing = True
     if args.install_only:
         packing = False
+    if args.hash not in [None, ""]:
+        build_hash = args.hash
 
     if packing:
         print(F"Running packaging on {system_name} {distribution} {architecture}")

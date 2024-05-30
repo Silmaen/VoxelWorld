@@ -25,6 +25,6 @@ if args.preset in data["images"]:
         print(f"##teamcity[setParameter name='docker_test_platform' value='{result['test_platform']}']")
 print(f"##teamcity[setParameter name='docker_image' value='{image}']")
 
-if result == "notfound":
+if image == "notfound":
     exit(1)
 exit(0)
