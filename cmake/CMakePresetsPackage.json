@@ -137,7 +137,7 @@
       }
     },
     {
-      "name": "packaging-app-drone-static",
+      "name": "package-app-drone-static",
       "displayName": "Package-app-drone-shared",
       "inherits": [
         "packaging-static"
