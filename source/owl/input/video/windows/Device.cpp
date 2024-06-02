@@ -332,14 +332,16 @@ void Device::close() {
 
 bool Device::isOpened() const { return m_size.surface() > 1; }
 
-void Device::fillFrame(shared<renderer::Texture> &frame) {
+void Device::fillFrame(shared<renderer::Texture> &iFrame) {
 	if (!isOpened())
 		return;
 	// Resizing the frame.
 	if (m_size.surface() == 0)
 		return;
-	if (!frame || frame->getSize() != m_size) {
-		frame = renderer::Texture2D::create(m_size, false);
+	if (!iFrame || iFrame->getSize() != m_size) {
+		if (iFrame)
+			iFrame.reset();
+		iFrame = renderer::Texture2D::create(m_size, false);
 	}
 	// For now only fill with black
 	WPointer<IMFSample> sample;
@@ -347,9 +349,9 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 	u_long actualIndex = 0;
 	u_long sampleFlags = MF_SOURCE_READERF_STREAMTICK;
 	while (sampleFlags & MF_SOURCE_READERF_STREAMTICK) {
-		const HRESULT hr = m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &actualIndex,
-													  &sampleFlags, &timestamp, sample.addr());
-		if (FAILED(hr)) {
+		if (const HRESULT hr = m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &actualIndex,
+														  &sampleFlags, &timestamp, sample.addr());
+			FAILED(hr)) {
 			OWL_CORE_WARN("Device ({}): Unable to read sample from device.", m_name)
 			return;
 		}
@@ -369,11 +371,11 @@ void Device::fillFrame(shared<renderer::Texture> &frame) {
 	buffer->Lock(&byteBuffer, nullptr, &bCurLen);
 	std::vector<byte> convertedBuffer = getRgbBuffer(byteBuffer, static_cast<int32_t>(bCurLen));
 	if (m_size.surface() * 3ull != convertedBuffer.size()) {
-		OWL_CORE_WARN("Frame size missmatch {} buffer: {}.", m_size.surface() * 3, convertedBuffer.size())
+		OWL_CORE_WARN("Frame size missmatch {} buffer: {}.", m_size.surface() * 3ull, convertedBuffer.size())
 		buffer->Unlock();
 		return;
 	}
-	frame->setData(convertedBuffer.data(), static_cast<uint32_t>(convertedBuffer.size()));
+	iFrame->setData(convertedBuffer.data(), static_cast<uint32_t>(convertedBuffer.size()));
 	buffer->Unlock();
 }
 

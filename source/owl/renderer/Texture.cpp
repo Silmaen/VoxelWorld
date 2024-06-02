@@ -17,14 +17,12 @@
 
 namespace owl::renderer {
 
-
 Texture::Texture(std::filesystem::path iPath) : m_path{std::move(iPath)} {}
 
 Texture::Texture(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
 	: m_size{iWidth, iHeight}, m_hasAlpha{iWithAlpha} {}
 
-Texture::Texture(math::FrameSize iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {}
-
+Texture::Texture(const math::FrameSize &iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {}
 
 [[nodiscard]] std::string Texture::getSerializeString() const {
 	if (!isLoaded()) {

@@ -129,6 +129,23 @@ public:
 	[[nodiscard]] virtual uint64_t getColorAttachmentRendererId(uint32_t iIndex) const = 0;
 
 	/**
+	 * @brief Returns true if the first byte is the lowest corner.
+	 * @return True if the data starts by the bottom.
+	 */
+	[[nodiscard]] virtual bool isUpsideDown() const { return false; }
+
+	/**
+	 * @brief Get the lower point of the data.
+	 * @return The lower point of the data.
+	 */
+	[[nodiscard]] virtual glm::vec2 getLowerData() const { return {0, 0}; }
+	/**
+	 * @brief Get the upper point of the data.
+	 * @return The upper point of the data.
+	 */
+	[[nodiscard]] virtual glm::vec2 getUpperData() const { return {1, 1}; }
+
+	/**
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */

@@ -119,23 +119,7 @@ void Scene::onUpdateRuntime(const core::Timestep &iTimeStep) {
 	if (mainCamera) {
 		renderer::Renderer2D::resetStats();
 		renderer::Renderer2D::beginScene(*mainCamera, cameraTransform);
-		//draw sprites
-		for (const auto group = registry.group<component::Transform>(entt::get<component::SpriteRenderer>);
-			 auto entity: group) {
-			auto [transform, sprite] = group.get<component::Transform, component::SpriteRenderer>(entity);
-			renderer::Renderer2D::drawSprite(transform.getTransform(), sprite, static_cast<int>(entity));
-		}
-
-		//draw circles
-		for (const auto view = registry.view<component::Transform, component::CircleRenderer>(); auto entity: view) {
-			auto [transform, circle] = view.get<component::Transform, component::CircleRenderer>(entity);
-			renderer::Renderer2D::drawCircle({.transform = transform.getTransform(),
-											  .color = circle.color,
-											  .thickness = circle.thickness,
-											  .fade = circle.fade,
-											  .entityID = static_cast<int>(entity)});
-		}
-
+		render();
 		renderer::Renderer2D::endScene();
 	}
 }
@@ -143,6 +127,19 @@ void Scene::onUpdateRuntime(const core::Timestep &iTimeStep) {
 void Scene::onUpdateEditor([[maybe_unused]] const core::Timestep &iTimeStep, const renderer::CameraEditor &iCamera) {
 	renderer::Renderer2D::resetStats();
 	renderer::Renderer2D::beginScene(iCamera);
+	render();
+	renderer::Renderer2D::endScene();
+}
+
+void Scene::onUpdateOrtho([[maybe_unused]] const core::Timestep &iTimeStep, const renderer::CameraOrtho &iCamera) {
+	renderer::Renderer2D::resetStats();
+	renderer::Renderer2D::beginScene(iCamera);
+	render();
+	renderer::Renderer2D::endScene();
+}
+
+
+void Scene::render() {
 	// Draw sprites
 	for (const auto group = registry.group<component::Transform>(entt::get<component::SpriteRenderer>);
 		 auto entity: group) {
@@ -158,7 +155,6 @@ void Scene::onUpdateEditor([[maybe_unused]] const core::Timestep &iTimeStep, con
 										  .fade = circle.fade,
 										  .entityID = static_cast<int>(entity)});
 	}
-	renderer::Renderer2D::endScene();
 }
 
 void Scene::onViewportResize(const math::FrameSize &iSize) {

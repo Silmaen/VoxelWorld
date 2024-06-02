@@ -9,6 +9,8 @@
 
 #include "CameraEditor.h"
 
+#include "RenderAPI.h"
+#include "RenderCommand.h"
 #include "input/Input.h"
 
 namespace owl::renderer {
@@ -57,6 +59,13 @@ glm::quat CameraEditor::getOrientation() const { return {glm::vec3(-m_pitch, -m_
 void CameraEditor::updateProjection() {
 	m_aspectRatio = m_viewportSize.ratio();
 	m_projection = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearClip, m_farClip);
+	if (RenderCommand::getApi() == RenderAPI::Type::Vulkan) {
+		auto biasMatrix = glm::mat4(1.f);
+		biasMatrix[2][2] = 0.5f;
+		biasMatrix[3][2] = 0.5f;
+		m_projection = biasMatrix * m_projection;
+		m_projection[1][1] *= -1.f;
+	}
 }
 
 void CameraEditor::updateView() {

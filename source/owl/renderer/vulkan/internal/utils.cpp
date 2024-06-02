@@ -113,6 +113,11 @@ void createBuffer(const VkDeviceSize iSize, const VkBufferUsageFlags iUsage, con
 		OWL_CORE_ERROR("Vulkan vertex buffer: failed to bind memory buffer ({}).", resultString(result))
 }
 
+void freeBuffer(const VkDevice &iDevice, const VkBuffer &iBuffer, const VkDeviceMemory &iBufferMemory) {
+	vkFreeMemory(iDevice, iBufferMemory, nullptr);
+	vkDestroyBuffer(iDevice, iBuffer, nullptr);
+}
+
 namespace {
 constexpr VkAccessFlags layoutToAccFlag(const VkImageLayout &iLayout) {
 	if (iLayout == VK_IMAGE_LAYOUT_UNDEFINED)

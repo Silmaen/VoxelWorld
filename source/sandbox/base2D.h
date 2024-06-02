@@ -15,35 +15,39 @@ namespace owl {
 /**
  * @brief Class base2D
  */
-class base2D final : public core::layer::Layer {
+class Base2D final : public core::layer::Layer {
 public:
 	/**
 	 * @brief Default constructor.
 	 */
-	base2D();
-	base2D(const base2D &) = delete;
-	base2D(base2D &&) = delete;
-	base2D &operator=(const base2D &) = delete;
-	base2D &operator=(base2D &&) = delete;
+	Base2D();
+	Base2D(const Base2D &) = delete;
+	Base2D(Base2D &&) = delete;
+	Base2D &operator=(const Base2D &) = delete;
+	Base2D &operator=(Base2D &&) = delete;
 	/**
 	 * @brief Destructor.
 	 */
-	~base2D() override = default;
+	~Base2D() override = default;
 
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const core::Timestep &ts) override;
-	void onEvent(event::Event &event) override;
-	void onImGuiRender(const core::Timestep &ts) override;
+	void onUpdate(const core::Timestep &iTs) override;
+	void onEvent(event::Event &ioEvent) override;
+	void onImGuiRender(const core::Timestep &iTs) override;
 
 private:
-	input::CameraOrthoController cameraController;
+	input::CameraOrthoController m_cameraController;
 
-	glm::vec2 viewportSize = {0.0f, 0.0f};
+	glm::vec2 m_viewportSize = {0.0f, 0.0f};
 
-	shared<renderer::Texture> checkerboardTexture;
-	glm::vec4 squareColor = {0.2f, 0.3f, 0.8f, 1.0f};
+	shared<renderer::Texture> m_checkerboardTexture;
+	glm::vec4 m_squareColor = {0.2f, 0.3f, 0.8f, 1.0f};
 	int32_t m_hoveredEntity = -1;
+
+	shared<renderer::Texture> m_spriteTexture;
+	glm::vec3 m_spritePosition{0, 0, 0.5};
+	float m_spriteRotation{0.f};
 };
 
 }// namespace owl

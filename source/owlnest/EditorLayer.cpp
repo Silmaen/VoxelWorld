@@ -18,6 +18,7 @@ OWL_DIAG_POP
 
 namespace owl {
 
+constexpr ImVec2 vec(glm::vec2 iVec) { return {iVec.x, iVec.y}; }
 
 EditorLayer::EditorLayer() : Layer("EditorLayer"), m_cameraController{1280.0f / 720.0f} {}
 
@@ -198,7 +199,8 @@ void EditorLayer::renderViewport() {
 
 	// NOLINTBEGIN(performance-no-int-to-ptr)
 	if (const uint64_t textureId = m_framebuffer->getColorAttachmentRendererId(0); textureId != 0)
-		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
+		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, vec(m_framebuffer->getLowerData()),
+					 vec(m_framebuffer->getUpperData()));
 	// NOLINTEND(performance-no-int-to-ptr)
 
 	if (ImGui::BeginDragDropTarget()) {
@@ -237,7 +239,9 @@ void EditorLayer::renderGizmo() {
 		// glm::mat4 cameraView = glm::inverse(cameraEntity.getComponent<scene::component::Transform>().getTransform());
 
 		// Editor camera
-		const glm::mat4 &cameraProjection = m_editorCamera.getProjection();
+		glm::mat4 cameraProjection = m_editorCamera.getProjection();
+		if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan)
+			cameraProjection[1][1] *= -1.f;
 		glm::mat4 cameraView = m_editorCamera.getViewMatrix();
 
 		// Entity transform

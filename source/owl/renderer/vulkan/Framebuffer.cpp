@@ -120,11 +120,6 @@ void Framebuffer::deepCleanup() {
 		vkDestroyRenderPass(vkc.getLogicalDevice(), m_renderPass, nullptr);
 		m_renderPass = nullptr;
 	}
-
-	if (m_swapChain != nullptr) {
-		vkDestroySwapchainKHR(vkc.getLogicalDevice(), m_swapChain, nullptr);
-		m_swapChain = nullptr;
-	}
 }
 
 void Framebuffer::cleanup() {
@@ -153,6 +148,10 @@ void Framebuffer::cleanup() {
 		}
 	}
 	m_images.clear();
+	if (m_swapChain != nullptr) {
+		vkDestroySwapchainKHR(vkc.getLogicalDevice(), m_swapChain, nullptr);
+		m_swapChain = nullptr;
+	}
 }
 
 int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const int iY) {
@@ -191,12 +190,15 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to allocate staging buffer memory ({}).", m_specs.debugName,
 						   internal::resultString(result))
+			vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
 			return 0;
 		}
 		if (const VkResult result = vkBindBufferMemory(vkc.getLogicalDevice(), stagingBuffer, stagingBufferMemory, 0);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to bind staging buffer memory ({}).", m_specs.debugName,
 						   internal::resultString(result))
+			vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
+			vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
 			return 0;
 		}
 	}
@@ -213,10 +215,14 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 		result != VK_SUCCESS) {
 		OWL_CORE_ERROR("Vulkan Framebuffer ({}): failed to map memory ({}).", m_specs.debugName,
 					   internal::resultString(result))
+		vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
+		vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
 		return 0;
 	}
 	int32_t pixel = 0;
 	memcpy(&pixel, data, internal::attachmentFormatToSize(format));
+	vkDestroyBuffer(vkc.getLogicalDevice(), stagingBuffer, nullptr);
+	vkFreeMemory(vkc.getLogicalDevice(), stagingBufferMemory, nullptr);
 	return pixel;
 }
 
@@ -574,8 +580,8 @@ void Framebuffer::createDescriptorSets() {
 	const VkSamplerCreateInfo samplerInfo{.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
 										  .pNext = nullptr,
 										  .flags = {},
-										  .magFilter = VK_FILTER_NEAREST,
-										  .minFilter = VK_FILTER_NEAREST,
+										  .magFilter = VK_FILTER_LINEAR,
+										  .minFilter = VK_FILTER_LINEAR,
 										  .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
 										  .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
 										  .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
@@ -583,11 +589,11 @@ void Framebuffer::createDescriptorSets() {
 										  .mipLodBias = {},
 										  .anisotropyEnable = VK_TRUE,
 										  .maxAnisotropy = core.getMaxSamplerAnisotropy(),
-										  .compareEnable = VK_FALSE,
-										  .compareOp = VK_COMPARE_OP_ALWAYS,
-										  .minLod = {},
-										  .maxLod = {},
-										  .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+										  .compareEnable = VK_TRUE,
+										  .compareOp = VK_COMPARE_OP_LESS,
+										  .minLod = -1000,
+										  .maxLod = 1000,
+										  .borderColor = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK,
 										  .unnormalizedCoordinates = VK_FALSE};
 	static constexpr VkDescriptorSetLayoutBinding samplerLayoutBinding{
 			.binding = 0,

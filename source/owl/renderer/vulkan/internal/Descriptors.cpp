@@ -90,6 +90,95 @@ void TextureData::createDescriptorSet() {
 	vkUpdateDescriptorSets(core.getLogicalDevice(), 1, &wrt, 0, nullptr);
 }
 
+void TextureData::createView() {
+	const auto &vkc = internal::VulkanCore::get();
+	const VkImageViewCreateInfo createInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+										   .pNext = nullptr,
+										   .flags = {},
+										   .image = textureImage,
+										   .viewType = VK_IMAGE_VIEW_TYPE_2D,
+										   .format = VK_FORMAT_R8G8B8A8_UNORM,
+										   .components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
+														  VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
+										   .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+																.baseMipLevel = 0,
+																.levelCount = 1,
+																.baseArrayLayer = 0,
+																.layerCount = 1}};
+	if (textureImageView)
+		vkDestroyImageView(vkc.getLogicalDevice(), textureImageView, nullptr);
+	if (const VkResult result = vkCreateImageView(vkc.getLogicalDevice(), &createInfo, nullptr, &textureImageView);
+		result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan Texture: Error creating image views ({}).", internal::resultString(result))
+	}
+}
+
+void TextureData::createSampler() {
+	const auto &vkc = internal::VulkanCore::get();
+	const VkSamplerCreateInfo samplerInfo{.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+										  .pNext = nullptr,
+										  .flags = {},
+										  .magFilter = VK_FILTER_LINEAR,
+										  .minFilter = VK_FILTER_LINEAR,
+										  .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+										  .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+										  .mipLodBias = {},
+										  .anisotropyEnable = VK_TRUE,
+										  .maxAnisotropy = vkc.getMaxSamplerAnisotropy(),
+										  .compareEnable = VK_TRUE,
+										  .compareOp = VK_COMPARE_OP_LESS,
+										  .minLod = -1000,
+										  .maxLod = 1000,
+										  .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+										  .unnormalizedCoordinates = VK_FALSE};
+	if (textureSampler)
+		vkDestroySampler(vkc.getLogicalDevice(), textureSampler, nullptr);
+	if (const VkResult result = vkCreateSampler(vkc.getLogicalDevice(), &samplerInfo, nullptr, &textureSampler);
+		result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan Texture: Error creating texture sampler ({}).", internal::resultString(result))
+	}
+}
+void TextureData::createImage(const math::FrameSize &iDimensions) {
+	freeTrexture();
+	const auto &vkc = internal::VulkanCore::get();
+	const VkImageCreateInfo imageInfo{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = {},
+			.imageType = VK_IMAGE_TYPE_2D,
+			.format = VK_FORMAT_R8G8B8A8_UNORM,
+			.extent = {.width = iDimensions.getWidth(), .height = iDimensions.getHeight(), .depth = 1},
+			.mipLevels = 1,
+			.arrayLayers = 1,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.tiling = VK_IMAGE_TILING_OPTIMAL,
+			.usage = static_cast<uint32_t>(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT) |
+					 static_cast<uint32_t>(VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT),
+			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+			.queueFamilyIndexCount = 0,
+			.pQueueFamilyIndices = nullptr,
+			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
+	if (const VkResult result = vkCreateImage(vkc.getLogicalDevice(), &imageInfo, nullptr, &textureImage);
+		result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan Texture: failed to create image ({}).", internal::resultString(result))
+		return;
+	}
+	VkMemoryRequirements memRequirements;
+	vkGetImageMemoryRequirements(vkc.getLogicalDevice(), textureImage, &memRequirements);
+	const VkMemoryAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+										 .pNext = nullptr,
+										 .allocationSize = memRequirements.size,
+										 .memoryTypeIndex = vkc.findMemoryTypeIndex(
+												 memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)};
+	if (const VkResult result = vkAllocateMemory(vkc.getLogicalDevice(), &allocInfo, nullptr, &textureImageMemory);
+		result != VK_SUCCESS) {
+		OWL_CORE_ERROR("Vulkan Texture: failed to allocate image memory ({}).", internal::resultString(result))
+		return;
+	}
+}
+
 Descriptors::Descriptors() = default;
 
 Descriptors::~Descriptors() { release(); }
@@ -252,6 +341,13 @@ uint32_t Descriptors::registerNewTexture() {
 	++m_nextId;
 	m_textures[m_nextId] = TextureData{};
 	return m_nextId;
+}
+
+
+bool Descriptors::isTextureRegistered(const uint32_t iIndex) const {
+	if (iIndex == 0)
+		return false;
+	return m_textures.contains(iIndex);
 }
 
 TextureData &Descriptors::getTextureData(const uint32_t iIndex) { return m_textures.at(iIndex); }
