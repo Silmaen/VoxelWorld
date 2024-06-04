@@ -80,6 +80,23 @@ public:
 	}
 
 	/**
+	 * @brief Returns true if the first byte is the lowest corner.
+	 * @return True if the data starts by the bottom.
+	 */
+	[[nodiscard]] bool isUpsideDown() const override { return true; }
+
+	/**
+	 * @brief Get the lower point of the data.
+	 * @return The lower point of the data.
+	 */
+	[[nodiscard]] glm::vec2 getLowerData() const override { return {0, 1}; }
+	/**
+	 * @brief Get the upper point of the data.
+	 * @return The upper point of the data.
+	 */
+	[[nodiscard]] glm::vec2 getUpperData() const override { return {1, 0}; }
+
+	/**
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */

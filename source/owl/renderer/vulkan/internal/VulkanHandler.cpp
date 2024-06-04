@@ -104,8 +104,8 @@ ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo(std::vector<VkFormat> &ioFo
 											.viewMask = 0,
 											.colorAttachmentCount = static_cast<uint32_t>(ioFormats.size()),
 											.pColorAttachmentFormats = ioFormats.data(),
-											.depthAttachmentFormat = VK_FORMAT_UNDEFINED,
-											.stencilAttachmentFormat = VK_FORMAT_UNDEFINED},
+											.depthAttachmentFormat = VK_FORMAT_D24_UNORM_S8_UINT,
+											.stencilAttachmentFormat = VK_FORMAT_D24_UNORM_S8_UINT},
 			.Allocator = nullptr,
 			.CheckVkResultFn = func,
 			.MinAllocationSize = 1048576u};
@@ -212,7 +212,7 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			 .dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
 			 .colorBlendOp = VK_BLEND_OP_ADD,
 			 .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
-			 .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+			 .dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
 			 .alphaBlendOp = VK_BLEND_OP_ADD,
 			 .colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
 							   VK_COLOR_COMPONENT_A_BIT},
@@ -245,12 +245,24 @@ int32_t VulkanHandler::pushPipeline(const std::string &iPipeLineName,
 			.pNext = nullptr,
 			.flags = {},
 			.depthTestEnable = VK_TRUE,
-			.depthWriteEnable = VK_TRUE,
+			.depthWriteEnable = VK_FALSE,
 			.depthCompareOp = VK_COMPARE_OP_LESS,
 			.depthBoundsTestEnable = VK_FALSE,
 			.stencilTestEnable = VK_FALSE,
-			.front = {},
-			.back = {},
+			.front = {.failOp = VK_STENCIL_OP_KEEP,
+					  .passOp = VK_STENCIL_OP_KEEP,
+					  .depthFailOp = VK_STENCIL_OP_KEEP,
+					  .compareOp = VK_COMPARE_OP_ALWAYS,
+					  .compareMask = 0,
+					  .writeMask = 0,
+					  .reference = 0},
+			.back = {.failOp = VK_STENCIL_OP_KEEP,
+					 .passOp = VK_STENCIL_OP_KEEP,
+					 .depthFailOp = VK_STENCIL_OP_KEEP,
+					 .compareOp = VK_COMPARE_OP_ALWAYS,
+					 .compareMask = 0,
+					 .writeMask = 0,
+					 .reference = 0},
 			.minDepthBounds = 0.0f,
 			.maxDepthBounds = 1.0f};
 	const VkGraphicsPipelineCreateInfo pipelineInfo{.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -480,7 +492,6 @@ void VulkanHandler::setResize() {
 	core.updateSurfaceInformations();
 	m_resize = true;
 }
-
 
 void VulkanHandler::bindFramebuffer(Framebuffer *iFrameBuffer) { m_currentframebuffer = iFrameBuffer; }
 

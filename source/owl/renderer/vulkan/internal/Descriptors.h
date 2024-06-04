@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include "math/sizingTypes.h"
+
+
 #include <vulkan/vulkan.h>
 
 namespace owl::renderer::vulkan::internal {
@@ -25,6 +28,9 @@ struct TextureData {
 
 	void freeTrexture();
 	void createDescriptorSet();
+	void createView();
+	void createSampler();
+	void createImage(const math::FrameSize &iDimensions);
 };
 
 /**
@@ -78,6 +84,8 @@ public:
 	void bindTextureImage(uint32_t iIndex);
 
 	void unregisterTexture(uint32_t iIndex);
+
+	[[nodiscard]] bool isTextureRegistered(uint32_t iIndex) const;
 
 	void setUniformData(const void *iData, size_t iSize) const;
 

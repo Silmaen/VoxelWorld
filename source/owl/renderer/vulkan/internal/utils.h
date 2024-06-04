@@ -124,6 +124,9 @@ void copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, VkDevice
 
 void createBuffer(VkDeviceSize iSize, VkBufferUsageFlags iUsage, VkMemoryPropertyFlags iProperties, VkBuffer &iBuffer,
 				  VkDeviceMemory &iBufferMemory);
+
+void freeBuffer(const VkDevice &iDevice, const VkBuffer &iBuffer, const VkDeviceMemory &iBufferMemory);
+
 void transitionImageLayout(const VkImage &iImage, VkImageLayout iOldLayout, VkImageLayout iNewLayout);
 void transitionImageLayout(const VkCommandBuffer &iCmd, const VkImage &iImage, VkImageLayout iOldLayout,
 						   VkImageLayout iNewLayout);

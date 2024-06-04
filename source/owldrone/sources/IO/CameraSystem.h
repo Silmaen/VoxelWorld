@@ -38,21 +38,21 @@ public:
 	/**
 	 * @brief Frame update of the camera
 	 */
-	void onUpdate(const owl::core::Timestep &ts);
+	void onUpdate(const owl::core::Timestep &iTs);
 
 	/**
 	 * @brief Get the camera frame.
 	 * @return The camera frame.
 	 */
-	[[nodiscard]] const owl::shared<owl::renderer::Texture> &getFrame() const { return frame; }
+	[[nodiscard]] const owl::shared<owl::renderer::Texture> &getFrame() const { return m_frame; }
 
 	/**
 	 * @brief Set the camera by its ID.
-	 * @param[in] id Id of the camera.
+	 * @param[in] iId Id of the camera.
 	 *
 	 * @note If the Camera does not match an id of the list, id will be set to 0.
 	 */
-	void setCamera(int32_t id);
+	void setCamera(int32_t iId);
 
 	/**
 	 * @brief Get the current Camera Id.
@@ -87,15 +87,15 @@ private:
 	 */
 	CameraSystem();
 
-	void resize(const owl::math::FrameSize &size);
+	void resize(const owl::math::FrameSize &iSize);
 
-	owl::math::FrameSize size;
+	owl::math::FrameSize m_size;
 
-	int32_t frameSkip = 0;
-	int32_t frameCheck = 50;
-	int32_t frameCount = 0;
+	int32_t m_frameSkip = 0;
+	int32_t m_frameCheck = 50;
+	int32_t m_frameCount = 0;
 
-	owl::shared<owl::renderer::Texture> frame;
+	owl::shared<owl::renderer::Texture> m_frame;
 };
 
 }// namespace drone::IO

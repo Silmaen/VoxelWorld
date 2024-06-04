@@ -8,6 +8,9 @@
 #include "owlpch.h"
 
 #include "SceneCamera.h"
+
+#include "renderer/RenderCommand.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace owl::scene {
@@ -46,8 +49,14 @@ void SceneCamera::recalculateProjection() {
 		const float orthoRight = m_orthographicSize * m_aspectRatio * 0.5f;
 		const float orthoBottom = -m_orthographicSize * 0.5f;
 		const float orthoTop = m_orthographicSize * 0.5f;
-		m_projection = glm::ortho(orthoLeft, orthoRight,
-								  orthoBottom, orthoTop, m_orthographicNear, m_orthographicFar);
+		m_projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_orthographicNear, m_orthographicFar);
+	}
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
+		auto biasMatrix = glm::mat4(1.f);
+		biasMatrix[2][2] = 0.5f;
+		biasMatrix[3][2] = 0.5f;
+		m_projection = biasMatrix * m_projection;
+		m_projection[1][1] *= -1.f;
 	}
 }
 

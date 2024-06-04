@@ -46,7 +46,7 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha Texture has alpha channel.
 	 */
-	explicit Texture(math::FrameSize iSize, bool iWithAlpha = true);
+	explicit Texture(const math::FrameSize &iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Comparison operator.

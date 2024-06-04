@@ -13,6 +13,8 @@ using namespace owl;
 
 namespace drone::panels {
 
+constexpr ImVec2 vec(glm::vec2 iVec) { return {iVec.x, iVec.y}; }
+
 Viewport::Viewport() {
 	const renderer::FramebufferSpecification specs{
 			.size = {1280, 720},
@@ -89,7 +91,8 @@ void Viewport::onRender() {
 	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	m_viewportSize = {static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y)};
 	if (const uint64_t textureId = mp_framebuffer->getColorAttachmentRendererId(0); textureId != 0)
-		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
+		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, vec(mp_framebuffer->getLowerData()),
+					 vec(mp_framebuffer->getUpperData()));
 
 	if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {

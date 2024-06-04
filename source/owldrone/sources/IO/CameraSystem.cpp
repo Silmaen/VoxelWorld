@@ -14,15 +14,19 @@ CameraSystem::CameraSystem() { resize({1, 1}); }
 
 CameraSystem::~CameraSystem() = default;
 
-void CameraSystem::onUpdate(const owl::core::Timestep &ts) {
-	++frameCount;
+void CameraSystem::onUpdate(const owl::core::Timestep &iTs) {
+	++m_frameCount;
 	auto &cameraManager = owl::input::video::Manager::get();
 	auto &settings = IO::DroneSettings::get();
 
 	// read image from camera
-	if (frameCount % frameCheck == 0) {
-		if (const size_t nbCam = cameraManager.getDeviceCount(); nbCam == 0) { settings.useCamera = false; } else {
-			if (settings.cameraId > static_cast<int32_t>(nbCam)) { settings.cameraId = 0; }
+	if (m_frameCount % m_frameCheck == 0) {
+		if (const size_t nbCam = cameraManager.getDeviceCount(); nbCam == 0) {
+			settings.useCamera = false;
+		} else {
+			if (settings.cameraId > static_cast<int32_t>(nbCam)) {
+				settings.cameraId = 0;
+			}
 		}
 		if (!cameraManager.isOpened()) {
 			// open the right one
@@ -32,29 +36,33 @@ void CameraSystem::onUpdate(const owl::core::Timestep &ts) {
 			}
 		}
 		if (cameraManager.isOpened()) {
-			if (!settings.useCamera) { cameraManager.close(); }
+			if (!settings.useCamera) {
+				cameraManager.close();
+			}
 			// Define the frameSkip
-			if (const float frameRateTs = ts.getStabilizedFps(); frameRateTs > 0) {
-				frameSkip = static_cast<int32_t>(240.f / frameRateTs);
+			if (const float frameRateTs = iTs.getStabilizedFps(); frameRateTs > 0) {
+				m_frameSkip = static_cast<int32_t>(240.f / frameRateTs);
 			}
 		}
 	}
 
-	if (frameSkip <= 0 || frameCount % frameSkip == 0) {
-		if (cameraManager.isOpened()) { cameraManager.fillFrame(frame); } else {
+	if (m_frameSkip <= 0 || m_frameCount % m_frameSkip == 0) {
+		if (cameraManager.isOpened()) {
+			cameraManager.fillFrame(m_frame);
+		} else {
 			resize({1, 1});
 			uint8_t color[] = {45, 87, 96};
-			frame->setData(&color, 3);
+			m_frame->setData(&color, 3);
 		}
 	}
 }
 
-void CameraSystem::resize(const owl::math::FrameSize &_size) {
-	if (_size == size)
+void CameraSystem::resize(const owl::math::FrameSize &iSize) {
+	if (iSize == m_size)
 		return;
-	size = _size;
-	frame.reset();
-	frame = owl::renderer::Texture2D::create(size, false);
+	m_size = iSize;
+	m_frame.reset();
+	m_frame = owl::renderer::Texture2D::create(m_size, false);
 }
 
 void CameraSystem::setCamera(int32_t iId) {
@@ -89,11 +97,11 @@ std::string CameraSystem::getCurrentCameraName() const {
 }
 
 void CameraSystem::invalidate() {
-	size = {0, 0};
-	frameSkip = 0;
-	frameCheck = 50;
-	frameCount = 0;
-	frame.reset();
+	m_size = {0, 0};
+	m_frameSkip = 0;
+	m_frameCheck = 50;
+	m_frameCount = 0;
+	m_frame.reset();
 }
 
 }// namespace drone::IO

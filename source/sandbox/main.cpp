@@ -17,7 +17,7 @@ OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 class Sandbox final : public owl::core::Application {
 public:
 	explicit Sandbox(const owl::core::AppParams &param) : Application(param) {
-		pushLayer(owl::mkShared<owl::base2D>());
+		pushLayer(owl::mkShared<owl::Base2D>());
 	}
 };
 OWL_DIAG_POP

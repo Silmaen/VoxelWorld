@@ -18,6 +18,8 @@ using namespace owl;
 
 namespace drone::panels {
 
+constexpr ImVec2 vec(glm::vec2 iVec) { return {iVec.x, iVec.y}; }
+
 Gauges::Gauges() {
 
 	const renderer::FramebufferSpecification specs{
@@ -132,7 +134,8 @@ void Gauges::onRender() {
 	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	m_viewportSize = {static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y)};
 	if (const uint64_t textureId = m_framebuffer->getColorAttachmentRendererId(0); textureId != 0)
-		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, ImVec2{0, 1}, ImVec2{1, 0});
+		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, vec(m_framebuffer->getLowerData()),
+					 vec(m_framebuffer->getUpperData()));
 	else
 		OWL_WARN("No frameBuffer to render...")
 

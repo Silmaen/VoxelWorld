@@ -22,44 +22,44 @@ namespace YAML {
 
 template<>
 struct convert<glm::vec3> {
-	static Node encode(const glm::vec3 &rhs) {
+	static Node encode(const glm::vec3 &iRhs) {
 		Node node;
-		node.push_back(rhs.x);
-		node.push_back(rhs.y);
-		node.push_back(rhs.z);
+		node.push_back(iRhs.x);
+		node.push_back(iRhs.y);
+		node.push_back(iRhs.z);
 		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec3 &rhs) {
-		if (!node.IsSequence() || node.size() != 3)
+	static bool decode(const Node &iNode, glm::vec3 &iRhs) {
+		if (!iNode.IsSequence() || iNode.size() != 3)
 			return false;
-		rhs.x = node[0].as<float>();
-		rhs.y = node[1].as<float>();
-		rhs.z = node[2].as<float>();
+		iRhs.x = iNode[0].as<float>();
+		iRhs.y = iNode[1].as<float>();
+		iRhs.z = iNode[2].as<float>();
 		return true;
 	}
 };
 
 template<>
 struct convert<glm::vec4> {
-	static Node encode(const glm::vec4 &rhs) {
+	static Node encode(const glm::vec4 &iRhs) {
 		Node node;
-		node.push_back(rhs.x);
-		node.push_back(rhs.y);
-		node.push_back(rhs.z);
-		node.push_back(rhs.w);
+		node.push_back(iRhs.x);
+		node.push_back(iRhs.y);
+		node.push_back(iRhs.z);
+		node.push_back(iRhs.w);
 		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec4 &rhs) {
-		if (!node.IsSequence() || node.size() != 4)
+	static bool decode(const Node &iNode, glm::vec4 &iRhs) {
+		if (!iNode.IsSequence() || iNode.size() != 4)
 			return false;
-		rhs.x = node[0].as<float>();
-		rhs.y = node[1].as<float>();
-		rhs.z = node[2].as<float>();
-		rhs.w = node[3].as<float>();
+		iRhs.x = iNode[0].as<float>();
+		iRhs.y = iNode[1].as<float>();
+		iRhs.z = iNode[2].as<float>();
+		iRhs.w = iNode[3].as<float>();
 		return true;
 	}
 };
