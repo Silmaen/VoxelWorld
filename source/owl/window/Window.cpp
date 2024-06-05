@@ -12,18 +12,18 @@
 #include "glfw/Window.h"
 #include "null/Window.h"
 
-namespace owl::input {
+namespace owl::window {
 
 uniq<Window> Window::create(const Properties &iProps) {
-	switch (iProps.winType) {
-		case Type::GLFW:
-			return mkUniq<glfw::Window>(iProps);
-		case Type::Null:
-			return mkUniq<null::Window>(iProps);
-	}
-	return nullptr;
+    switch (iProps.winType) {
+        case Type::GLFW:
+            return mkUniq<glfw::Window>(iProps);
+        case Type::Null:
+            return mkUniq<null::Window>(iProps);
+    }
+    return nullptr;
 }
 
 Window::~Window() = default;
 
-}// namespace owl::input
+}// namespace owl::window

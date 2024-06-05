@@ -5,23 +5,23 @@
 using namespace owl::input;
 
 TEST(input, Input_uninitialized) {
-	EXPECT_FALSE(Input::isMouseButtonPressed(0));
-	EXPECT_FALSE(Input::isKeyPressed(0));
-	EXPECT_EQ(Input::getMouseX(), 0);
-	EXPECT_EQ(Input::getMouseY(), 0);
-	const auto pos = Input::getMousePos();
-	Input::injectKey(0);
-	Input::injectMouseButton(0);
-	Input::injectMousePos(pos);
-	EXPECT_EQ(pos.x, 0);
-	EXPECT_EQ(pos.y, 0);
-	Input::invalidate();
+    EXPECT_FALSE(Input::isMouseButtonPressed(0));
+    EXPECT_FALSE(Input::isKeyPressed(0));
+    EXPECT_EQ(Input::getMouseX(), 0);
+    EXPECT_EQ(Input::getMouseY(), 0);
+    const auto pos = Input::getMousePos();
+    Input::injectKey(0);
+    Input::injectMouseButton(0);
+    Input::injectMousePos(pos);
+    EXPECT_EQ(pos.x, 0);
+    EXPECT_EQ(pos.y, 0);
+    Input::invalidate();
 }
 
 TEST(input, Input_doubleinit) {
-	Input::init(Type::GLFW);
-	Input::init(Type::Null);
-	Input::injectKey(3);
-	EXPECT_TRUE(Input::isKeyPressed(3));
-	Input::invalidate();
+    Input::init(owl::window::Type::GLFW);
+    Input::init(owl::window::Type::Null);
+    Input::injectKey(3);
+    EXPECT_TRUE(Input::isKeyPressed(3));
+    Input::invalidate();
 }

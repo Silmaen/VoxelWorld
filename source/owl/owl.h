@@ -41,10 +41,10 @@
 #include "gui/UiLayer.h"
 #include "input/CameraOrthoController.h"
 #include "input/Input.h"
-#include "input/Window.h"
-#include "input/video/Manager.h"
+#include "io/video/Manager.h"
 #include "math/Transform.h"
 #include "math/simpleFunctions.h"
+#include "window/Window.h"
 
 // ------- scene -----------
 #include "scene/Entity.h"
