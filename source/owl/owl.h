@@ -41,6 +41,7 @@
 #include "gui/UiLayer.h"
 #include "input/CameraOrthoController.h"
 #include "input/Input.h"
+#include "io/serial/Manager.h"
 #include "io/video/Manager.h"
 #include "math/Transform.h"
 #include "math/simpleFunctions.h"

@@ -26,6 +26,8 @@ if (OWL_PLATFORM_WINDOWS)
     # for web cam identification
     target_link_libraries(${CMAKE_PROJECT_NAME}drone PRIVATE strmiids)
 endif ()
+find_package(MAVSDK REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}drone PRIVATE MAVSDK::mavsdk)
 
 # ----==== third party ====----
 

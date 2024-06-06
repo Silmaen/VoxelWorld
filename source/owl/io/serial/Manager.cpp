@@ -54,7 +54,7 @@ void enumerateSerialDevices(Manager::deviceList &ioListToUpdate) {
                 // todo: get device informations
                 std::string name = "usbserial";
                 OWL_CORE_TRACE("Serial Found: ({}) [{}] ", port.c_str(), name.c_str())
-                ioListToUpdate.emplace_back({std::move(port), std::move(name), ""});
+                ioListToUpdate.emplace_back(std::move(port), std::move(name), "");
             }
         }
     } else {
@@ -74,5 +74,24 @@ void Manager::updateDeviceList() {
     // list COM Ports
     enumerateSerialDevices(m_devices);
 }
+
+shared<Device> Manager::getDeviceByName(const std::string &iName) const {
+    const auto it = std::ranges::find_if(m_devices.begin(), m_devices.end(),
+                                         [&iName](const Device &T) { return T.name() == iName; });
+    if (it == m_devices.end())
+        return nullptr;
+    return owl::mkShared<Device>(*it);
+}
+
+shared<Device> Manager::getDeviceByPort(const std::string &iPort) const {
+    const auto it = std::ranges::find_if(m_devices.begin(), m_devices.end(),
+                                         [&iPort](const Device &T) { return T.port() == iPort; });
+    if (it == m_devices.end())
+        return nullptr;
+    return owl::mkShared<Device>(*it);
+}
+
+void Manager::setCurrentDevice(const std::string &iPort) { m_currentDevice = getDeviceByPort(iPort); }
+
 
 }// namespace owl::io::serial

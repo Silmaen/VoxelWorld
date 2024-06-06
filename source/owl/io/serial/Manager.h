@@ -55,6 +55,38 @@ public:
      */
     [[nodiscard]] bool hasDevice() const { return !m_devices.empty(); }
 
+    /**
+     * @brief Get all the devices.
+     * @return List of all devices.
+     */
+    [[nodiscard]] const deviceList &getAllDevices() const { return m_devices; }
+
+    /**
+     * @brief Get device by its name.
+     * @param iName Name of device.
+     * @return Pointer to the device of nullptr if not exists.
+     */
+    [[nodiscard]] shared<Device> getDeviceByName(const std::string &iName) const;
+
+    /**
+    * @brief Get device by its port.
+    * @param iPort Port of device.
+    * @return Pointer to the device of nullptr if not exists.
+    */
+    [[nodiscard]] shared<Device> getDeviceByPort(const std::string &iPort) const;
+
+    /**
+     * @brief Define the new current device.
+     * @param iPort The port of the new current device.
+     */
+    void setCurrentDevice(const std::string &iPort);
+
+    /**
+     * @brief Get a pointer to the current Device.
+     * @return Pointer to the current device.
+     */
+    [[nodiscard]] const shared<Device> &getCurrentDevice() const { return m_currentDevice; }
+
 private:
     /**
      * @brief Default Constructor.
@@ -62,6 +94,8 @@ private:
     Manager();
     /// List of device names.
     deviceList m_devices;
+    /// Pointer to the current device.
+    shared<Device> m_currentDevice = nullptr;
 };
 
 }// namespace owl::io::serial

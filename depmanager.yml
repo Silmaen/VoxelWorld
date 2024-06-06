@@ -1,6 +1,7 @@
 packages:
   googletest:
   cpptrace:
+  curl:
   debugbreak:
   entt:
   libdwarf:
@@ -12,11 +13,13 @@ packages:
   glm:
   imgui:
   imguizmo:
+  jsoncpp:
   mavsdk:
-  spdlog:
-  yaml-cpp:
   nfd:
+  spdlog:
+  tinyxml2:
   vulkan_sdk:
     kind: "shared"
-  zstd:
+  yaml-cpp:
   zlib:
+  zstd:
