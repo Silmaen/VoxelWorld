@@ -14,6 +14,7 @@
 #include "input/Window.h"
 #include "layer/LayerStack.h"
 #include "renderer/RenderAPI.h"
+#include <filesystem>
 
 int main(int iArgc, char *iArgv[]);
 

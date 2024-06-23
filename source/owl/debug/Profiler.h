@@ -8,6 +8,7 @@
 #pragma once
 
 #include "core/Log.h"
+#include <fstream>
 
 namespace owl::debug {
 

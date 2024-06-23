@@ -78,6 +78,7 @@ void Window::init(const Properties &iProps) {
 		++s_glfwWindowCount;
 	}
 	// Set icon
+#ifndef OWL_PLATFORM_LINUX
 	GLFWimage icon;
 	int channels = 0;
 	if (!iProps.iconPath.empty()) {
@@ -85,6 +86,7 @@ void Window::init(const Properties &iProps) {
 		glfwSetWindowIcon(mp_glfwWindow, 1, &icon);
 		stbi_image_free(icon.pixels);
 	}
+#endif
 
 	mu_context = renderer::GraphContext::create(mp_glfwWindow);
 	mu_context->init();

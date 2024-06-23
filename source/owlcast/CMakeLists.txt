@@ -1,7 +1,7 @@
 #
 #  Main Executable
 #
-set(OWL_PROJECT ${CMAKE_PROJECT_NAME}Drone)
+set(OWL_PROJECT ${CMAKE_PROJECT_NAME}Cast)
 
 file(GLOB_RECURSE SRCS
         sources/*.cpp
@@ -19,15 +19,14 @@ target_link_libraries(${OWL_PROJECT} PRIVATE
         ${ENGINE_NAME}
 )
 
-target_compile_definitions(${OWL_PROJECT} PRIVATE OWL_ASSETS_LOCATION="source/owldrone/assets")
+target_compile_definitions(${OWL_PROJECT} PRIVATE OWL_ASSETS_LOCATION="source/owlcast/assets")
 
 target_import_so_files(${OWL_PROJECT})
 # ----==== third party ====----
 
-if (OWL_PLATFORM_WINDOWS)
-    # for web cam identification
-    target_link_libraries(${OWL_PROJECT} PRIVATE strmiids)
-endif ()
+# magic_enum
+find_package(magic_enum REQUIRED)
+target_link_libraries(${OWL_PROJECT} PRIVATE magic_enum::magic_enum)
 
 # ----==== third party ====----
 
