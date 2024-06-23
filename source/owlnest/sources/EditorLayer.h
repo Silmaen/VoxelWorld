@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <owl.h>
+#include <../../owl/owl.h>
 
 #include "panel/ContentBrowser.h"
 #include "panel/SceneHierarchy.h"

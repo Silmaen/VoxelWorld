@@ -14,6 +14,8 @@
 #include "opengl/Shader.h"
 #include "vulkan/Shader.h"
 
+#include <magic_enum.hpp>
+
 namespace owl::renderer {
 
 shared<Shader> Shader::create(const std::string &iShaderName, const std::string &iRenderer) {
@@ -45,7 +47,9 @@ shared<Shader> Shader::create(const std::string &iShaderName, const std::string 
 			OWL_CORE_WARN("Not able to find Shader {} in {}", iShaderName, iFile.string())
 			return nullptr;
 		}
-	} else { sources = {iFile}; }
+	} else {
+		sources = {iFile};
+	}
 	OWL_CORE_TRACE("Try to create shader {} for renderer {} / API {}.", iShaderName, iRenderer,
 				   magic_enum::enum_name(RenderCommand::getApi()))
 	switch (RenderCommand::getApi()) {

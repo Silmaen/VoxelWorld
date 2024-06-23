@@ -18,6 +18,7 @@ option(${PRJPREFIX}_DOC_ONLY "To only generate documentation" OFF)
 option(${PRJPREFIX}_BUILD_NEST "If wanted to generate Owl Nest" ON)
 option(${PRJPREFIX}_BUILD_SANDBOX "If wanted to generate Sandbox" ON)
 option(${PRJPREFIX}_BUILD_DRONE "If wanted to generate OWl Drone" ON)
+option(${PRJPREFIX}_BUILD_CAST "If wanted to generate OWl Cast" ON)
 
 option(${PRJPREFIX}_TESTING "Enable the unit tests" ON)
 option(${PRJPREFIX}_ENABLE_COVERAGE "Run code coverage during test run" OFF)

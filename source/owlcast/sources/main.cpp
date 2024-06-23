@@ -15,20 +15,20 @@ namespace owl {
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
-class OwlNest final : public core::Application {
+class OwlCast final : public core::Application {
 public:
-	OwlNest() = delete;
-	explicit OwlNest(const core::AppParams &param) : core::Application(param) {
+	OwlCast() = delete;
+	explicit OwlCast(const core::AppParams &param) : core::Application(param) {
 		if (getState() == core::Application::State::Running)
-			pushLayer(mkShared<EditorLayer>());
+			pushLayer(mkShared<raycaster::EditorLayer>());
 	}
 };
 OWL_DIAG_POP
 
 shared<core::Application> core::createApplication(int argc, char **argv) {
-	return mkShared<OwlNest>(core::AppParams{
+	return mkShared<OwlCast>(core::AppParams{
 			.args = argv,
-			.name = "Owl Nest - Owl Engine Editor",
+			.name = "Owl Caster",
 #ifdef OWL_ASSETS_LOCATION
 			.assetsPattern = OWL_ASSETS_LOCATION,
 #endif
