@@ -9,7 +9,7 @@
 #pragma once
 #include <owl.h>
 
-namespace owl::raycaster {
+namespace owl::raycaster::panel {
 
 /**
  * @brief Class MapWindow.
@@ -49,4 +49,4 @@ public:
 private:
 };
 
-}// namespace owl::raycaster
+}// namespace owl::raycaster::panel
