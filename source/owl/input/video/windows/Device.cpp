@@ -57,7 +57,7 @@ private:
 
 ComControl cc;
 
-std::string getPixelFormatString(const GUID &videoFormat) {
+std::string getPixelFormatString(const GUID& videoFormat) {
 	if (videoFormat == MFVideoFormat_AI44)
 		return "AI44";
 	if (videoFormat == MFVideoFormat_ARGB32)
@@ -161,7 +161,7 @@ std::string getPixelFormatString(const GUID &videoFormat) {
 	return "Unknown";
 }
 
-Device::PixelFormat getDevicePixelFormat(const GUID &videoFormat) {
+Device::PixelFormat getDevicePixelFormat(const GUID& videoFormat) {
 	if (videoFormat == MFVideoFormat_RGB24)
 		return Device::PixelFormat::Rgb24;
 	if (videoFormat == MFVideoFormat_NV12)
@@ -179,11 +179,11 @@ Device::PixelFormat getDevicePixelFormat(const GUID &videoFormat) {
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
-void updateList(std::vector<shared<video::Device>> &ioList) {
+void updateList(std::vector<shared<video::Device>>& ioList) {
 	if (!cc.addRef())
 		return;
 	// check if all listed devices still exists
-	if (std::remove_if(ioList.begin(), ioList.end(), [](const shared<video::Device> &iDev) {
+	if (std::remove_if(ioList.begin(), ioList.end(), [](const shared<video::Device>& iDev) {
 			return !std::static_pointer_cast<Device>(iDev)->isValid();
 		}) != ioList.end()) {
 		OWL_CORE_WARN("Possible problems during video input listing.")
@@ -205,7 +205,7 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 	}
 	std::vector<WPointer<IMFActivate>> devices;
 	{
-		IMFActivate **pDevices = nullptr;
+		IMFActivate** pDevices = nullptr;
 		uint32_t count = 0;
 		hr = MFEnumDeviceSources(pConfig.get(), &pDevices, &count);
 		if (FAILED(hr)) {
@@ -221,13 +221,13 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 	}
 	// search for new devices.
 	size_t devCounter = 0;
-	for (auto &devivce: devices) {
+	for (auto& devivce: devices) {
 		auto testDev = mkShared<Device>(devivce);
 		if (!testDev->isValid()) {
 			continue;
 		}
 		// don't add a device that already exists
-		if (std::ranges::find_if(ioList.begin(), ioList.end(), [&testDev](const shared<video::Device> &dev) {
+		if (std::ranges::find_if(ioList.begin(), ioList.end(), [&testDev](const shared<video::Device>& dev) {
 				return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo();
 			}) != ioList.end())
 			continue;
@@ -239,12 +239,12 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 }
 OWL_DIAG_POP
 
-Device::Device(WPointer<IMFActivate> &iMfa) : video::Device("") {
+Device::Device(WPointer<IMFActivate>& iMfa) : video::Device("") {
 	if (!cc.addRef())
 		return;
 	m_devActive.takeOwnershipFrom(iMfa);
 	{
-		wchar_t *fName = nullptr;
+		wchar_t* fName = nullptr;
 		uint32_t len = 0;
 		m_devActive->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &fName, &len);
 		std::wstring ws(fName);
@@ -252,7 +252,7 @@ Device::Device(WPointer<IMFActivate> &iMfa) : video::Device("") {
 		CoTaskMemFree(fName);
 	}
 	{
-		wchar_t *fName = nullptr;
+		wchar_t* fName = nullptr;
 		uint32_t len = 0;
 		m_devActive->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, &fName, &len);
 		std::wstring ws(fName);
@@ -305,7 +305,7 @@ void Device::open() {
 	uint64_t superSize = 0;
 	mediaType->GetUINT64(MF_MT_FRAME_SIZE, &superSize);
 	m_size = {static_cast<uint32_t>((superSize >> 32) & g_mask32), static_cast<uint32_t>(superSize & g_mask32)};
-	OWL_CORE_INFO("Device ({}): Frame size seen: {} {}.", m_name, m_size.getWidth(), m_size.getHeight())
+	OWL_CORE_INFO("Device ({}): Frame size seen: {} {}.", m_name, m_size.x(), m_size.y())
 	GUID format;
 	mediaType->GetGUID(MF_MT_SUBTYPE, &format);
 	OWL_CORE_INFO("Device ({}): Native media sub type: {}.", m_name, getPixelFormatString(format))
@@ -332,7 +332,7 @@ void Device::close() {
 
 bool Device::isOpened() const { return m_size.surface() > 1; }
 
-void Device::fillFrame(shared<renderer::Texture> &iFrame) {
+void Device::fillFrame(shared<renderer::Texture>& iFrame) {
 	if (!isOpened())
 		return;
 	// Resizing the frame.
@@ -366,7 +366,7 @@ void Device::fillFrame(shared<renderer::Texture> &iFrame) {
 		OWL_CORE_WARN("Device ({}): Unable to Convert buffer.", m_name)
 		return;
 	}
-	byte *byteBuffer = nullptr;
+	byte* byteBuffer = nullptr;
 	u_long bCurLen = 0;
 	buffer->Lock(&byteBuffer, nullptr, &bCurLen);
 	std::vector<byte> convertedBuffer = getRgbBuffer(byteBuffer, static_cast<int32_t>(bCurLen));

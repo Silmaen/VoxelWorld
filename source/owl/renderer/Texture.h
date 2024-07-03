@@ -9,7 +9,6 @@
 #pragma once
 
 #include "core/Core.h"
-#include "math/sizingTypes.h"
 
 #include <filesystem>
 
@@ -21,10 +20,10 @@ class TextureLibrary;
 class OWL_API Texture {
 public:
 	Texture() = default;
-	Texture(const Texture &) = default;
-	Texture(Texture &&) = default;
-	Texture &operator=(const Texture &) = default;
-	Texture &operator=(Texture &&) = default;
+	Texture(const Texture&) = default;
+	Texture(Texture&&) = default;
+	Texture& operator=(const Texture&) = default;
+	Texture& operator=(Texture&&) = default;
 	/**
 	 * @brief Destructor.
 	 */
@@ -46,32 +45,32 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha Texture has alpha channel.
 	 */
-	explicit Texture(const math::FrameSize &iSize, bool iWithAlpha = true);
+	explicit Texture(const math::vec2ui& iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Comparison operator.
 	 * @param[in] iOther Other texture to compare.
 	 * @return True if same.
 	 */
-	virtual bool operator==(const Texture &iOther) const = 0;
+	virtual bool operator==(const Texture& iOther) const = 0;
 
 	/**
 	 * @brief Access to texture's width.
 	 * @return Texture's width.
 	 */
-	[[nodiscard]] uint32_t getWidth() const { return m_size.getWidth(); }
+	[[nodiscard]] uint32_t getWidth() const { return m_size.x(); }
 
 	/**
 	 * @brief Access to texture's height.
 	 * @return Texture's height.
 	 */
-	[[nodiscard]] uint32_t getHeight() const { return m_size.getHeight(); }
+	[[nodiscard]] uint32_t getHeight() const { return m_size.y(); }
 
 	/**
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] math::FrameSize getSize() const { return m_size; }
+	[[nodiscard]] math::vec2ui getSize() const { return m_size; }
 
 	/**
 	 * @brief Tells if the data effectively loaded.
@@ -95,20 +94,20 @@ public:
 	 * @brief Get Path to texture file.
 	 * @return Path to texture file.
 	 */
-	[[nodiscard]] const std::filesystem::path &getPath() const { return m_path; }
+	[[nodiscard]] const std::filesystem::path& getPath() const { return m_path; }
 
 	/**
 	 * @brief Define the texture data.
 	 * @param[in] iData Raw data.
 	 * @param[in] iSize Size of the data.
 	 */
-	virtual void setData(void *iData, uint32_t iSize) = 0;
+	virtual void setData(void* iData, uint32_t iSize) = 0;
 
 	/**
 	 * @brief Get access to the texture's name.
 	 * @return The texture's name.
 	 */
-	[[nodiscard]] const std::string &getName() const { return m_name; }
+	[[nodiscard]] const std::string& getName() const { return m_name; }
 
 	/**
 	 * @brief Get a string that can be serialized.
@@ -118,7 +117,7 @@ public:
 
 protected:
 	/// Texture's size.
-	math::FrameSize m_size = {0, 0};
+	math::vec2ui m_size = {0, 0};
 	/// Path to the texture file.
 	std::filesystem::path m_path;
 	/// If texture has alpha.
@@ -155,27 +154,27 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha Texture has alpha channel.
 	 */
-	explicit Texture2D(const math::FrameSize &iSize, bool iWithAlpha = true);
+	explicit Texture2D(const math::vec2ui& iSize, bool iWithAlpha = true);
 	/**
 	 * @brief Creates the texture with the given filename.
 	 * @param[in] iFile The path to the file to load.
 	 * @return Resulting texture.
 	 */
-	static shared<Texture2D> create(const std::filesystem::path &iFile);
+	static shared<Texture2D> create(const std::filesystem::path& iFile);
 
 	/**
 	 * @brief Create a new texture.
 	 * @param[in] iTextureName Name of the files in the standard path.
 	 * @return Pointer to the texture.
 	 */
-	static shared<Texture2D> create(const std::string &iTextureName);
+	static shared<Texture2D> create(const std::string& iTextureName);
 
 	/**
 	 * @brief Create a new texture.
 	 * @param[in] iTextureSerializedName Name of the files in the standard path.
 	 * @return Pointer to the texture.
 	 */
-	static shared<Texture2D> createFromSerialized(const std::string &iTextureSerializedName);
+	static shared<Texture2D> createFromSerialized(const std::string& iTextureSerializedName);
 
 	/**
 	 * @brief Creates the texture with the given size.
@@ -183,7 +182,7 @@ public:
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 * @return Resulting texture.
 	 */
-	static shared<Texture2D> create(const math::FrameSize &iSize, bool iWithAlpha = true);
+	static shared<Texture2D> create(const math::vec2ui& iSize, bool iWithAlpha = true);
 	/**
 	 * @brief Creates the texture with the given size.
 	 * @param[in] iWidth The texture's width.

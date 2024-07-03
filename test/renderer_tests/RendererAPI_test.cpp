@@ -24,6 +24,12 @@ TEST(RenderAPI, RenderComamand) {
 	RenderCommand::init();
 	EXPECT_EQ(RenderCommand::getState(), RenderAPI::State::Ready);
 	RenderCommand::setViewport(1, 1, 45, 65);
+	RenderCommand::beginTextureLoad();
+	RenderCommand::endTextureLoad();
+	RenderCommand::beginFrame();
+	RenderCommand::beginBatch();
+	RenderCommand::endBatch();
+	RenderCommand::endFrame();
 	RenderCommand::invalidate();
 	EXPECT_EQ(RenderCommand::getState(), RenderAPI::State::Error);
 	owl::core::Log::invalidate();

@@ -3,12 +3,13 @@
 
 #include <core/Application.h>
 #include <core/utils/FileUtils.h>
-#include <fstream>
 #include <event/KeyEvent.h>
+#include <fstream>
+#include <renderer/Renderer.h>
 
 using namespace owl::core;
 
-TEST(Core, Application_dummy) {
+TEST(Core, ApplicationDummy) {
 	Log::init(spdlog::level::off);
 	AppParams params;
 	params.isDummy = true;
@@ -22,7 +23,7 @@ TEST(Core, Application_dummy) {
 	Log::invalidate();
 }
 
-TEST(Core, Application_basic) {
+TEST(Core, ApplicationBasic) {
 	Log::init(spdlog::level::off);
 	AppParams params;
 	params.isDummy = true;
@@ -35,7 +36,7 @@ TEST(Core, Application_basic) {
 	EXPECT_EQ(app->getState(), Application::State::Running);
 	app->enableDocking();
 	app->disableDocking();
-	owl::event::WindowResizeEvent resEv(800, 600);
+	owl::event::WindowResizeEvent resEv({800, 600});
 	app->onEvent(resEv);
 	owl::event::KeyPressedEvent keyEv(owl::input::key::A, 1);
 	app->onEvent(keyEv);
@@ -47,8 +48,24 @@ TEST(Core, Application_basic) {
 	app.reset();
 	Log::invalidate();
 }
+TEST(Core, App) {
+	Log::init(spdlog::level::off);
+	AppParams const params{.name = "super boby",
+						   .renderer = owl::renderer::RenderAPI::Type::Null,
+						   .hasGui = false,
+						   .isDummy = true};
+	auto app = owl::mkShared<Application>(params);
 
-TEST(Core, AppParams_serialize) {
+	EXPECT_EQ(app->getInitParams().hasGui, params.hasGui);
+	EXPECT_GE(app->getTimeStep().getMilliseconds(), 0);
+	EXPECT_EQ(Application::get().getImGuiLayer(), nullptr);
+	EXPECT_EQ(Application::get().getWindow().getGraphContext(), nullptr);
+	Application::invalidate();
+	app.reset();
+	Log::invalidate();
+}
+
+TEST(Core, AppParamsSerialize) {
 	AppParams paramsIni;
 	paramsIni.width = 785;
 	paramsIni.height = 7415;
@@ -68,8 +85,7 @@ TEST(Core, AppParams_serialize) {
 }
 
 TEST(Core, fileToString) {
-	Log::setVerbosityLevel(spdlog::level::off);
-	Log::init();
+	Log::init(spdlog::level::off);
 	const std::string superStr = "yoho\nI'm fine!\n";
 	const auto tmpFile = std::filesystem::temp_directory_path() / "testFile.b";
 	{

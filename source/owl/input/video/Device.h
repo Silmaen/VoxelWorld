@@ -106,7 +106,7 @@ protected:
 	/// The pixel format.
 	PixelFormat m_pixFormat = PixelFormat::Unknwon;
 	/// The size of the frame.
-	math::FrameSize m_size;
+	math::vec2ui m_size;
 	// NOLINTEND(readability-redundant-member-init)
 
 	/**

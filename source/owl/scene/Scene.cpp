@@ -157,7 +157,7 @@ void Scene::render() {
 	}
 }
 
-void Scene::onViewportResize(const math::FrameSize &iSize) {
+void Scene::onViewportResize(const math::vec2ui &iSize) {
 	m_viewportSize = iSize;
 	// Resize our non-FixedAspectRatio cameras
 	for (const auto view = registry.view<component::Camera>(); const auto entity: view) {

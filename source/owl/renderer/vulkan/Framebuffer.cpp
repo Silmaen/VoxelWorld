@@ -53,7 +53,7 @@ Framebuffer::~Framebuffer() {
 }
 
 void Framebuffer::invalidate() {
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	vkDeviceWaitIdle(vkc.getLogicalDevice());
 	cleanup();
 
@@ -67,13 +67,13 @@ void Framebuffer::invalidate() {
 void Framebuffer::bind() {
 	if (m_framebuffers.empty())
 		return;
-	const auto &core = internal::VulkanCore::get();
-	auto &vkh = internal::VulkanHandler::get();
+	const auto& core = internal::VulkanCore::get();
+	auto& vkh = internal::VulkanHandler::get();
 	m_firstBatch = true;
 	vkWaitForFences(core.getLogicalDevice(), 1, getCurrentFence(), VK_TRUE, UINT64_MAX);
 	resetBatch();
 	if (!m_specs.swapChainTarget) {
-		for (auto &img: m_images) {
+		for (auto& img: m_images) {
 			internal::transitionImageLayout(img.image, VK_IMAGE_LAYOUT_UNDEFINED,
 											VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 		}
@@ -82,9 +82,9 @@ void Framebuffer::bind() {
 }
 
 void Framebuffer::unbind() {
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	if (!m_specs.swapChainTarget) {
-		for (auto &img: m_images) {
+		for (auto& img: m_images) {
 			internal::transitionImageLayout(img.image, VK_IMAGE_LAYOUT_UNDEFINED,
 											VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
@@ -92,7 +92,7 @@ void Framebuffer::unbind() {
 	vkh.unbindFramebuffer();
 }
 
-void Framebuffer::resize(const math::FrameSize iSize) {
+void Framebuffer::resize(const math::vec2ui iSize) {
 	if (m_specs.size == iSize)// nothing to do.
 		return;
 	m_specs.size = iSize;
@@ -100,8 +100,8 @@ void Framebuffer::resize(const math::FrameSize iSize) {
 }
 
 void Framebuffer::deepCleanup() {
-	const auto &vkc = internal::VulkanCore::get();
-	for (auto &[imgAvail, renderFinish, fence, cmd]: m_samples) {
+	const auto& vkc = internal::VulkanCore::get();
+	for (auto& [imgAvail, renderFinish, fence, cmd]: m_samples) {
 		if (renderFinish != nullptr) {
 			vkDestroySemaphore(vkc.getLogicalDevice(), renderFinish, nullptr);
 			renderFinish = nullptr;
@@ -123,16 +123,16 @@ void Framebuffer::deepCleanup() {
 }
 
 void Framebuffer::cleanup() {
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	// Cleanup framebuffer
-	for (const auto &framebuffer: m_framebuffers) {
+	for (const auto& framebuffer: m_framebuffers) {
 		if (framebuffer)
 			vkDestroyFramebuffer(vkc.getLogicalDevice(), framebuffer, nullptr);
 	}
 	m_framebuffers.clear();
-	const auto &pool = internal::Descriptors::get().getSingleImageDescriptorPool();
+	const auto& pool = internal::Descriptors::get().getSingleImageDescriptorPool();
 	vkDeviceWaitIdle(vkc.getLogicalDevice());
-	for (auto &[image, memory, view, sampler, dSet, dSetLayout]: m_images) {
+	for (auto& [image, memory, view, sampler, dSet, dSetLayout]: m_images) {
 		if (dSet != nullptr)
 			vkFreeDescriptorSets(vkc.getLogicalDevice(), pool, 1, &dSet);
 		if (dSetLayout != nullptr)
@@ -155,8 +155,8 @@ void Framebuffer::cleanup() {
 }
 
 int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const int iY) {
-	const auto &vkc = internal::VulkanCore::get();
-	const auto &[format, tiling] = m_specs.attachments[iAttachmentIndex];
+	const auto& vkc = internal::VulkanCore::get();
+	const auto& [format, tiling] = m_specs.attachments[iAttachmentIndex];
 	const uint32_t imgIndex = attToImgIdx(iAttachmentIndex);
 	VkBuffer stagingBuffer = nullptr;
 	{
@@ -209,7 +209,7 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 	internal::transitionImageLayout(m_images[imgIndex].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 									m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 															: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-	void *data = nullptr;
+	void* data = nullptr;
 	if (const VkResult result = vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0,
 											internal::attachmentFormatToSize(format), 0, &data);
 		result != VK_SUCCESS) {
@@ -231,8 +231,8 @@ void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const int iVa
 		OWL_CORE_WARN("Vulkan Framebuffer ({}): Try to int-clear non integer attachment.", m_specs.debugName)
 		return;
 	}
-	const auto &core = internal::VulkanCore::get();
-	auto *const cmd = core.beginSingleTimeCommands();
+	const auto& core = internal::VulkanCore::get();
+	auto* const cmd = core.beginSingleTimeCommands();
 	const uint32_t imgIndex = attToImgIdx(iAttachmentIndex);
 	VkClearColorValue val;
 	val.int32[0] = iValue;
@@ -259,8 +259,8 @@ void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const math::v
 		OWL_CORE_WARN("Vulkan Framebuffer ({}): Try to color-clear non color attachment.", m_specs.debugName)
 		return;
 	}
-	const auto &core = internal::VulkanCore::get();
-	auto *const cmd = core.beginSingleTimeCommands();
+	const auto& core = internal::VulkanCore::get();
+	auto* const cmd = core.beginSingleTimeCommands();
 	const uint32_t imgIndex = attToImgIdx(iAttachmentIndex);
 	VkClearColorValue val;
 	val.float32[0] = iColorValue.r();
@@ -283,10 +283,10 @@ void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const math::v
 OWL_DIAG_POP
 
 void Framebuffer::createImages() {
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	m_swapChainImageCount = 0;
 	if (m_specs.swapChainTarget) {
-		auto *const gc = dynamic_cast<GraphContext *>(core::Application::get().getWindow().getGraphContext());
+		auto* const gc = dynamic_cast<GraphContext*>(core::Application::get().getWindow().getGraphContext());
 		m_swapChainImageCount = vkc.getImagecount();
 		const auto queueFamilyIndices = vkc.getQueueIndicies();
 		const bool shares = queueFamilyIndices.size() > 1;
@@ -339,7 +339,7 @@ void Framebuffer::createImages() {
 				.flags = {},
 				.imageType = VK_IMAGE_TYPE_2D,
 				.format = internal::attachmentFormatToVulkan(m_specs.attachments[attIndex].format),
-				.extent = {.width = m_specs.size.width(), .height = m_specs.size.height(), .depth = 1},
+				.extent = {.width = m_specs.size.x(), .height = m_specs.size.y(), .depth = 1},
 				.mipLevels = 1,
 				.arrayLayers = 1,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -385,7 +385,7 @@ void Framebuffer::createImages() {
 }
 
 void Framebuffer::createImageViews() {
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	for (uint32_t i = 0; i < m_images.size(); ++i) {
 		const uint32_t attIndex = imgIdxToAtt(i);
 		const VkImageViewCreateInfo createInfo{
@@ -413,10 +413,10 @@ void Framebuffer::createImageViews() {
 }
 
 void Framebuffer::createFrameBuffer() {
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	m_framebuffers.resize(std::max(1u, m_swapChainImageCount));
 	uint32_t idx = 0;
-	for (auto &framebuffer: m_framebuffers) {
+	for (auto& framebuffer: m_framebuffers) {
 		std::vector<VkImageView> views = {m_images[idx].imageView};
 		for (uint32_t iv = 1; iv < m_specs.attachments.size(); ++iv) {
 			views.push_back(m_images[m_swapChainImageCount == 0 ? iv : m_swapChainImageCount - 1 + iv].imageView);
@@ -427,8 +427,8 @@ void Framebuffer::createFrameBuffer() {
 													  .renderPass = m_renderPass,
 													  .attachmentCount = static_cast<uint32_t>(views.size()),
 													  .pAttachments = views.data(),
-													  .width = m_specs.size.width(),
-													  .height = m_specs.size.height(),
+													  .width = m_specs.size.x(),
+													  .height = m_specs.size.y(),
 													  .layers = 1};
 		if (const VkResult result =
 					vkCreateFramebuffer(vkc.getLogicalDevice(), &framebufferInfo, nullptr, &framebuffer);
@@ -441,13 +441,13 @@ void Framebuffer::createFrameBuffer() {
 }
 
 void Framebuffer::createRenderPass() {
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	std::vector<VkAttachmentReference> attRefs;
 	uniq<VkAttachmentReference> depthRefs = nullptr;
 	std::vector<VkAttachmentDescription> attDesc;
 
 	uint32_t i = 0;
-	for (const auto &[format, tiling]: m_specs.attachments) {
+	for (const auto& [format, tiling]: m_specs.attachments) {
 		if (format == AttachmentSpecification::Format::Depth24Stencil8) {
 			depthRefs = mkUniq<VkAttachmentReference>(
 					VkAttachmentReference{.attachment = i, .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL});
@@ -504,8 +504,8 @@ void Framebuffer::createRenderPass() {
 void Framebuffer::nextFrame() { m_currentFrame = (m_currentFrame + 1) % m_specs.samples; }
 
 void Framebuffer::createCommandBuffers() {
-	const auto &core = internal::VulkanCore::get();
-	for (auto &[imgAvail, renderFinish, fence, cmd]: m_samples) cmd = core.createCommandBuffer();
+	const auto& core = internal::VulkanCore::get();
+	for (auto& [imgAvail, renderFinish, fence, cmd]: m_samples) cmd = core.createCommandBuffer();
 }
 
 void Framebuffer::createSyncObjects() {
@@ -516,9 +516,9 @@ void Framebuffer::createSyncObjects() {
 										  .pNext = nullptr,
 										  .flags = VK_FENCE_CREATE_SIGNALED_BIT};
 
-	const auto &core = internal::VulkanCore::get();
+	const auto& core = internal::VulkanCore::get();
 	uint32_t idx = 0;
-	for (auto &[imgAvail, renderFinish, fence, cmd]: m_samples) {
+	for (auto& [imgAvail, renderFinish, fence, cmd]: m_samples) {
 		if (m_specs.swapChainTarget) {
 			if (const VkResult result = vkCreateSemaphore(core.getLogicalDevice(), &semaphoreInfo, nullptr, &imgAvail);
 				result != VK_SUCCESS) {
@@ -575,8 +575,8 @@ uint64_t Framebuffer::getColorAttachmentRendererId(const uint32_t iIndex) const 
 }
 
 void Framebuffer::createDescriptorSets() {
-	const auto &pool = internal::Descriptors::get().getSingleImageDescriptorPool();
-	const auto &core = internal::VulkanCore::get();
+	const auto& pool = internal::Descriptors::get().getSingleImageDescriptorPool();
+	const auto& core = internal::VulkanCore::get();
 	const VkSamplerCreateInfo samplerInfo{.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
 										  .pNext = nullptr,
 										  .flags = {},
@@ -606,7 +606,7 @@ void Framebuffer::createDescriptorSets() {
 													   .flags = {},
 													   .bindingCount = 1,
 													   .pBindings = &samplerLayoutBinding};
-	for (auto &img: m_images) {
+	for (auto& img: m_images) {
 		if (const VkResult result = vkCreateSampler(core.getLogicalDevice(), &samplerInfo, nullptr, &img.imageSampler);
 			result != VK_SUCCESS) {
 			OWL_CORE_ERROR("Vulkan Texture: Error creating texture sampler ({}).", internal::resultString(result))

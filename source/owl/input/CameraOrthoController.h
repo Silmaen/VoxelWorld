@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <math/sizingTypes.h>
-
 #include "core/Timestep.h"
 #include "event/AppEvent.h"
 #include "event/MouseEvent.h"
@@ -54,7 +52,7 @@ public:
 	 * @brief Action when view port is resized.
 	 * @param[in] iSize New size.
 	 */
-	void onResize(const math::FrameSize& iSize);
+	void onResize(const math::vec2ui& iSize);
 
 	/**
 	 * @brief Access to the camera.

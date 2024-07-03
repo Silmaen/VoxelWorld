@@ -22,7 +22,7 @@ void Framebuffer::bind() {}
 
 void Framebuffer::unbind() {}
 
-void Framebuffer::resize(const math::FrameSize iSize) {
+void Framebuffer::resize(const math::vec2ui iSize) {
 	m_specs.size = iSize;
 }
 

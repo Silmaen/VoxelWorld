@@ -173,8 +173,8 @@ void EditorLayer::renderStats(const core::Timestep& iTimeStep) {
 	ImGui::Text("Quads: %d", stats.quadCount);
 	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
 	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
-	ImGui::Text("Viewport size: %f %f", static_cast<double>(m_viewportSize.getWidth()),
-				static_cast<double>(m_viewportSize.getHeight()));
+	ImGui::Text("Viewport size: %f %f", static_cast<double>(m_viewportSize.x()),
+				static_cast<double>(m_viewportSize.y()));
 	ImGui::Text("Aspect ratio: %f", static_cast<double>(m_viewportSize.ratio()));
 	ImGui::End();
 }

@@ -8,9 +8,6 @@
 
 #pragma once
 
-#include "math/sizingTypes.h"
-
-
 #include <vulkan/vulkan.h>
 
 namespace owl::renderer::vulkan::internal {
@@ -30,7 +27,7 @@ struct TextureData {
 	void createDescriptorSet();
 	void createView();
 	void createSampler();
-	void createImage(const math::FrameSize &iDimensions);
+	void createImage(const math::vec2ui& iDimensions);
 };
 
 /**
@@ -38,10 +35,10 @@ struct TextureData {
  */
 class Descriptors {
 public:
-	Descriptors(const Descriptors &) = delete;
-	Descriptors(Descriptors &&) = delete;
-	Descriptors &operator=(const Descriptors &) = delete;
-	Descriptors &operator=(Descriptors &&) = delete;
+	Descriptors(const Descriptors&) = delete;
+	Descriptors(Descriptors&&) = delete;
+	Descriptors& operator=(const Descriptors&) = delete;
+	Descriptors& operator=(Descriptors&&) = delete;
 	/**
 	 * @brief Destructor.
 	 */
@@ -51,7 +48,7 @@ public:
 	 * @brief Singleton's accessor.
 	 * @return The instance of this object.
 	 */
-	static Descriptors &get() {
+	static Descriptors& get() {
 		static Descriptors instance;
 		return instance;
 	}
@@ -79,7 +76,7 @@ public:
 	 */
 	uint32_t registerNewTexture();
 
-	TextureData &getTextureData(uint32_t iIndex);
+	TextureData& getTextureData(uint32_t iIndex);
 
 	void bindTextureImage(uint32_t iIndex);
 
@@ -87,7 +84,7 @@ public:
 
 	[[nodiscard]] bool isTextureRegistered(uint32_t iIndex) const;
 
-	void setUniformData(const void *iData, size_t iSize) const;
+	void setUniformData(const void* iData, size_t iSize) const;
 
 	void resetTextureBind();
 	void commitTextureBind(size_t iCurrentFrame);
@@ -95,8 +92,8 @@ public:
 
 	[[nodiscard]] VkDescriptorPool getDescriptorPool() const { return m_descriptorPool; }
 
-	VkDescriptorSetLayout *getDescriptorSetLayout() { return &m_descriptorSetLayout; }
-	VkDescriptorSet *getDescriptorSet(const uint32_t iFrame) { return &m_descriptorSets[iFrame]; }
+	VkDescriptorSetLayout* getDescriptorSetLayout() { return &m_descriptorSetLayout; }
+	VkDescriptorSet* getDescriptorSet(const uint32_t iFrame) { return &m_descriptorSets[iFrame]; }
 
 	void createImguiDescriptorPool();
 	[[nodiscard]] VkDescriptorPool getImguiDescriptorPool() const { return m_imguiDescriptorPool; }
@@ -129,7 +126,7 @@ private:
 	std::vector<VkDescriptorSet> m_descriptorSets;
 	std::vector<VkBuffer> m_uniformBuffers;
 	std::vector<VkDeviceMemory> m_uniformBuffersMemory;
-	std::vector<void *> m_uniformBuffersMapped;
+	std::vector<void*> m_uniformBuffersMapped;
 	uint32_t m_uniformSize = 0;
 	uint32_t m_bindedTexture = 0;
 	std::vector<uint32_t> m_textureBind;

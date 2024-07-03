@@ -87,9 +87,9 @@ private:
 	 */
 	CameraSystem();
 
-	void resize(const owl::math::FrameSize &iSize);
+	void resize(const owl::math::vec2ui &iSize);
 
-	owl::math::FrameSize m_size;
+	owl::math::vec2ui m_size;
 
 	int32_t m_frameSkip = 0;
 	int32_t m_frameCheck = 50;

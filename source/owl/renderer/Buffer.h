@@ -56,7 +56,7 @@ static uint32_t shaderDataTypeSize(const ShaderDataType iType) {
 		case ShaderDataType::None:
 			return 0;
 	}
-	OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
+	OWL_CORE_ERROR("shaderDataTypeSize: Unknown ShaderDataType!")
 	return 0;
 }
 
@@ -81,7 +81,7 @@ struct OWL_API BufferElement {
 	 * @param[in] iType Data's type.
 	 * @param[in] iNormalized If data's normalized.
 	 */
-	BufferElement(std::string &&iName, const ShaderDataType iType, const bool iNormalized = false)
+	BufferElement(std::string&& iName, const ShaderDataType iType, const bool iNormalized = false)
 		: name(std::move(iName)), type(iType), size(shaderDataTypeSize(iType)), normalized(iNormalized) {}
 
 	/**
@@ -115,7 +115,7 @@ struct OWL_API BufferElement {
 			case ShaderDataType::None:
 				return 0;
 		}
-		OWL_CORE_ASSERT(false, "Unknown ShaderDataType!")
+		OWL_CORE_ERROR("getComponentCount: Unknown ShaderDataType!")
 		return 0;
 	}
 };
@@ -134,7 +134,7 @@ public:
 	 * @brief Constructor.
 	 * @param[in] iElements Elements in the layout.
 	 */
-	BufferLayout(const std::initializer_list<BufferElement> &iElements) : m_elements(iElements) {
+	BufferLayout(const std::initializer_list<BufferElement>& iElements) : m_elements(iElements) {
 		calculateOffsetsAndStride();
 	}
 
@@ -148,7 +148,7 @@ public:
 	 * @brief Get the buffer Elements.
 	 * @return Buffer elements.
 	 */
-	[[nodiscard]] const std::vector<BufferElement> &getElements() const { return m_elements; }
+	[[nodiscard]] const std::vector<BufferElement>& getElements() const { return m_elements; }
 
 	[[nodiscard]] iterator begin() { return m_elements.begin(); }
 	[[nodiscard]] iterator end() { return m_elements.end(); }
@@ -166,7 +166,7 @@ private:
 	void calculateOffsetsAndStride() {
 		uint32_t offset = 0;
 		m_stride = 0;
-		for (auto &element: m_elements) {
+		for (auto& element: m_elements) {
 			element.offset = offset;
 			offset += element.size;
 			m_stride += element.size;
@@ -179,11 +179,11 @@ private:
  */
 class OWL_API VertexBuffer {
 public:
-	VertexBuffer(const VertexBuffer &) = default;
-	VertexBuffer(VertexBuffer &&) = default;
-	VertexBuffer &operator=(const VertexBuffer &) = default;
-	VertexBuffer &operator=(VertexBuffer &&) = default;
-	VertexBuffer() = default;
+	VertexBuffer(const VertexBuffer&) = default;
+	VertexBuffer(VertexBuffer&&) = default;
+	VertexBuffer& operator=(const VertexBuffer&) = default;
+	VertexBuffer& operator=(VertexBuffer&&) = default;
+	VertexBuffer() = default;// ---UNCOVER---
 	/**
 	 * @brief Destructor.
 	 */
@@ -204,19 +204,19 @@ public:
 	 * @param[in] iData The raw data.
 	 * @param[in] iSize Number of data.
 	 */
-	virtual void setData(const void *iData, uint32_t iSize) = 0;
+	virtual void setData(const void* iData, uint32_t iSize) = 0;
 
 	/**
 	 * @brief Get the buffer data layout.
 	 * @return Data layout.
 	 */
-	[[nodiscard]] const BufferLayout &getLayout() const { return m_layout; }
+	[[nodiscard]] const BufferLayout& getLayout() const { return m_layout; }
 
 	/**
 	 * @brief Define the data layout.
 	 * @param[in] iLayout New data layout.
 	 */
-	void setLayout(const BufferLayout &iLayout) { m_layout = iLayout; }
+	void setLayout(const BufferLayout& iLayout) { m_layout = iLayout; }
 
 private:
 	/// Data layout description.
@@ -228,14 +228,14 @@ private:
  */
 class OWL_API IndexBuffer {
 public:
-	IndexBuffer(const IndexBuffer &) = default;
-	IndexBuffer(IndexBuffer &&) = default;
-	IndexBuffer &operator=(const IndexBuffer &) = default;
-	IndexBuffer &operator=(IndexBuffer &&) = default;
+	IndexBuffer(const IndexBuffer&) = default;
+	IndexBuffer(IndexBuffer&&) = default;
+	IndexBuffer& operator=(const IndexBuffer&) = default;
+	IndexBuffer& operator=(IndexBuffer&&) = default;
 	/**
 	 * @brief Default constructor.
 	 */
-	IndexBuffer() = default;
+	IndexBuffer() = default;// ---UNCOVER---
 	/**
 	 * @brief Destructor.
 	 */

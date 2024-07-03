@@ -60,7 +60,7 @@ private:
 	/// the frame buffer for this panel.
 	owl::shared<owl::renderer::Framebuffer> mp_framebuffer;
 	/// Size of the viewport
-	owl::math::FrameSize m_viewportSize = {0, 0};
+	owl::math::vec2ui m_viewportSize = {0, 0};
 	/// View port bounds
 	owl::math::vec2 m_viewportLower = {0.0f, 0.0f};
 	owl::math::vec2 m_viewportUpper = {0.0f, 0.0f};

@@ -48,19 +48,19 @@ public:
 		 * @brief Get Size attribute of width.
 		 * @return The window's width.
 		 */
-	[[nodiscard]] uint32_t getWidth() const override { return m_windowData.width; }
+	[[nodiscard]] uint32_t getWidth() const override { return m_windowData.size.x(); }
 
 	/**
 		 * @brief Get Size attribute of height.
 		 * @return The window's height.
 		 */
-	[[nodiscard]] uint32_t getHeight() const override { return m_windowData.height; }
+	[[nodiscard]] uint32_t getHeight() const override { return m_windowData.size.y(); }
 
 	/**
 		 * @brief Access to texture's size.
 		 * @return Texture's size.
 		 */
-	[[nodiscard]] math::FrameSize getSize() const override { return {m_windowData.width, m_windowData.height}; }
+	[[nodiscard]] const math::vec2ui& getSize() const override { return m_windowData.size; }
 	/**
 		 * @brief Get the type of window manager.
 		 * @return The window manager's type.
@@ -111,10 +111,8 @@ private:
 	struct WindowData {
 		/// Window's title.
 		std::string title;
-		/// Window's width.
-		uint32_t width{0};
-		/// Window's height.
-		uint32_t height{0};
+		/// Window's size.
+		math::vec2ui size;
 		/// Window's VSync property.
 		bool vSync{false};
 		/// Event Call back.

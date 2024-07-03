@@ -23,7 +23,7 @@ TEST(Input, EventCameraControler) {
 	CameraOrthoController coc(1);
 	owl::event::AppRenderEvent e;
 	coc.onEvent(e);// nothing
-	owl::event::WindowResizeEvent re(10, 5);
+	owl::event::WindowResizeEvent re({10, 5});
 	coc.onEvent(re);// resize
 	owl::event::MouseScrolledEvent me(0, 1);
 	coc.onEvent(me);// resize

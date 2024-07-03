@@ -73,7 +73,7 @@ TEST(WindowEvent, Close) {
 }
 
 TEST(WindowEvent, Resize) {
-	const WindowResizeEvent event(1422, 166);
+	const WindowResizeEvent event({1422, 166});
 	EXPECT_STREQ(event.getName().c_str(), "WindowResizeEvent");
 	EXPECT_EQ(event.getType(), Type::WindowResize);
 	EXPECT_EQ(event.getStaticType(), Type::WindowResize);

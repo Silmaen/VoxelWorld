@@ -22,7 +22,7 @@ Texture::Texture(std::filesystem::path iPath) : m_path{std::move(iPath)} {}
 Texture::Texture(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
 	: m_size{iWidth, iHeight}, m_hasAlpha{iWithAlpha} {}
 
-Texture::Texture(const math::FrameSize &iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {}
+Texture::Texture(const math::vec2ui& iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {}
 
 [[nodiscard]] std::string Texture::getSerializeString() const {
 	if (!isLoaded()) {
@@ -34,7 +34,7 @@ Texture::Texture(const math::FrameSize &iSize, const bool iWithAlpha) : m_size{i
 	if (!m_path.empty()) {
 		return "pat:" + m_path.string();
 	}
-	return fmt::format("siz:{}:{}:{}", m_size.width(), m_size.height(), m_hasAlpha);
+	return fmt::format("siz:{}:{}:{}", m_size.x(), m_size.y(), m_hasAlpha);
 }
 
 Texture2D::Texture2D(std::filesystem::path iPath) : Texture{std::move(iPath)} {}
@@ -42,9 +42,9 @@ Texture2D::Texture2D(std::filesystem::path iPath) : Texture{std::move(iPath)} {}
 Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
 	: Texture{iWidth, iHeight, iWithAlpha} {}
 
-Texture2D::Texture2D(const math::FrameSize &iSize, const bool iWithAlpha) : Texture{iSize, iWithAlpha} {}
+Texture2D::Texture2D(const math::vec2ui& iSize, const bool iWithAlpha) : Texture{iSize, iWithAlpha} {}
 
-shared<Texture2D> Texture2D::create(const std::filesystem::path &iFile) {
+shared<Texture2D> Texture2D::create(const std::filesystem::path& iFile) {
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			{
@@ -70,7 +70,7 @@ shared<Texture2D> Texture2D::create(const std::filesystem::path &iFile) {
 	return nullptr;
 }
 
-shared<Texture2D> Texture2D::create(const std::string &iTextureName) {
+shared<Texture2D> Texture2D::create(const std::string& iTextureName) {
 	return create(core::Application::get().getAssetDirectory() / (iTextureName + ".png"));
 }
 
@@ -88,7 +88,7 @@ shared<Texture2D> Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWit
 	return nullptr;
 }
 
-shared<Texture2D> Texture2D::create(const math::FrameSize &iSize, bool iWithAlpha) {
+shared<Texture2D> Texture2D::create(const math::vec2ui& iSize, bool iWithAlpha) {
 	shared<Texture2D> tex;
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
@@ -110,7 +110,7 @@ shared<Texture2D> Texture2D::create(const math::FrameSize &iSize, bool iWithAlph
 	return nullptr;
 }
 
-shared<Texture2D> Texture2D::createFromSerialized(const std::string &iTextureSerializedName) {
+shared<Texture2D> Texture2D::createFromSerialized(const std::string& iTextureSerializedName) {
 	if (iTextureSerializedName.size() < 4)
 		return nullptr;
 	const auto key = iTextureSerializedName.substr(0, 4);

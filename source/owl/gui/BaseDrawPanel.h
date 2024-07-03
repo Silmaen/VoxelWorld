@@ -70,7 +70,7 @@ protected:
 	/// the frame buffer for this panel.
 	shared<renderer::Framebuffer> mp_framebuffer;
 	/// Size of the viewport
-	math::FrameSize m_viewportSize = {0, 0};
+	math::vec2ui m_viewportSize = {0, 0};
 	/// The camera
 	shared<renderer::CameraOrtho> m_camera;
 	/// View port bounds

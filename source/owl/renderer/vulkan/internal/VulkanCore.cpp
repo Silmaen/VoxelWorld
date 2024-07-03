@@ -338,23 +338,23 @@ VkExtent2D VulkanCore::getCurrentExtent() const {
 		extent = m_phyProps.surfaceCapabilities.currentExtent;
 	} else {
 		auto sizes = core::Application::get().getWindow().getSize();
-		extent.width = std::clamp(sizes.width(), m_phyProps.surfaceCapabilities.minImageExtent.width,
+		extent.width = std::clamp(sizes.x(), m_phyProps.surfaceCapabilities.minImageExtent.width,
 								  m_phyProps.surfaceCapabilities.maxImageExtent.width);
-		extent.height = std::clamp(sizes.height(), m_phyProps.surfaceCapabilities.minImageExtent.height,
+		extent.height = std::clamp(sizes.y(), m_phyProps.surfaceCapabilities.minImageExtent.height,
 								   m_phyProps.surfaceCapabilities.maxImageExtent.height);
 	}
 	return extent;
 }
 
-math::FrameSize VulkanCore::getCurrentSize() const {
-	math::FrameSize extent;
+math::vec2ui VulkanCore::getCurrentSize() const {
+	math::vec2ui extent;
 	if (m_phyProps.surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-		extent = toFrameSize(m_phyProps.surfaceCapabilities.currentExtent);
+		extent = toSize(m_phyProps.surfaceCapabilities.currentExtent);
 	} else {
 		auto sizes = core::Application::get().getWindow().getSize();
-		extent.width() = std::clamp(sizes.width(), m_phyProps.surfaceCapabilities.minImageExtent.width,
+		extent.x() = std::clamp(sizes.x(), m_phyProps.surfaceCapabilities.minImageExtent.width,
 									m_phyProps.surfaceCapabilities.maxImageExtent.width);
-		extent.height() = std::clamp(sizes.height(), m_phyProps.surfaceCapabilities.minImageExtent.height,
+		extent.y() = std::clamp(sizes.y(), m_phyProps.surfaceCapabilities.minImageExtent.height,
 									 m_phyProps.surfaceCapabilities.maxImageExtent.height);
 	}
 	return extent;

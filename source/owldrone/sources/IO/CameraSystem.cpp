@@ -57,7 +57,7 @@ void CameraSystem::onUpdate(const owl::core::Timestep &iTs) {
 	}
 }
 
-void CameraSystem::resize(const owl::math::FrameSize &iSize) {
+void CameraSystem::resize(const owl::math::vec2ui &iSize) {
 	if (iSize == m_size)
 		return;
 	m_size = iSize;

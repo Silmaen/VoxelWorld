@@ -15,7 +15,7 @@ namespace owl::renderer::vulkan {
 /**
  * @brief Class Texture.
  */
-class Texture2D final : public ::owl::renderer::Texture2D {
+class OWL_API Texture2D final : public ::owl::renderer::Texture2D {
 public:
 	Texture2D(const Texture2D &) = default;
 	Texture2D(Texture2D &&) = default;
@@ -39,7 +39,7 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 */
-	explicit Texture2D(const math::FrameSize &iSize, bool iWithAlpha = true);
+	explicit Texture2D(const math::vec2ui &iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Destructor.

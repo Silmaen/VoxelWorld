@@ -9,7 +9,6 @@
 #pragma once
 
 #include "PhysicalDeviceCapabilities.h"
-#include "math/sizingTypes.h"
 
 /**
  * @brief Namespace for vulkan intenal functions
@@ -39,28 +38,28 @@ struct InstanceInformations {
 	 * @param[in] iLayer The layer name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasLayer(const std::string &iLayer) const;
+	[[nodiscard]] bool hasLayer(const std::string& iLayer) const;
 
 	/**
 	 * @brief Check if an extension is available on this device.
 	 * @param[in] iExtension The extension name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasExtension(const std::string &iExtension) const;
+	[[nodiscard]] bool hasExtension(const std::string& iExtension) const;
 
 	/**
 	 * @brief Check if some layers are available on this device.
 	 * @param[in] iLayers The layer's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasLayers(const std::vector<std::string> &iLayers) const;
+	[[nodiscard]] bool hasLayers(const std::vector<std::string>& iLayers) const;
 
 	/**
 	 * @brief Check if some extensions are available on this device.
 	 * @param[in] iExtensions The extension's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasExtensions(const std::vector<std::string> &iExtensions) const;
+	[[nodiscard]] bool hasExtensions(const std::vector<std::string>& iExtensions) const;
 
 	uint32_t version = 0;
 	std::vector<std::string> supportedExtensions;
@@ -72,13 +71,13 @@ struct InstanceInformations {
  */
 class VulkanCore final {
 public:
-	VulkanCore(const VulkanCore &) = delete;
+	VulkanCore(const VulkanCore&) = delete;
 
-	VulkanCore(VulkanCore &&) = delete;
+	VulkanCore(VulkanCore&&) = delete;
 
-	VulkanCore &operator=(const VulkanCore &) = delete;
+	VulkanCore& operator=(const VulkanCore&) = delete;
 
-	VulkanCore &operator=(VulkanCore &&) = delete;
+	VulkanCore& operator=(VulkanCore&&) = delete;
 
 	/**
 	 * @brief Destructor.
@@ -89,7 +88,7 @@ public:
 	 * @brief Singleton get instance.
 	 * @return Intance of Vulkan core.
 	 */
-	static VulkanCore &get() {
+	static VulkanCore& get() {
 		static VulkanCore instance;
 		return instance;
 	}
@@ -98,7 +97,7 @@ public:
 	 * @brief Initialize the vulkan core.
 	 * @param[in] iConfiguration The Given configuratio.
 	 */
-	void init(const VulkanConfiguraton &iConfiguration);
+	void init(const VulkanConfiguraton& iConfiguration);
 
 	/**
 	 * @brief Release the vulkan core.
@@ -145,7 +144,7 @@ public:
 	 * @brief Access to the actual state of the core.
 	 * @return The state of the core.
 	 */
-	[[nodiscard]] const State &getState() const { return m_state; }
+	[[nodiscard]] const State& getState() const { return m_state; }
 
 	/**
 	 * @brief Get the graphic queue index.
@@ -173,7 +172,7 @@ public:
 	 * @brief Get the current Size.
 	 * @return The current size.
 	 */
-	[[nodiscard]] math::FrameSize getCurrentSize() const;
+	[[nodiscard]] math::vec2ui getCurrentSize() const;
 
 	/**
 	 * @brief Get the surface format.

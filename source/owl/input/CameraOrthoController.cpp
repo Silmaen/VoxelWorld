@@ -80,7 +80,7 @@ bool CameraOrthoController::onWindowResized(const event::WindowResizeEvent& iEve
 	return false;
 }
 
-void CameraOrthoController::onResize(const math::FrameSize& iSize) {
+void CameraOrthoController::onResize(const math::vec2ui& iSize) {
 	m_aspectRatio = iSize.ratio();
 	m_camera.setProjection(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel);
 }

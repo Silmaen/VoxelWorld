@@ -9,7 +9,6 @@
 #pragma once
 
 #include "core/Core.h"
-#include "math/sizingTypes.h"
 
 namespace owl::renderer {
 /**
@@ -49,7 +48,7 @@ struct AttachmentSpecification {
  */
 struct FramebufferSpecification {
 	/// width.
-	math::FrameSize size = {0, 0};
+	math::vec2ui size = {0, 0};
 	/// Attachment Specs.
 	std::vector<AttachmentSpecification> attachments;
 	/// Amount of sample.
@@ -66,10 +65,10 @@ struct FramebufferSpecification {
 class OWL_API Framebuffer {
 public:
 	Framebuffer() = default;
-	Framebuffer(const Framebuffer &) = default;
-	Framebuffer(Framebuffer &&) = default;
-	Framebuffer &operator=(const Framebuffer &) = default;
-	Framebuffer &operator=(Framebuffer &&) = default;
+	Framebuffer(const Framebuffer&) = default;
+	Framebuffer(Framebuffer&&) = default;
+	Framebuffer& operator=(const Framebuffer&) = default;
+	Framebuffer& operator=(Framebuffer&&) = default;
 
 	/**
 	 * @brief Destructor.
@@ -97,7 +96,7 @@ public:
 	 * @brief Change the size of the frame buffer.
 	 * @param[in] iSize New size.
 	 */
-	virtual void resize(math::FrameSize iSize) = 0;
+	virtual void resize(math::vec2ui iSize) = 0;
 
 	/**
 	 * Get the Pixel information.
@@ -149,14 +148,14 @@ public:
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] virtual const FramebufferSpecification &getSpecification() const = 0;
+	[[nodiscard]] virtual const FramebufferSpecification& getSpecification() const = 0;
 
 	/**
 	 * @brief Create the frame buffer.
 	 * @param[in] iSpec Specifications.
 	 * @return The Frame buffer.
 	 */
-	static shared<Framebuffer> create(const FramebufferSpecification &iSpec);
+	static shared<Framebuffer> create(const FramebufferSpecification& iSpec);
 
 private:
 };

@@ -11,7 +11,7 @@
 
 namespace owl::renderer::null {
 
-Texture2D::Texture2D(const math::FrameSize iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {}
+Texture2D::Texture2D(const math::vec2ui iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {}
 
 Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
 	: renderer::Texture2D{iWidth, iHeight, iWithAlpha} {}

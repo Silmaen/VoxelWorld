@@ -16,7 +16,7 @@ namespace owl::input::null {
 namespace {
 uint8_t s_WinCount = 0;
 }// namespace
-Window::Window(const Properties &iProps) {
+Window::Window(const Properties& iProps) {
 	OWL_PROFILE_FUNCTION()
 	init(iProps);
 }
@@ -27,11 +27,10 @@ Window::~Window() {
 	shutdown();
 }
 
-void Window::init(const Properties &iProps) {
+void Window::init(const Properties& iProps) {
 	OWL_PROFILE_FUNCTION()
 	m_windowData.m_title = iProps.title;
-	m_windowData.m_width = iProps.width;
-	m_windowData.m_height = iProps.height;
+	m_windowData.m_size = {iProps.width, iProps.height};
 
 	OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width, iProps.height)
 	++s_WinCount;

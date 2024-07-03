@@ -70,7 +70,7 @@ private:
 
 	bool m_viewportFocused = false;
 	bool m_viewportHovered = false;
-	math::FrameSize m_viewportSize = {0, 0};
+	math::vec2ui m_viewportSize = {0, 0};
 	math::vec2 m_viewportLower = {0.0f, 0.0f};
 	math::vec2 m_viewportUpper = {0.0f, 0.0f};
 	shared<renderer::Framebuffer> m_framebuffer;

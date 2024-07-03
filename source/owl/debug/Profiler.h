@@ -106,7 +106,7 @@ private:
 /**
  * @brief Timer used for profiling.
  */
-class ProfileTimer {
+class OWL_API ProfileTimer {
 public:
 	/**
 	 * @brief Constructor.

@@ -175,8 +175,8 @@ void transitionImageLayout(const VkCommandBuffer &iCmd, const VkImage &iImage, c
 						 &barrier);
 }
 
-void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const math::FrameSize &iSize,
-					   const math::FrameSize &iOffset) {
+void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const math::vec2ui &iSize,
+					   const math::vec2ui &iOffset) {
 	const auto &core = VulkanCore::get();
 	const auto &commandBuffer = core.beginSingleTimeCommands();
 	const VkBufferImageCopy region{
@@ -187,14 +187,14 @@ void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const mat
 								 .mipLevel = 0,
 								 .baseArrayLayer = 0,
 								 .layerCount = 1},
-			.imageOffset = {static_cast<int32_t>(iOffset.width()), static_cast<int32_t>(iOffset.height()), 0},
-			.imageExtent = {iSize.width(), iSize.height(), 1}};
+			.imageOffset = {static_cast<int32_t>(iOffset.x()), static_cast<int32_t>(iOffset.y()), 0},
+			.imageExtent = {iSize.x(), iSize.y(), 1}};
 	vkCmdCopyBufferToImage(commandBuffer, iBuffer, iImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 	core.endSingleTimeCommands(commandBuffer);
 }
 
-void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const math::FrameSize &iSize,
-					   const math::FrameSize &iOffset) {
+void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const math::vec2ui &iSize,
+					   const math::vec2ui &iOffset) {
 	const auto &core = VulkanCore::get();
 	const auto &commandBuffer = core.beginSingleTimeCommands();
 	const VkBufferImageCopy region{
@@ -205,8 +205,8 @@ void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const mat
 								 .mipLevel = 0,
 								 .baseArrayLayer = 0,
 								 .layerCount = 1},
-			.imageOffset = {static_cast<int32_t>(iOffset.width()), static_cast<int32_t>(iOffset.height()), 0},
-			.imageExtent = {iSize.width(), iSize.height(), 1}};
+			.imageOffset = {static_cast<int32_t>(iOffset.x()), static_cast<int32_t>(iOffset.y()), 0},
+			.imageExtent = {iSize.x(), iSize.y(), 1}};
 	vkCmdCopyImageToBuffer(commandBuffer, iImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, iBuffer, 1, &region);
 	core.endSingleTimeCommands(commandBuffer);
 }

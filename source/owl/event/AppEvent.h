@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <math/sizingTypes.h>
-
 #include "Event.h"
 
 namespace owl::event {
@@ -20,41 +18,34 @@ class OWL_API WindowResizeEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
-	 * @param[in] iWidth Window's width.
-	 * @param[in] iHeight Window's height.
-	 */
-	WindowResizeEvent(const uint32_t iWidth, const uint32_t iHeight) : m_size{iWidth, iHeight} {}
-
-	/**
-	 * @brief Constructor.
 	 * @param[in] iSize Window's size.
 	 */
-	explicit WindowResizeEvent(const math::FrameSize &iSize) : m_size{iSize} {}
+	explicit WindowResizeEvent(const math::vec2ui& iSize) : m_size{iSize} {}
 
 	/**
 	 * @brief Get window's width.
 	 * @return The window's width.
 	 */
-	[[nodiscard]] uint32_t getWidth() const { return m_size.width(); }
+	[[nodiscard]] uint32_t getWidth() const { return m_size.x(); }
 
 	/**
 	 * @brief Get window's height.
 	 * @return The window's height.
 	 */
-	[[nodiscard]] uint32_t getHeight() const { return m_size.height(); }
+	[[nodiscard]] uint32_t getHeight() const { return m_size.y(); }
 
 	/**
 	 * @brief Get window's size.
 	 * @return The window's size.
 	 */
-	[[nodiscard]] const math::FrameSize &getSize() const { return m_size; }
+	[[nodiscard]] const math::vec2ui& getSize() const { return m_size; }
 
 	/**
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
 	[[nodiscard]] std::string toString() const override {
-		return fmt::format("WindowResizeEvent: {}, {}", m_size.width(), m_size.height());
+		return fmt::format("WindowResizeEvent: {}, {}", m_size.x(), m_size.y());
 	}
 
 	/**
@@ -83,7 +74,7 @@ public:
 
 private:
 	/// New size.
-	math::FrameSize m_size;
+	math::vec2ui m_size;
 };
 
 /**
