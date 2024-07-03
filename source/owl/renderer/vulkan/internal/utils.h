@@ -131,13 +131,13 @@ void transitionImageLayout(const VkImage &iImage, VkImageLayout iOldLayout, VkIm
 void transitionImageLayout(const VkCommandBuffer &iCmd, const VkImage &iImage, VkImageLayout iOldLayout,
 						   VkImageLayout iNewLayout);
 
-void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const math::FrameSize &iSize,
-					   const math::FrameSize &iOffset = {0, 0});
+void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const math::vec2ui &iSize,
+					   const math::vec2ui &iOffset = {0, 0});
 
-void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const math::FrameSize &iSize,
-					   const math::FrameSize &iOffset = {0, 0});
+void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const math::vec2ui &iSize,
+					   const math::vec2ui &iOffset = {0, 0});
 
-static constexpr VkExtent2D toExtent(const math::FrameSize &iSize) { return {iSize.getWidth(), iSize.getHeight()}; }
+static constexpr VkExtent2D toExtent(const math::vec2ui &iSize) { return {iSize.x(), iSize.y()}; }
 
-static constexpr math::FrameSize toFrameSize(const VkExtent2D &iSize) { return {iSize.width, iSize.height}; }
+static constexpr math::vec2ui toSize(const VkExtent2D &iSize) { return {iSize.width, iSize.height}; }
 }// namespace owl::renderer::vulkan::internal

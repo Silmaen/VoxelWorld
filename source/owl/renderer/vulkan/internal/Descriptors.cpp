@@ -140,7 +140,7 @@ void TextureData::createSampler() {
 		OWL_CORE_ERROR("Vulkan Texture: Error creating texture sampler ({}).", internal::resultString(result))
 	}
 }
-void TextureData::createImage(const math::FrameSize &iDimensions) {
+void TextureData::createImage(const math::vec2ui &iDimensions) {
 	freeTrexture();
 	const auto &vkc = internal::VulkanCore::get();
 	const VkImageCreateInfo imageInfo{
@@ -149,7 +149,7 @@ void TextureData::createImage(const math::FrameSize &iDimensions) {
 			.flags = {},
 			.imageType = VK_IMAGE_TYPE_2D,
 			.format = VK_FORMAT_R8G8B8A8_UNORM,
-			.extent = {.width = iDimensions.getWidth(), .height = iDimensions.getHeight(), .depth = 1},
+			.extent = {.width = iDimensions.x(), .height = iDimensions.y(), .depth = 1},
 			.mipLevels = 1,
 			.arrayLayers = 1,
 			.samples = VK_SAMPLE_COUNT_1_BIT,

@@ -414,6 +414,25 @@ public:
 	}
 
 	/**
+	 * @brief Compute the surface of a 2D vector;
+	 * @return The surface.
+	 */
+	[[nodiscard]] constexpr BaseType surface() const
+		requires(Dim == 2)
+	{
+		return x() * y();
+	}
+	/**
+	 * @brief Compute the ratio between dimentions.
+	 * @return The dimentions ratio.
+	 */
+	[[nodiscard]] constexpr float ratio() const
+		requires(Dim == 2)
+	{
+		return static_cast<float>(x()) / static_cast<float>(y());
+	}
+
+	/**
 	 * @brief Low level memory access.
 	 * @return Pointer to the data.
 	 */

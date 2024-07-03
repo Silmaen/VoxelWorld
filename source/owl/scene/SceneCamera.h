@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <math/sizingTypes.h>
-
 #include "core/Core.h"
 #include "renderer/Camera.h"
 
@@ -23,10 +21,10 @@ public:
 	 * @brief Default constructor.
 	 */
 	SceneCamera();
-	SceneCamera(const SceneCamera &) = default;
-	SceneCamera(SceneCamera &&) = default;
-	SceneCamera &operator=(const SceneCamera &) = default;
-	SceneCamera &operator=(SceneCamera &&) = default;
+	SceneCamera(const SceneCamera&) = default;
+	SceneCamera(SceneCamera&&) = default;
+	SceneCamera& operator=(const SceneCamera&) = default;
+	SceneCamera& operator=(SceneCamera&&) = default;
 
 	/**
 	 * @brief Destructor.
@@ -53,7 +51,7 @@ public:
 	 * @brief Defines the viewport.
 	 * @param[in] iSize Viewport's size.
 	 */
-	void setViewportSize(const math::FrameSize &iSize);
+	void setViewportSize(const math::vec2ui& iSize);
 
 	/**
 	 * @brief Get actual orthographic size.

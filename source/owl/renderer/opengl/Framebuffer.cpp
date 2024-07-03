@@ -22,7 +22,7 @@ namespace utils {
 namespace {
 GLenum textureTarget(const bool iMultisampled) { return iMultisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D; }
 
-void createTextures(const bool iMultisampled, uint32_t *oId, const uint32_t iCount) {
+void createTextures(const bool iMultisampled, uint32_t* oId, const uint32_t iCount) {
 	glCreateTextures(textureTarget(iMultisampled), static_cast<GLsizei>(iCount), oId);
 }
 
@@ -136,13 +136,11 @@ void Framebuffer::invalidate() {
 				case AttachmentSpecification::Format::Rgba8:
 				case AttachmentSpecification::Format::Surface:
 					utils::attachColorTexture(m_colorAttachments[i], static_cast<int>(m_specs.samples), GL_RGBA8,
-											  GL_RGBA, m_specs.size.width(), m_specs.size.height(),
-											  static_cast<int>(i));
+											  GL_RGBA, m_specs.size.x(), m_specs.size.y(), static_cast<int>(i));
 					break;
 				case AttachmentSpecification::Format::RedInteger:
 					utils::attachColorTexture(m_colorAttachments[i], static_cast<int>(m_specs.samples), GL_R32I,
-											  GL_RED_INTEGER, m_specs.size.width(), m_specs.size.height(),
-											  static_cast<int>(i));
+											  GL_RED_INTEGER, m_specs.size.x(), m_specs.size.y(), static_cast<int>(i));
 					break;
 				case AttachmentSpecification::Format::None:
 				case AttachmentSpecification::Format::Depth24Stencil8:
@@ -157,7 +155,7 @@ void Framebuffer::invalidate() {
 		switch (m_depthAttachmentSpecification.format) {
 			case AttachmentSpecification::Format::Depth24Stencil8:
 				utils::attachDepthTexture(m_depthAttachment, static_cast<int>(m_specs.samples), GL_DEPTH24_STENCIL8,
-										  GL_DEPTH_STENCIL_ATTACHMENT, m_specs.size.width(), m_specs.size.height());
+										  GL_DEPTH_STENCIL_ATTACHMENT, m_specs.size.x(), m_specs.size.y());
 				break;
 			case AttachmentSpecification::Format::None:
 			case AttachmentSpecification::Format::Rgba8:
@@ -188,15 +186,14 @@ void Framebuffer::invalidate() {
 
 void Framebuffer::bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_rendererId);
-	glViewport(0, 0, static_cast<GLsizei>(m_specs.size.width()), static_cast<GLsizei>(m_specs.size.height()));
+	glViewport(0, 0, static_cast<GLsizei>(m_specs.size.x()), static_cast<GLsizei>(m_specs.size.y()));
 }
 
 void Framebuffer::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-void Framebuffer::resize(const math::FrameSize iSize) {
-	if (iSize.getWidth() == 0 || iSize.getHeight() == 0 || iSize.getWidth() > g_maxFramebufferSize ||
-		iSize.getHeight() > g_maxFramebufferSize) {
-		OWL_CORE_WARN("Attempt to resize frame buffer to {} {}", iSize.getWidth(), iSize.getHeight())
+void Framebuffer::resize(const math::vec2ui iSize) {
+	if (iSize.x() == 0 || iSize.y() == 0 || iSize.x() > g_maxFramebufferSize || iSize.y() > g_maxFramebufferSize) {
+		OWL_CORE_WARN("Attempt to resize frame buffer to {} {}", iSize.x(), iSize.y())
 		return;
 	}
 	m_specs.size = iSize;
@@ -214,7 +211,7 @@ int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const 
 
 void Framebuffer::clearAttachment(const uint32_t iAttachmentIndex, const int iValue) {
 	OWL_CORE_ASSERT(iAttachmentIndex < m_colorAttachments.size(), "clearAttachment bad attachment index")
-	const auto &spec = m_colorAttachmentSpecifications[iAttachmentIndex];
+	const auto& spec = m_colorAttachmentSpecifications[iAttachmentIndex];
 	glClearTexImage(m_colorAttachments[iAttachmentIndex], 0, utils::FBTextureFormatToGL(spec.format), GL_INT, &iValue);
 }
 

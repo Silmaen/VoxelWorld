@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <math/sizingTypes.h>
-
 #include "Camera.h"
 #include "core/Timestep.h"
 #include "event/Event.h"
@@ -65,7 +63,7 @@ public:
 	 * @brief Set the camera viewport size.
 	 * @param[in] iSize New size.
 	 */
-	void setViewportSize(const math::FrameSize& iSize) {
+	void setViewportSize(const math::vec2ui& iSize) {
 		m_viewportSize = iSize;
 		updateProjection();
 	}
@@ -212,6 +210,6 @@ private:
 	// NOLINTEND(*-magic-numbers)
 
 	/// Viewport size.
-	math::FrameSize m_viewportSize = {1280, 720};
+	math::vec2ui m_viewportSize = {1280, 720};
 };
 }// namespace owl::renderer

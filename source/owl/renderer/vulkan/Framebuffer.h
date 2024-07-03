@@ -16,7 +16,7 @@ namespace owl::renderer::vulkan {
 /**
  * @brief Class Framebuffer.
  */
-class Framebuffer final : public renderer::Framebuffer {
+class OWL_API Framebuffer final : public renderer::Framebuffer {
 public:
 	Framebuffer(const Framebuffer &) = default;
 	Framebuffer(Framebuffer &&) = default;
@@ -53,7 +53,7 @@ public:
 	 * @brief Change the size of the frame buffer.
 	 * @param[in] iSize New size.
 	 */
-	void resize(math::FrameSize iSize) override;
+	void resize(math::vec2ui iSize) override;
 
 	/**
 	 * @brief Get the value of given pixel.

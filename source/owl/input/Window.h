@@ -9,7 +9,6 @@
 #pragma once
 #include "core/Core.h"
 #include "event/Event.h"
-#include "math/sizingTypes.h"
 #include "renderer/GraphContext.h"
 
 namespace owl::input {
@@ -44,13 +43,13 @@ struct Properties {
 class OWL_API Window {
 public:
 	/// Call back function's type.
-	using EventCallback = std::function<void(event::Event &)>;
+	using EventCallback = std::function<void(event::Event&)>;
 
 	Window() = default;
-	Window(const Window &) = delete;
-	Window(Window &&) = delete;
-	Window &operator=(const Window &) = delete;
-	Window &operator=(Window &&) = delete;
+	Window(const Window&) = delete;
+	Window(Window&&) = delete;
+	Window& operator=(const Window&) = delete;
+	Window& operator=(Window&&) = delete;
 
 	/**
 	 * @brief Destructor.
@@ -78,7 +77,7 @@ public:
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] virtual math::FrameSize getSize() const = 0;
+	[[nodiscard]] virtual const math::vec2ui& getSize() const = 0;
 
 	/**
 	 * @brief Get the type of window manager.
@@ -90,7 +89,7 @@ public:
 	 * @brief Define the Event Callback function.
 	 * @param[in] iCallback The new callback function.
 	 */
-	virtual void setEventCallback(const EventCallback &iCallback) = 0;
+	virtual void setEventCallback(const EventCallback& iCallback) = 0;
 
 	/**
 	 * @brief St the VSync.
@@ -108,20 +107,20 @@ public:
 	 * @brief Access to the Native Window.
 	 * @return Native window's raw pointer.
 	 */
-	[[nodiscard]] virtual void *getNativeWindow() const = 0;
+	[[nodiscard]] virtual void* getNativeWindow() const = 0;
 
 	/**
 	 * @brief Helper for Window creation.
 	 * @param[in] iProps The window properties.
 	 * @return Pointer to the window.
 	 */
-	static uniq<Window> create(const Properties &iProps = Properties());
+	static uniq<Window> create(const Properties& iProps = Properties());
 
 	/**
 	 * @brief Access to the graph context.
 	 * @return Graph context.
 	 */
-	[[nodiscard]] renderer::GraphContext *getGraphContext() const { return mu_context.get(); }
+	[[nodiscard]] renderer::GraphContext* getGraphContext() const { return mu_context.get(); }
 
 	/**
 	 * @brief Terminate the window.

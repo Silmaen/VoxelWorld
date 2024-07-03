@@ -38,7 +38,7 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 */
-	explicit Texture2D(math::FrameSize iSize, bool iWithAlpha = true);
+	explicit Texture2D(math::vec2ui iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Destructor.

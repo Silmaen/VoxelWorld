@@ -21,7 +21,7 @@ namespace owl::renderer::vulkan {
 
 namespace {
 
-void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
+void createImage(const uint32_t iIndex, const math::vec2ui &iDimensions) {
 	auto &data = internal::Descriptors::get().getTextureData(iIndex);
 	data.createImage(iDimensions);
 	internal::Descriptors::get().bindTextureImage(iIndex);
@@ -29,7 +29,7 @@ void createImage(const uint32_t iIndex, const math::FrameSize &iDimensions) {
 
 }// namespace
 
-Texture2D::Texture2D(const math::FrameSize &iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {}
+Texture2D::Texture2D(const math::vec2ui &iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {}
 
 Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
 	: renderer::Texture2D{iWidth, iHeight, iWithAlpha} {}

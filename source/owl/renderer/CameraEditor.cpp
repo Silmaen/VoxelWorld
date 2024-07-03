@@ -111,10 +111,10 @@ void CameraEditor::mouseZoom(const float iDelta) {
 math::vec3 CameraEditor::calculatePosition() const { return m_focalPoint - getForwardDirection() * m_distance; }
 
 std::pair<float, float> CameraEditor::panSpeed() const {
-	const float x = std::min(static_cast<float>(m_viewportSize.getWidth()) / 1000.0f, 2.4f);// max = 2.4f
+	const float x = std::min(static_cast<float>(m_viewportSize.x()) / 1000.0f, 2.4f);// max = 2.4f
 	const float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 
-	const float y = std::min(static_cast<float>(m_viewportSize.getHeight()) / 1000.0f, 2.4f);// max = 2.4f
+	const float y = std::min(static_cast<float>(m_viewportSize.y()) / 1000.0f, 2.4f);// max = 2.4f
 	const float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
 
 	return {xFactor, yFactor};

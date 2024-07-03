@@ -14,12 +14,12 @@ namespace owl::renderer::null {
 /**
  * @brief Class VertexBuffer.
  */
-class VertexBuffer final : public renderer::VertexBuffer {
+class OWL_API VertexBuffer final : public renderer::VertexBuffer {
 public:
-	VertexBuffer(const VertexBuffer &) = delete;
-	VertexBuffer(VertexBuffer &&) = delete;
-	VertexBuffer &operator=(const VertexBuffer &) = delete;
-	VertexBuffer &operator=(VertexBuffer &&) = delete;
+	VertexBuffer(const VertexBuffer&) = delete;
+	VertexBuffer(VertexBuffer&&) = delete;
+	VertexBuffer& operator=(const VertexBuffer&) = delete;
+	VertexBuffer& operator=(VertexBuffer&&) = delete;
 	/**
 	 * @brief Constructor.
 	 * @param[in] iSize The buffer size.
@@ -31,7 +31,7 @@ public:
 	 * @param[in] iVertices The Vertices.
 	 * @param[in] iSize The buffer size.
 	 */
-	VertexBuffer(float *iVertices, uint32_t iSize);
+	VertexBuffer(float* iVertices, uint32_t iSize);
 
 	/**
 	 * @brief Destructor.
@@ -53,24 +53,24 @@ public:
 	 * @param[in] iData The raw data.
 	 * @param[in] iSize Number of data.
 	 */
-	void setData(const void *iData, uint32_t iSize) override;
+	void setData(const void* iData, uint32_t iSize) override;
 };
 
 /**
  * @brief Class IndexBuffer.
  */
-class IndexBuffer final : public renderer::IndexBuffer {
+class OWL_API IndexBuffer final : public renderer::IndexBuffer {
 public:
-	IndexBuffer(const IndexBuffer &) = delete;
-	IndexBuffer(IndexBuffer &&) = delete;
-	IndexBuffer &operator=(const IndexBuffer &) = delete;
-	IndexBuffer &operator=(IndexBuffer &&) = delete;
+	IndexBuffer(const IndexBuffer&) = delete;
+	IndexBuffer(IndexBuffer&&) = delete;
+	IndexBuffer& operator=(const IndexBuffer&) = delete;
+	IndexBuffer& operator=(IndexBuffer&&) = delete;
 	/**
 	 * @brief Default constructor.
 	 * @param[in] iIndices Array of indices.
 	 * @param[in] iCount Number of indices in the array.
 	 */
-	IndexBuffer(uint32_t *iIndices, uint32_t iCount);
+	IndexBuffer(uint32_t* iIndices, uint32_t iCount);
 
 	/**
 	 * @brief Destructor.

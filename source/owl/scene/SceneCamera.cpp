@@ -32,7 +32,7 @@ void SceneCamera::setPerspective(const float iVerticalFov, const float iNearClip
 	recalculateProjection();
 }
 
-void SceneCamera::setViewportSize(const math::FrameSize& iSize) {
+void SceneCamera::setViewportSize(const math::vec2ui& iSize) {
 	OWL_CORE_ASSERT(iSize.surface() > 0, "Null viewport size")
 	m_aspectRatio = iSize.ratio();
 	recalculateProjection();

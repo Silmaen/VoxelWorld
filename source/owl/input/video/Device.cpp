@@ -20,23 +20,23 @@ namespace {
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 // NOLINTBEGIN(*-magic-numbers)
-void convertNv12ToRgb24(const uint8_t *iNv12Buffer, const math::FrameSize &iFrameSize, uint8_t *oRgb24Buffer) {
+void convertNv12ToRgb24(const uint8_t *iNv12Buffer, const math::vec2ui &iSize, uint8_t *oRgb24Buffer) {
 	// Chaque composant Y occupe width * height octets
-	const uint32_t ySize = iFrameSize.surface();
+	const uint32_t ySize = iSize.surface();
 
 	// Pointeurs vers les composants Y, U et V dans le tampon NV12
 	const uint8_t *yComponent = iNv12Buffer;
 	const uint8_t *uvComponent = iNv12Buffer + ySize;
 
 	// Parcourir chaque ligne
-	for (uint32_t i = 0; i < iFrameSize.getHeight(); i++) {
+	for (uint32_t i = 0; i < iSize.y(); i++) {
 		// Parcourir chaque pixel de la ligne
-		for (uint32_t j = 0; j < iFrameSize.getWidth(); j++) {
+		for (uint32_t j = 0; j < iSize.x(); j++) {
 			// Indices dans le tampon NV12
-			const uint32_t yIndex = i * iFrameSize.getWidth() + j;
-			const uint32_t uvIndex = (i / 2ul * iFrameSize.getWidth()) + (j & ~1ul);
+			const uint32_t yIndex = i * iSize.x() + j;
+			const uint32_t uvIndex = (i / 2ul * iSize.x()) + (j & ~1ul);
 			// Indices dans le tampon RGB24
-			const uint32_t rgbIndex = ((i + 1) * iFrameSize.getWidth() - j - 1) * 3;
+			const uint32_t rgbIndex = ((i + 1) * iSize.x() - j - 1) * 3;
 			// Conversion YUV vers RGB
 			const int32_t c = yComponent[yIndex] - 16;
 			const int32_t d = uvComponent[uvIndex] - 128;
@@ -50,9 +50,9 @@ void convertNv12ToRgb24(const uint8_t *iNv12Buffer, const math::FrameSize &iFram
 	}
 }
 
-void convertYuYvToRgb24(const uint8_t *iYuYvBuffer, const math::FrameSize &iFrameSize, uint8_t *oRgb24Buffer) {
+void convertYuYvToRgb24(const uint8_t *iYuYvBuffer, const math::vec2ui &iSize, uint8_t *oRgb24Buffer) {
 	// Chaque composant YUV prend deux octets dans le format YUYV
-	const uint32_t yuyvSize = iFrameSize.surface() * 2;
+	const uint32_t yuyvSize = iSize.surface() * 2;
 
 	// Parcourir chaque paire de pixels YUYV
 	for (uint32_t i = 0; i < yuyvSize; i += 4) {
@@ -78,7 +78,7 @@ void convertYuYvToRgb24(const uint8_t *iYuYvBuffer, const math::FrameSize &iFram
 	}
 }
 
-void convertMJpegToRgb24(const uint8_t *iJpegBuffer, const int32_t iJpegSize, const math::FrameSize &iFrameSize,
+void convertMJpegToRgb24(const uint8_t *iJpegBuffer, const int32_t iJpegSize, const math::vec2ui &iSize,
 						 uint8_t *oRgb24Buffer) {
 	int comp = 0;
 	int width = 0;
@@ -89,9 +89,9 @@ void convertMJpegToRgb24(const uint8_t *iJpegBuffer, const int32_t iJpegSize, co
 		OWL_CORE_WARN("Jpeg decoding: nullptr result.")
 		return;
 	}
-	if (iFrameSize != math::FrameSize{static_cast<uint32_t>(width), static_cast<uint32_t>(height)}) {
-		OWL_CORE_WARN("Jpeg decoding: size missmatch ({} {}) expecting {} {}.", width, height, iFrameSize.getWidth(),
-					  iFrameSize.getHeight())
+	if (iSize != math::vec2ui{static_cast<uint32_t>(width), static_cast<uint32_t>(height)}) {
+		OWL_CORE_WARN("Jpeg decoding: size missmatch ({} {}) expecting {} {}.", width, height, iSize.x(),
+					  iSize.y())
 		stbi_image_free(buffer);
 		return;
 	}

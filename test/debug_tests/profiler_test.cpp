@@ -6,7 +6,7 @@
 using namespace owl::debug;
 
 TEST(profiler, creation) {
-	auto &prof = Profiler::get();
+	auto& prof = Profiler::get();
 	prof.beginSession("bob", "");
 	prof.endSession();
 	owl::core::Log::init(spdlog::level::off);
@@ -21,5 +21,15 @@ TEST(profiler, creation) {
 	EXPECT_FALSE(exists(file2));
 	remove(file);
 	remove(file2);
+	owl::core::Log::invalidate();
+}
+
+TEST(profiler, timer) {
+	owl::core::Log::init(spdlog::level::off);
+	{ ProfileTimer const timer("toto"); }
+	{
+		ProfileTimer timer("toto2");
+		timer.stop();
+	}
 	owl::core::Log::invalidate();
 }

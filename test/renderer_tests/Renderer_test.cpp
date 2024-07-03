@@ -29,7 +29,6 @@ TEST(Renderer, fakeScene) {
 	const CameraOrtho cam(0, 0, 800, 600);
 	Renderer::beginScene(cam);
 	Renderer::endScene();
-
 	RenderCommand::invalidate();
 	owl::core::Log::invalidate();
 }

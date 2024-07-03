@@ -24,12 +24,12 @@ namespace owl::input::glfw {
 namespace {
 uint8_t s_glfwWindowCount = 0;
 
-void glfwErrorCallback(int iError, const char *iDescription) {
+void glfwErrorCallback(int iError, const char* iDescription) {
 	OWL_CORE_ERROR("GLFW Error ({}): {}", iError, iDescription)
 }
 }// namespace
 
-Window::Window(const Properties &iProps) {
+Window::Window(const Properties& iProps) {
 	OWL_PROFILE_FUNCTION()
 
 	init(iProps);
@@ -41,12 +41,11 @@ Window::~Window() {
 	shutdown();
 }
 
-void Window::init(const Properties &iProps) {
+void Window::init(const Properties& iProps) {
 	OWL_PROFILE_FUNCTION()
 
 	m_windowData.title = iProps.title;
-	m_windowData.width = iProps.width;
-	m_windowData.height = iProps.height;
+	m_windowData.size = {iProps.width, iProps.height};
 
 	OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width, iProps.height)
 
@@ -96,39 +95,39 @@ void Window::init(const Properties &iProps) {
 
 	// Set GLFW callbacks
 	{
-		glfwSetWindowSizeCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const int iWidth, const int iHeight) {
-			auto *const data = static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow));
-			data->width = static_cast<uint32_t>(iWidth);
-			data->height = static_cast<uint32_t>(iHeight);
+		glfwSetWindowSizeCallback(mp_glfwWindow, [](GLFWwindow* iWindow, const int iWidth, const int iHeight) {
+			auto* const data = static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow));
+			data->size.x() = static_cast<uint32_t>(iWidth);
+			data->size.y() = static_cast<uint32_t>(iHeight);
 
-			event::WindowResizeEvent event(data->width, data->height);
+			event::WindowResizeEvent event(data->size);
 			data->eventCallback(event);
 		});
 
-		glfwSetWindowCloseCallback(mp_glfwWindow, [](GLFWwindow *iWindow) {
+		glfwSetWindowCloseCallback(mp_glfwWindow, [](GLFWwindow* iWindow) {
 			event::WindowCloseEvent event;
-			static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+			static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 		});
-		glfwSetKeyCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const int iKey, [[maybe_unused]] int iScancode,
+		glfwSetKeyCallback(mp_glfwWindow, [](GLFWwindow* iWindow, const int iKey, [[maybe_unused]] int iScancode,
 											 const int iAction, [[maybe_unused]] int iMods) {
 			const auto cKey = static_cast<KeyCode>(iKey);
 			switch (iAction) {
 				case GLFW_PRESS:
 					{
 						event::KeyPressedEvent event(cKey, false);
-						static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+						static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 						break;
 					}
 				case GLFW_RELEASE:
 					{
 						event::KeyReleasedEvent event(cKey);
-						static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+						static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 						break;
 					}
 				case GLFW_REPEAT:
 					{
 						event::KeyPressedEvent event(cKey, true);
-						static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+						static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 						break;
 					}
 				default:
@@ -136,24 +135,24 @@ void Window::init(const Properties &iProps) {
 			}
 		});
 
-		glfwSetCharCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const unsigned int iKeycode) {
+		glfwSetCharCallback(mp_glfwWindow, [](GLFWwindow* iWindow, const unsigned int iKeycode) {
 			event::KeyTypedEvent event(static_cast<KeyCode>(iKeycode));
-			static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+			static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 		});
 
-		glfwSetMouseButtonCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const int iButton, const int iAction,
+		glfwSetMouseButtonCallback(mp_glfwWindow, [](GLFWwindow* iWindow, const int iButton, const int iAction,
 													 [[maybe_unused]] const int iMods) {
 			switch (iAction) {
 				case GLFW_PRESS:
 					{
 						event::MouseButtonPressedEvent event(static_cast<MouseCode>(iButton));
-						static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+						static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 						break;
 					}
 				case GLFW_RELEASE:
 					{
 						event::MouseButtonReleasedEvent event(static_cast<MouseCode>(iButton));
-						static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+						static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 						break;
 					}
 				default:
@@ -161,14 +160,14 @@ void Window::init(const Properties &iProps) {
 			}
 		});
 
-		glfwSetScrollCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const double iXOffset, const double iYOffset) {
+		glfwSetScrollCallback(mp_glfwWindow, [](GLFWwindow* iWindow, const double iXOffset, const double iYOffset) {
 			event::MouseScrolledEvent event(static_cast<float>(iXOffset), static_cast<float>(iYOffset));
-			static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+			static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 		});
 
-		glfwSetCursorPosCallback(mp_glfwWindow, [](GLFWwindow *iWindow, const double iX, const double iY) {
+		glfwSetCursorPosCallback(mp_glfwWindow, [](GLFWwindow* iWindow, const double iX, const double iY) {
 			event::MouseMovedEvent event(static_cast<float>(iX), static_cast<float>(iY));
-			static_cast<WindowData *>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+			static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 		});
 	}
 }
