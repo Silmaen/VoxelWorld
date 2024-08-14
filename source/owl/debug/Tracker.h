@@ -40,19 +40,99 @@ using size_t = std::size_t;
  * @brief namespace for debug functions.
  */
 namespace owl::debug {
-
-#ifdef OWL_STACKTRACE
 /**
- * @brief Simple class that enable Stacktrace during its lifetime.
+ * @brief Information about memory chunk.
  */
-class OWL_API ScopeTrace {
-public:
-	/// Constructor.
-	ScopeTrace();
-	/// Destructor.
-	~ScopeTrace();
-};
+struct OWL_API AllocationInfo {
+	AllocationInfo(void* iLocation, size_t iSize);
+	/// Location in memory.
+	void* location = nullptr;
+	/// Size of the memory chunk.
+	size_t size = 0;
+#ifdef OWL_STACKTRACE
+	/// Stack trace of the allocation.
+	cpptrace::stacktrace fullTrace;
+	/// @brief Look in the stack for the caller information.
+	/// @return The Calling frame.
+	[[nodiscard]] const cpptrace::stacktrace_frame& getCallerInfo() const;
 #endif
+	/**
+	 * @brief Express this allocation line as a string
+	 * @param[in] iTracePrint If the simplified trace should be print.
+	 * @param[in] iFullTrace If we print the full stack trace instead of simplified one.
+	 * @return String of the allocation.
+	 */
+	[[nodiscard]] OWL_API std::string toStr(bool iTracePrint = true, bool iFullTrace = false) const;
+};
+
+/**
+ * @brief Result structure of allocation state.
+ */
+struct OWL_API AllocationState {
+	~AllocationState();
+	AllocationState() = default;
+	AllocationState(const AllocationState&) = default;
+	AllocationState(AllocationState&&) = default;
+	AllocationState& operator=(const AllocationState&) = default;
+	AllocationState& operator=(AllocationState&&) = default;
+	/// Amount of allocated memory.
+	size_t allocatedMemory = 0;
+	/// Amount of memory allocation calls.
+	size_t allocationCalls = 0;
+	/// Amount of de-allocation calls.
+	size_t deallocationCalls = 0;
+	/// Max seen amount of memory.
+	size_t memoryPeek = 0;
+	/// list of allocated chunks of memory.
+	std::list<AllocationInfo> allocs;
+	/**
+	 * @brief Reset the database.
+	 */
+	void reset();
+	/**
+	 * @brief Add a chunk of memory to the database.
+	 * @param[in] iLocation Pointer to the allocated memory
+	 * @param[in] iSize Amount of allocated memory.
+	 */
+	void pushMemory(void* iLocation, size_t iSize);
+	/**
+	 * @brief Free the chunk of memory at the given location.
+	 * @param[in] iLocation Memory location.
+	 * @param[in] iSize Amount of memory.
+	 */
+	void freeMemory(void* iLocation, size_t iSize);
+};
+
+class OWL_API TrackerAPI {
+public:
+	/**
+	 * @brief Function called at each allocation.
+	 * @param[in] iMemoryPtr Memory pointer where allocation is done.
+	 * @param[in] iSize The Allocated size.
+	 */
+	static void allocate(void* iMemoryPtr, size_t iSize);
+
+	/**
+	 * @brief Function called each de-allocation.
+	 * @param[in] iMemoryPtr Memory pointer to deallocate.
+	 * @param[in] iSize De-allocation size.
+	 */
+	static void deallocate(void* iMemoryPtr, size_t iSize = 0);
+
+	/**
+	 * @brief Reset current memory state monitor and give the previous status.
+	 * @return Status since last call to check.
+	 */
+	static const AllocationState& checkState();
+
+	/**
+	 * @brief Get the memory state since the start of the program.
+	 * @return Memory state.
+	 */
+	static const AllocationState& globals();
+};
+
+// ---------- Scope utilities --------------------
 
 /**
  * @brief Simple class that disable memory tracking during its lifetime.
@@ -64,124 +144,28 @@ public:
 	/// Destructor.
 	~ScopeUntrack();
 
-	ScopeUntrack(const ScopeUntrack &) = delete;
-	ScopeUntrack(ScopeUntrack &&) = delete;
-	ScopeUntrack &operator=(const ScopeUntrack &) = delete;
-	ScopeUntrack &operator=(ScopeUntrack &&) = delete;
+	ScopeUntrack(const ScopeUntrack&) = delete;
+	ScopeUntrack(ScopeUntrack&&) = delete;
+	ScopeUntrack& operator=(const ScopeUntrack&) = delete;
+	ScopeUntrack& operator=(ScopeUntrack&&) = delete;
 };
-
 /**
- * @brief Class Tracker.
- *
- * A simple memory allocation tracker.
- */
-class OWL_API Tracker {
+* @brief Simple class that disable memory tracking during its lifetime.
+*/
+class OWL_API ScopeTrack {
 public:
-	Tracker(const Tracker &) = delete;
-	Tracker(Tracker &&) = delete;
-	Tracker &operator=(const Tracker &) = delete;
-	Tracker &operator=(Tracker &&) = delete;
-	/**
-	 * @brief Destructor.
-	 */
-	~Tracker();
+	/// Constructor.
+	ScopeTrack();
+	/// Destructor.
+	~ScopeTrack();
 
-	/**
-	 * @brief Get engine instance.
-	 * @return The engine instance.
-	 */
-	static Tracker &get();
-
-	/**
-	 * @brief Function called at each allocation.
-	 * @param[in] iMemoryPtr Memory pointer where allocation is done.
-	 * @param[in] iSize The Allocated size.
-	 */
-	void allocate(void *iMemoryPtr, size_t iSize);
-
-	/**
-	 * @brief Function called each de-allocation.
-	 * @param[in] iMemoryPtr Memory pointer to deallocate.
-	 * @param[in] iSize De-allocation size.
-	 */
-	void deallocate(void *iMemoryPtr, size_t iSize = 0);
-
-	/**
-	 * @brief Information about memory chunk.
-	 */
-	struct AllocationInfo {
-		AllocationInfo(void *iLocation, const size_t iSize) : location{iLocation}, size{iSize} {}
-		void *location = nullptr;///< location in memory.
-		size_t size = 0;///< size of the memory chunk.
-#ifdef OWL_STACKTRACE
-		cpptrace::stacktrace_frame traceAlloc;///< Stack trace of the allocation.
-#endif
-		/**
-		 * @brief Express this allocation line as a string
-		 * @return String of the allocation.
-		 */
-		[[nodiscard]] OWL_API std::string toStr() const;
-	};
-
-	/**
-	 * @brief Result structure of allocation state.
-	 */
-	struct AllocationState {
-		size_t allocatedMemory = 0;///< Amount of allocated memory.
-		size_t allocationCalls = 0;///< Amount of memory allocation calls.
-		size_t deallocationCalls = 0;///< Amount of de-allocation calls.
-		size_t memoryPeek = 0;///< Max seen amount of memory.
-		std::list<AllocationInfo> allocs;///< list of allocated chunks of memory.
-		/**
-		 * @brief Add a chunk of memory to the database.
-		 * @param[in] iLocation Pointer to the allocated memory
-		 * @param[in] iSize Amount of allocated memory.
-		 */
-		void pushMemory(void *iLocation, size_t iSize);
-		/**
-		 * @brief Free the chunk of memory at the given location.
-		 * @param[in] iLocation Memory location.
-		 * @param[in] iSize Amount of memory.
-		 */
-		void freeMemory(void *iLocation, size_t iSize);
-		/**
-		 * @brief Reset the database.
-		 */
-		void reset();
-	};
-
-	/**
-	 * @brief Reset current memory state monitor and give the previous status.
-	 * @return Status since last call to check.
-	 */
-	const AllocationState &checkState();
-
-	/**
-	 * @brief Get the memory state since the start of the program.
-	 * @return Memory state.
-	 */
-	[[nodiscard]] const AllocationState &globals() const;
-
-private:
-	/**
-	 * @brief Default constructor.
-	 */
-	Tracker();
-
-	/// Global Memory allocation state's info.
-	AllocationState m_globalAllocationState;
-	/// Current Memory allocation state's info.
-	AllocationState m_currentAllocationState;
-	/// Last Memory allocation state's info.
-	AllocationState m_lastAllocationState;
+	ScopeTrack(const ScopeTrack&) = delete;
+	ScopeTrack(ScopeTrack&&) = delete;
+	ScopeTrack& operator=(const ScopeTrack&) = delete;
+	ScopeTrack& operator=(ScopeTrack&&) = delete;
 };
 
 }// namespace owl::debug
 
-#ifdef OWL_STACKTRACE
-#define OWL_SCOPE_TRACE owl::debug::ScopeTrace scopeTrace;
-#else
-#define OWL_SCOPE_TRACE
-#endif
-
 #define OWL_SCOPE_UNTRACK const owl::debug::ScopeUntrack scopeUntrack;
+#define OWL_SCOPE_FORCE_TRACK const owl::debug::ScopeTrack scopeTrack;

@@ -150,7 +150,7 @@ public:
 	 * @brief Get the graphic queue index.
 	 * @return The graph queue index.
 	 */
-	[[nodiscard]] uint32_t getGraphQueueFamilyIndex() const { return m_phyProps.graphicQueueIndex; }
+	[[nodiscard]] uint32_t getGraphQueueFamilyIndex() const { return m_phyProps->graphicQueueIndex; }
 
 	/**
 	 * @brief Access to the graphic queue.
@@ -244,13 +244,13 @@ private:
 	VkDebugUtilsMessengerEXT m_debugUtilsMessenger{};
 
 	/// Information about the instance.
-	InstanceInformations m_instanceInfo;
+	uniq<InstanceInformations> m_instanceInfo{nullptr};
 	/// If  validation layer are enabled.
 	bool m_hasValidation = false;
 	/// The internal state.
 	State m_state = State::Created;
 	/// Save of the current physical device properties.
-	PhysicalDeviceCapabilities m_phyProps;
+	uniq<PhysicalDeviceCapabilities> m_phyProps;
 
 	/// The graphic queue.
 	VkQueue m_graphicQueue = nullptr;

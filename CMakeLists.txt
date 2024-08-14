@@ -22,6 +22,8 @@ option(${PRJPREFIX}_BUILD_CAST "If wanted to generate OWl Cast" ON)
 
 option(${PRJPREFIX}_TESTING "Enable the unit tests" ON)
 option(${PRJPREFIX}_ENABLE_COVERAGE "Run code coverage during test run" OFF)
+option(${PRJPREFIX}_ENABLE_STACKTRACE "Use stacktrace within the memory tracker (slow down the code)" OFF)
+option(${PRJPREFIX}_ENABLE_PROFILING "Output profiling informations during execution" OFF)
 
 #
 # ---=== Base Configs ===---

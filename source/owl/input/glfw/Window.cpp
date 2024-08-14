@@ -72,8 +72,11 @@ void Window::init(const Properties& iProps) {
 #endif
 		if (api == renderer::RenderAPI::Type::Vulkan)
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		mp_glfwWindow = glfwCreateWindow(static_cast<int>(iProps.width), static_cast<int>(iProps.height),
-										 m_windowData.title.c_str(), nullptr, nullptr);
+		{
+			OWL_SCOPE_UNTRACK
+			mp_glfwWindow = glfwCreateWindow(static_cast<int>(iProps.width), static_cast<int>(iProps.height),
+											 m_windowData.title.c_str(), nullptr, nullptr);
+		}
 		++s_glfwWindowCount;
 	}
 	// Set icon

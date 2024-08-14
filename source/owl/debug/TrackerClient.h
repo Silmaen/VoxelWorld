@@ -1,5 +1,5 @@
 /**
- * @file TrakerClient.h
+ * @file TrackerClient.h
  * @author Silmaen
  * @date 07/12/2022
  * Copyright © 2022 All rights reserved.
@@ -12,12 +12,13 @@
 #pragma once
 
 #include "Tracker.h"
-#ifdef OWL_BUILD_SHARED
+#if defined(OWL_BUILD_SHARED) && defined(OWL_PLATFORM_WINDOWS)
 
+// NOLINTBEGIN(*-no-malloc,cppcoreguidelines-owning-memory,misc-definitions-in-headers)
 #define OWL_DEALLOC_EXCEPT noexcept
 
 #if !defined(__cpp_sized_deallocation) || __cpp_sized_deallocation == 0
-void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT;
+void operator delete(void* memory, size_t size) OWL_DEALLOC_EXCEPT;
 #endif
 
 /**
@@ -25,9 +26,9 @@ void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT;
  * @param[in] size Size to allocate.
  * @return Pointer to allocated memory.
  */
-void *operator new(size_t size) {
-	void *mem = malloc(size);
-	owl::debug::Tracker::get().allocate(mem, size);
+void* operator new(size_t size) {
+	void* mem = malloc(size);
+	owl::debug::TrackerAPI::allocate(mem, size);
 	return mem;
 }
 
@@ -36,8 +37,8 @@ void *operator new(size_t size) {
  * @param[in] memory Memory to free.
  * @param[in] size Amount to free.
  */
-void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT {
-	owl::debug::Tracker::get().deallocate(memory, size);
+void operator delete(void* memory, [[maybe_unused]] size_t size) OWL_DEALLOC_EXCEPT {
+	owl::debug::TrackerAPI::deallocate(memory, size);
 	free(memory);
 }
 
@@ -45,8 +46,9 @@ void operator delete(void *memory, size_t size) OWL_DEALLOC_EXCEPT {
  * @brief Overload of standard memory deallocation.
  * @param[in] memory Memory to free.
  */
-void operator delete(void *memory) OWL_DEALLOC_EXCEPT {
-	owl::debug::Tracker::get().deallocate(memory);
+void operator delete(void* memory) OWL_DEALLOC_EXCEPT {
+	owl::debug::TrackerAPI::deallocate(memory);
 	free(memory);
 }
+// NOLINTEND(*-no-malloc,cppcoreguidelines-owning-memory,misc-definitions-in-headers)
 #endif

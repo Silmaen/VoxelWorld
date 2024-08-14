@@ -16,6 +16,7 @@ Base2D::Base2D() : core::layer::Layer("base2D"), m_cameraController{1280.0f / 72
 void Base2D::onAttach() {
 	OWL_PROFILE_FUNCTION()
 
+	OWL_SCOPE_UNTRACK
 	const auto texturePath = core::Application::get().getAssetDirectory() / "textures";
 	m_checkerboardTexture = renderer::Texture2D::create(texturePath / "CheckerBoard.png");
 	m_spriteTexture = renderer::Texture2D::create(texturePath / "mario.png");
@@ -135,20 +136,20 @@ void Base2D::onImGuiRender(const core::Timestep& iTs) {
 	}
 	// ==================================================================
 	{
-		const auto& tracker = debug::Tracker::get();
 		ImGui::Begin("Statistics");
 		ImGui::Text("%s", fmt::format("FPS: {:.2f}", iTs.getFps()).c_str());
-		ImGui::Text("%s", fmt::format("Current used memory: {}", tracker.globals().allocatedMemory).c_str());
-		ImGui::Text("%s", fmt::format("Max used memory: {}", tracker.globals().memoryPeek).c_str());
-		ImGui::Text("%s", fmt::format("Allocation calls: {}", tracker.globals().allocationCalls).c_str());
-		ImGui::Text("%s", fmt::format("Deallocation calls: {}", tracker.globals().deallocationCalls).c_str());
+		ImGui::Text("%s", fmt::format("Current used memory: {}", debug::TrackerAPI::globals().allocatedMemory).c_str());
+		ImGui::Text("%s", fmt::format("Max used memory: {}", debug::TrackerAPI::globals().memoryPeek).c_str());
+		ImGui::Text("%s", fmt::format("Allocation calls: {}", debug::TrackerAPI::globals().allocationCalls).c_str());
+		ImGui::Text("%s",
+					fmt::format("Deallocation calls: {}", debug::TrackerAPI::globals().deallocationCalls).c_str());
 
 		const auto stats = renderer::Renderer2D::getStats();
 		ImGui::Text("Renderer2D Stats:");
-		ImGui::Text("Draw Calls: %d", stats.drawCalls);
-		ImGui::Text("Quads: %d", stats.quadCount);
-		ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
-		ImGui::Text("Indices: %d", stats.getTotalIndexCount());
+		ImGui::Text("Draw Calls: %ud", stats.drawCalls);
+		ImGui::Text("Quads: %ud", stats.quadCount);
+		ImGui::Text("Vertices: %ud", stats.getTotalVertexCount());
+		ImGui::Text("Indices: %ud", stats.getTotalIndexCount());
 		ImGui::Text("Viewport size: %f %f", static_cast<double>(m_viewportSize.x()),
 					static_cast<double>(m_viewportSize.y()));
 		ImGui::Text("Aspect ratio: %f", static_cast<double>(m_viewportSize.x() / m_viewportSize.y()));

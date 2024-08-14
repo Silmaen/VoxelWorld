@@ -119,8 +119,6 @@ endif ()
 #
 # --== Properties ==--
 #
-
-
 get_property(${PRJPREFIX}_IS_GENERATOR_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 if (${${PRJPREFIX}_IS_GENERATOR_MULTI_CONFIG})
@@ -132,7 +130,6 @@ else ()
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif ()
-
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output/install)
 
@@ -182,6 +179,16 @@ else ()
     else ()
         target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_RELEASE)
     endif ()
+endif ()
+
+#
+# Debugging options
+#
+if (${PRJPREFIX}_ENABLE_STACKTRACE)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_STACKTRACE)
+endif ()
+if (${PRJPREFIX}_ENABLE_PROFILING)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_STACKTRACE)
 endif ()
 
 if (${PRJPREFIX}_ENABLE_COVERAGE)

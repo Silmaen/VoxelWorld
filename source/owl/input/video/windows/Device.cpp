@@ -18,7 +18,6 @@
 
 namespace owl::input::video::windows {
 
-static const std::string g_baseName = "input::video::windows::";
 constexpr uint64_t g_mask32 = 0xffffffff;
 
 namespace {
@@ -194,13 +193,13 @@ void updateList(std::vector<shared<video::Device>>& ioList) {
 
 	// Request video capture devices.
 	if (FAILED(hr)) {
-		OWL_CORE_ERROR("{}updateList: Unable to create MFAttribute.", g_baseName)
+		OWL_CORE_ERROR("input::video::windows::updateList: Unable to create MFAttribute.")
 		return;
 	}
 	// define what we search: Video input!
 	hr = pConfig->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
 	if (FAILED(hr)) {
-		OWL_CORE_ERROR("{}updateList: Unable to setup attributes.", g_baseName)
+		OWL_CORE_ERROR("input::video::windows::updateList: Unable to setup attributes.")
 		return;
 	}
 	std::vector<WPointer<IMFActivate>> devices;
@@ -209,14 +208,14 @@ void updateList(std::vector<shared<video::Device>>& ioList) {
 		uint32_t count = 0;
 		hr = MFEnumDeviceSources(pConfig.get(), &pDevices, &count);
 		if (FAILED(hr)) {
-			OWL_CORE_ERROR("{}updateList: Unable to Enum Device Sources.", g_baseName)
+			OWL_CORE_ERROR("input::video::windows::updateList: Unable to Enum Device Sources.")
 			return;
 		}
 		devices.reserve(count);
 		for (uint32_t i = 0; i < count; ++i) devices.emplace_back(pDevices[i]);
 	}
 	if (devices.empty()) {
-		OWL_CORE_WARN("{}updateList: No devices found.", g_baseName)
+		OWL_CORE_WARN("input::video::windows::updateList: No devices found.")
 		return;
 	}
 	// search for new devices.

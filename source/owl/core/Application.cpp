@@ -18,7 +18,7 @@
 namespace owl::core {
 
 
-Application *Application::s_instance = nullptr;
+Application* Application::s_instance = nullptr;
 
 Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppParams)} {
 	OWL_PROFILE_FUNCTION()
@@ -35,6 +35,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 
 		// load config file if any
 		if (!m_initParams.isDummy) {
+			OWL_SCOPE_UNTRACK
 			const auto configPath = m_workingDirectory / "config.yml";
 			if (exists(configPath))
 				m_initParams.loadFromFile(configPath);
@@ -91,7 +92,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 	}
 
 	// set up the callbacks
-	mu_appWindow->setEventCallback([this](auto &&PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
+	mu_appWindow->setEventCallback([this](auto&& PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 
 	// create the GUI layer
 	if (m_initParams.hasGui) {
@@ -153,12 +154,12 @@ void Application::run() {
 			{
 				OWL_PROFILE_SCOPE("LayerStack onUpdate")
 
-				for (const auto &layer: m_layerStack) layer->onUpdate(m_stepper);
+				for (const auto& layer: m_layerStack) layer->onUpdate(m_stepper);
 			}
 			if (mp_imGuiLayer) {
 				OWL_PROFILE_SCOPE("LayerStack onImUpdate")
 				mp_imGuiLayer->begin();
-				for (const auto &layer: m_layerStack) layer->onImGuiRender(m_stepper);
+				for (const auto& layer: m_layerStack) layer->onImGuiRender(m_stepper);
 				mp_imGuiLayer->end();
 			}
 			renderer::RenderCommand::endFrame();
@@ -167,7 +168,7 @@ void Application::run() {
 
 #if OWL_TRACKER_VERBOSITY >= 3
 		{
-			const auto &memState = debug::Tracker::get().checkState();
+			const auto& memState = debug::TrackerAPI::checkState();
 			if (memState.allocationCalls > memState.deallocationCalls && frameCount > 0) {
 				OWL_CORE_TRACE("----------------------------------")
 				OWL_CORE_TRACE("Frame Leak Detected")
@@ -175,7 +176,7 @@ void Application::run() {
 				OWL_CORE_TRACE("")
 				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory,
 							   memState.allocs.size())
-				for (const auto &chunk: memState.allocs) { OWL_CORE_TRACE(" ** {}", chunk.toStr()) }
+				for (const auto& chunk: memState.allocs) { OWL_CORE_TRACE(" ** {}", chunk.toStr()) }
 				OWL_CORE_TRACE("----------------------------------")
 				OWL_CORE_TRACE("")
 			}
@@ -185,20 +186,20 @@ void Application::run() {
 	}
 }
 
-void Application::onEvent(event::Event &ioEvent) {
+void Application::onEvent(event::Event& ioEvent) {
 	OWL_PROFILE_FUNCTION()
 
 	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::WindowCloseEvent>(
-			[this](auto &&PH1) { return onWindowClosed(std::forward<decltype(PH1)>(PH1)); });
+			[this](auto&& PH1) { return onWindowClosed(std::forward<decltype(PH1)>(PH1)); });
 	dispatcher.dispatch<event::WindowResizeEvent>(
-			[this](auto &&PH1) { return onWindowResized(std::forward<decltype(PH1)>(PH1)); });
+			[this](auto&& PH1) { return onWindowResized(std::forward<decltype(PH1)>(PH1)); });
 
 #if defined(__clang__) and __clang_major__ < 16
 	for (auto it2 = m_layerStack.rbegin(); it2 != m_layerStack.rend(); ++it2) {
 		auto it = (*it2);
 #else
-	for (const auto &it: std::ranges::reverse_view(m_layerStack)) {
+	for (const auto& it: std::ranges::reverse_view(m_layerStack)) {
 #endif
 		if (ioEvent.handled)
 			break;
@@ -206,14 +207,14 @@ void Application::onEvent(event::Event &ioEvent) {
 	}
 }
 
-bool Application::onWindowClosed(event::WindowCloseEvent &) {
+bool Application::onWindowClosed(event::WindowCloseEvent&) {
 	OWL_PROFILE_FUNCTION()
 
 	close();
 	return true;
 }
 
-bool Application::onWindowResized(const event::WindowResizeEvent &iEvent) {
+bool Application::onWindowResized(const event::WindowResizeEvent& iEvent) {
 	OWL_PROFILE_FUNCTION()
 
 	if (iEvent.getWidth() == 0 || iEvent.getHeight() == 0) {
@@ -225,40 +226,38 @@ bool Application::onWindowResized(const event::WindowResizeEvent &iEvent) {
 	return false;
 }
 
-void Application::pushLayer(shared<layer::Layer> &&iLayer) {
+void Application::pushLayer(shared<layer::Layer>&& iLayer) {
 	OWL_PROFILE_FUNCTION()
 	if (renderer::RenderCommand::getState() == renderer::RenderAPI::State::Error)
 		return;
 	m_layerStack.pushLayer(std::move(iLayer));
 }
 
-void Application::pushOverlay(shared<layer::Layer> &&iOverlay) {
+void Application::pushOverlay(shared<layer::Layer>&& iOverlay) {
 	OWL_PROFILE_FUNCTION()
 	if (renderer::RenderCommand::getState() == renderer::RenderAPI::State::Error)
 		return;
 	m_layerStack.pushOverlay(std::move(iOverlay));
 }
 
-bool Application::searchAssets(const std::string &iPattern) {
+bool Application::searchAssets(const std::string& iPattern) {
 	OWL_PROFILE_FUNCTION()
-
+	OWL_SCOPE_UNTRACK
 	std::filesystem::path parent = m_workingDirectory;
 	std::filesystem::path assets = parent / iPattern;
 	while (parent != parent.root_path()) {
 		if (exists(assets)) {
-			m_assetDirectory = std::move(assets);
+			m_assetDirectory = assets;
 			return true;
 		}
-		assets.clear();
 		parent = parent.parent_path();
-		assets = parent;
-		assets /= iPattern;
+		assets = parent / iPattern;
 	}
 	m_assetDirectory = m_workingDirectory;
 	return false;
 }
 
-void AppParams::loadFromFile(const std::filesystem::path &iFile) {
+void AppParams::loadFromFile(const std::filesystem::path& iFile) {
 	YAML::Node data = YAML::LoadFile(iFile.string());
 	if (auto appConfig = data["AppConfig"]; appConfig) {
 		if (appConfig["width"])
@@ -280,7 +279,7 @@ void AppParams::loadFromFile(const std::filesystem::path &iFile) {
 	}
 }
 
-void AppParams::saveToFile(const std::filesystem::path &iFile) const {
+void AppParams::saveToFile(const std::filesystem::path& iFile) const {
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 	out << YAML::Key << "AppConfig" << YAML::Value << YAML::BeginMap;
