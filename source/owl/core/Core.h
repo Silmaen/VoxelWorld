@@ -62,7 +62,7 @@ using uniq = std::unique_ptr<T>;
  * @return Unique pointer.
  */
 template<typename T, typename... Args>
-constexpr uniq<T> mkUniq(Args &&...iArgs) {
+constexpr uniq<T> mkUniq(Args&&... iArgs) {
 	return std::make_unique<T>(std::forward<Args>(iArgs)...);
 }
 
@@ -77,10 +77,12 @@ using shared = std::shared_ptr<T>;
  * @param[in] iArgs Args to pass to the constructor.
  * @return Shared pointer.
  */
+// NOLINTBEGIN(misc-no-recursion)
 template<typename T, typename... Args>
-constexpr shared<T> mkShared(Args &&...iArgs) {
+constexpr shared<T> mkShared(Args&&... iArgs) {
 	return std::make_shared<T>(std::forward<Args>(iArgs)...);
 }
+// NOLINTEND(misc-no-recursion)
 
 }// namespace owl
 

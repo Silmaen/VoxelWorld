@@ -18,11 +18,12 @@
 
 namespace owl::renderer {
 
-shared<Shader> Shader::create(const std::string &iShaderName, const std::string &iRenderer) {
+shared<Shader> Shader::create(const std::string& iShaderName, const std::string& iRenderer) {
 	const auto type = RenderCommand::getApi();
 	std::filesystem::path shaderDir;
 	if (RenderCommand::requireInit()) {
-		shaderDir = core::Application::get().getAssetDirectory() / "shaders";
+		shaderDir = core::Application::get().getAssetDirectory();
+		shaderDir /= std::filesystem::path{"shaders"};
 		if (!iRenderer.empty()) {
 			shaderDir /= iRenderer;
 			if (type == RenderAPI::Type::OpenGL)
@@ -34,11 +35,11 @@ shared<Shader> Shader::create(const std::string &iShaderName, const std::string 
 	return create(iShaderName, iRenderer, shaderDir);
 }
 
-shared<Shader> Shader::create(const std::string &iShaderName, const std::string &iRenderer,
-							  const std::filesystem::path &iFile) {
+shared<Shader> Shader::create(const std::string& iShaderName, const std::string& iRenderer,
+							  const std::filesystem::path& iFile) {
 	std::vector<std::filesystem::path> sources;
 	if (is_directory(iFile)) {
-		for (const auto &f: std::filesystem::directory_iterator(iFile)) {
+		for (const auto& f: std::filesystem::directory_iterator(iFile)) {
 			if (f.path().stem() != iShaderName)
 				continue;
 			sources.push_back(f);
@@ -52,16 +53,21 @@ shared<Shader> Shader::create(const std::string &iShaderName, const std::string 
 	}
 	OWL_CORE_TRACE("Try to create shader {} for renderer {} / API {}.", iShaderName, iRenderer,
 				   magic_enum::enum_name(RenderCommand::getApi()))
+	shared<Shader> shader = nullptr;
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
-			return mkShared<null::Shader>(iShaderName, iRenderer, sources);
+			shader = mkShared<null::Shader>(iShaderName, iRenderer, sources);
+			break;
 		case RenderAPI::Type::OpenGL:
-			return mkShared<opengl::Shader>(iShaderName, iRenderer, sources);
+			shader = mkShared<opengl::Shader>(iShaderName, iRenderer, sources);
+			break;
 		case RenderAPI::Type::Vulkan:
-			return mkShared<vulkan::Shader>(iShaderName, iRenderer, sources);
+			shader = mkShared<vulkan::Shader>(iShaderName, iRenderer, sources);
+			break;
 	}
-	OWL_CORE_ERROR("Unknown API Type!")
-	return nullptr;
+	sources.clear();
+	sources.shrink_to_fit();
+	return shader;
 }
 
 Shader::~Shader() = default;

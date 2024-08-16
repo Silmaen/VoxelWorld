@@ -127,21 +127,20 @@ void droneLayer::onImGuiRender(const core::Timestep& iTimeStep) {
 }
 
 void droneLayer::renderStats(const core::Timestep& iTimeStep) {
-	const auto& tracker = debug::Tracker::get();
 	ImGui::Begin("Stats");
 	ImGui::Text("%s", fmt::format("FPS: {:.2f}", iTimeStep.getFps()).c_str());
 	ImGui::Separator();
-	ImGui::Text("%s", fmt::format("Current used memory: {}", tracker.globals().allocatedMemory).c_str());
-	ImGui::Text("%s", fmt::format("Max used memory: {}", tracker.globals().memoryPeek).c_str());
-	ImGui::Text("%s", fmt::format("Allocation calls: {}", tracker.globals().allocationCalls).c_str());
-	ImGui::Text("%s", fmt::format("Deallocation calls: {}", tracker.globals().deallocationCalls).c_str());
+	ImGui::Text("%s", fmt::format("Current used memory: {}", debug::TrackerAPI::globals().allocatedMemory).c_str());
+	ImGui::Text("%s", fmt::format("Max used memory: {}", debug::TrackerAPI::globals().memoryPeek).c_str());
+	ImGui::Text("%s", fmt::format("Allocation calls: {}", debug::TrackerAPI::globals().allocationCalls).c_str());
+	ImGui::Text("%s", fmt::format("Deallocation calls: {}", debug::TrackerAPI::globals().deallocationCalls).c_str());
 	ImGui::Separator();
 	const auto stats = renderer::Renderer2D::getStats();
 	ImGui::Text("Renderer2D Stats:");
-	ImGui::Text("Draw Calls: %d", stats.drawCalls);
-	ImGui::Text("Quads: %d", stats.quadCount);
-	ImGui::Text("Vertices: %d", stats.getTotalVertexCount());
-	ImGui::Text("Indices: %d", stats.getTotalIndexCount());
+	ImGui::Text("Draw Calls: %ud", stats.drawCalls);
+	ImGui::Text("Quads: %ud", stats.quadCount);
+	ImGui::Text("Vertices: %ud", stats.getTotalVertexCount());
+	ImGui::Text("Indices: %ud", stats.getTotalIndexCount());
 	ImGui::Separator();
 	ImGui::Text("%s", fmt::format("UAV stats").c_str());
 	ImGui::Text("%s", fmt::format("Vel: {}", rc->getHorizontalVelocity()).c_str());

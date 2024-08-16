@@ -110,9 +110,30 @@ private:
 	 * @brief Default Constructor.
 	 */
 	Descriptors();
+
+	struct TextureList {
+		using tex = shared<TextureData>;
+		using elem = std::pair<uint32_t, tex>;
+		using list = std::vector<elem>;
+		list textures;
+		uint32_t nextId = 0;
+		[[nodiscard]] bool empty() const { return textures.empty(); }
+		void clear() {
+			textures.clear();
+			textures.shrink_to_fit();
+		}
+		list::iterator begin() { return textures.begin(); }
+		list::iterator end() { return textures.begin(); }
+		[[nodiscard]] list::const_iterator begin() const { return textures.begin(); }
+		[[nodiscard]] list::const_iterator end() const { return textures.begin(); }
+		[[nodiscard]] bool contains(uint32_t iIndex) const;
+		uint32_t registerNewTexture();
+		void unregisterTexture(uint32_t iIndex);
+		tex getTextureData(uint32_t iIndex);
+	};
+
 	/// The list of texture bindings.
-	std::unordered_map<uint32_t, TextureData> m_textures;
-	uint32_t m_nextId = 0;
+	TextureList m_textures;
 
 	/// The descriptor set layout.
 	VkDescriptorSetLayout m_descriptorSetLayout{nullptr};

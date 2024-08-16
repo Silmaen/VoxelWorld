@@ -29,9 +29,6 @@ These platform requires a graphic card that supports one of the following render
 
 * `Null` - for no graphic rendering (Server for example)
 * `OpenGL` - Use OpenGL 4.5 (you must have Graphics device that supports it)
-* `OpenGL_Legacy` - Use of OpenGL 2.1, but with some extensions (
-  GL_ARB_framebuffer_object,GL_ARB_framebuffer_sRGB,GL_ARB_texture_multisample,GL_ARB_texture_storage,GL_ARB_texture_storage_multisample)
-    * Some features will not be available with this renderer
 * `Vulkan` - Use Vulkan 1.3 (you must have Graphics device that supports it)
 
 ## Coding Style

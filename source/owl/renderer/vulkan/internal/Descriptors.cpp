@@ -17,8 +17,8 @@ namespace owl::renderer::vulkan::internal {
 
 
 void TextureData::freeTrexture() {
-	const auto &core = internal::VulkanCore::get();
-	const auto &pool = Descriptors::get().getSingleImageDescriptorPool();
+	const auto& core = internal::VulkanCore::get();
+	const auto& pool = Descriptors::get().getSingleImageDescriptorPool();
 	vkDeviceWaitIdle(core.getLogicalDevice());
 	if (textureDescriptorSet != nullptr) {
 		vkFreeDescriptorSets(core.getLogicalDevice(), pool, 1, &textureDescriptorSet);
@@ -47,8 +47,8 @@ void TextureData::freeTrexture() {
 }
 
 void TextureData::createDescriptorSet() {
-	const auto &pool = Descriptors::get().getSingleImageDescriptorPool();
-	const auto &core = VulkanCore::get();
+	const auto& pool = Descriptors::get().getSingleImageDescriptorPool();
+	const auto& core = VulkanCore::get();
 	static constexpr VkDescriptorSetLayoutBinding samplerLayoutBinding{
 			.binding = 0,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -91,7 +91,7 @@ void TextureData::createDescriptorSet() {
 }
 
 void TextureData::createView() {
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	const VkImageViewCreateInfo createInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 										   .pNext = nullptr,
 										   .flags = {},
@@ -114,7 +114,7 @@ void TextureData::createView() {
 }
 
 void TextureData::createSampler() {
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	const VkSamplerCreateInfo samplerInfo{.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
 										  .pNext = nullptr,
 										  .flags = {},
@@ -140,9 +140,9 @@ void TextureData::createSampler() {
 		OWL_CORE_ERROR("Vulkan Texture: Error creating texture sampler ({}).", internal::resultString(result))
 	}
 }
-void TextureData::createImage(const math::vec2ui &iDimensions) {
+void TextureData::createImage(const math::vec2ui& iDimensions) {
 	freeTrexture();
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	const VkImageCreateInfo imageInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 			.pNext = nullptr,
@@ -184,14 +184,29 @@ Descriptors::Descriptors() = default;
 Descriptors::~Descriptors() { release(); }
 
 void Descriptors::release() {
-	const auto &core = VulkanCore::get();
+	const auto& core = VulkanCore::get();
+	resetTextureBind();
+	m_textureBind.shrink_to_fit();
+	if (!m_textures.empty()) {
+		for (auto& tex: m_textures) {
+			tex.second->freeTrexture();
+			tex.second.reset();
+		}
+	}
+	m_textures.clear();
 	if (!m_uniformBuffers.empty()) {
 		for (size_t i = 0; i < g_maxFrameInFlight; ++i) {
+
+			vkUnmapMemory(core.getLogicalDevice(), m_uniformBuffersMemory[i]);
 			vkDestroyBuffer(core.getLogicalDevice(), m_uniformBuffers[i], nullptr);
 			vkFreeMemory(core.getLogicalDevice(), m_uniformBuffersMemory[i], nullptr);
 		}
 		m_uniformBuffers.clear();
 		m_uniformBuffersMemory.clear();
+		m_uniformBuffersMapped.clear();
+		m_uniformBuffers.shrink_to_fit();
+		m_uniformBuffersMemory.shrink_to_fit();
+		m_uniformBuffersMapped.shrink_to_fit();
 	}
 	if (m_singleImageDescriptorPool != nullptr) {
 		vkDestroyDescriptorPool(core.getLogicalDevice(), m_singleImageDescriptorPool, nullptr);
@@ -200,6 +215,12 @@ void Descriptors::release() {
 	if (m_imguiDescriptorPool != nullptr) {
 		vkDestroyDescriptorPool(core.getLogicalDevice(), m_imguiDescriptorPool, nullptr);
 		m_imguiDescriptorPool = nullptr;
+	}
+	if (!m_descriptorSets.empty()) {
+		vkFreeDescriptorSets(core.getLogicalDevice(), m_descriptorPool, static_cast<uint32_t>(m_descriptorSets.size()),
+							 m_descriptorSets.data());
+		m_descriptorSets.clear();
+		m_descriptorSets.shrink_to_fit();
 	}
 	if (m_descriptorSetLayout != nullptr) {
 		vkDestroyDescriptorSetLayout(core.getLogicalDevice(), m_descriptorSetLayout, nullptr);
@@ -212,7 +233,7 @@ void Descriptors::release() {
 }
 
 void Descriptors::createDescriptors() {
-	const auto &core = VulkanCore::get();
+	const auto& core = VulkanCore::get();
 	// Descriptor pools.
 	std::vector<VkDescriptorPoolSize> poolSizes{
 			{.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 32 * g_maxFrameInFlight},
@@ -272,16 +293,16 @@ void Descriptors::updateDescriptors() {
 }
 
 void Descriptors::updateDescriptor(const size_t iFrame) {
-	const auto &core = VulkanCore::get();
+	const auto& core = VulkanCore::get();
 	std::vector<VkDescriptorBufferInfo> bufferInfos;
 	if (!m_uniformBuffers.empty()) {
 		bufferInfos.push_back({.buffer = m_uniformBuffers[iFrame], .offset = 0, .range = m_uniformSize});
 	}
 	std::vector<VkDescriptorImageInfo> imageInfos;
 	imageInfos.reserve(m_textureBind.size());
-	for (const auto &id: m_textureBind) {
-		imageInfos.push_back({.sampler = m_textures[id].textureSampler,
-							  .imageView = m_textures[id].textureImageView,
+	for (const auto& id: m_textureBind) {
+		imageInfos.push_back({.sampler = m_textures.getTextureData(id)->textureSampler,
+							  .imageView = m_textures.getTextureData(id)->textureImageView,
 							  .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL});
 	}
 	std::vector<VkWriteDescriptorSet> descriptorWrites;
@@ -320,7 +341,7 @@ void Descriptors::registerUniform(const uint32_t iSize) {
 	m_uniformBuffersMemory.resize(g_maxFrameInFlight);
 	m_uniformBuffersMapped.resize(g_maxFrameInFlight);
 	m_uniformSize = iSize;
-	const auto &core = VulkanCore::get();
+	const auto& core = VulkanCore::get();
 	for (size_t i = 0; i < g_maxFrameInFlight; i++) {
 		createBuffer(iSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 					 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_uniformBuffers[i],
@@ -332,16 +353,12 @@ void Descriptors::registerUniform(const uint32_t iSize) {
 	}
 }
 
-void Descriptors::setUniformData(const void *iData, const size_t iSize) const {
-	const auto &vkh = VulkanHandler::get();
+void Descriptors::setUniformData(const void* iData, const size_t iSize) const {
+	const auto& vkh = VulkanHandler::get();
 	memcpy(m_uniformBuffersMapped[vkh.getCurrentFrameIndex()], iData, iSize);
 }
 
-uint32_t Descriptors::registerNewTexture() {
-	++m_nextId;
-	m_textures[m_nextId] = TextureData{};
-	return m_nextId;
-}
+uint32_t Descriptors::registerNewTexture() { return m_textures.registerNewTexture(); }
 
 
 bool Descriptors::isTextureRegistered(const uint32_t iIndex) const {
@@ -350,18 +367,15 @@ bool Descriptors::isTextureRegistered(const uint32_t iIndex) const {
 	return m_textures.contains(iIndex);
 }
 
-TextureData &Descriptors::getTextureData(const uint32_t iIndex) { return m_textures.at(iIndex); }
+TextureData& Descriptors::getTextureData(const uint32_t iIndex) { return *m_textures.getTextureData(iIndex); }
 
-void Descriptors::unregisterTexture(const uint32_t iIndex) {
-	m_textures[iIndex].freeTrexture();
-	m_textures.erase(iIndex);
-}
+void Descriptors::unregisterTexture(const uint32_t iIndex) { m_textures.unregisterTexture(iIndex); }
 
 void Descriptors::bindTextureImage(const uint32_t iIndex) {
 	if (iIndex == m_bindedTexture)
 		return;
-	vkBindImageMemory(VulkanCore::get().getLogicalDevice(), m_textures[iIndex].textureImage,
-					  m_textures[iIndex].textureImageMemory, 0);
+	vkBindImageMemory(VulkanCore::get().getLogicalDevice(), m_textures.getTextureData(iIndex)->textureImage,
+					  m_textures.getTextureData(iIndex)->textureImageMemory, 0);
 	m_bindedTexture = iIndex;
 }
 
@@ -369,12 +383,12 @@ void Descriptors::resetTextureBind() { m_textureBind.clear(); }
 
 void Descriptors::commitTextureBind(const size_t iCurrentFrame) { updateDescriptor(iCurrentFrame); }
 
-void Descriptors::textureBind(const uint32_t iIndex) { m_textureBind.push_back(iIndex); }
+void Descriptors::textureBind(const uint32_t iIndex) { m_textureBind.emplace_back(iIndex); }
 
 void Descriptors::createImguiDescriptorPool() {
 	if (m_imguiDescriptorPool)
 		return;
-	const auto &core = VulkanCore::get();
+	const auto& core = VulkanCore::get();
 	// Descriptor pools.
 	std::vector<VkDescriptorPoolSize> poolSizes{
 			{.type = VK_DESCRIPTOR_TYPE_SAMPLER, .descriptorCount = 1000},
@@ -405,7 +419,7 @@ void Descriptors::createImguiDescriptorPool() {
 void Descriptors::createSingleImageDescriptorPool() {
 	if (m_singleImageDescriptorPool)
 		return;
-	const auto &core = VulkanCore::get();
+	const auto& core = VulkanCore::get();
 	// Descriptor pools.
 	std::vector<VkDescriptorPoolSize> poolSizes{
 			{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1000},
@@ -422,6 +436,29 @@ void Descriptors::createSingleImageDescriptorPool() {
 		OWL_CORE_ERROR("Vulkan Descriptors: failed to create descriptor pool ({})", resultString(result))
 	}
 }
-
+bool Descriptors::TextureList::contains(uint32_t iIndex) const {
+	return std::find_if(textures.begin(), textures.end(),
+						[&iIndex](const auto& iElem) { return iElem.first == iIndex; }) != textures.end();
+}
+uint32_t Descriptors::TextureList::registerNewTexture() {
+	++nextId;
+	textures.emplace_back(nextId, mkShared<TextureData>());
+	return nextId;
+}
+void Descriptors::TextureList::unregisterTexture(uint32_t iIndex) {
+	auto iter = std::find_if(textures.begin(), textures.end(),
+							 [&iIndex](const auto& iElem) { return iElem.first == iIndex; });
+	if (iter == textures.end())
+		return;
+	iter->second->freeTrexture();
+	textures.erase(iter);
+}
+Descriptors::TextureList::tex Descriptors::TextureList::getTextureData(uint32_t iIndex) {
+	auto iter = std::find_if(textures.begin(), textures.end(),
+							 [&iIndex](const auto& iElem) { return iElem.first == iIndex; });
+	if (iter == textures.end())
+		return nullptr;
+	return iter->second;
+}
 
 }// namespace owl::renderer::vulkan::internal

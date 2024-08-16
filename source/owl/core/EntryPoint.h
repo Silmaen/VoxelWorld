@@ -9,7 +9,7 @@
 #include "Application.h"
 #include "Log.h"
 #include "debug/Profiler.h"
-#include "debug/Tracker.h"
+#include "debug/TrackerClient.h"
 
 /**
  * @brief Main entry point for the program.
@@ -18,8 +18,7 @@
  * @return Execution code.
  */
 // NOLINTBEGIN(misc-definitions-in-headers)
-int main(int iArgc, char *iArgv[]) {
-	OWL_SCOPE_TRACE
+int main(int iArgc, char* iArgv[]) {
 	owl::core::Log::init();
 	{
 		// Startup
@@ -38,7 +37,7 @@ int main(int iArgc, char *iArgv[]) {
 #if OWL_TRACKER_VERBOSITY >= 1
 		{
 			OWL_SCOPE_UNTRACK
-			const auto &memState = owl::debug::Tracker::get().checkState();
+			const auto& memState = owl::debug::TrackerAPI::checkState();
 			if (memState.allocationCalls > memState.deallocationCalls) {
 				OWL_CORE_TRACE("----------------------------------")
 				OWL_CORE_TRACE("Leak Detected during App release")
@@ -47,7 +46,7 @@ int main(int iArgc, char *iArgv[]) {
 				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory,
 							   memState.allocs.size())
 #if OWL_TRACKER_VERBOSITY >= 2
-				for (const auto &chunk: memState.allocs) { OWL_CORE_TRACE(" ** {}", chunk.toStr()) }
+				for (const auto& chunk: memState.allocs) { OWL_CORE_TRACE(" ** {}", chunk.toStr()) }
 #endif
 				OWL_CORE_TRACE("----------------------------------")
 				OWL_CORE_TRACE("")
@@ -61,17 +60,17 @@ int main(int iArgc, char *iArgv[]) {
 		// ==================== Print Memory informations ========================
 #if OWL_TRACKER_VERBOSITY >= 1
 		OWL_CORE_INFO("Memory State at the end of execution:")
-		const auto &memoryState = owl::debug::Tracker::get().globals();
+		const auto& memoryState = owl::debug::TrackerAPI::globals();
 		OWL_CORE_INFO("Residual memory          : {}", memoryState.allocatedMemory)
 		OWL_CORE_INFO("Memory peek              : {}", memoryState.memoryPeek)
 		OWL_CORE_INFO("Total Allocation calls   : {}", memoryState.allocationCalls)
 		OWL_CORE_INFO("Total Deallocation calls : {}", memoryState.deallocationCalls)
+#endif
 #if OWL_TRACKER_VERBOSITY >= 2
 		if (memoryState.allocationCalls > memoryState.deallocationCalls) {
 			OWL_CORE_INFO("Remaining memory chunks  :", memoryState.allocationCalls)
-			for (const auto &alloc: memoryState.allocs) { OWL_CORE_INFO("* {}", alloc.toStr()) }
+			for (const auto& alloc: memoryState.allocs) { OWL_CORE_INFO("* {}", alloc.toStr(true, true)) }
 		}
-#endif
 #endif
 	}
 	// Destroy the logger
