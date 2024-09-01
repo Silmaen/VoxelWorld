@@ -22,7 +22,7 @@ public:
 	 * @return The component.
 	 */
 	template<typename T>
-	T &getComponent() {
+	auto getComponent() -> T& {
 		return entity.getComponent<T>();
 	}
 
@@ -46,15 +46,15 @@ public:
 	 * @brief Function called on script update.
 	 * @param[in] iTimeStep Timestamp.
 	 */
-	void onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) {}
+	void onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) {}
 
-	ScriptableEntity(const ScriptableEntity &) = delete;
-	ScriptableEntity(ScriptableEntity &&) = delete;
-	ScriptableEntity &operator=(const ScriptableEntity &) = delete;
-	ScriptableEntity &operator=(ScriptableEntity &&) = delete;
+	ScriptableEntity(const ScriptableEntity&) = delete;
+	ScriptableEntity(ScriptableEntity&&) = delete;
+	auto operator=(const ScriptableEntity&) -> ScriptableEntity& = delete;
+	auto operator=(ScriptableEntity&&) -> ScriptableEntity& = delete;
 
 private:
 	/// To access the scene privates.
-	friend class scene;
+	friend class Scene;
 };
 }// namespace owl::scene

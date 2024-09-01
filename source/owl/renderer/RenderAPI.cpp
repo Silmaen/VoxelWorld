@@ -15,7 +15,7 @@
 namespace owl::renderer {
 
 
-uniq<RenderAPI> RenderAPI::create(const RenderAPI::Type &iType) {
+auto RenderAPI::create(const RenderAPI::Type& iType) -> uniq<RenderAPI> {
 	switch (iType) {
 		case Type::Null:
 			return mkUniq<null::RenderAPI>();

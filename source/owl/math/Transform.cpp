@@ -13,11 +13,15 @@
 
 namespace owl::math {
 
+namespace {
+
 constexpr float g_zero = 0.f;
 constexpr float g_one = 1.f;
 constexpr float g_epsi = epsilon<float>();
 
-mat4 composeTransform(const vec3& iTranslation, const vec3& iRotation, const vec3& iScale) {
+}// namespace
+
+auto composeTransform(const vec3& iTranslation, const vec3& iRotation, const vec3& iScale) -> mat4 {
 	return translate(identity<float, 4>(), iTranslation) * rotate(identity<float, 4>(), iRotation[2], {0, 0, 1}) *
 		   rotate(identity<float, 4>(), iRotation[1], {0, 1, 0}) *
 		   rotate(identity<float, 4>(), iRotation[0], {1, 0, 0}) * scale(identity<float, 4>(), iScale);
@@ -25,7 +29,7 @@ mat4 composeTransform(const vec3& iTranslation, const vec3& iRotation, const vec
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
-bool decomposeTransform(const mat4& iTransform, vec3& oTranslation, vec3& oRotation, vec3& oScale) {
+auto decomposeTransform(const mat4& iTransform, vec3& oTranslation, vec3& oRotation, vec3& oScale) -> bool {
 	// From glm::decompose in matrix_decompose.inl
 
 	mat4 localMatrix(iTransform);

@@ -27,8 +27,8 @@ public:
 	explicit RenderAPI(const Type& iType) : m_type{iType} {}
 	RenderAPI(const RenderAPI&) = delete;
 	RenderAPI(RenderAPI&&) = delete;
-	RenderAPI& operator=(const RenderAPI&) = delete;
-	RenderAPI& operator=(RenderAPI&&) = delete;
+	auto operator=(const RenderAPI&) -> RenderAPI& = delete;
+	auto operator=(RenderAPI&&) -> RenderAPI& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -77,7 +77,7 @@ public:
 	 * @brief Get the maximum number of texture slots.
 	 * @return Number of texture slots.
 	 */
-	[[nodiscard]] virtual uint32_t getMaxTextureSlots() const = 0;
+	[[nodiscard]] virtual auto getMaxTextureSlots() const -> uint32_t = 0;
 
 
 	/// Render API states.
@@ -91,26 +91,26 @@ public:
 	 * @brief Get the actual API type.
 	 * @return API Type.
 	 */
-	[[nodiscard]] Type getApi() const { return m_type; }
+	[[nodiscard]] auto getApi() const -> Type { return m_type; }
 
 	/**
 	 * @brief Static method to create a Render API.
 	 * @param[in] iType Type of API.
 	 * @return Render.
 	 */
-	static uniq<RenderAPI> create(const Type& iType);
+	static auto create(const Type& iType) -> uniq<RenderAPI>;
 
 	/**
 	 * @brief Get the actual API state.
 	 * @return API State.
 	 */
-	[[nodiscard]] State getState() const { return m_state; }
+	[[nodiscard]] auto getState() const -> State { return m_state; }
 
 	/**
 	 * @brief Check if the API type require initializations.
 	 * @return tRue if initialization required.
 	 */
-	[[nodiscard]] bool requireInit() const { return m_type == Type::OpenGL || m_type == Type::Vulkan; }
+	[[nodiscard]] auto requireInit() const -> bool { return m_type == Type::OpenGL || m_type == Type::Vulkan; }
 
 	/**
 	 * @brief Reset value for the frame to render.

@@ -27,19 +27,19 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	BaseGauge(const BaseGauge &) = default;
+	BaseGauge(const BaseGauge&) = default;
 	/**
 	 * @brief Move constructor.
 	 */
-	BaseGauge(BaseGauge &&) = default;
+	BaseGauge(BaseGauge&&) = default;
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	BaseGauge &operator=(const BaseGauge &) = default;
+	auto operator=(const BaseGauge&) -> BaseGauge& = default;
 	/**
 	 * @brief Move affectation operator.
 	 */
-	BaseGauge &operator=(BaseGauge &&) = default;
+	auto operator=(BaseGauge&&) -> BaseGauge& = default;
 
 	/**
 	 * @brief Draw the cover of the gauge.
@@ -60,31 +60,31 @@ public:
 	 * @brief Define the scale of the gauge
 	 * @param sc New gauge's scale.
 	 */
-	void setScale(const owl::math::vec2 &sc) { transform.size = sc; }
+	void setScale(const owl::math::vec2& sc) { transform.size = sc; }
 
 	/**
 	 * @brief Read the gauge's scale.
 	 * @return The gauge's scale.
 	 */
-	[[nodiscard]] const owl::math::vec2 &getScale() const { return transform.size; }
+	[[nodiscard]] auto getScale() const -> const owl::math::vec2& { return transform.size; }
 
 	/**
 	 * @brief Define the position of the gauge
 	 * @param pos New gauge's position.
 	 */
-	void setPosition(const owl::math::vec3 &pos) { transform.position = pos; }
+	void setPosition(const owl::math::vec3& pos) { transform.position = pos; }
 
 	/**
 	 * @brief Read the gauge's position.
 	 * @return The gauge's position.
 	 */
-	[[nodiscard]] const owl::math::vec3 &getPosition() const { return transform.position; }
+	[[nodiscard]] auto getPosition() const -> const owl::math::vec3& { return transform.position; }
 
 	/**
 	 * @brief Access to the object's transformation.
 	 * @return The transformation.
 	 */
-	[[nodiscard]] const owl::renderer::utils::PRS &getTransform() const { return transform; }
+	[[nodiscard]] auto getTransform() const -> const owl::renderer::utils::PRS& { return transform; }
 
 
 private:

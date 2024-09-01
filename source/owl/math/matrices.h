@@ -41,12 +41,12 @@ public:
 	 * @brief Copy affectation operator.
 	 * @return This vector.
 	 */
-	constexpr Matrix& operator=(const Matrix&) = default;
+	constexpr auto operator=(const Matrix&) -> Matrix& = default;
 	/**
 	 * @brief Move affectation operator.
 	 * @return This vector.
 	 */
-	constexpr Matrix& operator=(Matrix&&) = default;
+	constexpr auto operator=(Matrix&&) -> Matrix& = default;
 	/**
 	 * @brief Constructor with initializer list.
 	 * @param iInitList List for initialization.
@@ -59,27 +59,27 @@ public:
 	 * @param iOther Other vector to compare.
 	 * @return true if identical vectors.
 	 */
-	constexpr bool operator==(const Matrix& iOther) const { return m_data == iOther.m_data; }
+	constexpr auto operator==(const Matrix& iOther) const -> bool { return m_data == iOther.m_data; }
 	/**
 	 * @brief Comparison operator
 	 * @param iOther Other vector to compare.
 	 * @return false if identical vectors.
 	 */
-	constexpr bool operator!=(const Matrix& iOther) const { return m_data != iOther.m_data; }
+	constexpr auto operator!=(const Matrix& iOther) const -> bool { return m_data != iOther.m_data; }
 	/**
 	 * @brief Access to component.
 	 * @param iRow Row number.
 	 * @param iCol Column number.
 	 * @return The component value.
 	 */
-	constexpr BaseType& operator()(const std::size_t iRow, const std::size_t iCol) { return get(iRow, iCol); }
+	constexpr auto operator()(const std::size_t iRow, const std::size_t iCol) -> BaseType& { return get(iRow, iCol); }
 	/**
 	 * @brief Access to component.
 	 * @param iRow Row number.
 	 * @param iCol Column number.
 	 * @return The component value.
 	 */
-	constexpr const BaseType& operator()(const std::size_t iRow, const std::size_t iCol) const {
+	constexpr auto operator()(const std::size_t iRow, const std::size_t iCol) const -> const BaseType& {
 		return get(iRow, iCol);
 	}
 
@@ -88,7 +88,7 @@ public:
 	 * @param i The column's number.
 	 * @return Const column's value.
 	 */
-	[[nodiscard]] constexpr Vector<BaseType, NRow> column(const std::size_t i) const {
+	[[nodiscard]] constexpr auto column(const std::size_t i) const -> Vector<BaseType, NRow> {
 		Vector<BaseType, NRow> result;
 		for (size_t it = 0; it < NRow; ++it) result[it] = get(it, i);
 		return result;
@@ -98,7 +98,7 @@ public:
 	 * @param i The row's number.
 	 * @return Const row's value.
 	 */
-	[[nodiscard]] constexpr Vector<BaseType, NCol> row(const std::size_t i) const {
+	[[nodiscard]] constexpr auto row(const std::size_t i) const -> Vector<BaseType, NCol> {
 		Vector<BaseType, NCol> result;
 		for (size_t it = 0; it < NCol; ++it) result[it] = get(i, it);
 		return result;
@@ -127,16 +127,16 @@ public:
 	 * @param iOther Other vector to add.
 	 * @return This actualized vector.
 	 */
-	constexpr Matrix& operator+=(const Matrix& iOther) {
+	constexpr auto operator+=(const Matrix& iOther) -> Matrix& {
 		for (size_t it = 0; it < NCol * NRow; ++it) { m_data[it] += iOther.m_data[it]; }
 		return *this;
 	}
 	/**
-	 * @brief Self subtration operator.
+	 * @brief Self subtraction operator.
 	 * @param iOther Other vector to subtract.
 	 * @return This actualized vector.
 	 */
-	constexpr Matrix& operator-=(const Matrix& iOther) {
+	constexpr auto operator-=(const Matrix& iOther) -> Matrix& {
 		for (size_t it = 0; it < NCol * NRow; ++it) { m_data[it] -= iOther.m_data[it]; }
 		return *this;
 	}
@@ -145,17 +145,17 @@ public:
 	 * @param iOther Other vector to add.
 	 * @return This actualized vector.
 	 */
-	constexpr Matrix operator+(const Matrix& iOther) const {
+	constexpr auto operator+(const Matrix& iOther) const -> Matrix {
 		Matrix res{*this};
 		res += iOther;
 		return res;
 	}
 	/**
-	 * @brief Subtaction.
+	 * @brief Subtraction.
 	 * @param iOther Other vector to subtract.
 	 * @return This actualized vector.
 	 */
-	constexpr Matrix operator-(const Matrix& iOther) const {
+	constexpr auto operator-(const Matrix& iOther) const -> Matrix {
 		Matrix res{*this};
 		res -= iOther;
 		return res;
@@ -165,7 +165,7 @@ public:
 	 * @param iScalar the scalar to multiply.
 	 * @return This actualized vector.
 	 */
-	constexpr Matrix& operator*=(const BaseType iScalar) {
+	constexpr auto operator*=(const BaseType iScalar) -> Matrix& {
 		for (auto& data: m_data) { data *= iScalar; }
 		return *this;
 	}
@@ -174,7 +174,7 @@ public:
 	 * @param iScalar The scalar to multiply.
 	 * @return Vector result.
 	 */
-	constexpr Matrix operator*(const BaseType iScalar) const {
+	constexpr auto operator*(const BaseType iScalar) const -> Matrix {
 		Matrix res{*this};
 		res *= iScalar;
 		return res;
@@ -185,7 +185,7 @@ public:
 	 * @param iVector Vector to multiply.
 	 * @return Vector result.
 	 */
-	constexpr friend Matrix operator*(const BaseType iScalar, const Matrix& iVector) {
+	constexpr friend auto operator*(const BaseType iScalar, const Matrix& iVector) -> Matrix {
 		Matrix res{iVector};
 		res *= iScalar;
 		return res;
@@ -195,7 +195,7 @@ public:
 	 * @param iScalar The scalar to divide.
 	 * @return This actualized vector.
 	 */
-	constexpr Matrix& operator/=(const BaseType iScalar) {
+	constexpr auto operator/=(const BaseType iScalar) -> Matrix& {
 		for (auto& data: m_data) { data /= iScalar; }
 		return *this;
 	}
@@ -204,7 +204,7 @@ public:
 	 * @param iScalar The scalar to divide.
 	 * @return Vector result.
 	 */
-	constexpr Matrix operator/(const BaseType iScalar) const {
+	constexpr auto operator/(const BaseType iScalar) const -> Matrix {
 		Matrix res{*this};
 		res /= iScalar;
 		return res;
@@ -214,9 +214,7 @@ public:
 	 * @param iOther The other matrix.
 	 * @return This updated matrix.
 	 */
-	constexpr Matrix& operator*=(const Matrix& iOther)
-		requires(NRow == NCol)
-	{
+	constexpr auto operator*=(const Matrix& iOther) -> Matrix& requires(NRow == NCol) {
 		for (std::size_t row = 0; row < NRow; ++row) {
 			std::array<BaseType, NCol> rowVal{};
 			for (std::size_t col = 0; col < NCol; ++col) {
@@ -233,7 +231,7 @@ public:
 	 * @return The product.
 	 */
 	template<std::size_t NCol2>
-	constexpr Matrix<BaseType, NCol2, NRow> operator*(const Matrix<BaseType, NCol2, NCol>& iOther) const {
+	constexpr auto operator*(const Matrix<BaseType, NCol2, NCol>& iOther) const -> Matrix<BaseType, NCol2, NRow> {
 		Matrix<BaseType, NCol2, NRow> mat;
 		for (std::size_t row = 0; row < NRow; ++row) {
 			for (std::size_t col = 0; col < NCol2; ++col) {
@@ -246,7 +244,7 @@ public:
 	 * @brief Get a transposed version of this matrix.
 	 * @return Transposed matrix.
 	 */
-	[[nodiscard]] constexpr Matrix<BaseType, NRow, NCol> transposed() const {
+	[[nodiscard]] constexpr auto transposed() const -> Matrix<BaseType, NRow, NCol> {
 		Matrix<BaseType, NRow, NCol> mat;
 		for (std::size_t row = 0; row < NRow; ++row) {
 			for (std::size_t col = 0; col < NCol; ++col) { mat(col, row) = get(row, col); }
@@ -257,7 +255,7 @@ public:
 	 * @brief Transpose this matrix.
 	 * @return This updated matrix.
 	 */
-	constexpr Matrix& transpose() {
+	constexpr auto transpose() -> Matrix& {
 		for (std::size_t row = 0; row < NRow; ++row) {
 			for (std::size_t col = row; col < NCol; ++col) { std::swap(get(col, row), get(row, col)); }
 		}
@@ -267,7 +265,7 @@ public:
 	 * @brief Compute the norm of the matrix.
 	 * @return The norm of the matrix.
 	 */
-	[[nodiscard]] constexpr BaseType norm() const {
+	[[nodiscard]] constexpr auto norm() const -> BaseType {
 		BaseType normVal{};
 		for (std::size_t row = 0; row < NRow; ++row) {
 			for (std::size_t col = 0; col < NCol; ++col) { normVal += get(col, row) * get(row, col); }
@@ -281,12 +279,12 @@ public:
 	 * @brief Low level memory access.
 	 * @return Pointer to the data.
 	 */
-	[[nodiscard]] constexpr const BaseType* data() const { return m_data.data(); }
+	[[nodiscard]] constexpr auto data() const -> const BaseType* { return m_data.data(); }
 	/**
 	 * @brief Low level memory access.
 	 * @return Pointer to the data.
 	 */
-	[[nodiscard]] constexpr BaseType* data() { return m_data.data(); }
+	[[nodiscard]] constexpr auto data() -> BaseType* { return m_data.data(); }
 
 private:
 	/**
@@ -295,15 +293,17 @@ private:
 	 * @param iCol Column number.
 	 * @return The component value.
 	 */
-	constexpr BaseType& get(const std::size_t iRow, const std::size_t iCol) { return m_data[iRow + iCol * NRow]; }
+	constexpr auto get(const std::size_t iRow, const std::size_t iCol) -> BaseType& {
+		return m_data[iRow + (iCol * NRow)];
+	}
 	/**
 	 * @brief Access to component.
 	 * @param iRow Row number.
 	 * @param iCol Column number.
 	 * @return The component value.
 	 */
-	[[nodiscard]] constexpr const BaseType& get(const std::size_t iRow, const std::size_t iCol) const {
-		return m_data[iRow + iCol * NRow];
+	[[nodiscard]] constexpr auto get(const std::size_t iRow, const std::size_t iCol) const -> const BaseType& {
+		return m_data[iRow + (iCol * NRow)];
 	}
 	/// The matrix components.
 	std::array<BaseType, NCol * NRow> m_data;

@@ -20,13 +20,13 @@ namespace {
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 // NOLINTBEGIN(*-magic-numbers)
-void convertNv12ToRgb24(const uint8_t *iNv12Buffer, const math::vec2ui &iSize, uint8_t *oRgb24Buffer) {
+void convertNv12ToRgb24(const uint8_t* iNv12Buffer, const math::vec2ui& iSize, uint8_t* oRgb24Buffer) {
 	// Chaque composant Y occupe width * height octets
 	const uint32_t ySize = iSize.surface();
 
 	// Pointeurs vers les composants Y, U et V dans le tampon NV12
-	const uint8_t *yComponent = iNv12Buffer;
-	const uint8_t *uvComponent = iNv12Buffer + ySize;
+	const uint8_t* yComponent = iNv12Buffer;
+	const uint8_t* uvComponent = iNv12Buffer + ySize;
 
 	// Parcourir chaque ligne
 	for (uint32_t i = 0; i < iSize.y(); i++) {
@@ -50,7 +50,7 @@ void convertNv12ToRgb24(const uint8_t *iNv12Buffer, const math::vec2ui &iSize, u
 	}
 }
 
-void convertYuYvToRgb24(const uint8_t *iYuYvBuffer, const math::vec2ui &iSize, uint8_t *oRgb24Buffer) {
+void convertYuYvToRgb24(const uint8_t* iYuYvBuffer, const math::vec2ui& iSize, uint8_t* oRgb24Buffer) {
 	// Chaque composant YUV prend deux octets dans le format YUYV
 	const uint32_t yuyvSize = iSize.surface() * 2;
 
@@ -78,20 +78,19 @@ void convertYuYvToRgb24(const uint8_t *iYuYvBuffer, const math::vec2ui &iSize, u
 	}
 }
 
-void convertMJpegToRgb24(const uint8_t *iJpegBuffer, const int32_t iJpegSize, const math::vec2ui &iSize,
-						 uint8_t *oRgb24Buffer) {
+void convertMJpegToRgb24(const uint8_t* iJpegBuffer, const int32_t iJpegSize, const math::vec2ui& iSize,
+						 uint8_t* oRgb24Buffer) {
 	int comp = 0;
 	int width = 0;
 	int height = 0;
 	stbi_set_flip_vertically_on_load(0);
-	uint8_t *buffer = stbi_load_from_memory(iJpegBuffer, iJpegSize, &width, &height, &comp, 3);
+	uint8_t* buffer = stbi_load_from_memory(iJpegBuffer, iJpegSize, &width, &height, &comp, 3);
 	if (buffer == nullptr) {
 		OWL_CORE_WARN("Jpeg decoding: nullptr result.")
 		return;
 	}
 	if (iSize != math::vec2ui{static_cast<uint32_t>(width), static_cast<uint32_t>(height)}) {
-		OWL_CORE_WARN("Jpeg decoding: size missmatch ({} {}) expecting {} {}.", width, height, iSize.x(),
-					  iSize.y())
+		OWL_CORE_WARN("Jpeg decoding: size missmatch ({} {}) expecting {} {}.", width, height, iSize.x(), iSize.y())
 		stbi_image_free(buffer);
 		return;
 	}
@@ -120,7 +119,7 @@ Device::Device(std::string iName) : m_name(std::move(iName)) {}
 
 Device::~Device() = default;
 
-std::vector<uint8_t> Device::getRgbBuffer(const uint8_t *iInputBuffer, const int32_t iBufferSize) const {
+auto Device::getRgbBuffer(const uint8_t* iInputBuffer, const int32_t iBufferSize) const -> std::vector<uint8_t> {
 	std::vector<uint8_t> output;
 	if (m_pixFormat == PixelFormat::Nv12) {
 		output.resize(3ull * m_size.surface());
@@ -135,12 +134,12 @@ std::vector<uint8_t> Device::getRgbBuffer(const uint8_t *iInputBuffer, const int
 		output.resize(3ull * m_size.surface());
 		convertMJpegToRgb24(iInputBuffer, iBufferSize, m_size, output.data());
 	} else {
-		OWL_CORE_WARN("Unkown or unsupported pixel format, empty output buffer.")
+		OWL_CORE_WARN("Unknown or unsupported pixel format, empty output buffer.")
 	}
 	return output;
 }
 
-bool Device::isPixelFormatSupported(const PixelFormat &iPixFormat) {
+auto Device::isPixelFormatSupported(const PixelFormat& iPixFormat) -> bool {
 	switch (iPixFormat) {
 		case PixelFormat::Rgb24:
 		case PixelFormat::YuYv:

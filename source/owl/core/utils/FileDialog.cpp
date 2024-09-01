@@ -16,7 +16,7 @@ namespace owl::core::utils {
 namespace {
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
-std::vector<std::string_view> split(const std::string_view iString, const char iDelimiter = '\n') {
+auto split(const std::string_view iString, const char iDelimiter = '\n') -> std::vector<std::string_view> {
 	std::vector<std::string_view> result;
 	int indexCommaToRightOfColumn = -1;
 	for (uint32_t i = 0; i < iString.size(); i++) {
@@ -36,7 +36,7 @@ std::vector<std::string_view> split(const std::string_view iString, const char i
 }
 OWL_DIAG_POP
 
-std::vector<nfdu8filteritem_t> parseFilter(const std::string &iFilter) {
+auto parseFilter(const std::string& iFilter) -> std::vector<nfdu8filteritem_t> {
 	std::vector<nfdu8filteritem_t> filters;
 	for (const auto filterStr = split(iFilter); auto str: filterStr) {
 		if (str.empty())
@@ -46,17 +46,17 @@ std::vector<nfdu8filteritem_t> parseFilter(const std::string &iFilter) {
 			continue;
 		if (items[0].empty() || items[1].empty())
 			continue;
-		filters.push_back({items[0].data(), items[1].data()});
+		filters.push_back({std::string{items[0]}.c_str(), std::string{items[1]}.c_str()});
 	}
 	return filters;
 }
 }// namespace
 
-std::filesystem::path FileDialog::openFile(const std::string &iFilter) {
+auto FileDialog::openFile(const std::string& iFilter) -> std::filesystem::path {
 	NFD::Init();
-	nfdu8char_t *outPath = nullptr;
+	nfdu8char_t* outPath = nullptr;
 	std::filesystem::path resultPath;
-	const std::string &filters{iFilter};
+	const std::string& filters{iFilter};
 	const auto ff = parseFilter(filters);
 	const auto initialDir = Application::get().getAssetDirectory();
 	const std::string tmp = initialDir.string();
@@ -75,11 +75,11 @@ std::filesystem::path FileDialog::openFile(const std::string &iFilter) {
 	return resultPath;
 }
 
-std::filesystem::path FileDialog::saveFile([[maybe_unused]] const std::string &iFilter) {
+auto FileDialog::saveFile([[maybe_unused]] const std::string& iFilter) -> std::filesystem::path {
 	NFD::Init();
-	nfdu8char_t *outPath = nullptr;
+	nfdu8char_t* outPath = nullptr;
 	std::filesystem::path resultPath;
-	const std::string &filters{iFilter};
+	const std::string& filters{iFilter};
 	const auto ff = parseFilter(filters);
 	const auto initialDir = Application::get().getAssetDirectory();
 	if (const auto result = NFD::SaveDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()),

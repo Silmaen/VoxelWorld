@@ -8,14 +8,16 @@
 
 #pragma once
 
-namespace owl::input {
+
 /// Wrap to mouse code.
+namespace owl::input {
 using MouseCode = uint8_t;
+}// namespace owl::input
 
 /**
  * @brief Namespace for mouse codes.
  */
-namespace mouse {
+namespace owl::input::mouse {
 enum : MouseCode {
 	// From glfw3.h
 	Button0 = 0,
@@ -32,5 +34,4 @@ enum : MouseCode {
 	ButtonRight = Button1,
 	ButtonMiddle = Button2
 };
-}// namespace mouse
-}// namespace owl::input
+}// namespace owl::input::mouse

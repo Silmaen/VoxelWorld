@@ -15,14 +15,14 @@ namespace owl::core::layer {
 Layer::~Layer() = default;
 
 LayerStack::~LayerStack() {
-	for (auto &layer: m_layers) {
+	for (auto& layer: m_layers) {
 		layer->onDetach();
 		layer.reset();
 	}
 }
 
 void LayerStack::clear() {
-	for (auto &layer: m_layers) {
+	for (auto& layer: m_layers) {
 		auto name = layer->getName();
 		layer->onDetach();
 		layer.reset();
@@ -33,18 +33,18 @@ void LayerStack::clear() {
 	OWL_CORE_TRACE("LayerStack is empty.")
 }
 
-void LayerStack::pushLayer(shared<Layer> &&iLayer) {
+void LayerStack::pushLayer(shared<Layer>&& iLayer) {
 	iLayer->onAttach();
 	m_layers.emplace(m_layers.begin() + m_layerInsertIndex, std::move(iLayer));
 	m_layerInsertIndex++;
 }
 
-void LayerStack::pushOverlay(shared<Layer> &&iOverlay) {
+void LayerStack::pushOverlay(shared<Layer>&& iOverlay) {
 	m_layers.emplace_back(std::move(iOverlay));
 	m_layers.back()->onAttach();
 }
 
-void LayerStack::popLayer(const shared<Layer> &iLayer) {
+void LayerStack::popLayer(const shared<Layer>& iLayer) {
 	if (const auto it = std::find(m_layers.begin(), m_layers.begin() + m_layerInsertIndex, iLayer);
 		it != m_layers.begin() + m_layerInsertIndex) {
 		iLayer->onDetach();
@@ -53,7 +53,7 @@ void LayerStack::popLayer(const shared<Layer> &iLayer) {
 	}
 }
 
-void LayerStack::popOverlay(const shared<Layer> &iOverlay) {
+void LayerStack::popOverlay(const shared<Layer>& iOverlay) {
 	if (const auto it = std::find(m_layers.begin() + m_layerInsertIndex, m_layers.end(), iOverlay);
 		it != m_layers.end()) {
 		iOverlay->onDetach();

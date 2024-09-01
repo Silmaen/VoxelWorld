@@ -21,16 +21,16 @@ public:
 	 */
 	virtual ~CameraSystem();
 
-	CameraSystem(const CameraSystem &) = delete;
-	CameraSystem(CameraSystem &&) = delete;
-	CameraSystem &operator=(const CameraSystem &) = delete;
-	CameraSystem &operator=(CameraSystem &&) = delete;
+	CameraSystem(const CameraSystem&) = delete;
+	CameraSystem(CameraSystem&&) = delete;
+	auto operator=(const CameraSystem&) -> CameraSystem& = delete;
+	auto operator=(CameraSystem&&) -> CameraSystem& = delete;
 
 	/**
 	 * @brief Singleton get.
 	 * @return Instance of the Camera System.
 	 */
-	static CameraSystem &get() {
+	static auto get() -> CameraSystem& {
 		static CameraSystem instance;
 		return instance;
 	}
@@ -38,13 +38,13 @@ public:
 	/**
 	 * @brief Frame update of the camera
 	 */
-	void onUpdate(const owl::core::Timestep &iTs);
+	void onUpdate(const owl::core::Timestep& iTs);
 
 	/**
 	 * @brief Get the camera frame.
 	 * @return The camera frame.
 	 */
-	[[nodiscard]] const owl::shared<owl::renderer::Texture> &getFrame() const { return m_frame; }
+	[[nodiscard]] auto getFrame() const -> const owl::shared<owl::renderer::Texture>& { return m_frame; }
 
 	/**
 	 * @brief Set the camera by its ID.
@@ -58,12 +58,12 @@ public:
 	 * @brief Get the current Camera Id.
 	 * @return The current camera ID.
 	 */
-	[[nodiscard]] int32_t getCurrentCameraId() const;
+	[[nodiscard]] auto getCurrentCameraId() const -> int32_t;
 	/**
 	 * @brief Get the current Camera Id.
 	 * @return The current camera ID.
 	 */
-	[[nodiscard]] std::string getCurrentCameraName() const;
+	[[nodiscard]] auto getCurrentCameraName() const -> std::string;
 
 	/**
 	 * @brief Actualize the list of available cameras.
@@ -74,7 +74,7 @@ public:
 	 * @brief Gat the list of camera.
 	 * @return Lit of Camera.
 	 */
-	[[nodiscard]] std::vector<std::string> getListOfCameraNames() const;
+	[[nodiscard]] auto getListOfCameraNames() const -> std::vector<std::string>;
 
 	/**
 	 * @brief Destroy internal objects.
@@ -87,7 +87,7 @@ private:
 	 */
 	CameraSystem();
 
-	void resize(const owl::math::vec2ui &iSize);
+	void resize(const owl::math::vec2ui& iSize);
 
 	owl::math::vec2ui m_size;
 

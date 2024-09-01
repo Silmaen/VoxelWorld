@@ -18,10 +18,10 @@ namespace owl::renderer::vulkan {
  */
 class OWL_API Framebuffer final : public renderer::Framebuffer {
 public:
-	Framebuffer(const Framebuffer &) = default;
-	Framebuffer(Framebuffer &&) = default;
-	Framebuffer &operator=(const Framebuffer &) = default;
-	Framebuffer &operator=(Framebuffer &&) = default;
+	Framebuffer(const Framebuffer&) = default;
+	Framebuffer(Framebuffer&&) = default;
+	auto operator=(const Framebuffer&) -> Framebuffer& = default;
+	auto operator=(Framebuffer&&) -> Framebuffer& = default;
 
 	/**
 	 * @brief Default constructor.
@@ -62,7 +62,7 @@ public:
 	 * @param[in] iY Y coordinate.
 	 * @return Pixel value.
 	 */
-	int readPixel(uint32_t iAttachmentIndex, int iX, int iY) override;
+	auto readPixel(uint32_t iAttachmentIndex, int iX, int iY) -> int override;
 
 	/**
 	 * @brief Clear Attachment.
@@ -82,51 +82,53 @@ public:
 	 * @param[in] iIndex The color index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint64_t getColorAttachmentRendererId([[maybe_unused]] uint32_t iIndex) const override;
+	[[nodiscard]] auto getColorAttachmentRendererId([[maybe_unused]] uint32_t iIndex) const -> uint64_t override;
 
 	/**
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] const FramebufferSpecification &getSpecification() const override { return m_specs; }
+	[[nodiscard]] auto getSpecification() const -> const FramebufferSpecification& override { return m_specs; }
 
-	[[nodiscard]] VkFramebuffer getCurrentFramebuffer() const { return m_framebuffers[m_currentImage]; }
+	[[nodiscard]] auto getCurrentFramebuffer() const -> VkFramebuffer { return m_framebuffers[m_currentImage]; }
 
-	[[nodiscard]] VkRenderPass getRenderPass() const { return m_renderPass; }
+	[[nodiscard]] auto getRenderPass() const -> VkRenderPass { return m_renderPass; }
 
-	[[nodiscard]] uint32_t getImageCount() const { return m_specs.samples; }
-	[[nodiscard]] uint32_t getImageIndex() const { return m_currentFrame; }
+	[[nodiscard]] auto getImageCount() const -> uint32_t { return m_specs.samples; }
+	[[nodiscard]] auto getImageIndex() const -> uint32_t { return m_currentFrame; }
 
-	[[nodiscard]] VkSwapchainKHR getSwapChain() const { return m_swapChain; }
+	[[nodiscard]] auto getSwapChain() const -> VkSwapchainKHR { return m_swapChain; }
 
 	void nextFrame();
 
-	[[nodiscard]] VkSemaphore getCurrentFinishedSemaphore() const {
+	[[nodiscard]] auto getCurrentFinishedSemaphore() const -> VkSemaphore {
 		return m_samples[m_currentFrame].renderFinishedSemaphore;
 	}
 
-	[[nodiscard]] VkSemaphore getCurrentImageAvailableSemaphore() const {
-		if (m_samples[m_currentFrame].imageAvailableSemaphore)
+	[[nodiscard]] auto getCurrentImageAvailableSemaphore() const -> VkSemaphore {
+		if (m_samples[m_currentFrame].imageAvailableSemaphore != nullptr)
 			return m_samples[m_currentFrame].imageAvailableSemaphore;
 		return m_samples[m_currentFrame].renderFinishedSemaphore;
 	}
 
-	[[nodiscard]] VkCommandBuffer *getCurrentCommandbuffer() { return &m_samples[m_currentFrame].commandBuffer; }
-	[[nodiscard]] VkFence *getCurrentFence() { return &m_samples[m_currentFrame].inFlightFence; }
+	[[nodiscard]] auto getCurrentCommandbuffer() -> VkCommandBuffer* {
+		return &m_samples[m_currentFrame].commandBuffer;
+	}
+	[[nodiscard]] auto getCurrentFence() -> VkFence* { return &m_samples[m_currentFrame].inFlightFence; }
 
 
 	void setCurrentImage(const uint32_t iImage) { m_currentImage = iImage; }
-	[[nodiscard]] uint32_t *getCurrentImage() { return &m_currentImage; }
+	[[nodiscard]] auto getCurrentImage() -> uint32_t* { return &m_currentImage; }
 
-	[[nodiscard]] const std::string &getName() const { return m_specs.debugName; }
+	[[nodiscard]] auto getName() const -> const std::string& { return m_specs.debugName; }
 
-	[[nodiscard]] std::vector<VkFormat> getColorAttachmentformats() const;
+	[[nodiscard]] auto getColorAttachmentformats() const -> std::vector<VkFormat>;
 
-	[[nodiscard]] bool isFirstBatch() const { return m_firstBatch; }
+	[[nodiscard]] auto isFirstBatch() const -> bool { return m_firstBatch; }
 	void resetBatch() { m_firstBatch = true; }
 	void batchTouch() { m_firstBatch = false; }
 
-	[[nodiscard]] VkImage getCurrentImagePtr() const { return m_images[m_currentImage].image; }
+	[[nodiscard]] auto getCurrentImagePtr() const -> VkImage { return m_images[m_currentImage].image; }
 
 private:
 	/// The specs.
@@ -169,7 +171,7 @@ private:
 	void createFrameBuffer();
 	void createRenderPass();
 	void createDescriptorSets();
-	[[nodiscard]] uint32_t attToImgIdx(uint32_t iAttachmentIndex) const;
-	[[nodiscard]] uint32_t imgIdxToAtt(uint32_t iImageIndex) const;
+	[[nodiscard]] auto attToImgIdx(uint32_t iAttachmentIndex) const -> uint32_t;
+	[[nodiscard]] auto imgIdxToAtt(uint32_t iImageIndex) const -> uint32_t;
 };
 }// namespace owl::renderer::vulkan

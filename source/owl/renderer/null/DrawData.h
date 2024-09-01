@@ -17,8 +17,8 @@ class OWL_API DrawData final : public renderer::DrawData {
 public:
 	DrawData(const DrawData&) = default;
 	DrawData(DrawData&&) = default;
-	DrawData& operator=(const DrawData&) = default;
-	DrawData& operator=(DrawData&&) = default;
+	auto operator=(const DrawData&) -> DrawData& = default;
+	auto operator=(DrawData&&) -> DrawData& = default;
 	DrawData() = default;
 	/**
 	 * @brief Destructor.
@@ -33,8 +33,8 @@ public:
 	 * @param[in] iShaderName The shader name.
 	 */
 	void init([[maybe_unused]] const BufferLayout& iLayout, [[maybe_unused]] const std::string& iRenderer,
-	          [[maybe_unused]] std::vector<uint32_t>& iIndices,
-	          [[maybe_unused]] const std::string& iShaderName) override {}
+			  [[maybe_unused]] std::vector<uint32_t>& iIndices,
+			  [[maybe_unused]] const std::string& iShaderName) override {}
 
 	/**
 	 * @brief Bind this draw data.
@@ -57,7 +57,7 @@ public:
 	 * @brief Get the number of vertex to draw.
 	 * @return Number of vertex to draw
 	 */
-	[[nodiscard]] uint32_t getIndexCount() const override { return 0; }
+	[[nodiscard]] auto getIndexCount() const -> uint32_t override { return 0; }
 
 	/**
 	 * @brief Define the shader for this object.
@@ -65,6 +65,6 @@ public:
 	 * @param[in] iRenderer Name of the shader's related renderer.
 	 */
 	void setShader([[maybe_unused]] const std::string& iShaderName,
-	               [[maybe_unused]] const std::string& iRenderer) override {}
+				   [[maybe_unused]] const std::string& iRenderer) override {}
 };
-} // namespace owl::renderer::null
+}// namespace owl::renderer::null

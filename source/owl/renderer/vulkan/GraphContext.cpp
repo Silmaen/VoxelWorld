@@ -14,36 +14,35 @@
 
 namespace owl::renderer::vulkan {
 
-GraphContext::GraphContext(GLFWwindow *ioWindow)
-	: mp_wnd(ioWindow) {}
+GraphContext::GraphContext(GLFWwindow* ioWindow) : mp_wnd(ioWindow) {}
 
 GraphContext::~GraphContext() = default;
 
 void GraphContext::swapBuffers() {
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	vkh.swapFrame();
 }
 
 void GraphContext::init() {}
 
-GraphContext::Version GraphContext::getVersion() const {
+auto GraphContext::getVersion() const -> GraphContext::Version {
 	const int version = internal::VulkanHandler::get().getVersion();
 	return {static_cast<int32_t>(VK_API_VERSION_MAJOR(version)), static_cast<int32_t>(VK_API_VERSION_MAJOR(version))};
 }
 
-VkResult GraphContext::createSurface(const VkInstance &iInstance) {
+auto GraphContext::createSurface(const VkInstance& iInstance) -> VkResult {
 	return glfwCreateWindowSurface(iInstance, mp_wnd, nullptr, &m_surface);
 }
 
 
-void GraphContext::destroySurface(const VkInstance &iInstance) {
+void GraphContext::destroySurface(const VkInstance& iInstance) {
 	vkDestroySurfaceKHR(iInstance, m_surface, nullptr);
 	m_surface = nullptr;
 }
 
 void GraphContext::waitIdle() {
 	OWL_CORE_TRACE("GraphContext Wait for Idle.")
-	const auto &vkh = internal::VulkanCore::get();
+	const auto& vkh = internal::VulkanCore::get();
 	vkDeviceWaitIdle(vkh.getLogicalDevice());
 }
 

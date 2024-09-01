@@ -20,7 +20,7 @@ namespace owl::renderer::vulkan {
 namespace utils {
 namespace {
 // NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange)
-[[maybe_unused]] VkShaderStageFlagBits shaderStageToVkStageBit(const ShaderType &iStage) {
+[[maybe_unused]] auto shaderStageToVkStageBit(const ShaderType& iStage) -> VkShaderStageFlagBits {
 	switch (iStage) {
 		case ShaderType::Vertex:
 			return VK_SHADER_STAGE_VERTEX_BIT;
@@ -38,7 +38,7 @@ namespace {
 // NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange)
 
 
-VkShaderModule createShaderModule(const VkDevice &iLogicalDevice, const std::vector<uint32_t> &iCode) {
+auto createShaderModule(const VkDevice& iLogicalDevice, const std::vector<uint32_t>& iCode) -> VkShaderModule {
 	VkShaderModuleCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.codeSize = iCode.size() * sizeof(uint32_t);
@@ -55,29 +55,29 @@ VkShaderModule createShaderModule(const VkDevice &iLogicalDevice, const std::vec
 
 }// namespace utils
 
-Shader::Shader(const std::string &iShaderName, const std::string &iRenderer, const std::string &iVertexSrc,
-			   const std::string &iFragmentSrc)
+Shader::Shader(const std::string& iShaderName, const std::string& iRenderer, const std::string& iVertexSrc,
+			   const std::string& iFragmentSrc)
 	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 
 	createShader({{ShaderType::Vertex, iVertexSrc}, {ShaderType::Fragment, iFragmentSrc}});
 }
 
-Shader::Shader(const std::string &iShaderName, const std::string &iRenderer,
-			   const std::unordered_map<ShaderType, std::string> &iSources)
+Shader::Shader(const std::string& iShaderName, const std::string& iRenderer,
+			   const std::unordered_map<ShaderType, std::string>& iSources)
 	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 
 	createShader(iSources);
 }
 
-Shader::Shader(const std::string &iShaderName, const std::string &iRenderer,
-			   const std::vector<std::filesystem::path> &iSources)
+Shader::Shader(const std::string& iShaderName, const std::string& iRenderer,
+			   const std::vector<std::filesystem::path>& iSources)
 	: renderer::Shader{iShaderName, iRenderer} {
 	OWL_PROFILE_FUNCTION()
 	std::unordered_map<ShaderType, std::string> strSources;
 
-	for (const auto &src: iSources) {
+	for (const auto& src: iSources) {
 		auto type = ShaderType::None;
 		if (src.extension() == ".frag")
 			type = ShaderType::Fragment;
@@ -98,21 +98,21 @@ void Shader::bind() const {}
 
 void Shader::unbind() const {}
 
-void Shader::setInt(const std::string &, int) {}
+void Shader::setInt(const std::string&, int) {}
 
-void Shader::setIntArray(const std::string &, int *, uint32_t) {}
+void Shader::setIntArray(const std::string&, int*, uint32_t) {}
 
-void Shader::setFloat(const std::string &, float) {}
+void Shader::setFloat(const std::string&, float) {}
 
-void Shader::setFloat2(const std::string &, const math::vec2 &) {}
+void Shader::setFloat2(const std::string&, const math::vec2&) {}
 
-void Shader::setFloat3(const std::string &, const math::vec3 &) {}
+void Shader::setFloat3(const std::string&, const math::vec3&) {}
 
-void Shader::setFloat4(const std::string &, const math::vec4 &) {}
+void Shader::setFloat4(const std::string&, const math::vec4&) {}
 
-void Shader::setMat4(const std::string &, const math::mat4 &) {}
+void Shader::setMat4(const std::string&, const math::mat4&) {}
 
-void Shader::createShader(const std::unordered_map<ShaderType, std::string> &iSources) {
+void Shader::createShader(const std::unordered_map<ShaderType, std::string>& iSources) {
 	OWL_SCOPE_UNTRACK
 
 	OWL_PROFILE_FUNCTION()
@@ -127,16 +127,16 @@ void Shader::createShader(const std::unordered_map<ShaderType, std::string> &iSo
 	OWL_CORE_INFO("Compilation of shader {} in {} ms", getName(), duration)
 }
 
-void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string> &iSources) {
+void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string>& iSources) {
 	OWL_PROFILE_FUNCTION()
 
 	shaderc::CompileOptions options;
 	options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_0);
 	options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-	auto &shaderData = m_vulkanSpirv;
+	auto& shaderData = m_vulkanSpirv;
 	shaderData.clear();
-	for (auto &&[stage, source]: iSources) {
+	for (auto&& [stage, source]: iSources) {
 		const std::filesystem::path basePath =
 				renderer::utils::getShaderPath(getName(), getRenderer(), "vulkan", stage);
 		const std::filesystem::path cachedPath =
@@ -165,15 +165,15 @@ void Shader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std
 				OWL_CORE_WARN("Failed to write the compiled shader.")
 		}
 	}
-	for (auto &&[stage, data]: shaderData)
+	for (auto&& [stage, data]: shaderData)
 		renderer::utils::shaderReflect(getName(), getRenderer(), "vulkan", stage, data);
 }
 
-std::vector<VkPipelineShaderStageCreateInfo> Shader::getStagesInfo() {
-	auto &vkh = internal::VulkanHandler::get();
-	const auto &vkc = internal::VulkanCore::get();
+auto Shader::getStagesInfo() -> std::vector<VkPipelineShaderStageCreateInfo> {
+	auto& vkh = internal::VulkanHandler::get();
+	const auto& vkc = internal::VulkanCore::get();
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
-	for (auto &&[stage, code]: m_vulkanSpirv) {
+	for (auto&& [stage, code]: m_vulkanSpirv) {
 		shaderStages.emplace_back();
 		shaderStages.back().sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStages.back().stage = utils::shaderStageToVkStageBit(stage);

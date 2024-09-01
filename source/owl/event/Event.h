@@ -58,10 +58,10 @@ enum Category : uint8_t {
  */
 class OWL_API Event {
 public:
-	Event(const Event &) = default;
-	Event(Event &&) = default;
-	Event &operator=(const Event &) = default;
-	Event &operator=(Event &&) = default;
+	Event(const Event&) = default;
+	Event(Event&&) = default;
+	auto operator=(const Event&) -> Event& = default;
+	auto operator=(Event&&) -> Event& = default;
 	Event() = default;
 
 	/**
@@ -73,32 +73,34 @@ public:
 	 * @brief Get the Event type.
 	 * @return Event Type.
 	 */
-	[[nodiscard]] virtual Type getType() const = 0;
+	[[nodiscard]] virtual auto getType() const -> Type = 0;
 
 	/**
 	 * @brief Get the category flags for the Event.
 	 * @return All the Event category flags.
 	 */
-	[[nodiscard]] virtual uint8_t getCategoryFlags() const = 0;
+	[[nodiscard]] virtual auto getCategoryFlags() const -> uint8_t = 0;
 
 	/**
 	 * @brief Get the Event Name.
 	 * @return Event names.
 	 */
-	[[nodiscard]] virtual std::string getName() const = 0;
+	[[nodiscard]] virtual auto getName() const -> std::string = 0;
 
 	/**
 	 * @brief Get the Event Name;
 	 * @return Event names.
 	 */
-	[[nodiscard]] virtual std::string toString() const = 0;
+	[[nodiscard]] virtual auto toString() const -> std::string = 0;
 
 	/**
 	 * @brief Check if the event belongs to category.
 	 * @param[in] iCategory Category to check.
 	 * @return True if belongs to category.
 	 */
-	[[nodiscard]] bool isInCategory(const Category &iCategory) const { return (getCategoryFlags() & iCategory) != 0; }
+	[[nodiscard]] auto isInCategory(const Category& iCategory) const -> bool {
+		return (getCategoryFlags() & iCategory) != 0;
+	}
 
 	/// If event already handled.
 	bool handled = false;
@@ -113,7 +115,7 @@ public:
 	 * @brief Constructor.
 	 * @param[in,out] ioDispatchEvent Event to dispatch.
 	 */
-	explicit EventDispatcher(Event &ioDispatchEvent) : m_event(ioDispatchEvent) {}
+	explicit EventDispatcher(Event& ioDispatchEvent) : m_event(ioDispatchEvent) {}
 
 	/**
 	 * @brief Dispatching function.
@@ -123,9 +125,9 @@ public:
 	 * @return True if succeeded.
 	 */
 	template<typename T, typename F>
-	bool dispatch(const F &iFunc) {
+	auto dispatch(const F& iFunc) -> bool {
 		if (m_event.getType() == T::getStaticType()) {
-			m_event.handled |= iFunc(static_cast<T &>(m_event));
+			m_event.handled |= iFunc(static_cast<T&>(m_event));
 			return true;
 		}
 		return false;
@@ -133,7 +135,7 @@ public:
 
 private:
 	/// The event.
-	Event &m_event;
+	Event& m_event;
 };
 
 }// namespace owl::event

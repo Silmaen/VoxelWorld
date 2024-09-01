@@ -21,7 +21,7 @@ namespace owl::math {
  * @return Identity Matrix.
  */
 template<typename BaseType, std::size_t Dim>
-constexpr Matrix<BaseType, Dim, Dim> identity() {
+constexpr auto identity() -> Matrix<BaseType, Dim, Dim> {
 	Matrix<BaseType, Dim, Dim> result{};
 	for (std::size_t idx = 0; idx < Dim; ++idx) result(idx, idx) = BaseType{1};
 	return result;
@@ -34,7 +34,7 @@ constexpr Matrix<BaseType, Dim, Dim> identity() {
  * @return The 3x3 matrix.
  */
 template<typename BaseType>
-constexpr Matrix<BaseType, 3, 3> toMat3(const Quaternion<BaseType>& iQuaternion) {
+constexpr auto toMat3(const Quaternion<BaseType>& iQuaternion) -> Matrix<BaseType, 3, 3> {
 	Matrix<BaseType, 3, 3> result;
 	constexpr BaseType one{1};
 	constexpr BaseType two{2};
@@ -66,7 +66,7 @@ constexpr Matrix<BaseType, 3, 3> toMat3(const Quaternion<BaseType>& iQuaternion)
  * @return The 4x4 matrix.
  */
 template<typename BaseType>
-constexpr Matrix<BaseType, 4, 4> toMat4(const Quaternion<BaseType>& iQuaternion) {
+constexpr auto toMat4(const Quaternion<BaseType>& iQuaternion) -> Matrix<BaseType, 4, 4> {
 	Matrix<BaseType, 3, 3> res3 = toMat3(iQuaternion);
 	Matrix<BaseType, 4, 4> result{};
 	result(0, 0) = res3(0, 0);
@@ -92,7 +92,8 @@ constexpr Matrix<BaseType, 4, 4> toMat4(const Quaternion<BaseType>& iQuaternion)
  * @return Perspective Matrix.
  */
 template<typename BaseType>
-constexpr Matrix<BaseType, 4, 4> perspective(BaseType iFovy, BaseType iAspect, BaseType iZNear, BaseType iZFar) {
+constexpr auto perspective(BaseType iFovy, BaseType iAspect, BaseType iZNear,
+						   BaseType iZFar) -> Matrix<BaseType, 4, 4> {
 	static constexpr BaseType one{1};
 	static constexpr BaseType two{2};
 	Matrix<BaseType, 4, 4> result{};
@@ -106,7 +107,7 @@ constexpr Matrix<BaseType, 4, 4> perspective(BaseType iFovy, BaseType iAspect, B
 }
 
 /**
- * @brief Construct a ortogonal projection matrix.
+ * @brief Construct a orthogonal projection matrix.
  * @tparam BaseType The internal data type.
  * @param iLeft The left limit.
  * @param iRight The right limit.
@@ -117,8 +118,8 @@ constexpr Matrix<BaseType, 4, 4> perspective(BaseType iFovy, BaseType iAspect, B
  * @return The orthogonal matrix.
  */
 template<typename BaseType>
-constexpr Matrix<BaseType, 4, 4> ortho(const BaseType iLeft, const BaseType iRight, const BaseType iBottom,
-									   const BaseType iTop, const BaseType iNear, const BaseType iFar) {
+constexpr auto ortho(const BaseType iLeft, const BaseType iRight, const BaseType iBottom, const BaseType iTop,
+					 const BaseType iNear, const BaseType iFar) -> Matrix<BaseType, 4, 4> {
 	static constexpr BaseType two{2};
 	Matrix<BaseType, 4, 4> result{};
 	result(0, 0) = two / (iRight - iLeft);
@@ -139,7 +140,8 @@ constexpr Matrix<BaseType, 4, 4> ortho(const BaseType iLeft, const BaseType iRig
  * @return The translated matrix.
  */
 template<typename BaseType>
-constexpr Matrix<BaseType, 4, 4> translate(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseType, 3>& iVector) {
+constexpr auto translate(const Matrix<BaseType, 4, 4>& iMatrix,
+						 const Vector<BaseType, 3>& iVector) -> Matrix<BaseType, 4, 4> {
 	Matrix<BaseType, 4, 4> result(iMatrix);
 	result.setColumn(3, iMatrix.column(0) * iVector[0] + iMatrix.column(1) * iVector[1] +
 								iMatrix.column(2) * iVector[2] + iMatrix.column(3));
@@ -155,8 +157,8 @@ constexpr Matrix<BaseType, 4, 4> translate(const Matrix<BaseType, 4, 4>& iMatrix
  * @return Rotated matrix.
  */
 template<typename BaseType>
-constexpr Matrix<BaseType, 4, 4> rotate(Matrix<BaseType, 4, 4> const& iMatrix, const BaseType iAngle,
-										const Vector<BaseType, 3>& iAxis) {
+constexpr auto rotate(Matrix<BaseType, 4, 4> const& iMatrix, const BaseType iAngle,
+					  const Vector<BaseType, 3>& iAxis) -> Matrix<BaseType, 4, 4> {
 	BaseType const c = std::cos(iAngle);
 	BaseType const s = std::sin(iAngle);
 	Vector<BaseType, 3> axis(iAxis.normalized());
@@ -190,7 +192,8 @@ constexpr Matrix<BaseType, 4, 4> rotate(Matrix<BaseType, 4, 4> const& iMatrix, c
  * @return The transformed matrix.
  */
 template<typename BaseType>
-constexpr Matrix<BaseType, 4, 4> scale(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseType, 3>& iScale) {
+constexpr auto scale(const Matrix<BaseType, 4, 4>& iMatrix,
+					 const Vector<BaseType, 3>& iScale) -> Matrix<BaseType, 4, 4> {
 	Matrix<BaseType, 4, 4> result{};
 	result.setColumn(0, iMatrix.column(0) * iScale[0]);
 	result.setColumn(1, iMatrix.column(1) * iScale[1]);
@@ -210,9 +213,9 @@ constexpr Matrix<BaseType, 4, 4> scale(const Matrix<BaseType, 4, 4>& iMatrix, co
  * @return The transformed matrix.
  */
 template<typename BaseType>
-constexpr Matrix<BaseType, 4, 4> shear(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseType, 3>& iPoint,
-									   const Vector<BaseType, 2>& iLambdaX, const Vector<BaseType, 2>& iLambdaY,
-									   const Vector<BaseType, 2>& iLambdaZ) {
+constexpr auto shear(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseType, 3>& iPoint,
+					 const Vector<BaseType, 2>& iLambdaX, const Vector<BaseType, 2>& iLambdaY,
+					 const Vector<BaseType, 2>& iLambdaZ) -> Matrix<BaseType, 4, 4> {
 
 	Vector<BaseType, 3> pointLambda{(iLambdaX[0] + iLambdaX[1]), (iLambdaY[0] + iLambdaY[1]),
 									(iLambdaZ[0] + iLambdaZ[1])};
@@ -254,7 +257,7 @@ constexpr Matrix<BaseType, 4, 4> shear(const Matrix<BaseType, 4, 4>& iMatrix, co
  * @return Inversed matrix.
  */
 template<typename BaseType, size_t Dim>
-constexpr Matrix<BaseType, Dim, Dim> inverse(const Matrix<BaseType, Dim, Dim>& iMatrix)
+constexpr auto inverse(const Matrix<BaseType, Dim, Dim>& iMatrix) -> Matrix<BaseType, Dim, Dim>
 	requires(Dim == 2)
 {
 	BaseType determinant = iMatrix(0, 0) * iMatrix(1, 1) - iMatrix(1, 0) * iMatrix(0, 1);
@@ -276,7 +279,7 @@ constexpr Matrix<BaseType, Dim, Dim> inverse(const Matrix<BaseType, Dim, Dim>& i
  * @return Inversed matrix.
  */
 template<typename BaseType, size_t Dim>
-constexpr Matrix<BaseType, Dim, Dim> inverse(const Matrix<BaseType, Dim, Dim>& iMatrix)
+constexpr auto inverse(const Matrix<BaseType, Dim, Dim>& iMatrix) -> Matrix<BaseType, Dim, Dim>
 	requires(Dim == 3)
 {
 	BaseType determinant = iMatrix(0, 0) * (iMatrix(1, 1) * iMatrix(2, 2) - iMatrix(1, 2) * iMatrix(2, 1)) -
@@ -305,7 +308,7 @@ constexpr Matrix<BaseType, Dim, Dim> inverse(const Matrix<BaseType, Dim, Dim>& i
  * @return Inversed matrix.
  */
 template<typename BaseType, size_t Dim>
-constexpr Matrix<BaseType, Dim, Dim> inverse(const Matrix<BaseType, Dim, Dim>& iMatrix)
+constexpr auto inverse(const Matrix<BaseType, Dim, Dim>& iMatrix) -> Matrix<BaseType, Dim, Dim>
 	requires(Dim == 4)
 {
 	BaseType Coef00 = iMatrix(2, 2) * iMatrix(3, 3) - iMatrix(2, 3) * iMatrix(3, 2);

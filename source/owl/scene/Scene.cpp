@@ -24,19 +24,19 @@
 namespace owl::scene {
 namespace {
 template<typename Component>
-void copyComponent(entt::registry &oDst, const entt::registry &iSrc,
-				   const std::unordered_map<core::UUID, entt::entity> &enttMap) {
+void copyComponent(entt::registry& oDst, const entt::registry& iSrc,
+				   const std::unordered_map<core::UUID, entt::entity>& enttMap) {
 	for (auto view = iSrc.view<Component>(); auto e: view) {
 		const core::UUID uuid = iSrc.get<component::ID>(e).id;
 		OWL_CORE_ASSERT(enttMap.contains(uuid), "Error: Component not found in map.")
 		const entt::entity dstEnttID = enttMap.at(uuid);
-		auto &component = iSrc.get<Component>(e);
+		auto& component = iSrc.get<Component>(e);
 		oDst.emplace_or_replace<Component>(dstEnttID, component);
 	}
 }
 
 template<typename Component>
-void copyComponentIfExists(Entity &oDst, const Entity &iSrc) {
+void copyComponentIfExists(Entity& oDst, const Entity& iSrc) {
 	if (iSrc.hasComponent<Component>())
 		oDst.addOrReplaceComponent<Component>(iSrc.getComponent<Component>());
 }
@@ -46,20 +46,20 @@ Scene::Scene() = default;
 
 Scene::~Scene() = default;
 
-shared<Scene> Scene::copy(const shared<Scene> &iOther) {
+auto Scene::copy(const shared<Scene>& iOther) -> shared<Scene> {
 	shared<Scene> newScene = mkShared<Scene>();
 
 	newScene->m_viewportSize = iOther->m_viewportSize;
 
-	auto &srcSceneRegistry = iOther->registry;
-	auto &dstSceneRegistry = newScene->registry;
+	auto& srcSceneRegistry = iOther->registry;
+	auto& dstSceneRegistry = newScene->registry;
 	std::unordered_map<core::UUID, entt::entity> enttMap;
 
 	// Create entities in new scene
 	auto idView = srcSceneRegistry.view<component::ID>();
 	for (const auto e: idView) {
 		const core::UUID uuid = srcSceneRegistry.get<component::ID>(e).id;
-		const auto &name = srcSceneRegistry.get<component::Tag>(e).tag;
+		const auto& name = srcSceneRegistry.get<component::Tag>(e).tag;
 		const Entity newEntity = newScene->createEntityWithUUID(uuid, name);
 		enttMap[uuid] = static_cast<entt::entity>(newEntity);
 	}
@@ -76,26 +76,26 @@ shared<Scene> Scene::copy(const shared<Scene> &iOther) {
 	return newScene;
 }
 
-Entity Scene::createEntity(const std::string &iName) { return createEntityWithUUID(core::UUID(), iName); }
+auto Scene::createEntity(const std::string& iName) -> Entity { return createEntityWithUUID(core::UUID(), iName); }
 
-Entity Scene::createEntityWithUUID(const core::UUID iUuid, const std::string &iName) {
+auto Scene::createEntityWithUUID(const core::UUID iUuid, const std::string& iName) -> Entity {
 	Entity entity = {registry.create(), this};
 	entity.addComponent<component::Transform>();
-	auto &id = entity.addComponent<component::ID>();
+	auto& id = entity.addComponent<component::ID>();
 	id.id = iUuid;
-	auto &tag = entity.addComponent<component::Tag>();
+	auto& tag = entity.addComponent<component::Tag>();
 	tag.tag = iName.empty() ? "Entity" : iName;
 	return entity;
 }
 
-void Scene::destroyEntity(Entity &ioEntity) {
+void Scene::destroyEntity(Entity& ioEntity) {
 	registry.destroy(ioEntity.m_entityHandle);
 	ioEntity.m_entityHandle = entt::null;
 }
 
-void Scene::onUpdateRuntime(const core::Timestep &iTimeStep) {
+void Scene::onUpdateRuntime(const core::Timestep& iTimeStep) {
 	// update scripts
-	registry.view<component::NativeScript>().each([iTimeStep, this](auto entity, auto &nsc) {
+	registry.view<component::NativeScript>().each([iTimeStep, this](auto entity, auto& nsc) {
 		if (!nsc.instance) {
 			nsc.instance = nsc.instantiateScript();
 			nsc.instance->entity = Entity{entity, this};
@@ -105,7 +105,7 @@ void Scene::onUpdateRuntime(const core::Timestep &iTimeStep) {
 	});
 
 	// Render 2D
-	const renderer::Camera *mainCamera = nullptr;
+	const renderer::Camera* mainCamera = nullptr;
 	math::mat4 cameraTransform;
 	for (const auto view = registry.view<component::Transform, component::Camera>(); const auto entity: view) {
 		auto [transform, camera] = view.get<component::Transform, component::Camera>(entity);
@@ -116,7 +116,7 @@ void Scene::onUpdateRuntime(const core::Timestep &iTimeStep) {
 		}
 	}
 
-	if (mainCamera) {
+	if (mainCamera != nullptr) {
 		renderer::Renderer2D::resetStats();
 		renderer::Renderer2D::beginScene(*mainCamera, cameraTransform);
 		render();
@@ -124,14 +124,14 @@ void Scene::onUpdateRuntime(const core::Timestep &iTimeStep) {
 	}
 }
 
-void Scene::onUpdateEditor([[maybe_unused]] const core::Timestep &iTimeStep, const renderer::CameraEditor &iCamera) {
+void Scene::onUpdateEditor([[maybe_unused]] const core::Timestep& iTimeStep, const renderer::CameraEditor& iCamera) {
 	renderer::Renderer2D::resetStats();
 	renderer::Renderer2D::beginScene(iCamera);
 	render();
 	renderer::Renderer2D::endScene();
 }
 
-void Scene::onUpdateOrtho([[maybe_unused]] const core::Timestep &iTimeStep, const renderer::CameraOrtho &iCamera) {
+void Scene::onUpdateOrtho([[maybe_unused]] const core::Timestep& iTimeStep, const renderer::CameraOrtho& iCamera) {
 	renderer::Renderer2D::resetStats();
 	renderer::Renderer2D::beginScene(iCamera);
 	render();
@@ -157,16 +157,16 @@ void Scene::render() {
 	}
 }
 
-void Scene::onViewportResize(const math::vec2ui &iSize) {
+void Scene::onViewportResize(const math::vec2ui& iSize) {
 	m_viewportSize = iSize;
 	// Resize our non-FixedAspectRatio cameras
 	for (const auto view = registry.view<component::Camera>(); const auto entity: view) {
-		if (auto &cameraComponent = view.get<component::Camera>(entity); !cameraComponent.fixedAspectRatio)
+		if (auto& cameraComponent = view.get<component::Camera>(entity); !cameraComponent.fixedAspectRatio)
 			cameraComponent.camera.setViewportSize(iSize);
 	}
 }
 
-Entity Scene::duplicateEntity(const Entity &iEntity) {
+auto Scene::duplicateEntity(const Entity& iEntity) -> Entity {
 	const std::string name = iEntity.getName();
 	Entity newEntity = createEntity(name);
 
@@ -181,7 +181,7 @@ Entity Scene::duplicateEntity(const Entity &iEntity) {
 	return newEntity;
 }
 
-Entity Scene::getPrimaryCamera() {
+auto Scene::getPrimaryCamera() -> Entity {
 	for (const auto view = registry.view<component::Camera>(); const auto entity: view) {
 		if (view.get<component::Camera>(entity).primary)
 			return Entity{entity, this};
@@ -190,41 +190,41 @@ Entity Scene::getPrimaryCamera() {
 }
 
 template<typename T>
-void Scene::onComponentAdded([[maybe_unused]] const Entity &iEntity, [[maybe_unused]] T &ioComponent) {
+void Scene::onComponentAdded([[maybe_unused]] const Entity& iEntity, [[maybe_unused]] T& ioComponent) {
 	OWL_ASSERT(false, "Unknown component")
 }
 
 template<>
-OWL_API void Scene::onComponentAdded<component::ID>([[maybe_unused]] const Entity &iEntity,
-													[[maybe_unused]] component::ID &ioComponent) {}
+OWL_API void Scene::onComponentAdded<component::ID>([[maybe_unused]] const Entity& iEntity,
+													[[maybe_unused]] component::ID& ioComponent) {}
 
 template<>
-OWL_API void Scene::onComponentAdded<component::Tag>([[maybe_unused]] const Entity &iEntity,
-													 [[maybe_unused]] component::Tag &ioComponent) {}
+OWL_API void Scene::onComponentAdded<component::Tag>([[maybe_unused]] const Entity& iEntity,
+													 [[maybe_unused]] component::Tag& ioComponent) {}
 
 template<>
-OWL_API void Scene::onComponentAdded<component::Transform>([[maybe_unused]] const Entity &iEntity,
-														   [[maybe_unused]] component::Transform &ioComponent) {}
+OWL_API void Scene::onComponentAdded<component::Transform>([[maybe_unused]] const Entity& iEntity,
+														   [[maybe_unused]] component::Transform& ioComponent) {}
 
 template<>
-OWL_API void Scene::onComponentAdded<component::Camera>([[maybe_unused]] const Entity &iEntity,
-														component::Camera &ioComponent) {
+OWL_API void Scene::onComponentAdded<component::Camera>([[maybe_unused]] const Entity& iEntity,
+														component::Camera& ioComponent) {
 	if (m_viewportSize.surface() > 0)
 		ioComponent.camera.setViewportSize(m_viewportSize);
 }
 
 template<>
 OWL_API void
-Scene::onComponentAdded<component::SpriteRenderer>([[maybe_unused]] const Entity &iEntity,
-												   [[maybe_unused]] component::SpriteRenderer &ioComponent) {}
+Scene::onComponentAdded<component::SpriteRenderer>([[maybe_unused]] const Entity& iEntity,
+												   [[maybe_unused]] component::SpriteRenderer& ioComponent) {}
 
 template<>
 OWL_API void
-Scene::onComponentAdded<component::CircleRenderer>([[maybe_unused]] const Entity &iEntity,
-												   [[maybe_unused]] component::CircleRenderer &ioComponent) {}
+Scene::onComponentAdded<component::CircleRenderer>([[maybe_unused]] const Entity& iEntity,
+												   [[maybe_unused]] component::CircleRenderer& ioComponent) {}
 
 template<>
-OWL_API void Scene::onComponentAdded<component::NativeScript>([[maybe_unused]] const Entity &iEntity,
-															  [[maybe_unused]] component::NativeScript &ioComponent) {}
+OWL_API void Scene::onComponentAdded<component::NativeScript>([[maybe_unused]] const Entity& iEntity,
+															  [[maybe_unused]] component::NativeScript& ioComponent) {}
 
 }// namespace owl::scene

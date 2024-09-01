@@ -9,21 +9,21 @@
 
 #include <core/EntryPoint.h>
 
-#include "droneLayer.h"
+#include "DroneLayer.h"
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 class OwlNest final : public owl::core::Application {
 public:
 	OwlNest() = delete;
-	explicit OwlNest(const owl::core::AppParams &param) : owl::core::Application(param) {
+	explicit OwlNest(const owl::core::AppParams& param) : owl::core::Application(param) {
 		if (getState() == owl::core::Application::State::Running)
-			pushLayer(owl::mkShared<drone::droneLayer>());
+			pushLayer(owl::mkShared<drone::DroneLayer>());
 	}
 };
 OWL_DIAG_POP
 
-owl::shared<owl::core::Application> owl::core::createApplication(int argc, char **argv) {
+auto owl::core::createApplication(int argc, char** argv) -> owl::shared<owl::core::Application> {
 	return mkShared<OwlNest>(core::AppParams{
 			.args = argv,
 			.name = "Owl Drone - Navigator for drone",

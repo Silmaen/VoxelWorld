@@ -40,7 +40,7 @@ void Altitude::drawCursors() {
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor});
 }
 
-float Altitude::altitudeToAngle(float divider) const { return -std::max(altitude / divider, 0.f) / 10 * 360; }
+auto Altitude::altitudeToAngle(float divider) const -> float { return -std::max(altitude / divider, 0.f) / 10 * 360; }
 
 Altitude::~Altitude() = default;
 

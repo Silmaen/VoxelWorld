@@ -37,8 +37,8 @@ class Descriptors {
 public:
 	Descriptors(const Descriptors&) = delete;
 	Descriptors(Descriptors&&) = delete;
-	Descriptors& operator=(const Descriptors&) = delete;
-	Descriptors& operator=(Descriptors&&) = delete;
+	auto operator=(const Descriptors&) -> Descriptors& = delete;
+	auto operator=(Descriptors&&) -> Descriptors& = delete;
 	/**
 	 * @brief Destructor.
 	 */
@@ -48,7 +48,7 @@ public:
 	 * @brief Singleton's accessor.
 	 * @return The instance of this object.
 	 */
-	static Descriptors& get() {
+	static auto get() -> Descriptors& {
 		static Descriptors instance;
 		return instance;
 	}
@@ -74,15 +74,15 @@ public:
 	 * @brief Register new texture data in the
 	 * @return Id of the created texture.
 	 */
-	uint32_t registerNewTexture();
+	auto registerNewTexture() -> uint32_t;
 
-	TextureData& getTextureData(uint32_t iIndex);
+	auto getTextureData(uint32_t iIndex) -> TextureData&;
 
 	void bindTextureImage(uint32_t iIndex);
 
 	void unregisterTexture(uint32_t iIndex);
 
-	[[nodiscard]] bool isTextureRegistered(uint32_t iIndex) const;
+	[[nodiscard]] auto isTextureRegistered(uint32_t iIndex) const -> bool;
 
 	void setUniformData(const void* iData, size_t iSize) const;
 
@@ -90,17 +90,17 @@ public:
 	void commitTextureBind(size_t iCurrentFrame);
 	void textureBind(uint32_t iIndex);
 
-	[[nodiscard]] VkDescriptorPool getDescriptorPool() const { return m_descriptorPool; }
+	[[nodiscard]] auto getDescriptorPool() const -> VkDescriptorPool { return m_descriptorPool; }
 
-	VkDescriptorSetLayout* getDescriptorSetLayout() { return &m_descriptorSetLayout; }
-	VkDescriptorSet* getDescriptorSet(const uint32_t iFrame) { return &m_descriptorSets[iFrame]; }
+	auto getDescriptorSetLayout() -> VkDescriptorSetLayout* { return &m_descriptorSetLayout; }
+	auto getDescriptorSet(const uint32_t iFrame) -> VkDescriptorSet* { return &m_descriptorSets[iFrame]; }
 
 	void createImguiDescriptorPool();
-	[[nodiscard]] VkDescriptorPool getImguiDescriptorPool() const { return m_imguiDescriptorPool; }
+	[[nodiscard]] auto getImguiDescriptorPool() const -> VkDescriptorPool { return m_imguiDescriptorPool; }
 	void createSingleImageDescriptorPool();
 
-	[[nodiscard]] VkDescriptorPool getSingleImageDescriptorPool() {
-		if (!m_singleImageDescriptorPool)
+	[[nodiscard]] auto getSingleImageDescriptorPool() -> VkDescriptorPool {
+		if (m_singleImageDescriptorPool != nullptr)
 			createSingleImageDescriptorPool();
 		return m_singleImageDescriptorPool;
 	}
@@ -117,19 +117,19 @@ private:
 		using list = std::vector<elem>;
 		list textures;
 		uint32_t nextId = 0;
-		[[nodiscard]] bool empty() const { return textures.empty(); }
+		[[nodiscard]] auto empty() const -> bool { return textures.empty(); }
 		void clear() {
 			textures.clear();
 			textures.shrink_to_fit();
 		}
-		list::iterator begin() { return textures.begin(); }
-		list::iterator end() { return textures.begin(); }
-		[[nodiscard]] list::const_iterator begin() const { return textures.begin(); }
-		[[nodiscard]] list::const_iterator end() const { return textures.begin(); }
-		[[nodiscard]] bool contains(uint32_t iIndex) const;
-		uint32_t registerNewTexture();
+		auto begin() -> list::iterator { return textures.begin(); }
+		auto end() -> list::iterator { return textures.begin(); }
+		[[nodiscard]] auto begin() const -> list::const_iterator { return textures.begin(); }
+		[[nodiscard]] auto end() const -> list::const_iterator { return textures.begin(); }
+		[[nodiscard]] auto contains(uint32_t iIndex) const -> bool;
+		auto registerNewTexture() -> uint32_t;
 		void unregisterTexture(uint32_t iIndex);
-		tex getTextureData(uint32_t iIndex);
+		auto getTextureData(uint32_t iIndex) -> tex;
 	};
 
 	/// The list of texture bindings.

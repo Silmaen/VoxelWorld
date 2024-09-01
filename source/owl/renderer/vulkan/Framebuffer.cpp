@@ -126,7 +126,7 @@ void Framebuffer::cleanup() {
 	const auto& vkc = internal::VulkanCore::get();
 	// Cleanup framebuffer
 	for (const auto& framebuffer: m_framebuffers) {
-		if (framebuffer)
+		if (framebuffer != nullptr)
 			vkDestroyFramebuffer(vkc.getLogicalDevice(), framebuffer, nullptr);
 	}
 	m_framebuffers.clear();
@@ -154,7 +154,7 @@ void Framebuffer::cleanup() {
 	}
 }
 
-int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const int iY) {
+auto Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const int iY) -> int {
 	const auto& vkc = internal::VulkanCore::get();
 	const auto& [format, tiling] = m_specs.attachments[iAttachmentIndex];
 	const uint32_t imgIndex = attToImgIdx(iAttachmentIndex);
@@ -288,7 +288,7 @@ void Framebuffer::createImages() {
 	if (m_specs.swapChainTarget) {
 		auto* const gc = dynamic_cast<GraphContext*>(core::Application::get().getWindow().getGraphContext());
 		m_swapChainImageCount = vkc.getImagecount();
-		const auto queueFamilyIndices = vkc.getQueueIndicies();
+		const auto queueFamilyIndices = vkc.getQueueIndices();
 		const bool shares = queueFamilyIndices.size() > 1;
 		const VkSurfaceFormatKHR surface = vkc.getSurfaceFormat();
 		const VkSwapchainCreateInfoKHR createInfo{
@@ -540,7 +540,7 @@ void Framebuffer::createSyncObjects() {
 	}
 }
 
-uint32_t Framebuffer::attToImgIdx(const uint32_t iAttachmentIndex) const {
+auto Framebuffer::attToImgIdx(const uint32_t iAttachmentIndex) const -> uint32_t {
 	uint32_t imgIndex = iAttachmentIndex;
 	if (m_swapChainImageCount > 0) {
 		if (iAttachmentIndex == 0)
@@ -551,7 +551,7 @@ uint32_t Framebuffer::attToImgIdx(const uint32_t iAttachmentIndex) const {
 	return imgIndex;
 }
 
-uint32_t Framebuffer::imgIdxToAtt(const uint32_t iImageIndex) const {
+auto Framebuffer::imgIdxToAtt(const uint32_t iImageIndex) const -> uint32_t {
 	uint32_t attachmentIndex = iImageIndex;
 	if (m_swapChainImageCount > 0) {
 		if (iImageIndex < m_swapChainImageCount)
@@ -561,7 +561,7 @@ uint32_t Framebuffer::imgIdxToAtt(const uint32_t iImageIndex) const {
 	return attachmentIndex;
 }
 
-std::vector<VkFormat> Framebuffer::getColorAttachmentformats() const {
+auto Framebuffer::getColorAttachmentformats() const -> std::vector<VkFormat> {
 	std::vector<VkFormat> formats;
 	for (const auto att: m_specs.attachments) {
 		if (att.format != AttachmentSpecification::Format::Depth24Stencil8)
@@ -570,7 +570,7 @@ std::vector<VkFormat> Framebuffer::getColorAttachmentformats() const {
 	return formats;
 }
 
-uint64_t Framebuffer::getColorAttachmentRendererId(const uint32_t iIndex) const {
+auto Framebuffer::getColorAttachmentRendererId(const uint32_t iIndex) const -> uint64_t {
 	return reinterpret_cast<uint64_t>(m_images[imgIdxToAtt(iIndex)].descriptorSet);
 }
 

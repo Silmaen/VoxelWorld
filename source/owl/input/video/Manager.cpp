@@ -33,14 +33,14 @@ void Manager::updateDeviceList(const bool iReset) {
 #endif
 }
 
-std::vector<std::string> Manager::getDevicesNames() const {
+auto Manager::getDevicesNames() const -> std::vector<std::string> {
 	std::vector<std::string> res;
 	res.reserve(m_devices.size());
-	for (const auto &dev: m_devices) res.emplace_back(dev->getName());
+	for (const auto& dev: m_devices) res.emplace_back(dev->getName());
 	return res;
 }
 
-shared<Device> Manager::getCurrentDevice() const {
+auto Manager::getCurrentDevice() const -> shared<Device> {
 	if (m_currentDevice >= g_maxDevices)
 		return nullptr;
 	return m_devices[m_currentDevice];
@@ -60,13 +60,13 @@ void Manager::close() const {
 	getCurrentDevice()->close();
 }
 
-void Manager::fillFrame(shared<renderer::Texture> &iFrame) const {
+void Manager::fillFrame(shared<renderer::Texture>& iFrame) const {
 	if (!isOpened())
 		return;
 	getCurrentDevice()->fillFrame(iFrame);
 }
 
-int8_t Manager::getCurrentDeviceId() const {
+auto Manager::getCurrentDeviceId() const -> int8_t {
 	if (!isOpened())
 		return -1;
 	return static_cast<int8_t>(m_currentDevice);

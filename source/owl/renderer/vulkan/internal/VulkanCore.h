@@ -31,35 +31,35 @@ struct VulkanConfiguraton {
 struct InstanceInformations {
 	InstanceInformations();
 
-	[[nodiscard]] bool hasMinimalVersion(uint8_t iMajor, uint8_t iMinor, uint8_t iPatch = 0) const;
+	[[nodiscard]] auto hasMinimalVersion(uint8_t iMajor, uint8_t iMinor, uint8_t iPatch = 0) const -> bool;
 
 	/**
 	 * @brief Check if a layer is available on this device.
 	 * @param[in] iLayer The layer name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasLayer(const std::string& iLayer) const;
+	[[nodiscard]] auto hasLayer(const std::string& iLayer) const -> bool;
 
 	/**
 	 * @brief Check if an extension is available on this device.
 	 * @param[in] iExtension The extension name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasExtension(const std::string& iExtension) const;
+	[[nodiscard]] auto hasExtension(const std::string& iExtension) const -> bool;
 
 	/**
 	 * @brief Check if some layers are available on this device.
 	 * @param[in] iLayers The layer's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasLayers(const std::vector<std::string>& iLayers) const;
+	[[nodiscard]] auto hasLayers(const std::vector<std::string>& iLayers) const -> bool;
 
 	/**
 	 * @brief Check if some extensions are available on this device.
 	 * @param[in] iExtensions The extension's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasExtensions(const std::vector<std::string>& iExtensions) const;
+	[[nodiscard]] auto hasExtensions(const std::vector<std::string>& iExtensions) const -> bool;
 
 	uint32_t version = 0;
 	std::vector<std::string> supportedExtensions;
@@ -75,9 +75,9 @@ public:
 
 	VulkanCore(VulkanCore&&) = delete;
 
-	VulkanCore& operator=(const VulkanCore&) = delete;
+	auto operator=(const VulkanCore&) -> VulkanCore& = delete;
 
-	VulkanCore& operator=(VulkanCore&&) = delete;
+	auto operator=(VulkanCore&&) -> VulkanCore& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -88,7 +88,7 @@ public:
 	 * @brief Singleton get instance.
 	 * @return Intance of Vulkan core.
 	 */
-	static VulkanCore& get() {
+	static auto get() -> VulkanCore& {
 		static VulkanCore instance;
 		return instance;
 	}
@@ -108,25 +108,25 @@ public:
 	 * @brief Check if the currnt core is in good health.
 	 * @return True if everything ok.
 	 */
-	[[nodiscard]] bool isHealthy() const;
+	[[nodiscard]] auto isHealthy() const -> bool;
 
 	/**
 	 * @brief Access to the vulkan instance.
 	 * @return The vulkan instance.
 	 */
-	[[nodiscard]] VkInstance getInstance() const { return m_instance; }
+	[[nodiscard]] auto getInstance() const -> VkInstance { return m_instance; }
 
 	/**
 	 * @brief Access to the physical device.
 	 * @return The physical device.
 	 */
-	[[nodiscard]] VkPhysicalDevice getPhysicalDevice() const { return m_physicalDevice; }
+	[[nodiscard]] auto getPhysicalDevice() const -> VkPhysicalDevice { return m_physicalDevice; }
 
 	/**
 	 * @brief Access to the logical device.
 	 * @return The logical device.
 	 */
-	[[nodiscard]] VkDevice getLogicalDevice() const { return m_logicalDevice; }
+	[[nodiscard]] auto getLogicalDevice() const -> VkDevice { return m_logicalDevice; }
 
 	/**
 	 * @brief The different core states
@@ -144,65 +144,65 @@ public:
 	 * @brief Access to the actual state of the core.
 	 * @return The state of the core.
 	 */
-	[[nodiscard]] const State& getState() const { return m_state; }
+	[[nodiscard]] auto getState() const -> const State& { return m_state; }
 
 	/**
 	 * @brief Get the graphic queue index.
 	 * @return The graph queue index.
 	 */
-	[[nodiscard]] uint32_t getGraphQueueFamilyIndex() const { return m_phyProps->graphicQueueIndex; }
+	[[nodiscard]] auto getGraphQueueFamilyIndex() const -> uint32_t { return m_phyProps->graphicQueueIndex; }
 
 	/**
 	 * @brief Access to the graphic queue.
 	 * @return The graphic queue.
 	 */
-	[[nodiscard]] VkQueue getGraphicQueue() const { return m_graphicQueue; }
+	[[nodiscard]] auto getGraphicQueue() const -> VkQueue { return m_graphicQueue; }
 	/**
 	 * @brief Access to the present queue.
 	 * @return The present queue.
 	 */
-	[[nodiscard]] VkQueue getPresentQueue() const { return m_presentQueue; }
+	[[nodiscard]] auto getPresentQueue() const -> VkQueue { return m_presentQueue; }
 	/**
 	 * @brief Get the current Extent.
 	 * @return The current Extent.
 	 */
-	[[nodiscard]] VkExtent2D getCurrentExtent() const;
+	[[nodiscard]] auto getCurrentExtent() const -> VkExtent2D;
 
 	/**
 	 * @brief Get the current Size.
 	 * @return The current size.
 	 */
-	[[nodiscard]] math::vec2ui getCurrentSize() const;
+	[[nodiscard]] auto getCurrentSize() const -> math::vec2ui;
 
 	/**
 	 * @brief Get the surface format.
 	 * @return The surface format.
 	 */
-	[[nodiscard]] VkSurfaceFormatKHR getSurfaceFormat() const;
+	[[nodiscard]] auto getSurfaceFormat() const -> VkSurfaceFormatKHR;
 
 	/**
 	 * @brief Get the present mode.
 	 * @return The present mode.
 	 */
-	[[nodiscard]] VkPresentModeKHR getPresentMode() const;
+	[[nodiscard]] auto getPresentMode() const -> VkPresentModeKHR;
 
 	/**
 	 * @brief Get image count.
 	 * @return The image count.
 	 */
-	[[nodiscard]] uint32_t getImagecount() const;
+	[[nodiscard]] auto getImagecount() const -> uint32_t;
 
 	/**
 	 * @brief Get the current transform.
 	 * @return The current transform.
 	 */
-	[[nodiscard]] VkSurfaceTransformFlagBitsKHR getCurrentTransform() const;
+	[[nodiscard]] auto getCurrentTransform() const -> VkSurfaceTransformFlagBitsKHR;
 
 	/**
 	 * @brief Get The queue indices.
 	 * @return The queue indices.
 	 */
-	[[nodiscard]] std::vector<uint32_t> getQueueIndicies() const;
+	[[nodiscard]] auto getQueueIndices() const -> std::vector<uint32_t>;
 
 	/**
 	 * @brief Force to check for surface changes.
@@ -215,15 +215,16 @@ public:
 	 * @param[in] iMemProperties Memory properties.
 	 * @return The memory type index.
 	 */
-	[[nodiscard]] uint32_t findMemoryTypeIndex(uint32_t iTypeFilter, VkMemoryPropertyFlags iMemProperties) const;
+	[[nodiscard]] auto findMemoryTypeIndex(uint32_t iTypeFilter,
+										   VkMemoryPropertyFlags iMemProperties) const -> uint32_t;
 
-	[[nodiscard]] float getMaxSamplerAnisotropy() const;
+	[[nodiscard]] auto getMaxSamplerAnisotropy() const -> float;
 
-	[[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;
+	[[nodiscard]] auto beginSingleTimeCommands() const -> VkCommandBuffer;
 
 	void endSingleTimeCommands(VkCommandBuffer iCommandBuffer) const;
 
-	[[nodiscard]] VkCommandBuffer createCommandBuffer() const;
+	[[nodiscard]] auto createCommandBuffer() const -> VkCommandBuffer;
 
 private:
 	/**

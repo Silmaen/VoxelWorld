@@ -16,7 +16,7 @@ OWL_DIAG_POP
 
 namespace owl {
 
-constexpr ImVec2 vec(math::vec2 iVec) { return {iVec.x(), iVec.y()}; }
+constexpr auto vec(math::vec2 iVec) -> ImVec2 { return {iVec.x(), iVec.y()}; }
 
 EditorLayer::EditorLayer() : Layer("EditorLayer"), m_cameraController{1280.0f / 720.0f} {}
 
@@ -29,10 +29,10 @@ void EditorLayer::onAttach() {
 			.size = {1280, 720},
 			.attachments =
 					{
-							{renderer::AttachmentSpecification::Format::Surface,
-							 renderer::AttachmentSpecification::Tiling::Optimal},
-							{renderer::AttachmentSpecification::Format::RedInteger,
-							 renderer::AttachmentSpecification::Tiling::Optimal},
+							{.format = renderer::AttachmentSpecification::Format::Surface,
+							 .tiling = renderer::AttachmentSpecification::Tiling::Optimal},
+							{.format = renderer::AttachmentSpecification::Format::RedInteger,
+							 .tiling = renderer::AttachmentSpecification::Tiling::Optimal},
 							//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
 							// renderer::AttachmentSpecification::Tiling::Optimal}
 					},
@@ -386,9 +386,9 @@ void EditorLayer::saveCurrentScene() {
 		saveSceneAs(m_currentScenePath);
 }
 
-bool EditorLayer::onKeyPressed(const event::KeyPressedEvent& ioEvent) {
+auto EditorLayer::onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool {
 	// Shortcuts
-	if (ioEvent.getRepeatCount() > 0)
+	if (static_cast<int>(ioEvent.getRepeatCount()) > 0)
 		return false;
 
 	const bool control =
@@ -456,7 +456,7 @@ bool EditorLayer::onKeyPressed(const event::KeyPressedEvent& ioEvent) {
 	return false;
 }
 
-bool EditorLayer::onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent) {
+auto EditorLayer::onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent) -> bool {
 	if (ioEvent.getMouseButton() == input::mouse::ButtonLeft) {
 		if (m_viewportHovered && !ImGuizmo::IsOver() && !input::Input::isKeyPressed(input::key::LeftAlt))
 			m_sceneHierarchy.setSelectedEntity(m_hoveredEntity);

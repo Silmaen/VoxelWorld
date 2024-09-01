@@ -28,19 +28,19 @@ void TextureData::freeTrexture() {
 		vkDestroyDescriptorSetLayout(core.getLogicalDevice(), textureDescriptorSetLayout, nullptr);
 		textureDescriptorSetLayout = nullptr;
 	}
-	if (textureSampler) {
+	if (textureSampler != nullptr) {
 		vkDestroySampler(core.getLogicalDevice(), textureSampler, nullptr);
 		textureSampler = nullptr;
 	}
-	if (textureImageView) {
+	if (textureImageView != nullptr) {
 		vkDestroyImageView(core.getLogicalDevice(), textureImageView, nullptr);
 		textureImageView = nullptr;
 	}
-	if (textureImage) {
+	if (textureImage != nullptr) {
 		vkDestroyImage(core.getLogicalDevice(), textureImage, nullptr);
 		textureImage = nullptr;
 	}
-	if (textureImageMemory) {
+	if (textureImageMemory != nullptr) {
 		vkFreeMemory(core.getLogicalDevice(), textureImageMemory, nullptr);
 		textureImageMemory = nullptr;
 	}
@@ -105,7 +105,7 @@ void TextureData::createView() {
 																.levelCount = 1,
 																.baseArrayLayer = 0,
 																.layerCount = 1}};
-	if (textureImageView)
+	if (textureImageView != nullptr)
 		vkDestroyImageView(vkc.getLogicalDevice(), textureImageView, nullptr);
 	if (const VkResult result = vkCreateImageView(vkc.getLogicalDevice(), &createInfo, nullptr, &textureImageView);
 		result != VK_SUCCESS) {
@@ -133,7 +133,7 @@ void TextureData::createSampler() {
 										  .maxLod = 1000,
 										  .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
 										  .unnormalizedCoordinates = VK_FALSE};
-	if (textureSampler)
+	if (textureSampler != nullptr)
 		vkDestroySampler(vkc.getLogicalDevice(), textureSampler, nullptr);
 	if (const VkResult result = vkCreateSampler(vkc.getLogicalDevice(), &samplerInfo, nullptr, &textureSampler);
 		result != VK_SUCCESS) {
@@ -358,16 +358,16 @@ void Descriptors::setUniformData(const void* iData, const size_t iSize) const {
 	memcpy(m_uniformBuffersMapped[vkh.getCurrentFrameIndex()], iData, iSize);
 }
 
-uint32_t Descriptors::registerNewTexture() { return m_textures.registerNewTexture(); }
+auto Descriptors::registerNewTexture() -> uint32_t { return m_textures.registerNewTexture(); }
 
 
-bool Descriptors::isTextureRegistered(const uint32_t iIndex) const {
+auto Descriptors::isTextureRegistered(const uint32_t iIndex) const -> bool {
 	if (iIndex == 0)
 		return false;
 	return m_textures.contains(iIndex);
 }
 
-TextureData& Descriptors::getTextureData(const uint32_t iIndex) { return *m_textures.getTextureData(iIndex); }
+auto Descriptors::getTextureData(const uint32_t iIndex) -> TextureData& { return *m_textures.getTextureData(iIndex); }
 
 void Descriptors::unregisterTexture(const uint32_t iIndex) { m_textures.unregisterTexture(iIndex); }
 
@@ -386,7 +386,7 @@ void Descriptors::commitTextureBind(const size_t iCurrentFrame) { updateDescript
 void Descriptors::textureBind(const uint32_t iIndex) { m_textureBind.emplace_back(iIndex); }
 
 void Descriptors::createImguiDescriptorPool() {
-	if (m_imguiDescriptorPool)
+	if (m_imguiDescriptorPool != nullptr)
 		return;
 	const auto& core = VulkanCore::get();
 	// Descriptor pools.
@@ -417,7 +417,7 @@ void Descriptors::createImguiDescriptorPool() {
 }
 
 void Descriptors::createSingleImageDescriptorPool() {
-	if (m_singleImageDescriptorPool)
+	if (m_singleImageDescriptorPool != nullptr)
 		return;
 	const auto& core = VulkanCore::get();
 	// Descriptor pools.
@@ -436,11 +436,11 @@ void Descriptors::createSingleImageDescriptorPool() {
 		OWL_CORE_ERROR("Vulkan Descriptors: failed to create descriptor pool ({})", resultString(result))
 	}
 }
-bool Descriptors::TextureList::contains(uint32_t iIndex) const {
+auto Descriptors::TextureList::contains(uint32_t iIndex) const -> bool {
 	return std::find_if(textures.begin(), textures.end(),
 						[&iIndex](const auto& iElem) { return iElem.first == iIndex; }) != textures.end();
 }
-uint32_t Descriptors::TextureList::registerNewTexture() {
+auto Descriptors::TextureList::registerNewTexture() -> uint32_t {
 	++nextId;
 	textures.emplace_back(nextId, mkShared<TextureData>());
 	return nextId;
@@ -453,7 +453,7 @@ void Descriptors::TextureList::unregisterTexture(uint32_t iIndex) {
 	iter->second->freeTrexture();
 	textures.erase(iter);
 }
-Descriptors::TextureList::tex Descriptors::TextureList::getTextureData(uint32_t iIndex) {
+auto Descriptors::TextureList::getTextureData(uint32_t iIndex) -> Descriptors::TextureList::tex {
 	auto iter = std::find_if(textures.begin(), textures.end(),
 							 [&iIndex](const auto& iElem) { return iElem.first == iIndex; });
 	if (iter == textures.end())

@@ -28,24 +28,24 @@ public:
 	/**
 	 * @brief Default copy constructor.
 	 */
-	EditorLayer(const EditorLayer &) = delete;
+	EditorLayer(const EditorLayer&) = delete;
 	/**
 	 * @brief Default move constructor.
 	 */
-	EditorLayer(EditorLayer &&) = delete;
+	EditorLayer(EditorLayer&&) = delete;
 	/**
 	 * @brief Default copy affectation operator.
 	 */
-	EditorLayer &operator=(const EditorLayer &) = delete;
+	auto operator=(const EditorLayer&) -> EditorLayer& = delete;
 	/**
 	 * @brief Default move affectation operator.
 	 */
-	EditorLayer &operator=(EditorLayer &&) = delete;
+	auto operator=(EditorLayer&&) -> EditorLayer& = delete;
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const core::Timestep &iTimeStep) override;
-	void onEvent(event::Event &ioEvent) override;
-	void onImGuiRender(const core::Timestep &iTimeStep) override;
+	void onUpdate(const core::Timestep& iTimeStep) override;
+	void onEvent(event::Event& ioEvent) override;
+	void onImGuiRender(const core::Timestep& iTimeStep) override;
 
 private:
 	/// The view port window.
@@ -55,8 +55,8 @@ private:
 
 	void renderMenu();
 
-	bool onKeyPressed(event::KeyPressedEvent &ioEvent);
-	bool onMouseButtonPressed(event::MouseButtonPressedEvent &ioEvent);
+	auto onKeyPressed(event::KeyPressedEvent& ioEvent) -> bool;
+	auto onMouseButtonPressed(event::MouseButtonPressedEvent& ioEvent) -> bool;
 };
 
 }// namespace owl::raycaster

@@ -13,7 +13,7 @@
 
 namespace owl::renderer::vulkan::internal {
 
-VkFormat attachmentFormatToVulkan(const AttachmentSpecification::Format &iFormat) {
+auto attachmentFormatToVulkan(const AttachmentSpecification::Format& iFormat) -> VkFormat {
 	switch (iFormat) {
 		case AttachmentSpecification::Format::None:
 			return VK_FORMAT_UNDEFINED;
@@ -29,7 +29,7 @@ VkFormat attachmentFormatToVulkan(const AttachmentSpecification::Format &iFormat
 	return VK_FORMAT_UNDEFINED;
 }
 
-VkImageAspectFlags attachmentFormatToAspect(const AttachmentSpecification::Format &iFormat) {
+auto attachmentFormatToAspect(const AttachmentSpecification::Format& iFormat) -> VkImageAspectFlags {
 	switch (iFormat) {
 		case AttachmentSpecification::Format::None:
 		case AttachmentSpecification::Format::Rgba8:
@@ -42,7 +42,7 @@ VkImageAspectFlags attachmentFormatToAspect(const AttachmentSpecification::Forma
 	return VK_IMAGE_ASPECT_COLOR_BIT;
 }
 
-uint32_t attachmentFormatToSize(const AttachmentSpecification::Format &iFormat) {
+auto attachmentFormatToSize(const AttachmentSpecification::Format& iFormat) -> uint32_t {
 	switch (iFormat) {
 		case AttachmentSpecification::Format::Depth24Stencil8:
 		case AttachmentSpecification::Format::Rgba8:
@@ -55,7 +55,7 @@ uint32_t attachmentFormatToSize(const AttachmentSpecification::Format &iFormat) 
 	return 1;
 }
 
-VkImageTiling attachmentTilingToVulkan(const AttachmentSpecification::Tiling &iTiling) {
+auto attachmentTilingToVulkan(const AttachmentSpecification::Tiling& iTiling) -> VkImageTiling {
 	switch (iTiling) {
 		case AttachmentSpecification::Tiling::Linear:
 			return VK_IMAGE_TILING_LINEAR;
@@ -66,9 +66,9 @@ VkImageTiling attachmentTilingToVulkan(const AttachmentSpecification::Tiling &iT
 }
 
 
-void copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, const VkDeviceSize iSize) {
-	const auto &core = VulkanCore::get();
-	const VkCommandBuffer &commandBuffer = core.beginSingleTimeCommands();
+void copyBuffer(const VkBuffer& iSrcBuffer, const VkBuffer& iDstBuffer, const VkDeviceSize iSize) {
+	const auto& core = VulkanCore::get();
+	const VkCommandBuffer& commandBuffer = core.beginSingleTimeCommands();
 	VkBufferCopy copyRegion{};
 	copyRegion.size = iSize;
 	vkCmdCopyBuffer(commandBuffer, iSrcBuffer, iDstBuffer, 1, &copyRegion);
@@ -76,8 +76,8 @@ void copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, const Vk
 }
 
 void createBuffer(const VkDeviceSize iSize, const VkBufferUsageFlags iUsage, const VkMemoryPropertyFlags iProperties,
-				  VkBuffer &iBuffer, VkDeviceMemory &iBufferMemory) {
-	const auto &core = VulkanCore::get();
+				  VkBuffer& iBuffer, VkDeviceMemory& iBufferMemory) {
+	const auto& core = VulkanCore::get();
 	const VkBufferCreateInfo bufferInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 										.pNext = nullptr,
 										.flags = {},
@@ -113,13 +113,13 @@ void createBuffer(const VkDeviceSize iSize, const VkBufferUsageFlags iUsage, con
 		OWL_CORE_ERROR("Vulkan vertex buffer: failed to bind memory buffer ({}).", resultString(result))
 }
 
-void freeBuffer(const VkDevice &iDevice, const VkBuffer &iBuffer, const VkDeviceMemory &iBufferMemory) {
+void freeBuffer(const VkDevice& iDevice, const VkBuffer& iBuffer, const VkDeviceMemory& iBufferMemory) {
 	vkFreeMemory(iDevice, iBufferMemory, nullptr);
 	vkDestroyBuffer(iDevice, iBuffer, nullptr);
 }
 
 namespace {
-constexpr VkAccessFlags layoutToAccFlag(const VkImageLayout &iLayout) {
+constexpr auto layoutToAccFlag(const VkImageLayout& iLayout) -> VkAccessFlags {
 	if (iLayout == VK_IMAGE_LAYOUT_UNDEFINED)
 		return VK_ACCESS_NONE;
 	if (iLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
@@ -133,7 +133,7 @@ constexpr VkAccessFlags layoutToAccFlag(const VkImageLayout &iLayout) {
 	return VK_ACCESS_NONE;
 }
 
-constexpr VkPipelineStageFlags layoutToStgFlag(const VkImageLayout &iLayout) {
+constexpr auto layoutToStgFlag(const VkImageLayout& iLayout) -> VkPipelineStageFlags {
 	if (iLayout == VK_IMAGE_LAYOUT_UNDEFINED)
 		return VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 	if (iLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL || iLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
@@ -148,14 +148,14 @@ constexpr VkPipelineStageFlags layoutToStgFlag(const VkImageLayout &iLayout) {
 }
 }// namespace
 
-void transitionImageLayout(const VkImage &iImage, const VkImageLayout iOldLayout, const VkImageLayout iNewLayout) {
-	const auto &core = VulkanCore::get();
-	const auto &commandBuffer = core.beginSingleTimeCommands();
+void transitionImageLayout(const VkImage& iImage, const VkImageLayout iOldLayout, const VkImageLayout iNewLayout) {
+	const auto& core = VulkanCore::get();
+	const auto& commandBuffer = core.beginSingleTimeCommands();
 	transitionImageLayout(commandBuffer, iImage, iOldLayout, iNewLayout);
 	core.endSingleTimeCommands(commandBuffer);
 }
 
-void transitionImageLayout(const VkCommandBuffer &iCmd, const VkImage &iImage, const VkImageLayout iOldLayout,
+void transitionImageLayout(const VkCommandBuffer& iCmd, const VkImage& iImage, const VkImageLayout iOldLayout,
 						   const VkImageLayout iNewLayout) {
 	const VkImageMemoryBarrier barrier{.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
 									   .pNext = nullptr,
@@ -175,10 +175,10 @@ void transitionImageLayout(const VkCommandBuffer &iCmd, const VkImage &iImage, c
 						 &barrier);
 }
 
-void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const math::vec2ui &iSize,
-					   const math::vec2ui &iOffset) {
-	const auto &core = VulkanCore::get();
-	const auto &commandBuffer = core.beginSingleTimeCommands();
+void copyBufferToImage(const VkBuffer& iBuffer, const VkImage& iImage, const math::vec2ui& iSize,
+					   const math::vec2ui& iOffset) {
+	const auto& core = VulkanCore::get();
+	const auto& commandBuffer = core.beginSingleTimeCommands();
 	const VkBufferImageCopy region{
 			.bufferOffset = 0,
 			.bufferRowLength = 0,
@@ -193,10 +193,10 @@ void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const mat
 	core.endSingleTimeCommands(commandBuffer);
 }
 
-void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const math::vec2ui &iSize,
-					   const math::vec2ui &iOffset) {
-	const auto &core = VulkanCore::get();
-	const auto &commandBuffer = core.beginSingleTimeCommands();
+void copyImageToBuffer(const VkImage& iImage, const VkBuffer& iBuffer, const math::vec2ui& iSize,
+					   const math::vec2ui& iOffset) {
+	const auto& core = VulkanCore::get();
+	const auto& commandBuffer = core.beginSingleTimeCommands();
 	const VkBufferImageCopy region{
 			.bufferOffset = 0,
 			.bufferRowLength = 0,

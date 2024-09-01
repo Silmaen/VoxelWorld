@@ -16,10 +16,10 @@ namespace owl::renderer::null {
  */
 class Framebuffer final : public renderer::Framebuffer {
 public:
-	Framebuffer(const Framebuffer &) = default;
-	Framebuffer(Framebuffer &&) = default;
-	Framebuffer &operator=(const Framebuffer &) = default;
-	Framebuffer &operator=(Framebuffer &&) = default;
+	Framebuffer(const Framebuffer&) = default;
+	Framebuffer(Framebuffer&&) = default;
+	auto operator=(const Framebuffer&) -> Framebuffer& = default;
+	auto operator=(Framebuffer&&) -> Framebuffer& = default;
 
 	/**
 	 * @brief Default constructor.
@@ -60,7 +60,7 @@ public:
 	 * @param[in] iY Y coordinate.
 	 * @return Pixel value.
 	 */
-	int readPixel(uint32_t iAttachmentIndex, int iX, int iY) override;
+	auto readPixel(uint32_t iAttachmentIndex, int iX, int iY) -> int override;
 
 	/**
 	 * @brief Clear Attachment.
@@ -74,13 +74,15 @@ public:
 	 * @param[in] iIndex The color index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint64_t getColorAttachmentRendererId([[maybe_unused]] uint32_t iIndex) const override { return 0; }
+	[[nodiscard]] auto getColorAttachmentRendererId([[maybe_unused]] uint32_t iIndex) const -> uint64_t override {
+		return 0;
+	}
 
 	/**
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] const FramebufferSpecification &getSpecification() const override { return m_specs; }
+	[[nodiscard]] auto getSpecification() const -> const FramebufferSpecification& override { return m_specs; }
 
 private:
 	/// The specs.

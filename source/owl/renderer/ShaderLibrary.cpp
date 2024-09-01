@@ -13,7 +13,7 @@
 namespace owl::renderer {
 
 
-void ShaderLibrary::add(const shared<Shader> &iShader) {
+void ShaderLibrary::add(const shared<Shader>& iShader) {
 	if (exists(iShader->getName(), iShader->getRenderer())) {
 		OWL_CORE_WARN("Shader {} Already in the library", iShader->getName())
 		return;
@@ -21,7 +21,7 @@ void ShaderLibrary::add(const shared<Shader> &iShader) {
 	m_shaders[iShader->getFullName()] = iShader;
 }
 
-void ShaderLibrary::addNRename(const std::string &iName, const std::string &iRenderer, const shared<Shader> &iShader) {
+void ShaderLibrary::addNRename(const std::string& iName, const std::string& iRenderer, const shared<Shader>& iShader) {
 	if (exists(iName, iRenderer)) {
 		OWL_CORE_WARN("Shader {} Already in the library", iName)
 		return;
@@ -31,7 +31,7 @@ void ShaderLibrary::addNRename(const std::string &iName, const std::string &iRen
 	m_shaders[iShader->getFullName()] = iShader;
 }
 
-void ShaderLibrary::addFromStandardPath(const std::string &iName, const std::string &iRenderer) {
+void ShaderLibrary::addFromStandardPath(const std::string& iName, const std::string& iRenderer) {
 	if (exists(iName, iRenderer)) {
 		OWL_CORE_WARN("Shader {} Already in the library", iName)
 		return;
@@ -42,8 +42,8 @@ void ShaderLibrary::addFromStandardPath(const std::string &iName, const std::str
 		m_shaders[fmt::format("{}_{}", iRenderer, iName)] = Shader::create(iName, iRenderer);
 }
 
-shared<Shader> ShaderLibrary::load(const std::string &iName, const std::string &iRenderer,
-								   const std::filesystem::path &iFile) {
+auto ShaderLibrary::load(const std::string& iName, const std::string& iRenderer,
+						 const std::filesystem::path& iFile) -> shared<Shader> {
 	shared<Shader> shader = Shader::create(iName, iRenderer, iFile);
 	if (shader == nullptr) {
 		OWL_CORE_WARN("Could not load shader file {}", iFile.string())
@@ -53,7 +53,7 @@ shared<Shader> ShaderLibrary::load(const std::string &iName, const std::string &
 	return shader;
 }
 
-shared<Shader> ShaderLibrary::get(const std::string &iName, const std::string &iRenderer) {
+auto ShaderLibrary::get(const std::string& iName, const std::string& iRenderer) -> shared<Shader> {
 	if (!exists(iName, iRenderer)) {
 		OWL_CORE_ERROR("Shader {} not found in library", iName)
 		return nullptr;
@@ -61,12 +61,12 @@ shared<Shader> ShaderLibrary::get(const std::string &iName, const std::string &i
 	return m_shaders[fmt::format("{}_{}", iRenderer, iName)];
 }
 
-bool ShaderLibrary::exists(const std::string &iName, const std::string &iRenderer) const {
+auto ShaderLibrary::exists(const std::string& iName, const std::string& iRenderer) const -> bool {
 	return m_shaders.contains(fmt::format("{}_{}", iRenderer, iName));
 }
 
 ShaderLibrary::~ShaderLibrary() {
-	for (auto &shader: m_shaders) shader.second.reset();
+	for (auto& shader: m_shaders) shader.second.reset();
 	m_shaders.clear();
 }
 

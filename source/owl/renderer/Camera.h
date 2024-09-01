@@ -18,8 +18,8 @@ class OWL_API Camera {
 public:
 	Camera(const Camera&) = default;
 	Camera(Camera&&) = default;
-	Camera& operator=(const Camera&) = default;
-	Camera& operator=(Camera&&) = default;
+	auto operator=(const Camera&) -> Camera& = default;
+	auto operator=(Camera&&) -> Camera& = default;
 	Camera() = default;
 	/**
 	 * @brief Destructor.
@@ -36,10 +36,10 @@ public:
 	 * @brief Get the projection matrix of the camera.
 	 * @return The camera's projection matrix.
 	 */
-	[[nodiscard]] const math::mat4& getProjection() const { return m_projection; }
+	[[nodiscard]] auto getProjection() const -> const math::mat4& { return m_projection; }
 
 protected:
 	/// Camera's projection.
-	math::mat4 m_projection = math::identity<float,4>();
+	math::mat4 m_projection = math::identity<float, 4>();
 };
-} // namespace owl::renderer
+}// namespace owl::renderer

@@ -18,8 +18,8 @@ class OWL_API Shader final : public renderer::Shader {
 public:
 	Shader(const Shader&) = delete;
 	Shader(Shader&&) = delete;
-	Shader& operator=(const Shader&) = delete;
-	Shader& operator=(Shader&&) = delete;
+	auto operator=(const Shader&) -> Shader& = delete;
+	auto operator=(Shader&&) -> Shader& = delete;
 
 	/**
 	 * @brief Constructor.
@@ -119,14 +119,14 @@ public:
 	 * @param[in] iName Variable's name.
 	 * @param[in] iMatrix The matrix data.
 	 */
-	void uploadUniformMat3(const std::string& iName, const math::mat3& iMatrix)const ;
+	void uploadUniformMat3(const std::string& iName, const math::mat3& iMatrix) const;
 
 	/**
 	 * @brief Push a matrix to the GPU.
 	 * @param[in] iName Variable's name.
 	 * @param[in] iMatrix The matrix data.
 	 */
-	void uploadUniformMat4(const std::string& iName, const math::mat4& iMatrix)const;
+	void uploadUniformMat4(const std::string& iName, const math::mat4& iMatrix) const;
 
 	/**
 	 * @brief Push an int to the GPU.
@@ -189,4 +189,4 @@ private:
 	std::unordered_map<ShaderType, std::vector<uint32_t>> m_openGlSpirv;
 	std::unordered_map<ShaderType, std::string> m_openGlSource;
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

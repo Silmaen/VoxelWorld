@@ -16,13 +16,13 @@ OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 class Sandbox final : public owl::core::Application {
 public:
-	explicit Sandbox(const owl::core::AppParams &param) : Application(param) {
+	explicit Sandbox(const owl::core::AppParams& param) : Application(param) {
 		pushLayer(owl::mkShared<owl::Base2D>());
 	}
 };
 OWL_DIAG_POP
 
-owl::shared<owl::core::Application> owl::core::createApplication(int argc, char **argv) {
+auto owl::core::createApplication(int argc, char** argv) -> owl::shared<owl::core::Application> {
 	return owl::mkShared<Sandbox>(core::AppParams{
 			.args = argv,
 			.name = "Sandbox",

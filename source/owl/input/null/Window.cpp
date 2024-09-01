@@ -50,6 +50,6 @@ void Window::setVSync(bool iEnabled) {
 	m_windowData.m_VSync = iEnabled;
 }
 
-bool Window::isVSync() const { return m_windowData.m_VSync; }
+auto Window::isVSync() const -> bool { return m_windowData.m_VSync; }
 
 }// namespace owl::input::null

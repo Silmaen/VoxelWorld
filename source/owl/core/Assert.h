@@ -16,19 +16,19 @@
 
 #ifdef OWL_ENABLE_ASSERTS
 #include <debugbreak.h>
-#define OWL_ASSERT(x, ...)                                 \
-	{                                                      \
-		if (!(x)) {                                        \
-			OWL_ERROR("Assertion Failed: {}", __VA_ARGS__) \
-			debug_break();                                 \
-		}                                                  \
+#define OWL_ASSERT(x, ...)                                                                                             \
+	{                                                                                                                  \
+		if (!(x)) {                                                                                                    \
+			OWL_ERROR("Assertion Failed: {}", __VA_ARGS__)                                                             \
+			debug_break();                                                                                             \
+		}                                                                                                              \
 	}
-#define OWL_CORE_ASSERT(x, ...)                                 \
-	{                                                           \
-		if (!(x)) {                                             \
-			OWL_CORE_ERROR("Assertion Failed: {}", __VA_ARGS__) \
-			debug_break();                                      \
-		}                                                       \
+#define OWL_CORE_ASSERT(x, ...)                                                                                        \
+	{                                                                                                                  \
+		if (!(x)) {                                                                                                    \
+			OWL_CORE_ERROR("Assertion Failed: {}", __VA_ARGS__)                                                        \
+			debug_break();                                                                                             \
+		}                                                                                                              \
 	}
 #else
 #define OWL_ASSERT(x, ...)

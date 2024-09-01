@@ -28,8 +28,8 @@ class OWL_API Scene final {
 public:
 	Scene(const Scene&) = delete;
 	Scene(Scene&&) = delete;
-	Scene& operator=(const Scene&) = delete;
-	Scene& operator=(Scene&&) = delete;
+	auto operator=(const Scene&) -> Scene& = delete;
+	auto operator=(Scene&&) -> Scene& = delete;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -44,14 +44,14 @@ public:
 	 * @param[in] iOther The scene to copy.
 	 * @return Pointer to the new scene.
 	 */
-	static shared<Scene> copy(const shared<Scene>& iOther);
+	static auto copy(const shared<Scene>& iOther) -> shared<Scene>;
 
 	/**
 	 * @brief Create entity and add it to registry.
 	 * @param[in] iName Entity's name.
 	 * @return The Entity.
 	 */
-	Entity createEntity(const std::string& iName = std::string());
+	auto createEntity(const std::string& iName = std::string()) -> Entity;
 
 	/**
 	 * @brief Create entity with UUID and add it to registry.
@@ -59,7 +59,7 @@ public:
 	 * @param[in] iUuid The Entity's UUID.
 	 * @return The Entity.
 	 */
-	Entity createEntityWithUUID(core::UUID iUuid, const std::string& iName = std::string());
+	auto createEntityWithUUID(core::UUID iUuid, const std::string& iName = std::string()) -> Entity;
 
 	/**
 	 * @brief Destroy n entity.
@@ -98,13 +98,13 @@ public:
 	 * @param[in] iEntity Entity to duplicate.
 	 * @return The created entity.
 	 */
-	Entity duplicateEntity(const Entity& iEntity);
+	auto duplicateEntity(const Entity& iEntity) -> Entity;
 
 	/**
 	 * @brief Access to the primary Came.ra.
 	 * @return The primary camera
 	 */
-	Entity getPrimaryCamera();
+	auto getPrimaryCamera() -> Entity;
 
 	/// Entities registry.
 	entt::registry registry;

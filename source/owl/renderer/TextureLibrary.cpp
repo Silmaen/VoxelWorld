@@ -14,11 +14,11 @@ namespace owl::renderer {
 TextureLibrary::TextureLibrary() = default;
 
 TextureLibrary::~TextureLibrary() {
-	for (auto &texture: m_textures) texture.second.reset();
+	for (auto& texture: m_textures) texture.second.reset();
 	m_textures.clear();
 }
 
-void TextureLibrary::add(const shared<Texture> &iTexture) {
+void TextureLibrary::add(const shared<Texture>& iTexture) {
 	if (exists(iTexture->getName())) {
 		OWL_CORE_WARN("Texture {} Already in the library", iTexture->getName())
 		return;
@@ -27,7 +27,7 @@ void TextureLibrary::add(const shared<Texture> &iTexture) {
 	m_textures[iTexture->getName()] = iTexture;
 }
 
-void TextureLibrary::addNRename(const std::string &iName, const shared<Texture> &iTexture) {
+void TextureLibrary::addNRename(const std::string& iName, const shared<Texture>& iTexture) {
 	if (exists(iName)) {
 		OWL_CORE_WARN("Texture {} Already in the library", iName)
 		return;
@@ -37,7 +37,7 @@ void TextureLibrary::addNRename(const std::string &iName, const shared<Texture> 
 	m_textures[iName] = iTexture;
 }
 
-void TextureLibrary::addFromStandardPath(const std::string &iName) {
+void TextureLibrary::addFromStandardPath(const std::string& iName) {
 	if (exists(iName)) {
 		OWL_CORE_WARN("Texture {} Already in the library", iName)
 		return;
@@ -46,7 +46,7 @@ void TextureLibrary::addFromStandardPath(const std::string &iName) {
 	m_textures[iName] = Texture2D::create(iName);
 }
 
-shared<Texture> TextureLibrary::load(const std::filesystem::path &iFile) {
+auto TextureLibrary::load(const std::filesystem::path& iFile) -> shared<Texture> {
 	shared<Texture> texture = Texture2D::create(iFile);
 	if (texture == nullptr) {
 		OWL_CORE_WARN("Could not load texture file {}", iFile.string())
@@ -57,7 +57,7 @@ shared<Texture> TextureLibrary::load(const std::filesystem::path &iFile) {
 	return texture;
 }
 
-shared<Texture> TextureLibrary::get(const std::string &iName) {
+auto TextureLibrary::get(const std::string& iName) -> shared<Texture> {
 	if (!exists(iName)) {
 		OWL_CORE_ERROR("Texture {} not found in library", iName)
 		return nullptr;
@@ -65,6 +65,6 @@ shared<Texture> TextureLibrary::get(const std::string &iName) {
 	return m_textures[iName];
 }
 
-bool TextureLibrary::exists(const std::string &iName) const { return m_textures.contains(iName); }
+auto TextureLibrary::exists(const std::string& iName) const -> bool { return m_textures.contains(iName); }
 
 }// namespace owl::renderer

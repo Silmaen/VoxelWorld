@@ -29,28 +29,28 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Gauges(const Gauges &) = default;
+	Gauges(const Gauges&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Gauges(Gauges &&) = default;
+	Gauges(Gauges&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Gauges &operator=(const Gauges &) = default;
+	auto operator=(const Gauges&) -> Gauges& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Gauges &operator=(Gauges &&) = default;
+	auto operator=(Gauges&&) -> Gauges& = default;
 
 	/**
 	 * @brief Update panel Status.
 	 * @param ts The Time delta of the frame.
 	 */
-	void onUpdate(const owl::core::Timestep &ts) override;
+	void onUpdate(const owl::core::Timestep& ts) override;
 
 	/**
 	 * @brief Do the rendering.

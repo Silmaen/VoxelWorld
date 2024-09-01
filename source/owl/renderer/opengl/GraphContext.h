@@ -17,16 +17,16 @@ namespace owl::renderer::opengl {
  */
 class OWL_API GraphContext final : public renderer::GraphContext {
 public:
-	GraphContext(const GraphContext &) = delete;
-	GraphContext(GraphContext &&) = delete;
-	GraphContext &operator=(const GraphContext &) = delete;
-	GraphContext &operator=(GraphContext &&) = delete;
+	GraphContext(const GraphContext&) = delete;
+	GraphContext(GraphContext&&) = delete;
+	auto operator=(const GraphContext&) -> GraphContext& = delete;
+	auto operator=(GraphContext&&) -> GraphContext& = delete;
 
 	/**
 	 * @brief Default constructor.
 	 * @param[in,out] ioWindow The window into render context.
 	 */
-	explicit GraphContext(GLFWwindow *ioWindow);
+	explicit GraphContext(GLFWwindow* ioWindow);
 
 	/**
 	 * @brief Destructor.
@@ -47,11 +47,11 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	[[nodiscard]] Version getVersion() const override;
+	[[nodiscard]] auto getVersion() const -> Version override;
 
 private:
 	/// Link to the parent window.
-	GLFWwindow *mp_windowHandle;
+	GLFWwindow* mp_windowHandle;
 	/// OpenGL version
 	int m_version = 0;
 };

@@ -13,7 +13,7 @@ namespace drone::panels::gauge {
 /**
  * @brief Class MotorRate
  */
-class MotorRate final: public BaseGauge {
+class MotorRate final : public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.
@@ -28,22 +28,22 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	MotorRate(const MotorRate &) = default;
+	MotorRate(const MotorRate&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	MotorRate(MotorRate &&) = default;
+	MotorRate(MotorRate&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	MotorRate &operator=(const MotorRate &) = default;
+	auto operator=(const MotorRate&) -> MotorRate& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	MotorRate &operator=(MotorRate &&) = default;
+	auto operator=(MotorRate&&) -> MotorRate& = default;
 
 	/**
 	 * @brief Draw the  gauge back ground.
@@ -59,12 +59,12 @@ public:
 	 * @brief Defines the motor rates.
 	 * @param r Motor rates.
 	 */
-	void setMotorRates(const std::vector<float> &r) { rates = r; }
+	void setMotorRates(const std::vector<float>& r) { rates = r; }
 
 private:
 	std::vector<float> rates;
 
-	[[nodiscard]] float rateToAngle(uint8_t idx) const;
+	[[nodiscard]] auto rateToAngle(uint8_t idx) const -> float;
 
 	owl::shared<owl::renderer::Texture> background = nullptr;
 	owl::shared<owl::renderer::Texture> cursor1 = nullptr;

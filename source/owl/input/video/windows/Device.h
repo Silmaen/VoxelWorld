@@ -24,7 +24,7 @@ namespace owl::input::video::windows {
  * @brief Search for devices and them to the given list.
  * @param[in,out] ioList The device list to update.
  */
-void updateList(std::vector<shared<Device>> &ioList);
+void updateList(std::vector<shared<Device>>& ioList);
 
 /**
  * @brief Class Device.
@@ -35,15 +35,15 @@ public:
 	 * @brief Default Constructor.
 	 * @param[in] iMfa Poiter to windows device.
 	 */
-	explicit Device(WPointer<IMFActivate> &iMfa);
+	explicit Device(WPointer<IMFActivate>& iMfa);
 	/**
 	 * @brief Destructor.
 	 */
 	~Device() override;
-	Device(const Device&)=delete;
-	Device(Device&&)=delete;
-	Device& operator=(const Device&)=delete;
-	Device& operator=(Device&&)=delete;
+	Device(const Device&) = delete;
+	Device(Device&&) = delete;
+	auto operator=(const Device&) -> Device& = delete;
+	auto operator=(Device&&) -> Device& = delete;
 
 	/**
 	 * @brief Open this device.
@@ -59,19 +59,19 @@ public:
 	 * @brief Check if the device is open.
 	 * @return True if open.
 	 */
-	[[nodiscard]] bool isOpened() const override;
+	[[nodiscard]] auto isOpened() const -> bool override;
 
 	/**
 	 * @brief Retrieve a frame.
 	 * @param[in] iFrame The frame to update.
 	 */
-	void fillFrame(shared<renderer::Texture> &iFrame) override;
+	void fillFrame(shared<renderer::Texture>& iFrame) override;
 
 	/**
 	 * @brief Check the validity of the device.
 	 * @return True if valid.
 	 */
-	[[nodiscard]] bool isValid() const override;
+	[[nodiscard]] auto isValid() const -> bool override;
 
 private:
 	/// Pointer to a media source

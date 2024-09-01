@@ -29,7 +29,7 @@ struct Device {
 	 * @brief Access to a friendly name for the device
 	 * @return Friendly name of the device.
 	 */
-	[[nodiscard]] const std::string &getFriendlyName() const {
+	[[nodiscard]] auto getFriendlyName() const -> const std::string& {
 		if (name.empty())
 			return s_deviceFriendlyName;
 		return name;
@@ -38,7 +38,7 @@ struct Device {
 	 * @brief Hashing function.
 	 * @return Device's hash.
 	 */
-	[[nodiscard]] size_t hash() const {
+	[[nodiscard]] auto hash() const -> size_t {
 		return std::hash<std::string>{}(port) ^ (std::hash<std::string>{}(name) << 1u);
 	}
 };
@@ -55,16 +55,16 @@ public:
 	 */
 	virtual ~DeviceManager();
 
-	DeviceManager(const DeviceManager &) = delete;
-	DeviceManager(DeviceManager &&) = delete;
-	DeviceManager &operator=(const DeviceManager &) = delete;
-	DeviceManager &operator=(DeviceManager &&) = delete;
+	DeviceManager(const DeviceManager&) = delete;
+	DeviceManager(DeviceManager&&) = delete;
+	auto operator=(const DeviceManager&) -> DeviceManager& = delete;
+	auto operator=(DeviceManager&&) -> DeviceManager& = delete;
 
 	/**
 	 * @brief Singleton accessor.
 	 * @return Instance of this object.
 	 */
-	static DeviceManager &get() {
+	static auto get() -> DeviceManager& {
 		static DeviceManager instance;
 		return instance;
 	}
@@ -78,39 +78,39 @@ public:
 	 * @brief Get all the devices.
 	 * @return List of all devices.
 	 */
-	[[nodiscard]] const DeviceList &getAllDevices() const { return m_devices; }
+	[[nodiscard]] auto getAllDevices() const -> const DeviceList& { return m_devices; }
 
 	/**
 	 * @brief Get the number of device by type.
 	 * @return The number of devices.
 	 */
-	[[nodiscard]] size_t getDeviceCount() const { return m_devices.size(); }
+	[[nodiscard]] auto getDeviceCount() const -> size_t { return m_devices.size(); }
 
 	/**
 	 * @brief Get device by its name.
 	 * @param iName Name of device.
 	 * @return Pointer to the device of nullptr if not exists.
 	 */
-	[[nodiscard]] owl::shared<Device> getDeviceByName(const std::string &iName) const;
+	[[nodiscard]] auto getDeviceByName(const std::string& iName) const -> owl::shared<Device>;
 
 	/**
 	* @brief Get device by its port.
 	* @param iPort Port of device.
 	* @return Pointer to the device of nullptr if not exists.
 	*/
-	[[nodiscard]] owl::shared<Device> getDeviceByPort(const std::string &iPort) const;
+	[[nodiscard]] auto getDeviceByPort(const std::string& iPort) const -> owl::shared<Device>;
 
 	/**
 	 * @brief Define the new current device.
 	 * @param iPort The port of the new current device.
 	 */
-	void setCurrentDevice(const std::string &iPort);
+	void setCurrentDevice(const std::string& iPort);
 
 	/**
 	 * @brief Get a pointer to the current Device.
 	 * @return Pointer to the current device.
 	 */
-	[[nodiscard]] const owl::shared<Device> &getCurrentDevice() const { return m_currentDevice; }
+	[[nodiscard]] auto getCurrentDevice() const -> const owl::shared<Device>& { return m_currentDevice; }
 
 private:
 	/// List of devices.

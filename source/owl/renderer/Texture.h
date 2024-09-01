@@ -22,8 +22,8 @@ public:
 	Texture() = default;
 	Texture(const Texture&) = default;
 	Texture(Texture&&) = default;
-	Texture& operator=(const Texture&) = default;
-	Texture& operator=(Texture&&) = default;
+	auto operator=(const Texture&) -> Texture& = default;
+	auto operator=(Texture&&) -> Texture& = default;
 	/**
 	 * @brief Destructor.
 	 */
@@ -52,37 +52,25 @@ public:
 	 * @param[in] iOther Other texture to compare.
 	 * @return True if same.
 	 */
-	virtual bool operator==(const Texture& iOther) const = 0;
-
-	/**
-	 * @brief Access to texture's width.
-	 * @return Texture's width.
-	 */
-	[[nodiscard]] uint32_t getWidth() const { return m_size.x(); }
-
-	/**
-	 * @brief Access to texture's height.
-	 * @return Texture's height.
-	 */
-	[[nodiscard]] uint32_t getHeight() const { return m_size.y(); }
+	virtual auto operator==(const Texture& iOther) const -> bool = 0;
 
 	/**
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] math::vec2ui getSize() const { return m_size; }
+	[[nodiscard]] auto getSize() const -> math::vec2ui { return m_size; }
 
 	/**
 	 * @brief Tells if the data effectively loaded.
 	 * @return True if texture contains data.
 	 */
-	[[nodiscard]] bool isLoaded() const { return m_size.surface() > 0; }
+	[[nodiscard]] auto isLoaded() const -> bool { return m_size.surface() > 0; }
 
 	/**
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] virtual uint64_t getRendererId() const = 0;
+	[[nodiscard]] virtual auto getRendererId() const -> uint64_t = 0;
 
 	/**
 	 * @brief Activate the texture in the GPU.
@@ -94,7 +82,7 @@ public:
 	 * @brief Get Path to texture file.
 	 * @return Path to texture file.
 	 */
-	[[nodiscard]] const std::filesystem::path& getPath() const { return m_path; }
+	[[nodiscard]] auto getPath() const -> const std::filesystem::path& { return m_path; }
 
 	/**
 	 * @brief Define the texture data.
@@ -107,13 +95,13 @@ public:
 	 * @brief Get access to the texture's name.
 	 * @return The texture's name.
 	 */
-	[[nodiscard]] const std::string& getName() const { return m_name; }
+	[[nodiscard]] auto getName() const -> const std::string& { return m_name; }
 
 	/**
 	 * @brief Get a string that can be serialized.
 	 * @return A serialized String.
 	 */
-	[[nodiscard]] std::string getSerializeString() const;
+	[[nodiscard]] auto getSerializeString() const -> std::string;
 
 protected:
 	/// Texture's size.
@@ -160,21 +148,21 @@ public:
 	 * @param[in] iFile The path to the file to load.
 	 * @return Resulting texture.
 	 */
-	static shared<Texture2D> create(const std::filesystem::path& iFile);
+	static auto create(const std::filesystem::path& iFile) -> shared<Texture2D>;
 
 	/**
 	 * @brief Create a new texture.
 	 * @param[in] iTextureName Name of the files in the standard path.
 	 * @return Pointer to the texture.
 	 */
-	static shared<Texture2D> create(const std::string& iTextureName);
+	static auto create(const std::string& iTextureName) -> shared<Texture2D>;
 
 	/**
 	 * @brief Create a new texture.
 	 * @param[in] iTextureSerializedName Name of the files in the standard path.
 	 * @return Pointer to the texture.
 	 */
-	static shared<Texture2D> createFromSerialized(const std::string& iTextureSerializedName);
+	static auto createFromSerialized(const std::string& iTextureSerializedName) -> shared<Texture2D>;
 
 	/**
 	 * @brief Creates the texture with the given size.
@@ -182,7 +170,7 @@ public:
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 * @return Resulting texture.
 	 */
-	static shared<Texture2D> create(const math::vec2ui& iSize, bool iWithAlpha = true);
+	static auto create(const math::vec2ui& iSize, bool iWithAlpha = true) -> shared<Texture2D>;
 	/**
 	 * @brief Creates the texture with the given size.
 	 * @param[in] iWidth The texture's width.
@@ -190,7 +178,7 @@ public:
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 * @return Resulting texture.
 	 */
-	static shared<Texture2D> create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true);
+	static auto create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true) -> shared<Texture2D>;
 };
 OWL_DIAG_POP
 

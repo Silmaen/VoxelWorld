@@ -18,8 +18,8 @@ class OWL_API VertexBuffer final : public renderer::VertexBuffer {
 public:
 	VertexBuffer(const VertexBuffer&) = delete;
 	VertexBuffer(VertexBuffer&&) = delete;
-	VertexBuffer& operator=(const VertexBuffer&) = delete;
-	VertexBuffer& operator=(VertexBuffer&&) = delete;
+	auto operator=(const VertexBuffer&) -> VertexBuffer& = delete;
+	auto operator=(VertexBuffer&&) -> VertexBuffer& = delete;
 	/**
 	 * @brief Constructor.
 	 * @param[in] iSize The buffer size.
@@ -67,8 +67,8 @@ class OWL_API IndexBuffer final : public renderer::IndexBuffer {
 public:
 	IndexBuffer(const IndexBuffer&) = delete;
 	IndexBuffer(IndexBuffer&&) = delete;
-	IndexBuffer& operator=(const IndexBuffer&) = delete;
-	IndexBuffer& operator=(IndexBuffer&&) = delete;
+	auto operator=(const IndexBuffer&) -> IndexBuffer& = delete;
+	auto operator=(IndexBuffer&&) -> IndexBuffer& = delete;
 	/**
 	 * @brief Default constructor.
 	 * @param[in] iIndices Array of indices.
@@ -95,7 +95,7 @@ public:
 	 * @brief Get the number of element in the buffer.
 	 * @return Number of element in the buffer.
 	 */
-	[[nodiscard]] uint32_t getCount() const override { return m_count; }
+	[[nodiscard]] auto getCount() const -> uint32_t override { return m_count; }
 
 private:
 	/// ID in OpenGl context.
@@ -103,4 +103,4 @@ private:
 	/// Number of elements.
 	uint32_t m_count = 0;
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

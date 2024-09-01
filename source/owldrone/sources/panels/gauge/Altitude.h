@@ -38,12 +38,12 @@ public:
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Altitude& operator=(const Altitude&) = default;
+	auto operator=(const Altitude&) -> Altitude& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Altitude& operator=(Altitude&&) = default;
+	auto operator=(Altitude&&) -> Altitude& = default;
 
 	/**
 	 * @brief Draw the  gauge back ground.
@@ -56,19 +56,19 @@ public:
 	void drawCursors() override;
 
 	/**
-	 * @brief Define the altitude.
-	 * @param alt The new altitude from UAV.
+	 * @brief Define the m_altitude.
+	 * @param alt The new m_altitude from UAV.
 	 */
 	void setAltitude(float alt) { altitude = alt; }
 
 private:
 	float altitude = 0.f;
 
-	[[nodiscard]] float altitudeToAngle(float divider = 1.0) const;
+	[[nodiscard]] auto altitudeToAngle(float divider = 1.0) const -> float;
 
 	owl::shared<owl::renderer::Texture> background = nullptr;
 	owl::shared<owl::renderer::Texture> cursor = nullptr;
 	owl::shared<owl::renderer::Texture> cursor10 = nullptr;
 	owl::shared<owl::renderer::Texture> cursor100 = nullptr;
 };
-} // namespace drone::panels::gauge
+}// namespace drone::panels::gauge

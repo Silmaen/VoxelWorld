@@ -13,7 +13,7 @@
 
 namespace owl::renderer::opengl {
 
-GraphContext::GraphContext(GLFWwindow *ioWindow) : mp_windowHandle(ioWindow) {
+GraphContext::GraphContext(GLFWwindow* ioWindow) : mp_windowHandle(ioWindow) {
 	OWL_CORE_ASSERT(ioWindow, "Windows handle is nullptr")
 }
 
@@ -30,9 +30,9 @@ void GraphContext::init() {
 
 	OWL_CORE_INFO("OpenGL GraphContext Initiated.")
 	OWL_CORE_INFO("Device Info:")
-	OWL_CORE_INFO("  Vendor: {}", reinterpret_cast<const char *>(glGetString(GL_VENDOR)))
-	OWL_CORE_INFO("  Renderer: {}", reinterpret_cast<const char *>(glGetString(GL_RENDERER)))
-	OWL_CORE_INFO("  Version: {}", reinterpret_cast<const char *>(glGetString(GL_VERSION)))
+	OWL_CORE_INFO("  Vendor: {}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)))
+	OWL_CORE_INFO("  Renderer: {}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)))
+	OWL_CORE_INFO("  Version: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)))
 	int32_t textureUnits = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_UNITS, &textureUnits);
 	OWL_CORE_INFO(" Max texture slot per Shader: {}", textureUnits)
@@ -44,11 +44,11 @@ void GraphContext::swapBuffers() {
 	glfwSwapBuffers(mp_windowHandle);
 }
 
-GraphContext::Version GraphContext::getVersion() const {
+auto GraphContext::getVersion() const -> GraphContext::Version {
 #ifdef OLD_GLAD
-	return {GLVersion.major, GLVersion.minor};
+	return {.major = GLVersion.major, .minor = GLVersion.minor};
 #else
-	return {GLAD_VERSION_MAJOR(m_version), GLAD_VERSION_MINOR(m_version)};
+	return {.major = GLAD_VERSION_MAJOR(m_version), .minor = GLAD_VERSION_MINOR(m_version)};
 #endif
 }
 

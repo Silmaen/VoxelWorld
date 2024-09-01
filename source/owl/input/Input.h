@@ -19,10 +19,10 @@ namespace owl::input {
  */
 class OWL_API Input {
 public:
-	Input(const Input &) = delete;
-	Input(Input &&) = delete;
-	Input &operator=(const Input &) = delete;
-	Input &operator=(Input &&) = delete;
+	Input(const Input&) = delete;
+	Input(Input&&) = delete;
+	auto operator=(const Input&) -> Input& = delete;
+	auto operator=(Input&&) -> Input& = delete;
 
 	/**
 	 * @brief Default constructor.
@@ -38,7 +38,7 @@ public:
 	 * @brief Initialize the input;
 	 * @param[in] iType the type of input
 	 */
-	static void init(const Type &iType = Type::GLFW);
+	static void init(const Type& iType = Type::GLFW);
 
 	/**
 	 * @brief Destroy the inout instance.
@@ -50,32 +50,32 @@ public:
 	 * @param[in] iKeycode The Key to check.
 	 * @return True if pressed.
 	 */
-	static bool isKeyPressed(KeyCode iKeycode);
+	static auto isKeyPressed(KeyCode iKeycode) -> bool;
 
 	/**
 	 * @brief Mouse button pressed check.
 	 * @param[in] iMouseCode Mouse button to check.
 	 * @return True if pressed.
 	 */
-	static bool isMouseButtonPressed(MouseCode iMouseCode);
+	static auto isMouseButtonPressed(MouseCode iMouseCode) -> bool;
 
 	/**
 	 * @brief Get mouse X position.
 	 * @return Mouse X Position.
 	 */
-	static float getMouseX();
+	static auto getMouseX() -> float;
 
 	/**
 	 * @brief Get mouse Y position.
 	 * @return Mouse Y Position.
 	 */
-	static float getMouseY();
+	static auto getMouseY() -> float;
 
 	/**
 	 * @brief Get mouse position.
 	 * @return Mouse Position.
 	 */
-	static math::vec2 getMousePos();
+	static auto getMousePos() -> math::vec2;
 
 	/**
 	 * @brief Simulate key toggle.
@@ -93,7 +93,7 @@ public:
 	 * @brief Simulate mouse movement.
 	 * @param[in] iMousePos The new mouse pos.
 	 */
-	static void injectMousePos(const math::vec2 &iMousePos);
+	static void injectMousePos(const math::vec2& iMousePos);
 
 	/**
 	 * @brief Clear the previously defined injections.
@@ -111,18 +111,18 @@ private:
 	 * @param[in] iKeycode The Key to check.
 	 * @return True if pressed.
 	 */
-	virtual bool isKeyPressed_impl(KeyCode iKeycode) = 0;
+	virtual auto isKeyPressed_impl(KeyCode iKeycode) -> bool = 0;
 	/**
 	 * @brief Mouse button pressed check, private implementation.
 	 * @param[in] iMouseCode Mouse button to check.
 	 * @return True if pressed.
 	 */
-	virtual bool isMouseButtonPressed_impl(MouseCode iMouseCode) = 0;
+	virtual auto isMouseButtonPressed_impl(MouseCode iMouseCode) -> bool = 0;
 	/**
 	 * @brief Get mouse position, private implementation.
 	 * @return Mouse Position.
 	 */
-	virtual math::vec2 getMousePos_impl() = 0;
+	virtual auto getMousePos_impl() -> math::vec2 = 0;
 	/**
 	 * @brief Simulate key toggle, private implementation.
 	 * @param[in] iKeycode the key to press/release.
@@ -138,11 +138,12 @@ private:
 	 * @brief Simulate mouse movement, private implementation.
 	 * @param[in] iMousePos The new mouse pos.
 	 */
-	virtual void injectMousePos_impl(const math::vec2 &iMousePos) = 0;
+	virtual void injectMousePos_impl(const math::vec2& iMousePos) = 0;
 
 	/**
 	 * @brief Clear the previously defined injections.
 	 */
 	virtual void resetInjection_impl() = 0;
 };
+
 }// namespace owl::input

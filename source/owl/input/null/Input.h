@@ -16,10 +16,10 @@ namespace owl::input::null {
  */
 class OWL_API Input final : public input::Input {
 public:
-	Input(const Input &) = delete;
-	Input(Input &&) = delete;
-	Input &operator=(const Input &) = delete;
-	Input &operator=(Input &&) = delete;
+	Input(const Input&) = delete;
+	Input(Input&&) = delete;
+	auto operator=(const Input&) -> Input& = delete;
+	auto operator=(Input&&) -> Input& = delete;
 
 	/**
 	 * @brief Default constructor.
@@ -36,18 +36,18 @@ public:
 	 * @param[in] iKeyCode The Key to check.
 	 * @return True if pressed.
 	 */
-	bool isKeyPressed_impl(KeyCode iKeyCode) override;
+	auto isKeyPressed_impl(KeyCode iKeyCode) -> bool override;
 	/**
 	 * @brief Mouse button pressed check, private implementation.
 	 * @param[in] iMouseCode Mouse button to check.
 	 * @return True if pressed.
 	 */
-	bool isMouseButtonPressed_impl(MouseCode iMouseCode) override;
+	auto isMouseButtonPressed_impl(MouseCode iMouseCode) -> bool override;
 	/**
 	 * @brief Get mouse position, private implementation.
 	 * @return Mouse Position.
 	 */
-	math::vec2 getMousePos_impl() override;
+	auto getMousePos_impl() -> math::vec2 override;
 	/**
 	 * @brief Simulate key toggle, private implementation.
 	 * @param[in] iKeyCode the key to press/release.
@@ -63,7 +63,7 @@ public:
 	 * @brief Simulate mouse movement, private implementation.
 	 * @param[in] iMousePos The new mouse pos.
 	 */
-	void injectMousePos_impl(const math::vec2 &iMousePos) override;
+	void injectMousePos_impl(const math::vec2& iMousePos) override;
 	/**
 	 * @brief Clear the previously defined injections.
 	 */

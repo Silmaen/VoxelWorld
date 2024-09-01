@@ -33,7 +33,9 @@ void AirSpeed::drawCursors() {
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor});
 }
 
-float AirSpeed::velocityToAngle() const { return -std::clamp(velocity, 0.f, maxVelocity) / maxVelocity * maxAngle; }
+auto AirSpeed::velocityToAngle() const -> float {
+	return -std::clamp(velocity, 0.f, maxVelocity) / maxVelocity * maxAngle;
+}
 
 AirSpeed::~AirSpeed() = default;
 

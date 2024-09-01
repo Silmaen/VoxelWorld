@@ -23,8 +23,8 @@ public:
 	~CameraEditor() override;
 	CameraEditor(const CameraEditor&) = default;
 	CameraEditor(CameraEditor&&) = default;
-	CameraEditor& operator=(const CameraEditor&) = default;
-	CameraEditor& operator=(CameraEditor&&) = default;
+	auto operator=(const CameraEditor&) -> CameraEditor& = default;
+	auto operator=(CameraEditor&&) -> CameraEditor& = default;
 
 	/**
 	 * @brief Constructor
@@ -51,7 +51,7 @@ public:
 	 * @brief Get the camera distance to the focal point.
 	 * @return Camera distance to the focal point.
 	 */
-	[[nodiscard]] float getDistance() const { return m_distance; }
+	[[nodiscard]] auto getDistance() const -> float { return m_distance; }
 
 	/**
 	 * @brief Set the camera distance to the focal point.
@@ -72,54 +72,54 @@ public:
 	 * @brief Get the camera view matrix.
 	 * @return Camera view matrix.
 	 */
-	[[nodiscard]] const math::mat4& getViewMatrix() const { return m_viewMatrix; }
+	[[nodiscard]] auto getViewMatrix() const -> const math::mat4& { return m_viewMatrix; }
 
 	/**
 	 * @brief Get the camera view projection matrix.
 	 * @return Camera view projection matrix.
 	 */
-	[[nodiscard]] math::mat4 getViewProjection() const { return m_projection * m_viewMatrix; }
+	[[nodiscard]] auto getViewProjection() const -> math::mat4 { return m_projection * m_viewMatrix; }
 
 	/**
 	 * @brief Get the camera up vector.
 	 * @return Camera up vector.
 	 */
-	[[nodiscard]] math::vec3 getUpDirection() const;
+	[[nodiscard]] auto getUpDirection() const -> math::vec3;
 
 	/**
 	 * @brief Get the camera right vector.
 	 * @return Camera right vector.
 	 */
-	[[nodiscard]] math::vec3 getRightDirection() const;
+	[[nodiscard]] auto getRightDirection() const -> math::vec3;
 
 	/**
 	 * @brief Get the camera forward vector.
 	 * @return Camera forward vector.
 	 */
-	[[nodiscard]] math::vec3 getForwardDirection() const;
+	[[nodiscard]] auto getForwardDirection() const -> math::vec3;
 	/**
 	 * @brief Get the camera position.
 	 * @return Camera position.
 	 */
-	[[nodiscard]] const math::vec3& getPosition() const { return m_position; }
+	[[nodiscard]] auto getPosition() const -> const math::vec3& { return m_position; }
 
 	/**
 	 * @brief Get the camera orientation quaternion.
 	 * @return Camera orientation.
 	 */
-	[[nodiscard]] math::quat getOrientation() const;
+	[[nodiscard]] auto getOrientation() const -> math::quat;
 
 	/**
 	 * @brief Get the camera pitch.
 	 * @return Camera pitch.
 	 */
-	[[nodiscard]] float getPitch() const { return m_pitch; }
+	[[nodiscard]] auto getPitch() const -> float { return m_pitch; }
 
 	/**
 	 * @brief Get the camera yaw.
 	 * @return Camera yaw.
 	 */
-	[[nodiscard]] float getYaw() const { return m_yaw; }
+	[[nodiscard]] auto getYaw() const -> float { return m_yaw; }
 
 private:
 	/**
@@ -137,7 +137,7 @@ private:
 	 * @param[in] iEvent Mouse scroll event.
 	 * @return If treated.
 	 */
-	bool onMouseScroll(const event::MouseScrolledEvent& iEvent);
+	auto onMouseScroll(const event::MouseScrolledEvent& iEvent) -> bool;
 
 	/**
 	 * @brief Mouse panoramic move.
@@ -161,25 +161,25 @@ private:
 	 * @brief Calculate the camera position.
 	 * @return Camera position.
 	 */
-	[[nodiscard]] math::vec3 calculatePosition() const;
+	[[nodiscard]] auto calculatePosition() const -> math::vec3;
 
 	/**
 	 * @brief Get the pan speeds.
 	 * @return Pan speeds.
 	 */
-	[[nodiscard]] std::pair<float, float> panSpeed() const;
+	[[nodiscard]] auto panSpeed() const -> std::pair<float, float>;
 
 	/**
 	 * @brief Get the rotation speed.
 	 * @return The rotation speed.
 	 */
-	[[nodiscard]] float rotationSpeed() const;
+	[[nodiscard]] auto rotationSpeed() const -> float;
 
 	/**
 	 * @brief Get the zoom speed.
 	 * @return The zoom speed.
 	 */
-	[[nodiscard]] float zoomSpeed() const;
+	[[nodiscard]] auto zoomSpeed() const -> float;
 
 	// NOLINTBEGIN(*-magic-numbers)
 	/// Field of View.

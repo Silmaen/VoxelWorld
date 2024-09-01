@@ -18,8 +18,8 @@ public:
 	UniformBuffer() = delete;
 	UniformBuffer(const UniformBuffer&) = default;
 	UniformBuffer(UniformBuffer&&) = default;
-	UniformBuffer& operator=(const UniformBuffer&) = default;
-	UniformBuffer& operator=(UniformBuffer&&) = default;
+	auto operator=(const UniformBuffer&) -> UniformBuffer& = default;
+	auto operator=(UniformBuffer&&) -> UniformBuffer& = default;
 
 	/**
 	 * @brief Constructor.
@@ -48,4 +48,4 @@ public:
 
 private:
 };
-} // namespace owl::renderer::null
+}// namespace owl::renderer::null

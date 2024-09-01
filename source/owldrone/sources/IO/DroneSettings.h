@@ -21,28 +21,28 @@ public:
 	 */
 	~DroneSettings();
 
-	DroneSettings(const DroneSettings &) = delete;
-	DroneSettings(DroneSettings &&) = delete;
-	DroneSettings &operator=(const DroneSettings &) = delete;
-	DroneSettings &operator=(DroneSettings &&) = delete;
+	DroneSettings(const DroneSettings&) = delete;
+	DroneSettings(DroneSettings&&) = delete;
+	auto operator=(const DroneSettings&) -> DroneSettings& = delete;
+	auto operator=(DroneSettings&&) -> DroneSettings& = delete;
 
 	/**
 	 * @brief Reads the configuration from file.
 	 * @param file The file name to read.
 	 */
-	void readFromFile(const std::filesystem::path &file);
+	void readFromFile(const std::filesystem::path& file);
 
 	/**
 	 * @brief Save the configuration to file.
 	 * @param file The file name to write.
 	 */
-	void saveToFile(const std::filesystem::path &file) const;
+	void saveToFile(const std::filesystem::path& file) const;
 
 	/**
 	 * @brief Access to Settings singleton.
 	 * @return Settings instance.
 	 */
-	static DroneSettings &get() {
+	static auto get() -> DroneSettings& {
 		static DroneSettings instance;
 		return instance;
 	}

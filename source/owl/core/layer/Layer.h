@@ -23,10 +23,10 @@ namespace owl::core::layer {
  */
 class OWL_API Layer {
 public:
-	Layer(const Layer &) = delete;
-	Layer(Layer &&) = delete;
-	Layer &operator=(const Layer &) = delete;
-	Layer &operator=(Layer &&) = delete;
+	Layer(const Layer&) = delete;
+	Layer(Layer&&) = delete;
+	auto operator=(const Layer&) -> Layer& = delete;
+	auto operator=(Layer&&) -> Layer& = delete;
 
 	/**
 	 * @brief Default constructor.
@@ -53,25 +53,25 @@ public:
 	 * @brief Action on update.
 	 * @param[in] iTimeStep The time step since last frame.
 	 */
-	virtual void onUpdate([[maybe_unused]] const Timestep &iTimeStep) {}
+	virtual void onUpdate([[maybe_unused]] const Timestep& iTimeStep) {}
 
 	/**
 	 * @brief Action for that layer when gui is rendered.
 	 * @param[in] iTimeStep The time step since last frame.
 	 */
-	virtual void onImGuiRender([[maybe_unused]] const Timestep &iTimeStep) {}
+	virtual void onImGuiRender([[maybe_unused]] const Timestep& iTimeStep) {}
 
 	/**
 	 * @brief Action on event.
 	 * @param[in,out] ioEvent The Event to react.
 	 */
-	virtual void onEvent([[maybe_unused]] event::Event &ioEvent) {}
+	virtual void onEvent([[maybe_unused]] event::Event& ioEvent) {}
 
 	/**
 	 * @brief Get the debug name of the layer.
 	 * @return Debug Name of the layer.
 	 */
-	[[nodiscard]] const std::string &getName() const { return m_debugName; }
+	[[nodiscard]] auto getName() const -> const std::string& { return m_debugName; }
 
 protected:
 	/// Debug name for this layer.

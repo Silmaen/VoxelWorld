@@ -23,7 +23,7 @@ namespace owl::input::video::linux64 {
 
 namespace {
 
-std::string getPixelFormatString(const uint32_t iPixelFormat) {
+auto getPixelFormatString(const uint32_t iPixelFormat) -> std::string {
 	switch (iPixelFormat) {
 		case V4L2_PIX_FMT_RGB24:
 			return "RGB24";
@@ -83,7 +83,7 @@ std::string getPixelFormatString(const uint32_t iPixelFormat) {
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
-std::string unFourCC(const uint32_t pixelFormat) {
+auto unFourCC(const uint32_t pixelFormat) -> std::string {
 	constexpr uint32_t mmask = 0xff;
 	char fcc[4];
 	fcc[0] = static_cast<char>(pixelFormat & mmask);
@@ -94,7 +94,7 @@ std::string unFourCC(const uint32_t pixelFormat) {
 }
 OWL_DIAG_POP
 
-Device::PixelFormat getDevicePixelFormat(const uint32_t iPixelFormat) {
+auto getDevicePixelFormat(const uint32_t iPixelFormat) -> Device::PixelFormat {
 	if (iPixelFormat == V4L2_PIX_FMT_RGB24)
 		return Device::PixelFormat::Rgb24;
 	if (iPixelFormat == V4L2_PIX_FMT_NV12)
@@ -106,7 +106,7 @@ Device::PixelFormat getDevicePixelFormat(const uint32_t iPixelFormat) {
 	return Device::PixelFormat::Unknwon;
 }
 
-uint32_t getV4L2PixelFormat(const Device::PixelFormat &iPixelFormat) {
+auto getV4L2PixelFormat(const Device::PixelFormat& iPixelFormat) -> uint32_t {
 	if (iPixelFormat == Device::PixelFormat::Rgb24)
 		return V4L2_PIX_FMT_RGB24;
 	if (iPixelFormat == Device::PixelFormat::Nv12)
@@ -121,9 +121,9 @@ uint32_t getV4L2PixelFormat(const Device::PixelFormat &iPixelFormat) {
 }// namespace
 
 
-void updateList(std::vector<shared<video::Device>> &ioList) {
+void updateList(std::vector<shared<video::Device>>& ioList) {
 	// check if all listed devices still exists
-	if (std::remove_if(ioList.begin(), ioList.end(), [](const shared<video::Device> &dev) {
+	if (std::remove_if(ioList.begin(), ioList.end(), [](const shared<video::Device>& dev) {
 			return !std::static_pointer_cast<Device>(dev)->isValid();
 		}) != ioList.end()) {
 		OWL_CORE_WARN("Possible problems during video input listing.")
@@ -137,7 +137,7 @@ void updateList(std::vector<shared<video::Device>> &ioList) {
 			continue;
 		}
 		// don't add a device that already exists
-		if (std::find_if(ioList.begin(), ioList.end(), [&testDev](const shared<video::Device> &dev) {
+		if (std::find_if(ioList.begin(), ioList.end(), [&testDev](const shared<video::Device>& dev) {
 				return testDev->getBusInfo() == static_pointer_cast<Device>(dev)->getBusInfo();
 			}) != ioList.end())
 			continue;
@@ -152,7 +152,7 @@ Device::Device(std::string iFile) : video::Device{""}, m_file{std::move(iFile)} 
 		return;
 
 	const int fd = ::open(m_file.c_str(), O_RDONLY | O_CLOEXEC);
-	if (!fd) {
+	if (fd == 0) {
 		OWL_CORE_WARN("Unable to open device file {}", m_file)
 		return;
 	}
@@ -164,17 +164,17 @@ Device::Device(std::string iFile) : video::Device{""}, m_file{std::move(iFile)} 
 		return;
 	}
 	if (vcap == 0) {
-		m_name = reinterpret_cast<const char *>(capability.card);
-		m_busInfo = reinterpret_cast<const char *>(capability.bus_info);
+		m_name = reinterpret_cast<const char*>(capability.card);
+		m_busInfo = reinterpret_cast<const char*>(capability.bus_info);
 	} else {
 		// second method
 		media_device_info mdi{};
 		if (ioctl(fd, MEDIA_IOC_DEVICE_INFO, &mdi) > 0) {
-			if (mdi.bus_info[0])
+			if (mdi.bus_info[0] != 0)
 				m_busInfo = mdi.bus_info;
 			else
 				m_busInfo = fmt::format("platform: {}", mdi.driver);
-			if (mdi.model[0])
+			if (mdi.model[0] != 0)
 				m_name = mdi.model;
 			else
 				m_name = mdi.driver;
@@ -283,7 +283,7 @@ void Device::open() {
 void Device::close() {
 	if (!isOpened())
 		return;
-	if (mp_buffer)
+	if (mp_buffer != nullptr)
 		munmap(mp_buffer, m_bufferInfo.length);
 	if (m_streaming) {
 		if (ioctl(m_fileHandler, VIDIOC_STREAMOFF, &m_bufferInfo) < 0) {
@@ -297,9 +297,9 @@ void Device::close() {
 	m_streaming = false;
 }
 
-bool Device::isOpened() const { return m_fileHandler != 0; }
+auto Device::isOpened() const -> bool { return m_fileHandler != 0; }
 
-void Device::fillFrame(shared<renderer::Texture> &ioFrame) {
+void Device::fillFrame(shared<renderer::Texture>& ioFrame) {
 	if (!m_streaming)
 		return;// need to be open and ready!
 	// recreate the frame if not the right size.
@@ -313,8 +313,8 @@ void Device::fillFrame(shared<renderer::Texture> &ioFrame) {
 	}
 
 	std::vector<uint8_t> convertedBuffer =
-			getRgbBuffer(static_cast<const uint8_t *>(mp_buffer), static_cast<int32_t>(m_bufferInfo.bytesused));
-	// frames are written after dequeing the buffer
+			getRgbBuffer(static_cast<const uint8_t*>(mp_buffer), static_cast<int32_t>(m_bufferInfo.bytesused));
+	// frames are written after dequeue the buffer
 	if (!convertedBuffer.empty()) {
 		if (static_cast<size_t>(m_size.surface()) * 3ull != convertedBuffer.size()) {
 			OWL_CORE_WARN("Device ({}) buffer size missmatch: {}, expecting {}.", m_file, m_bufferInfo.bytesused,
@@ -329,12 +329,12 @@ void Device::fillFrame(shared<renderer::Texture> &ioFrame) {
 	}
 }
 
-bool Device::isValid() const {
+auto Device::isValid() const -> bool {
 	// fast out: open is assumed valid.
 	if (isOpened())
 		return true;
 
-	// check if realy initiated.
+	// check if really initiated.
 	if (m_file.empty())
 		return false;
 	if (m_name.empty())
@@ -346,7 +346,7 @@ bool Device::isValid() const {
 	if (!exists(std::filesystem::path(m_file)))
 		return false;
 	const int fd = ::open(m_file.c_str(), O_RDWR | O_CLOEXEC);
-	if (!fd)
+	if (fd == 0)
 		return false;
 	// check have supported capabilities
 	{
@@ -356,12 +356,12 @@ bool Device::isValid() const {
 			::close(fd);
 			return false;
 		}
-		if (!(capability.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
+		if ((capability.capabilities & V4L2_CAP_VIDEO_CAPTURE) == 0u) {
 			OWL_CORE_TRACE("Device {} ({}) does not have Video capability.", m_name, m_file)
 			::close(fd);
 			return false;// not a capture device.
 		}
-		if (!(capability.capabilities & V4L2_CAP_STREAMING)) {
+		if ((capability.capabilities & V4L2_CAP_STREAMING) == 0u) {
 			OWL_CORE_TRACE("Device {} ({}) does not have streaming capability.", m_name, m_file)
 			::close(fd);
 			return false;// no read capability.
@@ -385,7 +385,7 @@ void Device::printSupportedFormat() const {
 	if (!exists(std::filesystem::path(m_file)))
 		return;
 	const int fd = ::open(m_file.c_str(), O_RDWR | O_CLOEXEC);
-	if (!fd)
+	if (fd == 0)
 		return;
 	// Structure pour interroger les formats de pixel
 	v4l2_fmtdesc formatDescription{};
@@ -401,7 +401,7 @@ void Device::printSupportedFormat() const {
 	::close(fd);
 }
 
-Device::PixelFormat Device::getFirstSupportedPixelFormat(int32_t iFd) const {
+auto Device::getFirstSupportedPixelFormat(int32_t iFd) const -> Device::PixelFormat {
 	if (iFd == -1)
 		iFd = m_fileHandler;
 	if (iFd == -1)

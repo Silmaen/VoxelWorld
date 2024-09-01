@@ -1,12 +1,12 @@
 /**
- * @file droneLayer.cpp
+ * @file DroneLayer.cpp
  * @author Silmaen
  * @date 16/09/2023
  * Copyright (c) 2023 All rights reserved.
  * All modification must get authorization from the author.
  */
 
-#include "droneLayer.h"
+#include "DroneLayer.h"
 
 #include "IO/CameraSystem.h"
 #include "IO/DeviceManager.h"
@@ -23,9 +23,9 @@ using namespace owl;
 namespace drone {
 
 
-droneLayer::droneLayer() : Layer("droneLayer") {}
+DroneLayer::DroneLayer() : Layer("DroneLayer") {}
 
-void droneLayer::onAttach() {
+void DroneLayer::onAttach() {
 	OWL_PROFILE_FUNCTION()
 	core::Application::get().enableDocking();
 
@@ -61,7 +61,7 @@ void droneLayer::onAttach() {
 	viewport->setRemoteController(rc);
 }
 
-void droneLayer::onDetach() {
+void DroneLayer::onDetach() {
 	OWL_PROFILE_FUNCTION()
 
 	IO::CameraSystem::get().invalidate();
@@ -75,7 +75,7 @@ void droneLayer::onDetach() {
 	IO::DroneSettings::get().saveToFile(file);
 }
 
-void droneLayer::onUpdate(const core::Timestep& iTimeStep) {
+void DroneLayer::onUpdate(const core::Timestep& iTimeStep) {
 	OWL_PROFILE_FUNCTION()
 
 	renderer::Renderer2D::resetStats();
@@ -92,7 +92,7 @@ void droneLayer::onUpdate(const core::Timestep& iTimeStep) {
 	}
 }
 
-void droneLayer::onEvent(event::Event& ioEvent) {
+void DroneLayer::onEvent(event::Event& ioEvent) {
 
 	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::KeyPressedEvent>(
@@ -101,7 +101,7 @@ void droneLayer::onEvent(event::Event& ioEvent) {
 			[this](auto&& PH1) { return onMouseButtonPressed(std::forward<decltype(PH1)>(PH1)); });
 }
 
-void droneLayer::onImGuiRender(const core::Timestep& iTimeStep) {
+void DroneLayer::onImGuiRender(const core::Timestep& iTimeStep) {
 	OWL_PROFILE_FUNCTION()
 
 	// ==================================================================
@@ -126,7 +126,7 @@ void droneLayer::onImGuiRender(const core::Timestep& iTimeStep) {
 	renderToolbar();
 }
 
-void droneLayer::renderStats(const core::Timestep& iTimeStep) {
+void DroneLayer::renderStats(const core::Timestep& iTimeStep) {
 	ImGui::Begin("Stats");
 	ImGui::Text("%s", fmt::format("FPS: {:.2f}", iTimeStep.getFps()).c_str());
 	ImGui::Separator();
@@ -149,7 +149,7 @@ void droneLayer::renderStats(const core::Timestep& iTimeStep) {
 }
 
 
-void droneLayer::renderFakeDrone(const core::Timestep&) {
+void DroneLayer::renderFakeDrone(const core::Timestep&) {
 	ImGui::Begin("FakeDrone");
 	float vel = rc->getHorizontalVelocity();
 	if (ImGui::SliderFloat("Velocity", &vel, -5, 100))
@@ -181,7 +181,7 @@ void droneLayer::renderFakeDrone(const core::Timestep&) {
 	ImGui::End();
 }
 
-void droneLayer::renderMenu() {
+void DroneLayer::renderMenu() {
 	if (ImGui::BeginMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
 			if (ImGui::MenuItem("Exit"))
@@ -201,7 +201,8 @@ void droneLayer::renderMenu() {
 	}
 }
 
-bool droneLayer::onKeyPressed(event::KeyPressedEvent& ioEvent) {
+//NOLINTBEGIN(readability-convert-member-functions-to-static)
+auto DroneLayer::onKeyPressed(event::KeyPressedEvent& ioEvent) -> bool {
 	// Shortcuts
 	if (ioEvent.getRepeatCount() > 0)
 		return false;
@@ -210,7 +211,7 @@ bool droneLayer::onKeyPressed(event::KeyPressedEvent& ioEvent) {
 	return false;
 }
 
-bool droneLayer::onMouseButtonPressed(event::MouseButtonPressedEvent& ioEvent) {
+auto DroneLayer::onMouseButtonPressed(event::MouseButtonPressedEvent& ioEvent) -> bool {
 	if (ioEvent.getMouseButton() == input::mouse::ButtonLeft) {
 		return false;
 	}
@@ -218,10 +219,11 @@ bool droneLayer::onMouseButtonPressed(event::MouseButtonPressedEvent& ioEvent) {
 	// return non-blocking.
 	return false;
 }
+//NOLINTEND(readability-convert-member-functions-to-static)
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
-void droneLayer::renderToolbar() {
+void DroneLayer::renderToolbar() {
 	ImGui::Begin("##toolbar", nullptr,
 				 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
@@ -272,7 +274,7 @@ void droneLayer::renderToolbar() {
 }
 OWL_DIAG_POP
 
-bool droneLayer::isConnected() const { return connected; }
-void droneLayer::toggleConnect() { connected = !connected; }
+auto DroneLayer::isConnected() const -> bool { return connected; }
+void DroneLayer::toggleConnect() { connected = !connected; }
 
 }// namespace drone

@@ -19,8 +19,8 @@ public:
 	VertexArray();
 	VertexArray(const VertexArray&) = default;
 	VertexArray(VertexArray&&) = default;
-	VertexArray& operator=(const VertexArray&) = default;
-	VertexArray& operator=(VertexArray&&) = default;
+	auto operator=(const VertexArray&) -> VertexArray& = default;
+	auto operator=(VertexArray&&) -> VertexArray& = default;
 
 	using vertexBuf = shared<VertexBuffer>;
 	using vertBufs = std::vector<vertexBuf>;
@@ -38,7 +38,7 @@ public:
 	/**
 	 * @brief Deactivate the buffer in the GPU.
 	 */
-	void unbind() const;
+	static void unbind();
 
 	/**
 	 * @brief Append a vertex buffer to the list.
@@ -56,13 +56,13 @@ public:
 	 * @brief Access to vertex buffers.
 	 * @return Vertex buffers.
 	 */
-	[[nodiscard]] const vertBufs& getVertexBuffers() const { return m_vertexBuffers; }
+	[[nodiscard]] auto getVertexBuffers() const -> const vertBufs& { return m_vertexBuffers; }
 
 	/**
 	 * @brief Access to index buffer.
 	 * @return Index buffer.
 	 */
-	[[nodiscard]] const indexBuf& getIndexBuffer() const { return m_indexBuffer; }
+	[[nodiscard]] auto getIndexBuffer() const -> const indexBuf& { return m_indexBuffer; }
 
 private:
 	/// Id in the OpenGL context.
@@ -74,4 +74,4 @@ private:
 	/// The index buffer.
 	indexBuf m_indexBuffer;
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

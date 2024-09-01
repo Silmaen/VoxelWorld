@@ -27,24 +27,24 @@ public:
 	/**
 	 * @brief Default copy constructor.
 	 */
-	MapWindow(const MapWindow &) = default;
+	MapWindow(const MapWindow&) = default;
 	/**
 	 * @brief Default move constructor.
 	 */
-	MapWindow(MapWindow &&) = default;
+	MapWindow(MapWindow&&) = default;
 	/**
 	 * @brief Default copy affectation operator.
 	 */
-	MapWindow &operator=(const MapWindow &) = default;
+	auto operator=(const MapWindow&) -> MapWindow& = default;
 	/**
 	 * @brief Default move affectation operator.
 	 */
-	MapWindow &operator=(MapWindow &&) = default;
+	auto operator=(MapWindow&&) -> MapWindow& = default;
 	/**
 	 * @brief Update panel Status.
 	 * @param iTimeStep The Time delta of the frame.
 	 */
-	void onUpdate(const core::Timestep &iTimeStep) override;
+	void onUpdate(const core::Timestep& iTimeStep) override;
 
 private:
 };

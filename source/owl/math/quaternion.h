@@ -39,12 +39,12 @@ public:
 	 * @brief Copy affectation operator.
 	 * @return This Quaternion.
 	 */
-	constexpr Quaternion& operator=(const Quaternion&) = default;
+	constexpr auto operator=(const Quaternion&) -> Quaternion& = default;
 	/**
 	 * @brief Move affectation operator.
 	 * @return This Quaternion.
 	 */
-	constexpr Quaternion& operator=(Quaternion&&) = default;
+	constexpr auto operator=(Quaternion&&) -> Quaternion& = default;
 	/**
 	 * @brief Constructor with initializer list.
 	 * @param iW W component.
@@ -77,55 +77,55 @@ public:
 	 * @param iOther Other Quaternion to compare.
 	 * @return true if identical Quaternions.
 	 */
-	constexpr bool operator==(const Quaternion& iOther) const { return m_data == iOther.m_data; }
+	constexpr auto operator==(const Quaternion& iOther) const -> bool { return m_data == iOther.m_data; }
 	/**
 	 * @brief Comparison operator
 	 * @param iOther Other Quaternion to compare.
 	 * @return false if identical Quaternions.
 	 */
-	constexpr bool operator!=(const Quaternion& iOther) const { return m_data != iOther.m_data; }
+	constexpr auto operator!=(const Quaternion& iOther) const -> bool { return m_data != iOther.m_data; }
 	// Accessors
 	/**
 	 * @brief Access to components values.
 	 * @param i The component's number.
 	 * @return Component's value.
 	 */
-	BaseType& operator[](std::size_t i) { return m_data[i]; }
+	auto operator[](std::size_t i) -> BaseType& { return m_data[i]; }
 	/**
 	 * @brief Access to const components values.
 	 * @param i The component's number.
 	 * @return Const component's value.
 	 */
-	constexpr const BaseType& operator[](std::size_t i) const { return m_data[i]; }
-	constexpr BaseType& x() { return m_data[0]; }
-	constexpr BaseType& y() { return m_data[1]; }
-	constexpr BaseType& z() { return m_data[2]; }
-	constexpr BaseType& w() { return m_data[3]; }
-	[[nodiscard]] constexpr const BaseType& x() const { return m_data[0]; }
-	[[nodiscard]] constexpr const BaseType& y() const { return m_data[1]; }
-	[[nodiscard]] constexpr const BaseType& z() const { return m_data[2]; }
-	[[nodiscard]] constexpr const BaseType& w() const { return m_data[3]; }
+	constexpr auto operator[](std::size_t i) const -> const BaseType& { return m_data[i]; }
+	constexpr auto x() -> BaseType& { return m_data[0]; }
+	constexpr auto y() -> BaseType& { return m_data[1]; }
+	constexpr auto z() -> BaseType& { return m_data[2]; }
+	constexpr auto w() -> BaseType& { return m_data[3]; }
+	[[nodiscard]] constexpr auto x() const -> const BaseType& { return m_data[0]; }
+	[[nodiscard]] constexpr auto y() const -> const BaseType& { return m_data[1]; }
+	[[nodiscard]] constexpr auto z() const -> const BaseType& { return m_data[2]; }
+	[[nodiscard]] constexpr auto w() const -> const BaseType& { return m_data[3]; }
 	// iterator
-	typename std::array<BaseType, 4>::iterator begin() { return m_data.begin(); }
-	typename std::array<BaseType, 4>::iterator end() { return m_data.end(); }
-	[[nodiscard]] typename std::array<BaseType, 4>::const_iterator begin() const { return m_data.begin(); }
-	[[nodiscard]] typename std::array<BaseType, 4>::const_iterator end() const { return m_data.end(); }
+	auto begin() -> typename std::array<BaseType, 4>::iterator { return m_data.begin(); }
+	auto end() -> typename std::array<BaseType, 4>::iterator { return m_data.end(); }
+	[[nodiscard]] auto begin() const -> typename std::array<BaseType, 4>::const_iterator { return m_data.begin(); }
+	[[nodiscard]] auto end() const -> typename std::array<BaseType, 4>::const_iterator { return m_data.end(); }
 	// base operator
 	/**
 	 * @brief Self Addition operator.
 	 * @param iOther Other Quaternion to add.
 	 * @return This actualized Quaternion.
 	 */
-	constexpr Quaternion& operator+=(const Quaternion& iOther) {
+	constexpr auto operator+=(const Quaternion& iOther) -> Quaternion& {
 		for (size_t it = 0; it < 4; ++it) { m_data[it] += iOther[it]; }
 		return *this;
 	}
 	/**
-	 * @brief Self subtration operator.
+	 * @brief Self subtraction operator.
 	 * @param iOther Other Quaternion to subtract.
 	 * @return This actualized Quaternion.
 	 */
-	constexpr Quaternion& operator-=(const Quaternion& iOther) {
+	constexpr auto operator-=(const Quaternion& iOther) -> Quaternion& {
 		for (size_t it = 0; it < 4; ++it) { m_data[it] -= iOther[it]; }
 		return *this;
 	}
@@ -134,17 +134,17 @@ public:
 	 * @param iOther Other Quaternion to add.
 	 * @return This actualized Quaternion.
 	 */
-	constexpr Quaternion operator+(const Quaternion& iOther) const {
+	constexpr auto operator+(const Quaternion& iOther) const -> Quaternion {
 		Quaternion res{*this};
 		res += iOther;
 		return res;
 	}
 	/**
-	 * @brief Subtaction.
+	 * @brief Subtraction.
 	 * @param iOther Other Quaternion to subtract.
 	 * @return This actualized Quaternion.
 	 */
-	constexpr Quaternion operator-(const Quaternion& iOther) const {
+	constexpr auto operator-(const Quaternion& iOther) const -> Quaternion {
 		Quaternion res{*this};
 		res -= iOther;
 		return res;
@@ -153,7 +153,7 @@ public:
 	 * @brief Unary minus.
 	 * @return This actualized Quaternion.
 	 */
-	constexpr Quaternion operator-() const
+	constexpr auto operator-() const -> Quaternion
 		requires(std::is_signed_v<BaseType>)
 	{
 		Quaternion res{*this};
@@ -165,7 +165,7 @@ public:
 	 * @param iScalar the scalar to multiply.
 	 * @return This actualized Quaternion.
 	 */
-	constexpr Quaternion& operator*=(const BaseType iScalar) {
+	constexpr auto operator*=(const BaseType iScalar) -> Quaternion& {
 		for (size_t it = 0; it < 4; ++it) { m_data[it] *= iScalar; }
 		return *this;
 	}
@@ -174,7 +174,7 @@ public:
 	 * @param iScalar The scalar to multiply.
 	 * @return Quaternion result.
 	 */
-	constexpr Quaternion operator*(const BaseType iScalar) const {
+	constexpr auto operator*(const BaseType iScalar) const -> Quaternion {
 		Quaternion res{*this};
 		res *= iScalar;
 		return res;
@@ -185,7 +185,7 @@ public:
 	 * @param iQuaternion Quaternion to multiply.
 	 * @return Quaternion result.
 	 */
-	constexpr friend Quaternion operator*(const BaseType iScalar, const Quaternion& iQuaternion) {
+	constexpr friend auto operator*(const BaseType iScalar, const Quaternion& iQuaternion) -> Quaternion {
 		Quaternion res{iQuaternion};
 		res *= iScalar;
 		return res;
@@ -195,7 +195,7 @@ public:
 	 * @param iScalar The scalar to divide.
 	 * @return This actualized Quaternion.
 	 */
-	constexpr Quaternion& operator/=(const BaseType iScalar) {
+	constexpr auto operator/=(const BaseType iScalar) -> Quaternion& {
 		for (size_t it = 0; it < 4; ++it) { m_data[it] /= iScalar; }
 		return *this;
 	}
@@ -204,7 +204,7 @@ public:
 	 * @param iScalar The scalar to divide.
 	 * @return Quaternion result.
 	 */
-	constexpr Quaternion operator/(const BaseType iScalar) const {
+	constexpr auto operator/(const BaseType iScalar) const -> Quaternion {
 		Quaternion res{*this};
 		res /= iScalar;
 		return res;
@@ -215,7 +215,7 @@ public:
 	 * @param iOther Other Quaternion to multiply.
 	 * @return The product quaternion.
 	 */
-	constexpr Quaternion operator*(const Quaternion& iOther) const {
+	constexpr auto operator*(const Quaternion& iOther) const -> Quaternion {
 		Quaternion res{};
 		res.w() = w() * iOther.w() - x() * iOther.x() - y() * iOther.y() - z() * iOther.z();
 		res.x() = w() * iOther.x() + x() * iOther.w() + y() * iOther.z() - z() * iOther.y();
@@ -228,7 +228,7 @@ public:
 	 * @param iOther Other Quaternion to multiply.
 	 * @return The product quaternion.
 	 */
-	constexpr Quaternion& operator*=(const Quaternion& iOther) {
+	constexpr auto operator*=(const Quaternion& iOther) -> Quaternion& {
 		*this = *this * iOther;
 		return *this;
 	}
@@ -238,19 +238,19 @@ public:
 	 * @param iOther Other quaternion to multiply.
 	 * @return The dot product.
 	 */
-	[[nodiscard]] constexpr BaseType dot(const Quaternion& iOther) const {
-		return w() * iOther.w() + x() * iOther.x() + y() * iOther.y() + z() * iOther.z();
+	[[nodiscard]] constexpr auto dot(const Quaternion& iOther) const -> BaseType {
+		return (w() * iOther.w()) + (x() * iOther.x()) + (y() * iOther.y()) + (z() * iOther.z());
 	}
 	/**
 	 * @brief Get a conjugated copy of this quaternion.
 	 * @return Conjugated quaternion.
 	 */
-	[[nodiscard]] constexpr Quaternion conjugated() const { return Quaternion{*this}.conjugate(); }
+	[[nodiscard]] constexpr auto conjugated() const -> Quaternion { return Quaternion{*this}.conjugate(); }
 	/**
 	 * @brief Conjugate this quaternion.
 	 * @return Conjugated quaternion.
 	 */
-	constexpr Quaternion& conjugate() {
+	constexpr auto conjugate() -> Quaternion& {
 		x() = -x();
 		y() = -y();
 		z() = -z();
@@ -258,14 +258,16 @@ public:
 	}
 	/**
 	 * @brief Compute the square norm.
-	 * @return The sqare norm.
+	 * @return The square norm.
 	 */
-	[[nodiscard]] constexpr BaseType normSq() const { return w() * w() + x() * x() + y() * y() + z() * z(); }
+	[[nodiscard]] constexpr auto normSq() const -> BaseType {
+		return (w() * w()) + (x() * x()) + (y() * y()) + (z() * z());
+	}
 	/**
 	 * @brief Compute the norm.
 	 * @return The norm.
 	 */
-	[[nodiscard]] constexpr BaseType norm() const {
+	[[nodiscard]] constexpr auto norm() const -> BaseType {
 		if constexpr (std::is_floating_point_v<BaseType>) {
 			return std::sqrt(normSq());
 		}
@@ -275,7 +277,7 @@ public:
 	 * @brief Normalize this Quaternion if possible.
 	 * @return This Quaternion.
 	 */
-	constexpr Quaternion& normalize() {
+	constexpr auto normalize() -> Quaternion& {
 		if constexpr (std::is_floating_point_v<BaseType>) {
 			const BaseType n = normSq();
 			if (n < std::numeric_limits<BaseType>::epsilon())
@@ -289,12 +291,12 @@ public:
 	 * @brief Create a new normalized Quaternion.
 	 * @return Normalized Quaternion.
 	 */
-	[[nodiscard]] constexpr Quaternion normalized() const { return Quaternion{*this}.normalize(); }
+	[[nodiscard]] constexpr auto normalized() const -> Quaternion { return Quaternion{*this}.normalize(); }
 	/**
 	 * @brief Inverse this quaternion.
 	 * @return This quaternion.
 	 */
-	constexpr Quaternion& inverse() {
+	constexpr auto inverse() -> Quaternion& {
 		const BaseType n = normSq();
 		if (n < std::numeric_limits<BaseType>::epsilon())
 			return *this;
@@ -306,7 +308,7 @@ public:
 	 * @brief Get an inverted copy of this quaternion.
 	 * @return Inverted quaternion
 	 */
-	[[nodiscard]] constexpr Quaternion inverted() const { return Quaternion{*this}.inverse(); }
+	[[nodiscard]] constexpr auto inverted() const -> Quaternion { return Quaternion{*this}.inverse(); }
 
 private:
 	std::array<BaseType, 4> m_data;
@@ -320,11 +322,12 @@ private:
  * @return The transformed vector.
  */
 template<typename BaseType>
-constexpr Vector<BaseType, 3> rotate(const Quaternion<BaseType>& iQuaternion, const Vector<BaseType, 3>& iVector) {
+constexpr auto rotate(const Quaternion<BaseType>& iQuaternion,
+					  const Vector<BaseType, 3>& iVector) -> Vector<BaseType, 3> {
 	Vector<BaseType, 3> qv{iQuaternion.x(), iQuaternion.y(), iQuaternion.z()};
 	const Vector<BaseType, 3> uv(qv ^ iVector);
 	const Vector<BaseType, 3> uuv(qv ^ uv);
-	return iVector + ((uv * iQuaternion.w()) + uuv) * BaseType{2};
+	return iVector + (((uv * iQuaternion.w()) + uuv) * BaseType{2});
 }
 
 using quat = Quaternion<float>;

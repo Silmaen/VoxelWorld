@@ -24,7 +24,7 @@ Texture::Texture(const uint32_t iWidth, const uint32_t iHeight, const bool iWith
 
 Texture::Texture(const math::vec2ui& iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {}
 
-[[nodiscard]] std::string Texture::getSerializeString() const {
+[[nodiscard]] auto Texture::getSerializeString() const -> std::string {
 	if (!isLoaded()) {
 		return "emp:";
 	}
@@ -44,7 +44,7 @@ Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool i
 
 Texture2D::Texture2D(const math::vec2ui& iSize, const bool iWithAlpha) : Texture{iSize, iWithAlpha} {}
 
-shared<Texture2D> Texture2D::create(const std::filesystem::path& iFile) {
+auto Texture2D::create(const std::filesystem::path& iFile) -> shared<Texture2D> {
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			{
@@ -70,11 +70,11 @@ shared<Texture2D> Texture2D::create(const std::filesystem::path& iFile) {
 	return nullptr;
 }
 
-shared<Texture2D> Texture2D::create(const std::string& iTextureName) {
+auto Texture2D::create(const std::string& iTextureName) -> shared<Texture2D> {
 	return create(core::Application::get().getAssetDirectory() / (iTextureName + ".png"));
 }
 
-shared<Texture2D> Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha) {
+auto Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha) -> shared<Texture2D> {
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkShared<null::Texture2D>(iWidth, iHeight);
@@ -88,7 +88,7 @@ shared<Texture2D> Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWit
 	return nullptr;
 }
 
-shared<Texture2D> Texture2D::create(const math::vec2ui& iSize, bool iWithAlpha) {
+auto Texture2D::create(const math::vec2ui& iSize, bool iWithAlpha) -> shared<Texture2D> {
 	shared<Texture2D> tex;
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
@@ -110,7 +110,7 @@ shared<Texture2D> Texture2D::create(const math::vec2ui& iSize, bool iWithAlpha) 
 	return nullptr;
 }
 
-shared<Texture2D> Texture2D::createFromSerialized(const std::string& iTextureSerializedName) {
+auto Texture2D::createFromSerialized(const std::string& iTextureSerializedName) -> shared<Texture2D> {
 	if (iTextureSerializedName.size() < 4)
 		return nullptr;
 	const auto key = iTextureSerializedName.substr(0, 4);

@@ -18,8 +18,8 @@ class OWL_API CameraOrtho {
 public:
 	CameraOrtho(const CameraOrtho&) = default;
 	CameraOrtho(CameraOrtho&&) = default;
-	CameraOrtho& operator=(const CameraOrtho&) = default;
-	CameraOrtho& operator=(CameraOrtho&&) = default;
+	auto operator=(const CameraOrtho&) -> CameraOrtho& = default;
+	auto operator=(CameraOrtho&&) -> CameraOrtho& = default;
 	~CameraOrtho() = default;
 	/**
 	 * @brief Create the camera giving coordinates of corners.
@@ -45,7 +45,7 @@ public:
 	 * @brief Access to camera's position.
 	 * @return Camera's position.
 	 */
-	[[nodiscard]] const math::vec3& getPosition() const { return m_position; }
+	[[nodiscard]] auto getPosition() const -> const math::vec3& { return m_position; }
 
 	/**
 	 * @brief Define camera's position.
@@ -60,7 +60,7 @@ public:
 	 * @brief Access to camera's rotation.
 	 * @return Camera's rotation.
 	 */
-	[[nodiscard]] float getRotation() const { return m_rotation; }
+	[[nodiscard]] auto getRotation() const -> float { return m_rotation; }
 
 	/**
 	 * @brief Defines camera's rotation.
@@ -75,19 +75,19 @@ public:
 	 * @brief Access to projection matrix.
 	 * @return The projection matrix.
 	 */
-	[[nodiscard]] const math::mat4& getProjectionMatrix() const { return m_projectionMatrix; }
+	[[nodiscard]] auto getProjectionMatrix() const -> const math::mat4& { return m_projectionMatrix; }
 
 	/**
 	 * @brief Access to view matrix.
 	 * @return The view matrix.
 	 */
-	[[nodiscard]] const math::mat4& getViewMatrix() const { return m_viewMatrix; }
+	[[nodiscard]] auto getViewMatrix() const -> const math::mat4& { return m_viewMatrix; }
 
 	/**
 	 * @brief Access to view projection matrix.
 	 * @return The view position matrix.
 	 */
-	[[nodiscard]] const math::mat4& getViewProjectionMatrix() const { return m_viewProjectionMatrix; }
+	[[nodiscard]] auto getViewProjectionMatrix() const -> const math::mat4& { return m_viewProjectionMatrix; }
 
 private:
 	/**

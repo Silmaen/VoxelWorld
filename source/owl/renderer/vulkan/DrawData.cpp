@@ -16,8 +16,8 @@ namespace owl::renderer::vulkan {
 
 DrawData::~DrawData() = default;
 
-void DrawData::init(const BufferLayout &iLayout, const std::string &iRenderer, std::vector<uint32_t> &iIndices,
-					const std::string &iShaderName) {
+void DrawData::init(const BufferLayout& iLayout, const std::string& iRenderer, std::vector<uint32_t>& iIndices,
+					const std::string& iShaderName) {
 	m_shaderName = iShaderName;
 	m_renderer = iRenderer;
 	setShader(iShaderName, iRenderer);
@@ -26,7 +26,7 @@ void DrawData::init(const BufferLayout &iLayout, const std::string &iRenderer, s
 		mp_vertexBuffer->setLayout(iLayout);
 		mp_indexBuffer = mkShared<IndexBuffer>(iIndices.data(), iIndices.size());
 	}
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages = mp_shader->getStagesInfo();
 
 	VkVertexInputBindingDescription bindingDescription;
@@ -42,21 +42,22 @@ void DrawData::init(const BufferLayout &iLayout, const std::string &iRenderer, s
 			.vertexBindingDescriptionCount = mp_vertexBuffer ? 1u : 0u,
 			.pVertexBindingDescriptions = mp_vertexBuffer ? &bindingDescription : nullptr,
 			.vertexAttributeDescriptionCount =
-			mp_vertexBuffer ? static_cast<uint32_t>(attributeDescriptions.size()) : 0,
+					mp_vertexBuffer ? static_cast<uint32_t>(attributeDescriptions.size()) : 0,
 			.pVertexAttributeDescriptions = mp_vertexBuffer ? attributeDescriptions.data() : nullptr,
 	};
 	if (m_pipelineId >= 0)
 		vkh.popPipeline(m_pipelineId);
 	m_pipelineId = vkh.pushPipeline(mp_shader->getName(), shaderStages, vertexInputInfo);
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 
-	for (const auto &stage: shaderStages)
-		vkDestroyShaderModule(vkc.getLogicalDevice(), stage.module, nullptr);
-	if (m_pipelineId < 0) { OWL_CORE_WARN("Vulkan shader: Failed to register pipeline {}.", mp_shader->getName()) }
+	for (const auto& stage: shaderStages) vkDestroyShaderModule(vkc.getLogicalDevice(), stage.module, nullptr);
+	if (m_pipelineId < 0) {
+		OWL_CORE_WARN("Vulkan shader: Failed to register pipeline {}.", mp_shader->getName())
+	}
 }
 
-void DrawData::setShader(const std::string &iShaderName, const std::string &iRenderer) {
-	auto &shLib = Renderer::getShaderLibrary();
+void DrawData::setShader(const std::string& iShaderName, const std::string& iRenderer) {
+	auto& shLib = Renderer::getShaderLibrary();
 	if (!shLib.exists(iShaderName, iRenderer))
 		shLib.addFromStandardPath(iShaderName, iRenderer);
 	mp_shader = static_pointer_cast<Shader>(shLib.get(iShaderName, iRenderer));
@@ -65,7 +66,7 @@ void DrawData::setShader(const std::string &iShaderName, const std::string &iRen
 void DrawData::bind() const {
 	if (m_pipelineId < 0)
 		return;
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	vkh.bindPipeline(m_pipelineId);
 	if (mp_vertexBuffer)
 		mp_vertexBuffer->bind();
@@ -75,14 +76,14 @@ void DrawData::bind() const {
 
 void DrawData::unbind() const {}
 
-void DrawData::setVertexData(const void *iData, const uint32_t iSize) {
+void DrawData::setVertexData(const void* iData, const uint32_t iSize) {
 	if (m_pipelineId < 0)
 		return;
 	if (mp_vertexBuffer)
 		mp_vertexBuffer->setData(iData, iSize);
 }
 
-uint32_t DrawData::getIndexCount() const {
+auto DrawData::getIndexCount() const -> uint32_t {
 	if (m_pipelineId < 0)
 		return 0;
 	if (mp_indexBuffer)

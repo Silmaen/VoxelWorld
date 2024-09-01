@@ -16,7 +16,7 @@ namespace owl::renderer::vulkan {
 
 namespace {
 
-VkFormat shaderDataTypeToVulkanFormat(const ShaderDataType &iType) {
+auto shaderDataTypeToVulkanFormat(const ShaderDataType& iType) -> VkFormat {
 	switch (iType) {
 		case ShaderDataType::None:
 			return VK_FORMAT_UNDEFINED;
@@ -49,7 +49,7 @@ VkFormat shaderDataTypeToVulkanFormat(const ShaderDataType &iType) {
 
 VertexBuffer::VertexBuffer(const uint32_t iSize) { createBuffer(nullptr, iSize); }
 
-VertexBuffer::VertexBuffer(const float *iVertices, const uint32_t iSize) { createBuffer(iVertices, iSize); }
+VertexBuffer::VertexBuffer(const float* iVertices, const uint32_t iSize) { createBuffer(iVertices, iSize); }
 
 VertexBuffer::~VertexBuffer() { release(); }
 
@@ -58,7 +58,7 @@ void VertexBuffer::release() {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to delete vertex buffer after VulkanHander release...")
 		return;
 	}
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 	if (m_vertexBuffer != nullptr)
 		vkDestroyBuffer(vkc.getLogicalDevice(), m_vertexBuffer, nullptr);
 	m_vertexBuffer = nullptr;
@@ -68,7 +68,7 @@ void VertexBuffer::release() {
 }
 
 void VertexBuffer::bind() const {
-	const auto &vkh = internal::VulkanHandler::get();
+	const auto& vkh = internal::VulkanHandler::get();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to bind vertex buffer after VulkanHander release...")
 		return;
@@ -80,7 +80,7 @@ void VertexBuffer::bind() const {
 
 void VertexBuffer::unbind() const {}
 
-void VertexBuffer::setData(const void *iData, const uint32_t iSize) {
+void VertexBuffer::setData(const void* iData, const uint32_t iSize) {
 	if (internal::VulkanHandler::get().getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to set vertex buffer data after VulkanHander release...")
 		return;
@@ -92,9 +92,9 @@ void VertexBuffer::setData(const void *iData, const uint32_t iSize) {
 		internal::createBuffer(iSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 							   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 							   stagingBuffer, stagingBufferMemory);
-		const auto &vkc = internal::VulkanCore::get();
+		const auto& vkc = internal::VulkanCore::get();
 
-		void *dataInternal = nullptr;
+		void* dataInternal = nullptr;
 		vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, iSize, 0, &dataInternal);
 		memcpy(dataInternal, iData, iSize);
 		vkUnmapMemory(vkc.getLogicalDevice(), stagingBufferMemory);
@@ -106,16 +106,16 @@ void VertexBuffer::setData(const void *iData, const uint32_t iSize) {
 	}
 }
 
-VkVertexInputBindingDescription VertexBuffer::getBindingDescription() const {
+auto VertexBuffer::getBindingDescription() const -> VkVertexInputBindingDescription {
 	return {.binding = 0, .stride = getLayout().getStride(), .inputRate = VK_VERTEX_INPUT_RATE_VERTEX};
 }
 
-std::vector<VkVertexInputAttributeDescription> VertexBuffer::getAttributeDescriptions() const {
+auto VertexBuffer::getAttributeDescriptions() const -> std::vector<VkVertexInputAttributeDescription> {
 	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 
 	auto layout = getLayout();
 	uint32_t id = 0;
-	for (const auto &element: layout) {
+	for (const auto& element: layout) {
 		attributeDescriptions.emplace_back(VkVertexInputAttributeDescription{
 				.location = id,
 				.binding = 0,
@@ -127,7 +127,7 @@ std::vector<VkVertexInputAttributeDescription> VertexBuffer::getAttributeDescrip
 	return attributeDescriptions;
 }
 
-void VertexBuffer::createBuffer(const float *iData, const uint32_t iSize) {
+void VertexBuffer::createBuffer(const float* iData, const uint32_t iSize) {
 
 	if (internal::VulkanHandler::get().getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to set vertex buffer data after VulkanHander release...")
@@ -140,7 +140,7 @@ void VertexBuffer::createBuffer(const float *iData, const uint32_t iSize) {
 }
 
 
-IndexBuffer::IndexBuffer(const uint32_t *iIndices, const uint32_t iSize) : m_count(iSize) {
+IndexBuffer::IndexBuffer(const uint32_t* iIndices, const uint32_t iSize) : m_count(iSize) {
 	if (internal::VulkanHandler::get().getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan index buffer: Trying to create index buffer data after VulkanHander release...")
 		return;
@@ -155,8 +155,8 @@ IndexBuffer::IndexBuffer(const uint32_t *iIndices, const uint32_t iSize) : m_cou
 		internal::createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 							   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 							   stagingBuffer, stagingBufferMemory);
-		void *dataInternal{nullptr};
-		const auto &vkc = internal::VulkanCore::get();
+		void* dataInternal{nullptr};
+		const auto& vkc = internal::VulkanCore::get();
 
 		vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, bufferSize, 0, &dataInternal);
 		memcpy(dataInternal, iIndices, bufferSize);
@@ -174,7 +174,7 @@ void IndexBuffer::release() {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to delete vertex buffer after VulkanHander release...")
 		return;
 	}
-	const auto &vkc = internal::VulkanCore::get();
+	const auto& vkc = internal::VulkanCore::get();
 
 	if (m_indexBuffer != nullptr)
 		vkDestroyBuffer(vkc.getLogicalDevice(), m_indexBuffer, nullptr);
@@ -186,7 +186,7 @@ void IndexBuffer::release() {
 }
 
 void IndexBuffer::bind() const {
-	const auto &vkh = internal::VulkanHandler::get();
+	const auto& vkh = internal::VulkanHandler::get();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_WARN("Vulkan vertex buffer: Trying to bind vertex buffer after VulkanHander release...")
 		return;

@@ -38,17 +38,17 @@ struct ProfileSession {
  */
 class OWL_API Profiler {
 public:
-	Profiler(const Profiler &) = delete;
-	Profiler(Profiler &&) = delete;
-	Profiler &operator=(const Profiler &) = delete;
-	Profiler &operator=(Profiler &&) = delete;
+	Profiler(const Profiler&) = delete;
+	Profiler(Profiler&&) = delete;
+	auto operator=(const Profiler&) -> Profiler& = delete;
+	auto operator=(Profiler&&) -> Profiler& = delete;
 
 	/**
 	 * @brief Begins a new profiling session.
 	 * @param[in] iName Session's name.
 	 * @param[in] iFilepath Session File path to store information.
 	 */
-	void beginSession(const std::string &iName, const std::string &iFilepath = "results.json");
+	void beginSession(const std::string& iName, const std::string& iFilepath = "results.json");
 
 	/**
 	 * @brief Terminate profile session.
@@ -59,13 +59,13 @@ public:
 	 * @brief Write profiling result into json file.
 	 * @param[in] iResult The Result to write.
 	 */
-	void writeProfile(const ProfileResult &iResult);
+	void writeProfile(const ProfileResult& iResult);
 
 	/**
 	 * @brief Singleton accessor.
 	 * @return This instance.
 	 */
-	static Profiler &get() {
+	static auto get() -> Profiler& {
 		static Profiler instance;
 		return instance;
 	}
@@ -97,10 +97,12 @@ private:
 	 * @note: you must already own lock on m_Mutex before calling InternalEndSession().
 	 */
 	void internalEndSession();
-
-	std::mutex m_profilerMutex;/// Mutex.
-	uniq<ProfileSession> m_currentSession{nullptr};/// actual running session.
-	std::ofstream m_outputStream;/// output file stream.
+	/// Mutex.
+	std::mutex m_profilerMutex;
+	/// Actual running session.
+	uniq<ProfileSession> m_currentSession{nullptr};
+	/// Output file stream.
+	std::ofstream m_outputStream;
 };
 
 /**
@@ -112,12 +114,12 @@ public:
 	 * @brief Constructor.
 	 * @param[in] iName Scope's name.
 	 */
-	explicit ProfileTimer(const char *iName);
+	explicit ProfileTimer(const char* iName);
 
-	ProfileTimer(const ProfileTimer &) = delete;
-	ProfileTimer(ProfileTimer &&) = delete;
-	ProfileTimer &operator=(const ProfileTimer &) = delete;
-	ProfileTimer &operator=(ProfileTimer &&) = delete;
+	ProfileTimer(const ProfileTimer&) = delete;
+	ProfileTimer(ProfileTimer&&) = delete;
+	auto operator=(const ProfileTimer&) -> ProfileTimer& = delete;
+	auto operator=(ProfileTimer&&) -> ProfileTimer& = delete;
 	/**
 	 * @brief Destructor.
 	 */
@@ -130,7 +132,7 @@ public:
 
 private:
 	/// Scope's name.
-	const char *m_name;
+	const char* m_name;
 	/// Timer starting point.
 	std::chrono::time_point<std::chrono::steady_clock> m_startTimePoint;
 	/// Timer state, true if not running.
@@ -162,7 +164,7 @@ struct ChangeResult {
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 template<size_t N, size_t K>
-constexpr auto cleanupOutputString(const char (&iExpr)[N], const char (&iRemove)[K]) {
+constexpr auto cleanupOutputString(const char (&iExpr)[N], const char (&iRemove)[K]) -> ChangeResult<N> {
 	ChangeResult<N> result = {};
 
 	size_t srcIndex = 0;

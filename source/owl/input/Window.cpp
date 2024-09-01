@@ -14,7 +14,7 @@
 
 namespace owl::input {
 
-uniq<Window> Window::create(const Properties &iProps) {
+auto Window::create(const Properties& iProps) -> uniq<Window> {
 	switch (iProps.winType) {
 		case Type::GLFW:
 			return mkUniq<glfw::Window>(iProps);

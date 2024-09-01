@@ -24,10 +24,10 @@ namespace owl::renderer {
 class OWL_API Renderer {
 public:
 	Renderer() = default;
-	Renderer(const Renderer &) = delete;
-	Renderer(Renderer &&) = delete;
-	Renderer &operator=(const Renderer &) = delete;
-	Renderer &operator=(Renderer &&) = delete;
+	Renderer(const Renderer&) = delete;
+	Renderer(Renderer&&) = delete;
+	auto operator=(const Renderer&) -> Renderer& = delete;
+	auto operator=(Renderer&&) -> Renderer& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -59,7 +59,7 @@ public:
 		Error,///< Render has an error.
 	};
 
-	static State getState() { return m_internalState; }
+	static auto getState() -> State { return m_internalState; }
 
 	/**
 	 * @brief Event on Window size change.
@@ -72,7 +72,7 @@ public:
 	 * @brief Begins a scene.
 	 * @param[in] iCamera The camera.
 	 */
-	static void beginScene(const CameraOrtho &iCamera);
+	static void beginScene(const CameraOrtho& iCamera);
 
 	/**
 	 * @brief Ends a scene.
@@ -83,13 +83,13 @@ public:
 	 * @brief Access to the shader Library.
 	 * @return The shader library.
 	 */
-	static ShaderLibrary &getShaderLibrary() { return *m_shaderLibrary; }
+	static auto getShaderLibrary() -> ShaderLibrary& { return *m_shaderLibrary; }
 
 	/**
 	 * @brief Access to the texture Library.
 	 * @return The texture library.
 	 */
-	static TextureLibrary &getTextureLibrary() { return *m_textureLibrary; }
+	static auto getTextureLibrary() -> TextureLibrary& { return *m_textureLibrary; }
 
 private:
 	/// The state of the renderer.

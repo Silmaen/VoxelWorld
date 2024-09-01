@@ -19,8 +19,8 @@ class OWL_API Shader final : public owl::renderer::Shader {
 public:
 	Shader(const Shader&) = delete;
 	Shader(Shader&&) = delete;
-	Shader& operator=(const Shader&) = delete;
-	Shader& operator=(Shader&&) = delete;
+	auto operator=(const Shader&) -> Shader& = delete;
+	auto operator=(Shader&&) -> Shader& = delete;
 
 	/**
 	 * @brief Constructor.
@@ -30,7 +30,7 @@ public:
 	 * @param[in] iFragmentSrc Source of fragment shader.
 	 */
 	Shader(const std::string& iShaderName, const std::string& iRenderer, const std::string& iVertexSrc,
-	       const std::string& iFragmentSrc);
+		   const std::string& iFragmentSrc);
 
 	/**
 	 * @brief Constructor.
@@ -39,7 +39,7 @@ public:
 	 * @param[in] iSources The shader's sources with type.
 	 */
 	Shader(const std::string& iShaderName, const std::string& iRenderer,
-	       const std::unordered_map<ShaderType, std::string>& iSources);
+		   const std::unordered_map<ShaderType, std::string>& iSources);
 
 	/**
 	 * @brief Constructor.
@@ -48,7 +48,7 @@ public:
 	 * @param[in] iSources The shader source's path with type.
 	 */
 	Shader(const std::string& iShaderName, const std::string& iRenderer,
-	       const std::vector<std::filesystem::path>& iSources);
+		   const std::vector<std::filesystem::path>& iSources);
 
 	/**
 	 * @brief Destructor.
@@ -119,7 +119,7 @@ public:
 	 * @brief Compute the stages informations.
 	 * @return Stage informations.
 	 */
-	std::vector<VkPipelineShaderStageCreateInfo> getStagesInfo();
+	auto getStagesInfo() -> std::vector<VkPipelineShaderStageCreateInfo>;
 
 private:
 	void createShader(const std::unordered_map<ShaderType, std::string>& iSources);
@@ -127,4 +127,4 @@ private:
 
 	std::unordered_map<ShaderType, std::vector<uint32_t>> m_vulkanSpirv;
 };
-} // namespace owl::renderer::vulkan
+}// namespace owl::renderer::vulkan

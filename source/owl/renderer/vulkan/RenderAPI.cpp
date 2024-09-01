@@ -17,19 +17,19 @@
 namespace owl::renderer::vulkan {
 
 RenderAPI::~RenderAPI() {
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	vkh.release();
 }
 
 void RenderAPI::init() {
 	OWL_PROFILE_FUNCTION()
-	const auto &app = core::Application::get();
+	const auto& app = core::Application::get();
 	const bool extraDebugging = app.getInitParams().useDebugging;
 
 	if (getState() != State::Created)
 		return;
 
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	if (extraDebugging)
 		vkh.activateValidation();
 	vkh.initVulkan();
@@ -43,32 +43,32 @@ void RenderAPI::init() {
 }
 
 void RenderAPI::setViewport(uint32_t, uint32_t, uint32_t, uint32_t) {
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	vkh.setResize();
 }
 
-void RenderAPI::setClearColor(const math::vec4 &iColor) {
-	auto &vkh = internal::VulkanHandler::get();
+void RenderAPI::setClearColor(const math::vec4& iColor) {
+	auto& vkh = internal::VulkanHandler::get();
 	vkh.setClearColor(iColor);
 }
 
 void RenderAPI::clear() {
-	const auto &vkh = internal::VulkanHandler::get();
+	const auto& vkh = internal::VulkanHandler::get();
 	vkh.clear();
 }
 
-void RenderAPI::drawData(const shared<DrawData> &iData, const uint32_t iIndexCount) {
-	auto &vkh = internal::VulkanHandler::get();
+void RenderAPI::drawData(const shared<DrawData>& iData, const uint32_t iIndexCount) {
+	auto& vkh = internal::VulkanHandler::get();
 	iData->bind();
 	const bool isIndexed = iData->getIndexCount() > 0;
-	const uint32_t count = iIndexCount ? iIndexCount : iData->getIndexCount();
+	const uint32_t count = (iIndexCount != 0u) ? iIndexCount : iData->getIndexCount();
 	vkh.drawData(count, isIndexed);
 }
 
 void RenderAPI::setLineWidth(float) {}
 
 void RenderAPI::beginFrame() {
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_ERROR("Vulkan is in error state ({}).", magic_enum::enum_name(vkh.getState()))
 		setState(State::Error);
@@ -78,17 +78,17 @@ void RenderAPI::beginFrame() {
 }
 
 void RenderAPI::beginBatch() {
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	vkh.beginBatch();
 }
 
 void RenderAPI::endBatch() {
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	vkh.endBatch();
 }
 
 void RenderAPI::endFrame() {
-	auto &vkh = internal::VulkanHandler::get();
+	auto& vkh = internal::VulkanHandler::get();
 	if (vkh.getState() != internal::VulkanHandler::State::Running) {
 		OWL_CORE_ERROR("Vulkan is in error state: ({}).", magic_enum::enum_name(vkh.getState()))
 		setState(State::Error);
@@ -98,12 +98,12 @@ void RenderAPI::endFrame() {
 }
 
 void RenderAPI::beginTextureLoad() {
-	auto &vkd = internal::Descriptors::get();
+	auto& vkd = internal::Descriptors::get();
 	vkd.resetTextureBind();
 }
 
 void RenderAPI::endTextureLoad() {
-	auto &vkd = internal::Descriptors::get();
+	auto& vkd = internal::Descriptors::get();
 	vkd.commitTextureBind(internal::VulkanHandler::get().getCurrentFrameIndex());
 }
 

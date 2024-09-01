@@ -19,10 +19,10 @@ namespace owl::gui {
  */
 class OWL_API UiLayer final : public core::layer::Layer {
 public:
-	UiLayer(const UiLayer &) = delete;
-	UiLayer(UiLayer &&) = delete;
-	UiLayer &operator=(const UiLayer &) = delete;
-	UiLayer &operator=(UiLayer &&) = delete;
+	UiLayer(const UiLayer&) = delete;
+	UiLayer(UiLayer&&) = delete;
+	auto operator=(const UiLayer&) -> UiLayer& = delete;
+	auto operator=(UiLayer&&) -> UiLayer& = delete;
 
 	/**
 	 * @brief Default constructor.
@@ -48,12 +48,12 @@ public:
 	 * @brief Action on event.
 	 * @param[in,out] ioEvent The Event to react.
 	 */
-	void onEvent(event::Event &ioEvent) override;
+	void onEvent(event::Event& ioEvent) override;
 
 	/**
 	 * @brief Begin layer definition.
 	 */
-	void begin();
+	void begin() const;
 
 	/**
 	 * @brief End layer definition.
@@ -70,7 +70,7 @@ public:
 	 * @brief Defines the theme for the UI.
 	 * @param[in] iTheme The theme to apply.
 	 */
-	void setTheme(const Theme &iTheme = Theme());
+	static void setTheme(const Theme& iTheme = Theme());
 
 	/**
 	 * @brief Enable docking of windows.
@@ -96,6 +96,6 @@ private:
 	bool m_withApp = true;
 
 	/// Function that initialize the docking port.
-	void initializeDocking();
+	static void initializeDocking();
 };
 }// namespace owl::gui

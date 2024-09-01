@@ -16,18 +16,18 @@ Settings::Settings() = default;
 
 Settings::~Settings() = default;
 
-void Settings::onUpdate(const owl::core::Timestep &) {}
+void Settings::onUpdate(const owl::core::Timestep&) {}
 
 // NOLINTBEGIN(misc-const-correctness)
 void Settings::onRender() {
-	auto &settings = IO::DroneSettings::get();
+	auto& settings = IO::DroneSettings::get();
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
 	ImGui::Begin("Drone Settings");
 	static bool camOpen = true;
-	if (ImGui::CollapsingHeader("Camera Settings", camOpen)) {
+	if (ImGui::CollapsingHeader("Camera Settings", static_cast<ImGuiTreeNodeFlags>(camOpen))) {
 		bool val = settings.useCamera;
-		auto &camSys = IO::CameraSystem::get();
-		const auto &cameras = camSys.getListOfCameraNames();
+		auto& camSys = IO::CameraSystem::get();
+		const auto& cameras = camSys.getListOfCameraNames();
 		const size_t nbCam = cameras.size();
 		if (ImGui::Checkbox("Use the camera", &val)) {
 			settings.useCamera = val && (nbCam > 0);
@@ -38,7 +38,7 @@ void Settings::onRender() {
 			const int32_t cCam = sCam;
 			if (ImGui::BeginCombo("Camera", fmt::format("Camera {}: {}", sCam, Cam).c_str())) {
 				int32_t i = 0;
-				for (const auto &camera: cameras) {
+				for (const auto& camera: cameras) {
 					const bool isSelected = (i == cCam);
 					if (ImGui::Selectable(fmt::format("Camera {}: {}", i, camera).c_str(), isSelected))
 						sCam = i;
@@ -59,10 +59,10 @@ void Settings::onRender() {
 		}
 	}
 	static bool comOpen = true;
-	if (ImGui::CollapsingHeader("Serial Port Setting", comOpen)) {
+	if (ImGui::CollapsingHeader("Serial Port Setting", static_cast<ImGuiTreeNodeFlags>(comOpen))) {
 		bool val = settings.useSerialPort;
-		auto &deviceManager = IO::DeviceManager::get();
-		const auto &devices = deviceManager.getAllDevices();
+		auto& deviceManager = IO::DeviceManager::get();
+		const auto& devices = deviceManager.getAllDevices();
 		const size_t nbCom = devices.size();
 		if (ImGui::Checkbox("Use the serial ports", &val)) {
 			settings.useSerialPort = val && (nbCom > 0);
@@ -76,7 +76,7 @@ void Settings::onRender() {
 				cPort = device->port;
 			}
 			if (ImGui::BeginCombo("Serial port", fmt::format("Serial {} ({})", cName, cPort).c_str())) {
-				for (const auto &dev: devices) {
+				for (const auto& dev: devices) {
 					const bool isSelected = (dev.port == cPort);
 					if (ImGui::Selectable(fmt::format("Serial {} ({})", dev.getFriendlyName(), dev.port).c_str(),
 										  isSelected))

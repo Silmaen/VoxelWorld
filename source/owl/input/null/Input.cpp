@@ -12,11 +12,13 @@
 
 namespace owl::input::null {
 
-bool Input::isKeyPressed_impl(const KeyCode iKeyCode) { return keyPressed.contains(iKeyCode); }
+auto Input::isKeyPressed_impl(const KeyCode iKeyCode) -> bool { return keyPressed.contains(iKeyCode); }
 
-bool Input::isMouseButtonPressed_impl(const MouseCode iMouseCode) { return mouseBtnPressed.contains(iMouseCode); }
+auto Input::isMouseButtonPressed_impl(const MouseCode iMouseCode) -> bool {
+	return mouseBtnPressed.contains(iMouseCode);
+}
 
-math::vec2 Input::getMousePos_impl() { return mousePos; }
+auto Input::getMousePos_impl() -> math::vec2 { return mousePos; }
 
 void Input::injectKey_impl(const KeyCode iKeyCode) {
 	if (keyPressed.contains(iKeyCode)) {
@@ -34,7 +36,7 @@ void Input::injectMouseButton_impl(const MouseCode iMouseCode) {
 	}
 }
 
-void Input::injectMousePos_impl(const math::vec2 &iMousePos) { mousePos = iMousePos; }
+void Input::injectMousePos_impl(const math::vec2& iMousePos) { mousePos = iMousePos; }
 
 void Input::resetInjection_impl() {
 	keyPressed.clear();

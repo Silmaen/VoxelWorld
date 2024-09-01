@@ -20,7 +20,7 @@ namespace {
  *
  * @note https://stackoverflow.com/questions/2674048/what-is-proper-way-to-detect-all-available-serial-ports-on-windows
  */
-void enumerateSerialDevices(DeviceManager::DeviceList &listToUpdate) {
+void enumerateSerialDevices(DeviceManager::DeviceList& listToUpdate) {
 	constexpr int maxPort = 32;
 	char lpTargetPath[5000];// buffer to store the path of the COMPORTS
 	for (int i = 0; i < maxPort; i++)// checking ports from COM0 to COM255
@@ -56,9 +56,9 @@ namespace {
  * @brief List The serial Port Available
  * @param ioListToUpdate The device's list to update.
  */
-void enumerateSerialDevices(DeviceManager::DeviceList &ioListToUpdate) {
+void enumerateSerialDevices(DeviceManager::DeviceList& ioListToUpdate) {
 	if (const std::filesystem::path base{"/dev/serial/by-id"}; exists(base)) {
-		for (const auto &devLink: std::filesystem::directory_iterator(base)) {
+		for (const auto& devLink: std::filesystem::directory_iterator(base)) {
 			if (is_symlink(devLink.symlink_status())) {
 				std::string port = std::filesystem::canonical(base / read_symlink(devLink)).string();
 				// todo: get device informations
@@ -93,23 +93,23 @@ void DeviceManager::updateList() {
 		setCurrentDevice(m_currentDevice->port);
 }
 
-owl::shared<Device> DeviceManager::getDeviceByName(const std::string &iName) const {
+auto DeviceManager::getDeviceByName(const std::string& iName) const -> owl::shared<Device> {
 	const auto it = std::ranges::find_if(m_devices.begin(), m_devices.end(),
-										 [&iName](const Device &T) { return T.name == iName; });
+										 [&iName](const Device& T) { return T.name == iName; });
 	if (it == m_devices.end())
 		return nullptr;
 	return owl::mkShared<Device>(*it);
 }
 
-owl::shared<Device> DeviceManager::getDeviceByPort(const std::string &iPort) const {
+auto DeviceManager::getDeviceByPort(const std::string& iPort) const -> owl::shared<Device> {
 	const auto it = std::ranges::find_if(m_devices.begin(), m_devices.end(),
-										 [&iPort](const Device &T) { return T.port == iPort; });
+										 [&iPort](const Device& T) { return T.port == iPort; });
 	if (it == m_devices.end())
 		return nullptr;
 	return owl::mkShared<Device>(*it);
 }
 
-void DeviceManager::setCurrentDevice(const std::string &iPort) { m_currentDevice = getDeviceByPort(iPort); }
+void DeviceManager::setCurrentDevice(const std::string& iPort) { m_currentDevice = getDeviceByPort(iPort); }
 
 
 }// namespace drone::IO

@@ -22,7 +22,7 @@ namespace YAML {
 
 template<>
 struct convert<owl::math::vec3> {
-	static Node encode(const owl::math::vec3& iRhs) {
+	static auto encode(const owl::math::vec3& iRhs) -> Node {
 		Node node;
 		node.push_back(iRhs.x());
 		node.push_back(iRhs.y());
@@ -31,7 +31,7 @@ struct convert<owl::math::vec3> {
 		return node;
 	}
 
-	static bool decode(const Node& iNode, owl::math::vec3& iRhs) {
+	static auto decode(const Node& iNode, owl::math::vec3& iRhs) -> bool {
 		if (!iNode.IsSequence() || iNode.size() != 3)
 			return false;
 		iRhs.x() = iNode[0].as<float>();
@@ -43,7 +43,7 @@ struct convert<owl::math::vec3> {
 
 template<>
 struct convert<owl::math::vec4> {
-	static Node encode(const owl::math::vec4& iRhs) {
+	static auto encode(const owl::math::vec4& iRhs) -> Node {
 		Node node;
 		node.push_back(iRhs.x());
 		node.push_back(iRhs.y());
@@ -53,7 +53,7 @@ struct convert<owl::math::vec4> {
 		return node;
 	}
 
-	static bool decode(const Node& iNode, owl::math::vec4& iRhs) {
+	static auto decode(const Node& iNode, owl::math::vec4& iRhs) -> bool {
 		if (!iNode.IsSequence() || iNode.size() != 4)
 			return false;
 		iRhs.x() = iNode[0].as<float>();
@@ -65,13 +65,13 @@ struct convert<owl::math::vec4> {
 };
 
 // NOLINTBEGIN(misc-use-anonymous-namespace)
-static Emitter& operator<<(Emitter& out, const owl::math::vec3& v) {
+static auto operator<<(Emitter& out, const owl::math::vec3& v) -> Emitter& {
 	out << Flow;
 	out << BeginSeq << v.x() << v.y() << v.z() << EndSeq;
 	return out;
 }
 
-static Emitter& operator<<(Emitter& out, const owl::math::vec4& v) {
+static auto operator<<(Emitter& out, const owl::math::vec4& v) -> Emitter& {
 	out << Flow;
 	out << BeginSeq << v.x() << v.y() << v.z() << v.w() << EndSeq;
 	return out;
@@ -170,7 +170,7 @@ void SceneSerializer::serialize(const std::filesystem::path& iFilepath) const {
 	fileOut.close();
 }
 
-bool SceneSerializer::deserialize(const std::filesystem::path& iFilepath) const {
+auto SceneSerializer::deserialize(const std::filesystem::path& iFilepath) const -> bool {
 	try {
 		YAML::Node data = YAML::LoadFile(iFilepath.string());
 

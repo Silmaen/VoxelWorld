@@ -20,23 +20,23 @@ public:
 	 * @brief Default Constructor.
 	 * @param[in] iDev The physical device to analyse.
 	 */
-	explicit PhysicalDeviceCapabilities(const VkPhysicalDevice &iDev = nullptr);
+	explicit PhysicalDeviceCapabilities(const VkPhysicalDevice& iDev = nullptr);
 	/**
 	 * @brief Copy Constructor.
 	 */
-	PhysicalDeviceCapabilities(const PhysicalDeviceCapabilities &) = default;
+	PhysicalDeviceCapabilities(const PhysicalDeviceCapabilities&) = default;
 	/**
 	 * @brief Move Constructor.
 	 */
-	PhysicalDeviceCapabilities(PhysicalDeviceCapabilities &&) = default;
+	PhysicalDeviceCapabilities(PhysicalDeviceCapabilities&&) = default;
 	/**
 	 * @brief Copy assignation.
 	 */
-	PhysicalDeviceCapabilities &operator=(const PhysicalDeviceCapabilities &) = default;
+	auto operator=(const PhysicalDeviceCapabilities&) -> PhysicalDeviceCapabilities& = default;
 	/**
 	 * @brief Move assignation.
 	 */
-	PhysicalDeviceCapabilities &operator=(PhysicalDeviceCapabilities &&) = default;
+	auto operator=(PhysicalDeviceCapabilities&&) -> PhysicalDeviceCapabilities& = default;
 
 	/**
 	 * @brief Destructor.
@@ -46,32 +46,32 @@ public:
 	 * @brief compute the device's score.
 	 * @return The device's score.
 	 */
-	[[nodiscard]] uint32_t getScore() const;
+	[[nodiscard]] auto getScore() const -> uint32_t;
 
 	/**
 	 * @brief Check if a layer is available on this device.
 	 * @param[in] iLayer The layer name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasLayer(const std::string &iLayer) const;
+	[[nodiscard]] auto hasLayer(const std::string& iLayer) const -> bool;
 	/**
 	 * @brief Check if an extension is available on this device.
 	 * @param[in] iExtension The extension name to test.
 	 * @return True if available
 	 */
-	[[nodiscard]] bool hasExtension(const std::string &iExtension) const;
+	[[nodiscard]] auto hasExtension(const std::string& iExtension) const -> bool;
 	/**
 	 * @brief Check if some layers are available on this device.
 	 * @param[in] iLayers The layer's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasLayers(const std::vector<std::string> &iLayers) const;
+	[[nodiscard]] auto hasLayers(const std::vector<std::string>& iLayers) const -> bool;
 	/**
 	 * @brief Check if some extensions are available on this device.
 	 * @param[in] iExtensions The extension's names to test.
 	 * @return True if all available
 	 */
-	[[nodiscard]] bool hasExtensions(const std::vector<std::string> &iExtensions) const;
+	[[nodiscard]] auto hasExtensions(const std::vector<std::string>& iExtensions) const -> bool;
 
 
 	/**
@@ -111,5 +111,5 @@ public:
  * @param[in] iInstance The vulkan instance.
  * @return List of physical devices sorted by decreasing score.
  */
-std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance &iInstance);
+auto enumerateDevices(const VkInstance& iInstance) -> std::vector<PhysicalDeviceCapabilities>;
 }// namespace owl::renderer::vulkan::internal

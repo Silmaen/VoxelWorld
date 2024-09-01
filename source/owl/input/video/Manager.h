@@ -22,10 +22,10 @@ constexpr size_t g_maxDevices = 10;
  */
 class OWL_API Manager final {
 public:
-	Manager(const Manager &) = delete;
-	Manager(Manager &&) = delete;
-	Manager &operator=(const Manager &) = delete;
-	Manager &operator=(Manager &&) = delete;
+	Manager(const Manager&) = delete;
+	Manager(Manager&&) = delete;
+	auto operator=(const Manager&) -> Manager& = delete;
+	auto operator=(Manager&&) -> Manager& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -36,7 +36,7 @@ public:
 	 * @brief Singleton accessor.
 	 * @return Instance of the manager.
 	 */
-	static Manager &get() {
+	static auto get() -> Manager& {
 		static Manager instance;
 		return instance;
 	}
@@ -45,7 +45,7 @@ public:
 	 * @brief Get the number of found devices.
 	 * @return The number of found devices.
 	 */
-	[[nodiscard]] size_t getDeviceCount() const { return m_devices.size(); }
+	[[nodiscard]] auto getDeviceCount() const -> size_t { return m_devices.size(); }
 
 	/**
 	 * @brief Request a refresh of the devices list.
@@ -57,30 +57,30 @@ public:
 	 * @brief Get an ordered list of device names.
 	 * @return List of device name.
 	 */
-	[[nodiscard]] std::vector<std::string> getDevicesNames() const;
+	[[nodiscard]] auto getDevicesNames() const -> std::vector<std::string>;
 
 	/**
 	 * @brief Access to the current device.
 	 * @return Pointer to the current device of nullptr if not opened.
 	 */
-	[[nodiscard]] shared<Device> getCurrentDevice() const;
+	[[nodiscard]] auto getCurrentDevice() const -> shared<Device>;
 	/**
 	 * @brief Access to the current device id.
 	 * @return Id of the current device of -1 if not opened.
 	 */
-	[[nodiscard]] int8_t getCurrentDeviceId() const;
+	[[nodiscard]] auto getCurrentDeviceId() const -> int8_t;
 
 	/**
 	 * @brief Check if a device is open.
 	 * @return True if a device is open.
 	 */
-	[[nodiscard]] bool isOpened() const { return m_currentDevice < g_maxDevices; }
+	[[nodiscard]] auto isOpened() const -> bool { return m_currentDevice < g_maxDevices; }
 
 	/**
 	 * @brief Check if some devices exist in the list.
 	 * @return True if a device exist.
 	 */
-	[[nodiscard]] bool hasDevice() const { return !m_devices.empty(); }
+	[[nodiscard]] auto hasDevice() const -> bool { return !m_devices.empty(); }
 
 	/**
 	 * @brief Open the device with the selected id.
@@ -97,7 +97,7 @@ public:
 	 * @brief Grab a frame and put it into the Texture.
 	 * @param[in] iFrame The texture to update.
 	 */
-	void fillFrame(shared<renderer::Texture> &iFrame) const;
+	void fillFrame(shared<renderer::Texture>& iFrame) const;
 
 private:
 	/**

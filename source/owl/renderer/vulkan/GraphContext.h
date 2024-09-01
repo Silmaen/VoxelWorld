@@ -17,16 +17,16 @@ namespace owl::renderer::vulkan {
  */
 class OWL_API GraphContext final : public ::owl::renderer::GraphContext {
 public:
-	GraphContext(const GraphContext &) = delete;
-	GraphContext(GraphContext &&) = delete;
-	GraphContext &operator=(const GraphContext &) = delete;
-	GraphContext &operator=(GraphContext &&) = delete;
+	GraphContext(const GraphContext&) = delete;
+	GraphContext(GraphContext&&) = delete;
+	auto operator=(const GraphContext&) -> GraphContext& = delete;
+	auto operator=(GraphContext&&) -> GraphContext& = delete;
 
 	/**
 	 * @brief Default constructor.
 	 * @param[in] ioWindow The windows draw surface.
 	 */
-	explicit GraphContext(GLFWwindow *ioWindow);
+	explicit GraphContext(GLFWwindow* ioWindow);
 
 	/**
 	 * @brief Destructor.
@@ -46,26 +46,26 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	[[nodiscard]] Version getVersion() const override;
+	[[nodiscard]] auto getVersion() const -> Version override;
 
 	/**
 	 * @brief Create the Window surface.
 	 * @param[in] iInstance The Vulkan instance
 	 * @return The operation result.
 	 */
-	VkResult createSurface(const VkInstance &iInstance);
+	auto createSurface(const VkInstance& iInstance) -> VkResult;
 
 	/**
 	 * @brief Destroy the Window surface.
 	 * @param[in] iInstance The Vulkan instance
 	 */
-	void destroySurface(const VkInstance &iInstance);
+	void destroySurface(const VkInstance& iInstance);
 
 	/**
 	 * \brief Access to the vulkn surface.
 	 * \return The vulkan surface.
 	 */
-	[[nodiscard]] VkSurfaceKHR getSurface() const { return m_surface; }
+	[[nodiscard]] auto getSurface() const -> VkSurfaceKHR { return m_surface; }
 	/**
 	 * @brief Wait for device ready.
 	 */
@@ -73,7 +73,7 @@ public:
 
 private:
 	/// The window.
-	GLFWwindow *mp_wnd = nullptr;
+	GLFWwindow* mp_wnd = nullptr;
 	/// the presenttin surface.
 	VkSurfaceKHR m_surface = nullptr;
 };
