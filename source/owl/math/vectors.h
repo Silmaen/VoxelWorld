@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "core/Core.h"
+#include "core/Macros.h"
 
 namespace owl::math {
 
@@ -128,33 +128,88 @@ public:
 	 * @return Const component's value.
 	 */
 	constexpr auto operator[](std::size_t i) const -> const BaseType& { return m_data[i]; }
-	constexpr auto x() -> BaseType& requires(Dim >= 1) {
+	constexpr auto x() -> BaseType&
+		requires(Dim >= 1)
+	{
 		return m_data[0];
-	} constexpr auto y() -> BaseType& requires(Dim >= 2) {
-		return m_data[1];
-	} constexpr auto z() -> BaseType& requires(Dim >= 3) {
-		return m_data[2];
-	} constexpr auto w() -> BaseType& requires(Dim >= 4) {
-		return m_data[3];
-	} constexpr auto r() -> BaseType& requires(Dim == 4) {
-		return x();
-	} constexpr auto g() -> BaseType& requires(Dim == 4) {
-		return y();
-	} constexpr auto b() -> BaseType& requires(Dim == 4) {
-		return z();
-	} constexpr auto a() -> BaseType& requires(Dim == 4) { return w(); }
-	[[nodiscard]] constexpr auto x() const -> const BaseType& requires(Dim >= 1) { return m_data[0]; }
-	[[nodiscard]] constexpr auto y() const -> const BaseType& requires(Dim >= 2) { return m_data[1]; }
-	[[nodiscard]] constexpr auto z() const -> const BaseType& requires(Dim >= 3) { return m_data[2]; }
-	[[nodiscard]] constexpr auto w() const -> const BaseType& requires(Dim >= 4) { return m_data[3]; }
-	[[nodiscard]] constexpr auto r() const -> const BaseType& requires(Dim == 4) { return x(); }
-	[[nodiscard]] constexpr auto g() const -> const BaseType& requires(Dim == 4) { return y(); }
-	[[nodiscard]] constexpr auto b() const -> const BaseType& requires(Dim == 4) { return z(); }
-	[[nodiscard]] constexpr auto a() const -> const BaseType& requires(Dim == 4) { return w(); }
-	// iterator
-	constexpr auto begin() -> typename std::array<BaseType, Dim>::iterator {
-		return m_data.begin();
 	}
+	constexpr auto y() -> BaseType&
+		requires(Dim >= 2)
+	{
+		return m_data[1];
+	}
+	constexpr auto z() -> BaseType&
+		requires(Dim >= 3)
+	{
+		return m_data[2];
+	}
+	constexpr auto w() -> BaseType&
+		requires(Dim >= 4)
+	{
+		return m_data[3];
+	}
+	constexpr auto r() -> BaseType&
+		requires(Dim == 4)
+	{
+		return x();
+	}
+	constexpr auto g() -> BaseType&
+		requires(Dim == 4)
+	{
+		return y();
+	}
+	constexpr auto b() -> BaseType&
+		requires(Dim == 4)
+	{
+		return z();
+	}
+	constexpr auto a() -> BaseType&
+		requires(Dim == 4)
+	{
+		return w();
+	}
+	[[nodiscard]] constexpr auto x() const -> const BaseType&
+		requires(Dim >= 1)
+	{
+		return m_data[0];
+	}
+	[[nodiscard]] constexpr auto y() const -> const BaseType&
+		requires(Dim >= 2)
+	{
+		return m_data[1];
+	}
+	[[nodiscard]] constexpr auto z() const -> const BaseType&
+		requires(Dim >= 3)
+	{
+		return m_data[2];
+	}
+	[[nodiscard]] constexpr auto w() const -> const BaseType&
+		requires(Dim >= 4)
+	{
+		return m_data[3];
+	}
+	[[nodiscard]] constexpr auto r() const -> const BaseType&
+		requires(Dim == 4)
+	{
+		return x();
+	}
+	[[nodiscard]] constexpr auto g() const -> const BaseType&
+		requires(Dim == 4)
+	{
+		return y();
+	}
+	[[nodiscard]] constexpr auto b() const -> const BaseType&
+		requires(Dim == 4)
+	{
+		return z();
+	}
+	[[nodiscard]] constexpr auto a() const -> const BaseType&
+		requires(Dim == 4)
+	{
+		return w();
+	}
+	// iterator
+	constexpr auto begin() -> typename std::array<BaseType, Dim>::iterator { return m_data.begin(); }
 	constexpr auto end() -> typename std::array<BaseType, Dim>::iterator { return m_data.end(); }
 	[[nodiscard]] constexpr auto begin() const -> typename std::array<BaseType, Dim>::const_iterator {
 		return m_data.begin();
@@ -339,7 +394,9 @@ public:
 	 * @param iOther Other vector to multiply.
 	 * @return This actualized vector.
 	 */
-	constexpr auto operator^=(const Vector& iOther) -> Vector& requires(Dim == 3) {
+	constexpr auto operator^=(const Vector& iOther) -> Vector&
+		requires(Dim == 3)
+	{
 		BaseType x = (m_data[1] * iOther[2]) - (m_data[2] * iOther[1]);
 		BaseType y = (m_data[2] * iOther[0]) - (m_data[0] * iOther[2]);
 		m_data[2] = m_data[0] * iOther[1] - m_data[1] * iOther[0];
@@ -371,7 +428,7 @@ public:
 	}
 	/**
 	 * @brief Compute the ratio between dimensions.
-	 * @return The dimensions ratio.
+	 * @return The dimension ratio.
 	 */
 	[[nodiscard]] constexpr auto ratio() const -> float
 		requires(Dim == 2)

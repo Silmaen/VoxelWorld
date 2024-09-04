@@ -1,6 +1,7 @@
 
 #include "testHelper.h"
 
+#include <core/Core.h>
 #include <debug/TrackerClient.h>
 
 using namespace owl::debug;

@@ -25,16 +25,16 @@ auto AppUpdateEvent::getCategoryFlags() const -> uint8_t { return Category::Appl
 auto AppRenderEvent::getCategoryFlags() const -> uint8_t { return Category::Application; }
 
 auto KeyEvent::getCategoryFlags() const -> uint8_t { return Category::Input | Category::Keyboard; }
-auto KeyPressedEvent::getName() const -> std::string { return fmt::format("KeyPressedEvent"); }
-auto KeyReleasedEvent::getName() const -> std::string { return fmt::format("KeyReleasedEvent"); }
-auto KeyTypedEvent::getName() const -> std::string { return fmt::format("KeyTypedEvent"); }
+auto KeyPressedEvent::getName() const -> std::string { return "KeyPressedEvent"; }
+auto KeyReleasedEvent::getName() const -> std::string { return "KeyReleasedEvent"; }
+auto KeyTypedEvent::getName() const -> std::string { return "KeyTypedEvent"; }
 
 auto MouseMovedEvent::getCategoryFlags() const -> uint8_t { return Category::Input | Category::Mouse; }
 auto MouseScrolledEvent::getCategoryFlags() const -> uint8_t { return Category::Input | Category::Mouse; }
 auto MouseButtonEvent::getCategoryFlags() const -> uint8_t {
 	return static_cast<uint8_t>(Category::Input | Category::Mouse) | static_cast<uint8_t>(Category::MouseButton);
 }
-auto MouseButtonPressedEvent::getName() const -> std::string { return fmt::format("MouseButtonPressedEvent"); }
-auto MouseButtonReleasedEvent::getName() const -> std::string { return fmt::format("MouseButtonReleasedEvent"); }
+auto MouseButtonPressedEvent::getName() const -> std::string { return "MouseButtonPressedEvent"; }
+auto MouseButtonReleasedEvent::getName() const -> std::string { return "MouseButtonReleasedEvent"; }
 
 }// namespace owl::event

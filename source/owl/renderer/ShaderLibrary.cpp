@@ -39,7 +39,7 @@ void ShaderLibrary::addFromStandardPath(const std::string& iName, const std::str
 	if (iRenderer.empty())
 		m_shaders[iName] = Shader::create(iName, iRenderer);
 	else
-		m_shaders[fmt::format("{}_{}", iRenderer, iName)] = Shader::create(iName, iRenderer);
+		m_shaders[std::format("{}_{}", iRenderer, iName)] = Shader::create(iName, iRenderer);
 }
 
 auto ShaderLibrary::load(const std::string& iName, const std::string& iRenderer,
@@ -58,11 +58,11 @@ auto ShaderLibrary::get(const std::string& iName, const std::string& iRenderer) 
 		OWL_CORE_ERROR("Shader {} not found in library", iName)
 		return nullptr;
 	}
-	return m_shaders[fmt::format("{}_{}", iRenderer, iName)];
+	return m_shaders[std::format("{}_{}", iRenderer, iName)];
 }
 
 auto ShaderLibrary::exists(const std::string& iName, const std::string& iRenderer) const -> bool {
-	return m_shaders.contains(fmt::format("{}_{}", iRenderer, iName));
+	return m_shaders.contains(std::format("{}_{}", iRenderer, iName));
 }
 
 ShaderLibrary::~ShaderLibrary() {

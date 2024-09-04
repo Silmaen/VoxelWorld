@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "core/Log.h"
+#include "Log.h"
 
 #ifdef OWL_DEBUG
 #define OWL_ENABLE_ASSERTS

@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include "core/Core.h"
+#include "core/Macros.h"
+#include <list>
 
 #ifndef OWL_TRACKER_VERBOSITY
 #define OWL_TRACKER_VERBOSITY 0

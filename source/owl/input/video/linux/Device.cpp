@@ -132,7 +132,7 @@ void updateList(std::vector<shared<video::Device>>& ioList) {
 	// search for new devices.
 	size_t devCounter = 0;
 	for (size_t iCam = 0; iCam < g_maxDevices; ++iCam) {
-		auto testDev = mkShared<Device>(fmt::format("/dev/video{}", iCam).c_str());
+		auto testDev = mkShared<Device>(std::format("/dev/video{}", iCam).c_str());
 		if (!testDev->isValid()) {
 			continue;
 		}
@@ -173,7 +173,7 @@ Device::Device(std::string iFile) : video::Device{""}, m_file{std::move(iFile)} 
 			if (mdi.bus_info[0] != 0)
 				m_busInfo = mdi.bus_info;
 			else
-				m_busInfo = fmt::format("platform: {}", mdi.driver);
+				m_busInfo = std::format("platform: {}", mdi.driver);
 			if (mdi.model[0] != 0)
 				m_name = mdi.model;
 			else

@@ -60,11 +60,6 @@ find_package(EnTT REQUIRED)
 message(STATUS "Found EnTT version ${EnTT_VERSION} @ ${EnTT_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC EnTT::EnTT)
 
-# fmt
-find_package(fmt REQUIRED)
-message(STATUS "Found fmt version ${fmt_VERSION} @ ${fmt_DIR}")
-target_link_libraries(${ENGINE_NAME} PUBLIC fmt::fmt)
-
 # glad
 find_package(glad 2.0 REQUIRED)
 message(STATUS "Found glad version ${glad_VERSION} @ ${glad_DIR}")

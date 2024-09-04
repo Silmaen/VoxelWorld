@@ -12,6 +12,7 @@
 #include "MouseCode.h"
 #include "Window.h"
 #include "core/Core.h"
+#include "math/vectors.h"
 
 namespace owl::input {
 /**
@@ -102,9 +103,9 @@ public:
 
 private:
 	/// The Input type.
-	static Type ms_type;
+	static Type s_type;
 	/// The input instance.
-	static uniq<Input> mus_instance;
+	static uniq<Input> s_instance;
 
 	/**
 	 * @brief Keyboard pressed check, private implementation.

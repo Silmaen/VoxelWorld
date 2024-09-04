@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "core/Core.h"
+#include <core/Macros.h>
 
 namespace owl::math {
 

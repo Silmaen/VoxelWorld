@@ -8,8 +8,10 @@
 
 #pragma once
 
+#include "Macros.h"
+#include "Memory.h"
+
 #include "external/spdlog.h"
-#include "math/linAlgebra.h"
 
 /**
  * @brief Namespace for the core objects.
@@ -17,7 +19,7 @@
 namespace owl::core {
 
 /// Default frequency for frame output.
-constexpr uint64_t gDefaultFrequency{100};
+constexpr uint64_t g_DefaultFrequency{100};
 
 /**
  * @brief Logging system.
@@ -30,7 +32,7 @@ public:
 	 * @param[in] iFrequency Frequency of frame output (number of frames).
 	 */
 	static void init(const spdlog::level::level_enum& iLevel = spdlog::level::trace,
-					 uint64_t iFrequency = gDefaultFrequency);
+					 uint64_t iFrequency = g_DefaultFrequency);
 
 	/**
 	 * @brief Access to the logger for the core system.

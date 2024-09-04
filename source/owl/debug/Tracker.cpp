@@ -7,11 +7,12 @@
  */
 
 #include "owlpch.h"
+
+#include <iostream>
 #include <stack>
 
 #include "Tracker.h"
 
-// NOLINTBEGIN(misc-no-recursion)
 
 #define OWL_DEALLOC_EXCEPT noexcept
 namespace {
@@ -156,25 +157,25 @@ AllocationInfo::AllocationInfo(void* iLocation, const size_t iSize) : location{i
 #endif
 }
 
-auto AllocationInfo::toStr([[maybe_unused]] const bool iTracePrint,
-						   [[maybe_unused]] const bool iFullTrace) const -> std::string {
-	std::string result = fmt::format("memory chunk at {} size ({})", location, size);
+auto AllocationInfo::toStr([[maybe_unused]] const bool iTracePrint, [[maybe_unused]] const bool iFullTrace) const
+		-> std::string {
+	std::string result = std::format("memory chunk at {} size ({})", location, size);
 
 #ifdef OWL_STACKTRACE
 	if (fullTrace.empty()) {
-		result += fmt::format(" <empty Trace>");
+		result += std::format(" <empty Trace>");
 	} else {
 		auto last = getCallerInfo();
-		result += fmt::format(" allocated {} ({}:{}:{})", last.symbol, last.filename, last.line.value_or(0),
+		result += std::format(" allocated {} ({}:{}:{})", last.symbol, last.filename, last.line.value_or(0),
 							  last.column.value_or(0));
 		if (iTracePrint) {
-			result += fmt::format("\n *** {} StackTrace (most recent call first) *** \n",
+			result += std::format("\n *** {} StackTrace (most recent call first) *** \n",
 								  iFullTrace ? "Full" : "Simplified");
 			uint32_t frameId = 0;
 			for (auto frame: fullTrace) {
 				if (!iFullTrace && !frame.symbol.starts_with("owl::"))
 					continue;
-				result += fmt::format("#{} at {}:{}:{} symbol {}{} ({:#x})\n", frameId, frame.filename,
+				result += std::format("#{} at {}:{}:{} symbol {}{} ({:#x})\n", frameId, frame.filename,
 									  frame.line.value_or(0), frame.column.value_or(0),
 									  frame.is_inline ? "(inline) " : "", frame.symbol, frame.raw_address);
 				++frameId;
@@ -207,7 +208,7 @@ void AllocationState::pushMemory(void* iLocation, size_t iSize) {
 	allocatedMemory += iSize;
 	memoryPeek = std::max(memoryPeek, allocatedMemory);
 	if (!s_antiLoop)
-		fmt::println("Problème d'antiloop!!!");
+		std::println(std::cerr, "anti-loop issue!");
 	allocs.emplace_back(iLocation, iSize);
 }
 
@@ -257,5 +258,3 @@ ScopeTrack::~ScopeTrack() {
 }
 
 }// namespace owl::debug
-
-// NOLINTEND(misc-no-recursion)

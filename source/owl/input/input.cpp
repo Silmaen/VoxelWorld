@@ -1,5 +1,5 @@
 /**
- * @file Input.cpp
+ * @file input.cpp
  * @author Silmaen
  * @date 02/08/2023
  * Copyright © 2023 All rights reserved.
@@ -14,39 +14,39 @@
 
 namespace owl::input {
 
-Type Input::ms_type = Type::GLFW;
-uniq<Input> Input::mus_instance = nullptr;
+Type Input::s_type = Type::GLFW;
+uniq<Input> Input::s_instance = nullptr;
 
 Input::~Input() = default;
 
 
 void Input::init(const Type& iType) {
-	if (mus_instance)
-		mus_instance.reset();
-	ms_type = iType;
-	switch (ms_type) {
+	if (s_instance)
+		s_instance.reset();
+	s_type = iType;
+	switch (s_type) {
 		case Type::GLFW:
-			mus_instance = mkUniq<glfw::Input>();
+			s_instance = mkUniq<glfw::Input>();
 			return;
 		case Type::Null:
-			mus_instance = mkUniq<null::Input>();
+			s_instance = mkUniq<null::Input>();
 	}
 }
 
 void Input::invalidate() {
-	if (mus_instance)
-		mus_instance.reset();
+	if (s_instance)
+		s_instance.reset();
 }
 
 auto Input::isKeyPressed(const KeyCode iKeycode) -> bool {
-	if (mus_instance)
-		return mus_instance->isKeyPressed_impl(iKeycode);
+	if (s_instance)
+		return s_instance->isKeyPressed_impl(iKeycode);
 	return false;
 }
 
 auto Input::isMouseButtonPressed(const MouseCode iMouseCode) -> bool {
-	if (mus_instance)
-		return mus_instance->isMouseButtonPressed_impl(iMouseCode);
+	if (s_instance)
+		return s_instance->isMouseButtonPressed_impl(iMouseCode);
 	return false;
 }
 
@@ -55,29 +55,29 @@ auto Input::getMouseX() -> float { return getMousePos().x(); }
 auto Input::getMouseY() -> float { return getMousePos().y(); }
 
 auto Input::getMousePos() -> math::vec2 {
-	if (mus_instance)
-		return mus_instance->getMousePos_impl();
+	if (s_instance)
+		return s_instance->getMousePos_impl();
 	return {};
 }
 
 void Input::injectKey(const KeyCode iKeycode) {
-	if (mus_instance)
-		mus_instance->injectKey_impl(iKeycode);
+	if (s_instance)
+		s_instance->injectKey_impl(iKeycode);
 }
 
 void Input::injectMouseButton(const MouseCode iMouseCode) {
-	if (mus_instance)
-		mus_instance->injectMouseButton_impl(iMouseCode);
+	if (s_instance)
+		s_instance->injectMouseButton_impl(iMouseCode);
 }
 
 void Input::injectMousePos(const math::vec2& iMousePos) {
-	if (mus_instance)
-		mus_instance->injectMousePos_impl(iMousePos);
+	if (s_instance)
+		s_instance->injectMousePos_impl(iMousePos);
 }
 
 void Input::resetInjection() {
-	if (mus_instance)
-		mus_instance->resetInjection_impl();
+	if (s_instance)
+		s_instance->resetInjection_impl();
 }
 
 }// namespace owl::input

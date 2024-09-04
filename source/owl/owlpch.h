@@ -10,9 +10,6 @@
 
 #include "core/Macros.h"
 
-OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
-
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -38,11 +35,10 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <ranges>
 #endif
 
-#include "debug/Profiler.h"
-#include "debug/Tracker.h"
-
 // third party
 #include <entt/entt.hpp>
+
 #include <magic_enum.hpp>
 
-OWL_DIAG_POP
+// definition needed everywhere
+#include "core/Core.h"

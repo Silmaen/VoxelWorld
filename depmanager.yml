@@ -1,21 +1,25 @@
 packages:
-  googletest:
+  # Owl engine
   cpptrace:
+  libdwarf: # as cpptrace dependency
+  zlib: # as libdwarf dependency
+  zstd: # as libdwarf dependency
   debugbreak:
   entt:
-  libdwarf:
-  magic_enum:
-  stb_image:
-  fmt:
   glad:
   glfw:
   imgui:
   imguizmo:
-  mavsdk:
-  spdlog:
-  yaml-cpp:
+  magic_enum:
   nfd:
+  spdlog:
+  fmt: # as spdlog dependency
+  stb_image:
   vulkan_sdk:
+    # includes Spir-V & Shaderc
     kind: "shared"
-  zstd:
-  zlib:
+  yaml-cpp:
+  # Tests
+  googletest:
+  # Owl Drone
+  mavsdk:

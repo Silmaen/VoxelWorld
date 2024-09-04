@@ -121,8 +121,6 @@ private:
 /**
  * @brief Class texture 2D
  */
-OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 class OWL_API Texture2D : public Texture {
 public:
 	/**
@@ -137,6 +135,10 @@ public:
 	 * @param[in] iWithAlpha Texture has alpha channel.
 	 */
 	Texture2D(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true);
+	/**
+	 * @brief Destructor.
+	 */
+	~Texture2D() override;
 	/**
 	 * @brief Constructor by size.
 	 * @param[in] iSize Texture's width.
@@ -180,6 +182,5 @@ public:
 	 */
 	static auto create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true) -> shared<Texture2D>;
 };
-OWL_DIAG_POP
 
 }// namespace owl::renderer

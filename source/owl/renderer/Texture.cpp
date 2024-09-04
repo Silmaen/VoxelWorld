@@ -34,7 +34,7 @@ Texture::Texture(const math::vec2ui& iSize, const bool iWithAlpha) : m_size{iSiz
 	if (!m_path.empty()) {
 		return "pat:" + m_path.string();
 	}
-	return fmt::format("siz:{}:{}:{}", m_size.x(), m_size.y(), m_hasAlpha);
+	return std::format("siz:{}:{}:{}", m_size.x(), m_size.y(), m_hasAlpha);
 }
 
 Texture2D::Texture2D(std::filesystem::path iPath) : Texture{std::move(iPath)} {}
@@ -136,5 +136,7 @@ auto Texture2D::createFromSerialized(const std::string& iTextureSerializedName) 
 }
 
 Texture::~Texture() = default;
+
+Texture2D::~Texture2D() = default;
 
 }// namespace owl::renderer

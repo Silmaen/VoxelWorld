@@ -92,12 +92,12 @@ constexpr auto toMat4(const Quaternion<BaseType>& iQuaternion) -> Matrix<BaseTyp
  * @return Perspective Matrix.
  */
 template<typename BaseType>
-constexpr auto perspective(BaseType iFovy, BaseType iAspect, BaseType iZNear,
-						   BaseType iZFar) -> Matrix<BaseType, 4, 4> {
+constexpr auto perspective(BaseType iFovy, BaseType iAspect, BaseType iZNear, BaseType iZFar)
+		-> Matrix<BaseType, 4, 4> {
 	static constexpr BaseType one{1};
 	static constexpr BaseType two{2};
 	Matrix<BaseType, 4, 4> result{};
-	BaseType const tanHalfFovy = std::tan(iFovy / two);
+	const BaseType tanHalfFovy = std::tan(iFovy / two);
 	result(0, 0) = one / (iAspect * tanHalfFovy);
 	result(1, 1) = one / (tanHalfFovy);
 	result(2, 2) = -(iZFar + iZNear) / (iZFar - iZNear);
@@ -140,8 +140,8 @@ constexpr auto ortho(const BaseType iLeft, const BaseType iRight, const BaseType
  * @return The translated matrix.
  */
 template<typename BaseType>
-constexpr auto translate(const Matrix<BaseType, 4, 4>& iMatrix,
-						 const Vector<BaseType, 3>& iVector) -> Matrix<BaseType, 4, 4> {
+constexpr auto translate(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseType, 3>& iVector)
+		-> Matrix<BaseType, 4, 4> {
 	Matrix<BaseType, 4, 4> result(iMatrix);
 	result.setColumn(3, iMatrix.column(0) * iVector[0] + iMatrix.column(1) * iVector[1] +
 								iMatrix.column(2) * iVector[2] + iMatrix.column(3));
@@ -157,10 +157,10 @@ constexpr auto translate(const Matrix<BaseType, 4, 4>& iMatrix,
  * @return Rotated matrix.
  */
 template<typename BaseType>
-constexpr auto rotate(Matrix<BaseType, 4, 4> const& iMatrix, const BaseType iAngle,
-					  const Vector<BaseType, 3>& iAxis) -> Matrix<BaseType, 4, 4> {
-	BaseType const c = std::cos(iAngle);
-	BaseType const s = std::sin(iAngle);
+constexpr auto rotate(const Matrix<BaseType, 4, 4>& iMatrix, const BaseType iAngle, const Vector<BaseType, 3>& iAxis)
+		-> Matrix<BaseType, 4, 4> {
+	const BaseType c = std::cos(iAngle);
+	const BaseType s = std::sin(iAngle);
 	Vector<BaseType, 3> axis(iAxis.normalized());
 	Vector<BaseType, 3> temp((BaseType(1) - c) * axis);
 	Matrix<BaseType, 4, 4> rotate{};
@@ -192,8 +192,8 @@ constexpr auto rotate(Matrix<BaseType, 4, 4> const& iMatrix, const BaseType iAng
  * @return The transformed matrix.
  */
 template<typename BaseType>
-constexpr auto scale(const Matrix<BaseType, 4, 4>& iMatrix,
-					 const Vector<BaseType, 3>& iScale) -> Matrix<BaseType, 4, 4> {
+constexpr auto scale(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseType, 3>& iScale)
+		-> Matrix<BaseType, 4, 4> {
 	Matrix<BaseType, 4, 4> result{};
 	result.setColumn(0, iMatrix.column(0) * iScale[0]);
 	result.setColumn(1, iMatrix.column(1) * iScale[1]);

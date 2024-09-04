@@ -3,15 +3,17 @@
 
 #include <cmath>
 #include <math/Transform.h>
+#include <math/matrixCreation.h>
 
 using namespace owl::math;
-
-constexpr bool vecNear(const vec3& a, const vec3& b, float accuracy = 0.001f) {
+namespace {
+constexpr auto vecNear(const vec3& a, const vec3& b, float accuracy = 0.001f) -> bool {
 	return (std::abs(a[0] - b[0]) < accuracy) && (std::abs(a[1] - b[1]) < accuracy) &&
 		   (std::abs(a[2] - b[2]) < accuracy);
 }
 
 const float pis2 = 2.f * std::atan(1.f);
+}// namespace
 
 TEST(math, decomposeTrivial) {
 	mat4 mat{};
@@ -93,11 +95,15 @@ TEST_P(ComposeDecomposeTest, ComposeDecomposeTests) {
 	EXPECT_TRUE(vecNear(scale, GetParam().scale));
 }
 
-static ComposeDecomposeData ComposeDecomposeTestData[] = {
-		{vec3{0.f, 0.f, 0.f}, vec3{pis2, 0.f, 0.f}, vec3{1.f, 1.f, 1.f}},
-		{vec3{0.f, 0.f, 0.f}, vec3{0.f, pis2, 0.f}, vec3{1.f, 1.f, 1.f}},
-		{vec3{0.f, 0.f, 0.f}, vec3{0.f, 0.f, pis2}, vec3{1.f, 1.f, 1.f}},
-		{vec3{10.f, -0.2f, 0.7f}, vec3{-pis2 / 2.f, 0.f, pis2}, vec3{1.1f, 0.4f, 1.8f}},
-		{vec3{1.f, 0.0f, 0.0f}, vec3{0.f, 0.f, 0.f}, vec3{-1.0f, -1.0f, -1.0f}}};
+namespace {
+ComposeDecomposeData ComposeDecomposeTestData[] = {
+		{.translation = vec3{0.f, 0.f, 0.f}, .rotation = vec3{pis2, 0.f, 0.f}, .scale = vec3{1.f, 1.f, 1.f}},
+		{.translation = vec3{0.f, 0.f, 0.f}, .rotation = vec3{0.f, pis2, 0.f}, .scale = vec3{1.f, 1.f, 1.f}},
+		{.translation = vec3{0.f, 0.f, 0.f}, .rotation = vec3{0.f, 0.f, pis2}, .scale = vec3{1.f, 1.f, 1.f}},
+		{.translation = vec3{10.f, -0.2f, 0.7f},
+		 .rotation = vec3{-pis2 / 2.f, 0.f, pis2},
+		 .scale = vec3{1.1f, 0.4f, 1.8f}},
+		{.translation = vec3{1.f, 0.0f, 0.0f}, .rotation = vec3{0.f, 0.f, 0.f}, .scale = vec3{-1.0f, -1.0f, -1.0f}}};
+}// namespace
 
 INSTANTIATE_TEST_SUITE_P(ComposeDecomposeCases, ComposeDecomposeTest, testing::ValuesIn(ComposeDecomposeTestData));

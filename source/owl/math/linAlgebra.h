@@ -72,12 +72,12 @@ constexpr auto epsilon() -> BaseType {
  * @tparam BaseType The internal type of data.
  * @param iA First value.
  * @param iB Second value.
- * @param iEpsi Epsilon value.
+ * @param iEpsilon Epsilon value.
  * @return True if the 2 values are nearly equal.
  */
 template<typename BaseType>
-constexpr auto epsilonEqual(const BaseType& iA, const BaseType& iB, const BaseType& iEpsi) -> bool {
-	return std::abs(iA - iB) < iEpsi;
+constexpr auto epsilonEqual(const BaseType& iA, const BaseType& iB, const BaseType& iEpsilon) -> bool {
+	return std::abs(iA - iB) < iEpsilon;
 }
 
 /**
@@ -85,12 +85,12 @@ constexpr auto epsilonEqual(const BaseType& iA, const BaseType& iB, const BaseTy
  * @tparam BaseType The internal type of data.
  * @param iA First value.
  * @param iB Second value.
- * @param iEpsi Epsilon value.
+ * @param iEpsilon Epsilon value.
  * @return True if the 2 values are not nearly equal.
  */
 template<typename BaseType>
-constexpr auto epsilonNotEqual(const BaseType& iA, const BaseType& iB, const BaseType& iEpsi) -> bool {
-	return std::abs(iA - iB) > iEpsi;
+constexpr auto epsilonNotEqual(const BaseType& iA, const BaseType& iB, const BaseType& iEpsilon) -> bool {
+	return std::abs(iA - iB) > iEpsilon;
 }
 
 /**
@@ -103,8 +103,8 @@ constexpr auto epsilonNotEqual(const BaseType& iA, const BaseType& iB, const Bas
  * @return The resulting vector.
  */
 template<typename BaseType, std::size_t NRow, std::size_t NCol>
-constexpr auto operator*(const Matrix<BaseType, NRow, NCol>& iMatrix,
-						 const Vector<BaseType, NCol>& iVector) -> Vector<BaseType, NRow> {
+constexpr auto operator*(const Matrix<BaseType, NRow, NCol>& iMatrix, const Vector<BaseType, NCol>& iVector)
+		-> Vector<BaseType, NRow> {
 	Vector<BaseType, NRow> result{};
 	for (std::size_t idx = 0; idx < NRow; ++idx) {
 		for (std::size_t it = 0; it < NCol; ++it) { result[idx] += iMatrix(idx, it) * iVector[it]; }
@@ -121,8 +121,8 @@ constexpr auto operator*(const Matrix<BaseType, NRow, NCol>& iMatrix,
  * @return The resulting vector.
  */
 template<typename BaseType, std::size_t NRow, std::size_t NCol>
-constexpr auto operator*(const Vector<BaseType, NRow>& iVector,
-						 const Matrix<BaseType, NRow, NCol>& iMatrix) -> Vector<BaseType, NCol> {
+constexpr auto operator*(const Vector<BaseType, NRow>& iVector, const Matrix<BaseType, NRow, NCol>& iMatrix)
+		-> Vector<BaseType, NCol> {
 	Vector<BaseType, NRow> result{};
 	for (std::size_t idx = 0; idx < NCol; ++idx) {
 		for (std::size_t it = 0; it < NRow; ++it) { result[idx] += iMatrix(it, idx) * iVector[it]; }

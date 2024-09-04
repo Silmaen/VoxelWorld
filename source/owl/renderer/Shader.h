@@ -139,7 +139,7 @@ public:
 	 * @brief get the shader's full name.
 	 * @return Shader's full name.
 	 */
-	[[nodiscard]] virtual auto getFullName() const -> std::string { return fmt::format("{}_{}", m_renderer, m_name); }
+	[[nodiscard]] virtual auto getFullName() const -> std::string { return std::format("{}_{}", m_renderer, m_name); }
 
 private:
 	/// Shader's name.

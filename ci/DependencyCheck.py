@@ -11,7 +11,6 @@ dependencies = [
     {"name": "entt", "version": "*", "header": True},
     {"name": "magic_enum", "version": "*", "header": True},
     {"name": "stb_image", "version": "*", "header": True},
-    {"name": "fmt", "version": "*", "header": False},
     {"name": "glad", "version": "*", "header": False},
     {"name": "glfw", "version": "*", "header": False},
     {"name": "imgui", "version": "*", "header": False},
