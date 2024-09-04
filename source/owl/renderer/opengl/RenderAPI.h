@@ -19,11 +19,11 @@ namespace owl::renderer::opengl {
  */
 class RenderAPI final : public renderer::RenderAPI {
 public:
-	RenderAPI(): renderer::RenderAPI(Type::OpenGL) {}
-	RenderAPI(const RenderAPI &) = delete;
-	RenderAPI(RenderAPI &&) = delete;
-	RenderAPI &operator=(const RenderAPI &) = delete;
-	RenderAPI &operator=(RenderAPI &&) = delete;
+	RenderAPI() : renderer::RenderAPI(Type::OpenGL) {}
+	RenderAPI(const RenderAPI&) = delete;
+	RenderAPI(RenderAPI&&) = delete;
+	auto operator=(const RenderAPI&) -> RenderAPI& = delete;
+	auto operator=(RenderAPI&&) -> RenderAPI& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -48,7 +48,7 @@ public:
 	 * @brief Define the background color.
 	 * @param[in] iColor The background color.
 	 */
-	void setClearColor(const math::vec4 &iColor) override;
+	void setClearColor(const math::vec4& iColor) override;
 
 	/**
 	 * @brief Clear the screen.
@@ -60,7 +60,7 @@ public:
 	 * @param[in] iData Draw data to render.
 	 * @param[in] iIndexCount Number of vertex to draw (=0 all).
 	 */
-	void drawData(const shared<DrawData> &iData, uint32_t iIndexCount) override;
+	void drawData(const shared<DrawData>& iData, uint32_t iIndexCount) override;
 
 	/**
 	 * @brief Define the line width.
@@ -72,6 +72,6 @@ public:
 	 * @brief Get the maximum number of texture slots.
 	 * @return Number of texture slots.
 	 */
-	[[nodiscard]] uint32_t getMaxTextureSlots() const override;
+	[[nodiscard]] auto getMaxTextureSlots() const -> uint32_t override;
 };
 }// namespace owl::renderer::opengl

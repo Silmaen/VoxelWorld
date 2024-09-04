@@ -207,14 +207,14 @@ void Application::onEvent(event::Event& ioEvent) {
 	}
 }
 
-bool Application::onWindowClosed(event::WindowCloseEvent&) {
+auto Application::onWindowClosed(event::WindowCloseEvent&) -> bool {
 	OWL_PROFILE_FUNCTION()
 
 	close();
 	return true;
 }
 
-bool Application::onWindowResized(const event::WindowResizeEvent& iEvent) {
+auto Application::onWindowResized(const event::WindowResizeEvent& iEvent) -> bool {
 	OWL_PROFILE_FUNCTION()
 
 	if (iEvent.getWidth() == 0 || iEvent.getHeight() == 0) {
@@ -240,7 +240,7 @@ void Application::pushOverlay(shared<layer::Layer>&& iOverlay) {
 	m_layerStack.pushOverlay(std::move(iOverlay));
 }
 
-bool Application::searchAssets(const std::string& iPattern) {
+auto Application::searchAssets(const std::string& iPattern) -> bool {
 	OWL_PROFILE_FUNCTION()
 	OWL_SCOPE_UNTRACK
 	std::filesystem::path parent = m_workingDirectory;

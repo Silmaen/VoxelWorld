@@ -24,7 +24,7 @@ spdlog::level::level_enum Log::s_verbosity = spdlog::level::trace;
 uint64_t Log::s_frameCounter = 0;
 uint64_t Log::s_frequency = gDefaultFrequency;
 
-void Log::init(const spdlog::level::level_enum &iLevel, const uint64_t iFrequency) {
+void Log::init(const spdlog::level::level_enum& iLevel, const uint64_t iFrequency) {
 	OWL_SCOPE_UNTRACK
 	if (s_coreLogger != nullptr) {
 		OWL_CORE_INFO("Logger already initiated.")
@@ -51,7 +51,7 @@ void Log::init(const spdlog::level::level_enum &iLevel, const uint64_t iFrequenc
 	s_frequency = iFrequency;
 }
 
-void Log::setVerbosityLevel(const spdlog::level::level_enum &iLevel) {
+void Log::setVerbosityLevel(const spdlog::level::level_enum& iLevel) {
 	s_verbosity = iLevel;
 	if (s_coreLogger) {
 		s_coreLogger->set_level(s_verbosity);

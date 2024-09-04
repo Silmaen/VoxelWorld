@@ -33,7 +33,7 @@ void Compas::drawCursors() {
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor});
 }
 
-float Compas::headingToAngle() {
+auto Compas::headingToAngle() -> float {
 	while (heading > 360) heading -= 360;
 	while (heading < 0) heading += 360;
 	return heading;

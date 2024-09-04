@@ -38,23 +38,23 @@ void Input::invalidate() {
 		mus_instance.reset();
 }
 
-bool Input::isKeyPressed(const KeyCode iKeycode) {
+auto Input::isKeyPressed(const KeyCode iKeycode) -> bool {
 	if (mus_instance)
 		return mus_instance->isKeyPressed_impl(iKeycode);
 	return false;
 }
 
-bool Input::isMouseButtonPressed(const MouseCode iMouseCode) {
+auto Input::isMouseButtonPressed(const MouseCode iMouseCode) -> bool {
 	if (mus_instance)
 		return mus_instance->isMouseButtonPressed_impl(iMouseCode);
 	return false;
 }
 
-float Input::getMouseX() { return getMousePos().x(); }
+auto Input::getMouseX() -> float { return getMousePos().x(); }
 
-float Input::getMouseY() { return getMousePos().y(); }
+auto Input::getMouseY() -> float { return getMousePos().y(); }
 
-math::vec2 Input::getMousePos() {
+auto Input::getMousePos() -> math::vec2 {
 	if (mus_instance)
 		return mus_instance->getMousePos_impl();
 	return {};

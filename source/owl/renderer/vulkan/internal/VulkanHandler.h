@@ -22,13 +22,10 @@ namespace owl::renderer::vulkan::internal {
  */
 class VulkanHandler final {
 public:
-	VulkanHandler(const VulkanHandler &) = delete;
-
-	VulkanHandler(VulkanHandler &&) = delete;
-
-	VulkanHandler &operator=(const VulkanHandler &) = delete;
-
-	VulkanHandler &operator=(VulkanHandler &&) = delete;
+	VulkanHandler(const VulkanHandler&) = delete;
+	VulkanHandler(VulkanHandler&&) = delete;
+	auto operator=(const VulkanHandler&) -> VulkanHandler& = delete;
+	auto operator=(VulkanHandler&&) -> VulkanHandler& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -39,7 +36,7 @@ public:
 	 * @brief Handler for vulkan objects
 	 * @return Vulcan handler
 	 */
-	static VulkanHandler &get() {
+	static auto get() -> VulkanHandler& {
 		static VulkanHandler handler;
 		return handler;
 	}
@@ -85,19 +82,19 @@ public:
 	 * @brief Gets the current state of the handler.
 	 * @return The state of the handler.
 	 */
-	[[nodiscard]] const State &getState() const { return m_state; }
+	[[nodiscard]] auto getState() const -> const State& { return m_state; }
 
 	/**
 	 * @brief Define a new state for the vulkan handler
 	 * @param[in] iState The new state.
 	 */
-	void setState(const State &iState) { m_state = iState; }
+	void setState(const State& iState) { m_state = iState; }
 
 	/**
 	 * @brief The vulkan version.
 	 * @return The actual Vulkan version
 	 */
-	[[nodiscard]] int getVersion() const { return m_version; }
+	[[nodiscard]] auto getVersion() const -> int { return m_version; }
 
 	/**
 	 * @brief Activate the validation layer, if not already initialized.
@@ -107,11 +104,11 @@ public:
 			m_validation = true;
 	}
 
-	[[nodiscard]] ImGui_ImplVulkan_InitInfo toImGuiInfo(std::vector<VkFormat> &ioFormats);
+	[[nodiscard]] auto toImGuiInfo(std::vector<VkFormat>& ioFormats) -> ImGui_ImplVulkan_InitInfo;
 
-	[[nodiscard]] VkRenderPass getGlobalRenderPass() const { return m_swapChain->getRenderPass(); }
+	[[nodiscard]] auto getGlobalRenderPass() const -> VkRenderPass { return m_swapChain->getRenderPass(); }
 
-	[[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const;
+	[[nodiscard]] auto getCurrentCommandBuffer() const -> VkCommandBuffer;
 
 	void clear() const;
 
@@ -123,10 +120,10 @@ public:
 		VkPipelineLayout layout = nullptr;
 	};
 
-	[[nodiscard]] PipeLineData getPipeline(int32_t iId) const;
+	[[nodiscard]] auto getPipeline(int32_t iId) const -> PipeLineData;
 
-	int32_t pushPipeline(const std::string &iPipeLineName, std::vector<VkPipelineShaderStageCreateInfo> &iShaderStages,
-						 VkPipelineVertexInputStateCreateInfo iVertexInputInfo, bool iDoubleSided = true);
+	auto pushPipeline(const std::string& iPipeLineName, std::vector<VkPipelineShaderStageCreateInfo>& iShaderStages,
+					  VkPipelineVertexInputStateCreateInfo iVertexInputInfo, bool iDoubleSided = true) -> int32_t;
 
 	// Command buffer data
 	bool inBatch = false;
@@ -148,15 +145,15 @@ public:
 
 	void drawData(uint32_t iVertexCount, bool iIndexed = true);
 
-	void setClearColor(const math::vec4 &iColor);
+	void setClearColor(const math::vec4& iColor);
 
 	void setResize();
 
-	[[nodiscard]] uint32_t getCurrentFrameIndex() const;
+	[[nodiscard]] auto getCurrentFrameIndex() const -> uint32_t;
 
-	void bindFramebuffer(Framebuffer *iFrameBuffer);
+	void bindFramebuffer(Framebuffer* iFrameBuffer);
 	void unbindFramebuffer();
-	[[nodiscard]] std::string getCurrentFrameBufferName() const;
+	[[nodiscard]] auto getCurrentFrameBufferName() const -> std::string;
 
 private:
 	/**
@@ -183,7 +180,7 @@ private:
 	/// The swapchain (main framebuffer).
 	uniq<Framebuffer> m_swapChain;
 	/// The active framebuffer.
-	Framebuffer *m_currentframebuffer = nullptr;
+	Framebuffer* m_currentframebuffer = nullptr;
 
 	math::vec4 m_clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 

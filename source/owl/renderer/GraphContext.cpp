@@ -15,14 +15,14 @@
 
 namespace owl::renderer {
 
-uniq<GraphContext> GraphContext::create(void *ioWindow) {
+auto GraphContext::create(void* ioWindow) -> uniq<GraphContext> {
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
-			return mkUniq<null::GraphContext>(static_cast<GLFWwindow *>(ioWindow));
+			return mkUniq<null::GraphContext>(static_cast<GLFWwindow*>(ioWindow));
 		case RenderAPI::Type::OpenGL:
-			return mkUniq<opengl::GraphContext>(static_cast<GLFWwindow *>(ioWindow));
+			return mkUniq<opengl::GraphContext>(static_cast<GLFWwindow*>(ioWindow));
 		case RenderAPI::Type::Vulkan:
-			return mkUniq<vulkan::GraphContext>(static_cast<GLFWwindow *>(ioWindow));
+			return mkUniq<vulkan::GraphContext>(static_cast<GLFWwindow*>(ioWindow));
 	}
 
 	OWL_CORE_ERROR("Unknown RendererAPI!")

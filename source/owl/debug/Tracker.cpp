@@ -25,10 +25,10 @@ public:
 
 	TrackerState(const TrackerState&) = delete;
 	TrackerState(TrackerState&&) = delete;
-	TrackerState& operator=(const TrackerState&) = delete;
-	TrackerState& operator=(TrackerState&&) = delete;
+	auto operator=(const TrackerState&) -> TrackerState& = delete;
+	auto operator=(TrackerState&&) -> TrackerState& = delete;
 
-	static TrackerState& get() {
+	static auto get() -> TrackerState& {
 		static TrackerState instance;
 		return instance;
 	}
@@ -38,7 +38,7 @@ public:
 		if (m_doTrack.size() > 1)
 			m_doTrack.pop();
 	}
-	[[nodiscard]] bool canTrack() const {
+	[[nodiscard]] auto canTrack() const -> bool {
 		if (m_doTrack.empty())
 			return true;
 		return m_doTrack.top();
@@ -57,7 +57,7 @@ void operator delete(void* iMemory, size_t iSize) OWL_DEALLOC_EXCEPT;
 #endif
 
 // NOLINTBEGIN(*-no-malloc,cppcoreguidelines-owning-memory)
-void* operator new(const size_t iSize) {
+auto operator new(const size_t iSize) -> void* {
 	void* mem = malloc(iSize);
 	owl::debug::TrackerAPI::allocate(mem, iSize);
 	return mem;
@@ -81,14 +81,9 @@ namespace {
 class StateManager {
 public:
 	static void allocate() {
-
-		// NOLINTBEGIN(misc-no-recursion)
-
-		s_globalAllocationState = mkShared<AllocationState>();
-		s_currentAllocationState = mkShared<AllocationState>();
-		s_lastAllocationState = mkShared<AllocationState>();
-
-		// NOLINTEND(misc-no-recursion)
+		s_globalAllocationState = std::make_shared<AllocationState>();
+		s_currentAllocationState = std::make_shared<AllocationState>();
+		s_lastAllocationState = std::make_shared<AllocationState>();
 	}
 	static void pushMemory(void* iLocation, const size_t iSize) {
 		if (!s_globalAllocationState)
@@ -104,8 +99,8 @@ public:
 		s_lastAllocationState->reset();
 		std::swap(s_currentAllocationState, s_lastAllocationState);
 	}
-	[[nodiscard]] static const AllocationState& getLastAllocationState() { return *s_lastAllocationState; }
-	[[nodiscard]] static const AllocationState& getGlobalAllocationState() { return *s_globalAllocationState; }
+	[[nodiscard]] static auto getLastAllocationState() -> const AllocationState& { return *s_lastAllocationState; }
+	[[nodiscard]] static auto getGlobalAllocationState() -> const AllocationState& { return *s_globalAllocationState; }
 
 private:
 	/// Global Memory allocation state's info.
@@ -146,12 +141,12 @@ void TrackerAPI::deallocate(void* iMemoryPtr, const size_t iSize) {
 	s_antiLoop = false;
 }
 
-const AllocationState& TrackerAPI::checkState() {
+auto TrackerAPI::checkState() -> const AllocationState& {
 	StateManager::swapCurrent();
 	return StateManager::getLastAllocationState();
 }
 
-const AllocationState& TrackerAPI::globals() { return StateManager::getGlobalAllocationState(); }
+auto TrackerAPI::globals() -> const AllocationState& { return StateManager::getGlobalAllocationState(); }
 
 // =========================== Allocation Info =================================
 
@@ -161,8 +156,8 @@ AllocationInfo::AllocationInfo(void* iLocation, const size_t iSize) : location{i
 #endif
 }
 
-std::string AllocationInfo::toStr([[maybe_unused]] const bool iTracePrint,
-								  [[maybe_unused]] const bool iFullTrace) const {
+auto AllocationInfo::toStr([[maybe_unused]] const bool iTracePrint,
+						   [[maybe_unused]] const bool iFullTrace) const -> std::string {
 	std::string result = fmt::format("memory chunk at {} size ({})", location, size);
 
 #ifdef OWL_STACKTRACE
@@ -191,7 +186,7 @@ std::string AllocationInfo::toStr([[maybe_unused]] const bool iTracePrint,
 }
 
 #ifdef OWL_STACKTRACE
-const cpptrace::stacktrace_frame& AllocationInfo::getCallerInfo() const {
+auto AllocationInfo::getCallerInfo() const -> const cpptrace::stacktrace_frame& {
 	for (const auto& frame: fullTrace) {
 		if ((!frame.filename.ends_with(".cpp") && !frame.filename.ends_with(".h")) ||
 			frame.filename.ends_with("Tracker.cpp") || frame.filename.ends_with("Core.h") ||

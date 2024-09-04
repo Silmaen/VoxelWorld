@@ -25,14 +25,14 @@ public:
 	 * @param[in] iFilter Filter to apply during the search.
 	 * @return A valid file path or null if canceled.
 	 */
-	static std::filesystem::path openFile(const std::string &iFilter);
+	static auto openFile(const std::string& iFilter) -> std::filesystem::path;
 
 	/**
 	 * @brief Open a file dialog to define a file to create.
 	 * @param[in] iFilter Filter to apply during the search.
 	 * @return A valid file path or null if canceled.
 	 */
-	static std::filesystem::path saveFile(const std::string &iFilter);
+	static auto saveFile(const std::string& iFilter) -> std::filesystem::path;
 };
 
 }// namespace owl::core::utils

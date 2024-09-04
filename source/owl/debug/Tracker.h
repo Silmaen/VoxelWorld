@@ -54,7 +54,7 @@ struct OWL_API AllocationInfo {
 	cpptrace::stacktrace fullTrace;
 	/// @brief Look in the stack for the caller information.
 	/// @return The Calling frame.
-	[[nodiscard]] const cpptrace::stacktrace_frame& getCallerInfo() const;
+	[[nodiscard]] auto getCallerInfo() const -> const cpptrace::stacktrace_frame&;
 #endif
 	/**
 	 * @brief Express this allocation line as a string
@@ -62,7 +62,7 @@ struct OWL_API AllocationInfo {
 	 * @param[in] iFullTrace If we print the full stack trace instead of simplified one.
 	 * @return String of the allocation.
 	 */
-	[[nodiscard]] OWL_API std::string toStr(bool iTracePrint = true, bool iFullTrace = false) const;
+	[[nodiscard]] OWL_API auto toStr(bool iTracePrint = true, bool iFullTrace = false) const -> std::string;
 };
 
 /**
@@ -73,8 +73,8 @@ struct OWL_API AllocationState {
 	AllocationState() = default;
 	AllocationState(const AllocationState&) = default;
 	AllocationState(AllocationState&&) = default;
-	AllocationState& operator=(const AllocationState&) = default;
-	AllocationState& operator=(AllocationState&&) = default;
+	auto operator=(const AllocationState&) -> AllocationState& = default;
+	auto operator=(AllocationState&&) -> AllocationState& = default;
 	/// Amount of allocated memory.
 	size_t allocatedMemory = 0;
 	/// Amount of memory allocation calls.
@@ -123,13 +123,13 @@ public:
 	 * @brief Reset current memory state monitor and give the previous status.
 	 * @return Status since last call to check.
 	 */
-	static const AllocationState& checkState();
+	static auto checkState() -> const AllocationState&;
 
 	/**
 	 * @brief Get the memory state since the start of the program.
 	 * @return Memory state.
 	 */
-	static const AllocationState& globals();
+	static auto globals() -> const AllocationState&;
 };
 
 // ---------- Scope utilities --------------------
@@ -146,8 +146,8 @@ public:
 
 	ScopeUntrack(const ScopeUntrack&) = delete;
 	ScopeUntrack(ScopeUntrack&&) = delete;
-	ScopeUntrack& operator=(const ScopeUntrack&) = delete;
-	ScopeUntrack& operator=(ScopeUntrack&&) = delete;
+	auto operator=(const ScopeUntrack&) -> ScopeUntrack& = delete;
+	auto operator=(ScopeUntrack&&) -> ScopeUntrack& = delete;
 };
 /**
 * @brief Simple class that disable memory tracking during its lifetime.
@@ -161,8 +161,8 @@ public:
 
 	ScopeTrack(const ScopeTrack&) = delete;
 	ScopeTrack(ScopeTrack&&) = delete;
-	ScopeTrack& operator=(const ScopeTrack&) = delete;
-	ScopeTrack& operator=(ScopeTrack&&) = delete;
+	auto operator=(const ScopeTrack&) -> ScopeTrack& = delete;
+	auto operator=(ScopeTrack&&) -> ScopeTrack& = delete;
 };
 
 }// namespace owl::debug

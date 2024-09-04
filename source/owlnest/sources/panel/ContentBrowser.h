@@ -20,21 +20,21 @@ public:
 	/**
 	 * @brief Default copy constructor
 	 */
-	ContentBrowser(const ContentBrowser &) = default;
+	ContentBrowser(const ContentBrowser&) = default;
 	/**
 	 * @brief Default move constructor
 	 */
-	ContentBrowser(ContentBrowser &&) = default;
+	ContentBrowser(ContentBrowser&&) = default;
 	/**
 	 * @brief Default copy assignation
 	 * @return this
 	 */
-	ContentBrowser &operator=(const ContentBrowser &) = default;
+	auto operator=(const ContentBrowser&) -> ContentBrowser& = default;
 	/**
 	 * @brief Default move assignation
 	 * @return this
 	 */
-	ContentBrowser &operator=(ContentBrowser &&) = default;
+	auto operator=(ContentBrowser&&) -> ContentBrowser& = default;
 	/**
 	 * @brief Default constructor.
 	 */

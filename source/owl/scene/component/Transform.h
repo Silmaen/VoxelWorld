@@ -25,9 +25,9 @@ struct OWL_API Transform {
 	 * @brief Get the transformation matrix based on TRS.
 	 * @return The transformation matrix.
 	 */
-	[[nodiscard]] math::mat4 getTransform() const {
-		return math::translate(math::identity<float,4>(), translation) * math::toMat4(math::quat(rotation)) *
-			   math::scale(math::identity<float,4>(), scale);
+	[[nodiscard]] auto getTransform() const -> math::mat4 {
+		return math::translate(math::identity<float, 4>(), translation) * math::toMat4(math::quat(rotation)) *
+			   math::scale(math::identity<float, 4>(), scale);
 	}
 };
 

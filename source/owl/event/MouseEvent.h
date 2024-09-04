@@ -27,19 +27,19 @@ public:
 	 * @brief Get X mouse position.
 	 * @return X mouse position.
 	 */
-	[[nodiscard]] float getX() const { return m_mouseX; }
+	[[nodiscard]] auto getX() const -> float { return m_mouseX; }
 
 	/**
 	 * @brief Get X mouse position.
 	 * @return X mouse position.
 	 */
-	[[nodiscard]] float getY() const { return m_mouseY; }
+	[[nodiscard]] auto getY() const -> float { return m_mouseY; }
 
 	/**
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override {
+	[[nodiscard]] auto toString() const -> std::string override {
 		return fmt::format("MouseMovedEvent: {:.1f}, {:.1f}", m_mouseX, m_mouseY);
 	}
 
@@ -47,25 +47,25 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("MouseMovedEvent"); }
+	[[nodiscard]] auto getName() const -> std::string override { return fmt::format("MouseMovedEvent"); }
 
 	/**
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::MouseMoved; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::MouseMoved; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 
 private:
 	/// X mouse position.
@@ -90,19 +90,19 @@ public:
 	 * @brief Get X wheel offset.
 	 * @return X wheel offset.
 	 */
-	[[nodiscard]] float getXOff() const { return m_xOffset; }
+	[[nodiscard]] auto getXOff() const -> float { return m_xOffset; }
 
 	/**
 	 * @brief Get Y wheel offset.
 	 * @return Y wheel offset.
 	 */
-	[[nodiscard]] float getYOff() const { return m_yOffset; }
+	[[nodiscard]] auto getYOff() const -> float { return m_yOffset; }
 
 	/**
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override {
+	[[nodiscard]] auto toString() const -> std::string override {
 		return fmt::format("MouseScrolledEvent: {}, {}", getXOff(), getYOff());
 	}
 
@@ -110,25 +110,25 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("MouseScrolledEvent"); }
+	[[nodiscard]] auto getName() const -> std::string override { return fmt::format("MouseScrolledEvent"); }
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::MouseScrolled; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::MouseScrolled; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 
 	/**
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
 
 private:
 	/// X wheel offset.
@@ -146,13 +146,13 @@ public:
 	 * @brief Get the mouse button involved in Event.
 	 * @return The mouse button.
 	 */
-	[[nodiscard]] input::MouseCode getMouseButton() const { return m_mouseButton; }
+	[[nodiscard]] auto getMouseButton() const -> input::MouseCode { return m_mouseButton; }
 
 	/**
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
 
 protected:
 	/**
@@ -180,7 +180,7 @@ public:
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override {
+	[[nodiscard]] auto toString() const -> std::string override {
 		return fmt::format("MouseButtonPressedEvent: {}", m_mouseButton);
 	}
 
@@ -188,19 +188,19 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override;
+	[[nodiscard]] auto getName() const -> std::string override;
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::MouseButtonPressed; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::MouseButtonPressed; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 };
 
 /**
@@ -218,7 +218,7 @@ public:
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override {
+	[[nodiscard]] auto toString() const -> std::string override {
 		return fmt::format("MouseButtonReleasedEvent: {}", m_mouseButton);
 	}
 
@@ -226,18 +226,18 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override;
+	[[nodiscard]] auto getName() const -> std::string override;
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::MouseButtonReleased; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::MouseButtonReleased; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 };
 }// namespace owl::event

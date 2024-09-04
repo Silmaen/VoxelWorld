@@ -14,8 +14,8 @@ namespace owl::renderer::opengl {
 
 DrawData::~DrawData() = default;
 
-void DrawData::init(const BufferLayout &iLayout, const std::string &iRenderer, std::vector<uint32_t> &iIndices,
-                    const std::string &iShaderName) {
+void DrawData::init(const BufferLayout& iLayout, const std::string& iRenderer, std::vector<uint32_t>& iIndices,
+					const std::string& iShaderName) {
 	if (iLayout.getStride() > 0) {
 		mp_vertexArray = mkShared<opengl::VertexArray>();
 		mp_vertexBuffer = mkShared<opengl::VertexBuffer>(iLayout.getStride() * iIndices.size());
@@ -40,19 +40,19 @@ void DrawData::unbind() const {
 		mp_shader->unbind();
 }
 
-void DrawData::setVertexData(const void *iData, const uint32_t iSize) {
+void DrawData::setVertexData(const void* iData, const uint32_t iSize) {
 	if (mp_vertexBuffer)
 		mp_vertexBuffer->setData(iData, iSize);
 }
 
-uint32_t DrawData::getIndexCount() const {
+auto DrawData::getIndexCount() const -> uint32_t {
 	if (mp_vertexArray)
 		return mp_vertexArray->getIndexBuffer()->getCount();
 	return 0;
 }
 
-void DrawData::setShader(const std::string &iShaderName, const std::string &iRenderer) {
-	auto &shLib = Renderer::getShaderLibrary();
+void DrawData::setShader(const std::string& iShaderName, const std::string& iRenderer) {
+	auto& shLib = Renderer::getShaderLibrary();
 	if (!shLib.exists(iShaderName, iRenderer))
 		shLib.addFromStandardPath(iShaderName, iRenderer);
 	mp_shader = static_pointer_cast<Shader>(shLib.get(iShaderName, iRenderer));

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "Core.h"
 #include "external/spdlog.h"
 #include "math/linAlgebra.h"
 
@@ -17,7 +16,7 @@
  */
 namespace owl::core {
 
-/// Default frequency for frame ooutput.
+/// Default frequency for frame output.
 constexpr uint64_t gDefaultFrequency{100};
 
 /**
@@ -28,7 +27,7 @@ public:
 	/**
 	 * @brief initialize the logging system.
 	 * @param[in] iLevel Verbosity level of the logger.
-	 * @param[in] iFrequency Frequence of frame outputput (number of frames).
+	 * @param[in] iFrequency Frequency of frame output (number of frames).
 	 */
 	static void init(const spdlog::level::level_enum& iLevel = spdlog::level::trace,
 					 uint64_t iFrequency = gDefaultFrequency);
@@ -37,13 +36,13 @@ public:
 	 * @brief Access to the logger for the core system.
 	 * @return The Core logger.
 	 */
-	static shared<spdlog::logger> getCoreLogger() { return s_coreLogger; }
+	static auto getCoreLogger() -> shared<spdlog::logger> { return s_coreLogger; }
 
 	/**
 	 * @brief Access to the logger for the application system.
 	 * @return The application logger.
 	 */
-	static shared<spdlog::logger> getClientLogger() { return s_clientLogger; }
+	static auto getClientLogger() -> shared<spdlog::logger> { return s_clientLogger; }
 
 	/**
 	 * @brief Defines the Verbosity level
@@ -60,13 +59,13 @@ public:
 	 * @brief Check if logger is initiated.
 	 * @return True if initiated.
 	 */
-	static bool initiated() { return s_coreLogger != nullptr; }
+	static auto initiated() -> bool { return s_coreLogger != nullptr; }
 
 	/**
 	 * @brief To know if in logging frame.
 	 * @return True if in logging frame.
 	 */
-	static bool frameLog() { return s_frequency > 0 && s_frameCounter % s_frequency == 0; }
+	static auto frameLog() -> bool { return s_frequency > 0 && s_frameCounter % s_frequency == 0; }
 
 	/**
 	 * @brief Start a new logging frame.
@@ -74,7 +73,7 @@ public:
 	static void newFrame();
 
 	/**
-	 * @brief define a new frame log frequncy.
+	 * @brief define a new frame log frequency.
 	 * @param[in] iFrequency New frequency.
 	 */
 	static void setFrameFrequency(const uint64_t iFrequency) { s_frequency = iFrequency; }

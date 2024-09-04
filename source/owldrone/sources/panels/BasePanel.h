@@ -30,28 +30,28 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	BasePanel(const BasePanel &) = default;
+	BasePanel(const BasePanel&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	BasePanel(BasePanel &&) = default;
+	BasePanel(BasePanel&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	BasePanel &operator=(const BasePanel &) = default;
+	auto operator=(const BasePanel&) -> BasePanel& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	BasePanel &operator=(BasePanel &&) = default;
+	auto operator=(BasePanel&&) -> BasePanel& = default;
 
 	/**
 	 * @brief Update panel Status.
 	 * @param ts The Time delta of the frame.
 	 */
-	virtual void onUpdate(const owl::core::Timestep &ts) = 0;
+	virtual void onUpdate(const owl::core::Timestep& ts) = 0;
 
 	/**
 	 * @brief Do the rendering.
@@ -62,13 +62,13 @@ public:
 	 * @brief Define the remote controller.
 	 * @param remote The new remote controller.
 	 */
-	void setRemoteController(const owl::shared<controller::RemoteController> &remote) { rc = remote; }
+	void setRemoteController(const owl::shared<controller::RemoteController>& remote) { rc = remote; }
 
 	/**
 	 * @brief Access to the remote controller.
 	 * @return The remote controller.
 	 */
-	[[nodiscard]] const owl::shared<controller::RemoteController> &getRemoteController() const { return rc; }
+	[[nodiscard]] auto getRemoteController() const -> const owl::shared<controller::RemoteController>& { return rc; }
 
 private:
 	/// pointer to the remote controller

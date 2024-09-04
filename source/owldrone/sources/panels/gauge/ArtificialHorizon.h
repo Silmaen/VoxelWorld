@@ -13,7 +13,7 @@ namespace drone::panels::gauge {
 /**
  * @brief Class ArtificialHorizon
  */
-class ArtificialHorizon final: public BaseGauge {
+class ArtificialHorizon final : public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.
@@ -28,22 +28,22 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	ArtificialHorizon(const ArtificialHorizon &) = default;
+	ArtificialHorizon(const ArtificialHorizon&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	ArtificialHorizon(ArtificialHorizon &&) = default;
+	ArtificialHorizon(ArtificialHorizon&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	ArtificialHorizon &operator=(const ArtificialHorizon &) = default;
+	auto operator=(const ArtificialHorizon&) -> ArtificialHorizon& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	ArtificialHorizon &operator=(ArtificialHorizon &&) = default;
+	auto operator=(ArtificialHorizon&&) -> ArtificialHorizon& = default;
 
 	/**
 	 * @brief Draw the  gauge back ground.

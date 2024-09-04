@@ -21,7 +21,7 @@ OWL_DIAG_DISABLE_CLANG("-Wimplicit-float-conversion")
  * @return Angle in radians.
  */
 template<typename BaseType>
-constexpr BaseType radians(const BaseType& iInput) {
+constexpr auto radians(const BaseType& iInput) -> BaseType {
 	return iInput * BaseType{0.01745329251994329576923690768489};
 }
 /**
@@ -31,7 +31,7 @@ constexpr BaseType radians(const BaseType& iInput) {
  * @return Angle in radians.
  */
 template<typename BaseType, size_t Dim>
-constexpr Vector<BaseType, Dim> radians(const Vector<BaseType, Dim>& iInput) {
+constexpr auto radians(const Vector<BaseType, Dim>& iInput) -> Vector<BaseType, Dim> {
 	return iInput * BaseType{0.01745329251994329576923690768489};
 }
 
@@ -42,7 +42,7 @@ constexpr Vector<BaseType, Dim> radians(const Vector<BaseType, Dim>& iInput) {
  * @return Angle in degrees.
  */
 template<typename BaseType>
-constexpr BaseType degrees(const BaseType& iInput) {
+constexpr auto degrees(const BaseType& iInput) -> BaseType {
 	return iInput / BaseType{0.01745329251994329576923690768489};
 }
 /**
@@ -52,7 +52,7 @@ constexpr BaseType degrees(const BaseType& iInput) {
  * @return Angle in degrees.
  */
 template<typename BaseType, size_t Dim>
-constexpr Vector<BaseType, Dim> degrees(const Vector<BaseType, Dim>& iInput) {
+constexpr auto degrees(const Vector<BaseType, Dim>& iInput) -> Vector<BaseType, Dim> {
 	return iInput / BaseType{0.01745329251994329576923690768489};
 }
 OWL_DIAG_POP
@@ -63,7 +63,7 @@ OWL_DIAG_POP
  * @return Value of epsilon.
  */
 template<typename BaseType>
-constexpr BaseType epsilon() {
+constexpr auto epsilon() -> BaseType {
 	return std::numeric_limits<BaseType>::epsilon();
 }
 
@@ -76,7 +76,7 @@ constexpr BaseType epsilon() {
  * @return True if the 2 values are nearly equal.
  */
 template<typename BaseType>
-constexpr bool epsilonEqual(const BaseType& iA, const BaseType& iB, const BaseType& iEpsi) {
+constexpr auto epsilonEqual(const BaseType& iA, const BaseType& iB, const BaseType& iEpsi) -> bool {
 	return std::abs(iA - iB) < iEpsi;
 }
 
@@ -89,7 +89,7 @@ constexpr bool epsilonEqual(const BaseType& iA, const BaseType& iB, const BaseTy
  * @return True if the 2 values are not nearly equal.
  */
 template<typename BaseType>
-constexpr bool epsilonNotEqual(const BaseType& iA, const BaseType& iB, const BaseType& iEpsi) {
+constexpr auto epsilonNotEqual(const BaseType& iA, const BaseType& iB, const BaseType& iEpsi) -> bool {
 	return std::abs(iA - iB) > iEpsi;
 }
 
@@ -103,8 +103,8 @@ constexpr bool epsilonNotEqual(const BaseType& iA, const BaseType& iB, const Bas
  * @return The resulting vector.
  */
 template<typename BaseType, std::size_t NRow, std::size_t NCol>
-constexpr Vector<BaseType, NRow> operator*(const Matrix<BaseType, NRow, NCol>& iMatrix,
-										   const Vector<BaseType, NCol>& iVector) {
+constexpr auto operator*(const Matrix<BaseType, NRow, NCol>& iMatrix,
+						 const Vector<BaseType, NCol>& iVector) -> Vector<BaseType, NRow> {
 	Vector<BaseType, NRow> result{};
 	for (std::size_t idx = 0; idx < NRow; ++idx) {
 		for (std::size_t it = 0; it < NCol; ++it) { result[idx] += iMatrix(idx, it) * iVector[it]; }
@@ -121,8 +121,8 @@ constexpr Vector<BaseType, NRow> operator*(const Matrix<BaseType, NRow, NCol>& i
  * @return The resulting vector.
  */
 template<typename BaseType, std::size_t NRow, std::size_t NCol>
-constexpr Vector<BaseType, NCol> operator*(const Vector<BaseType, NRow>& iVector,
-										   const Matrix<BaseType, NRow, NCol>& iMatrix) {
+constexpr auto operator*(const Vector<BaseType, NRow>& iVector,
+						 const Matrix<BaseType, NRow, NCol>& iMatrix) -> Vector<BaseType, NCol> {
 	Vector<BaseType, NRow> result{};
 	for (std::size_t idx = 0; idx < NCol; ++idx) {
 		for (std::size_t it = 0; it < NRow; ++it) { result[idx] += iMatrix(it, idx) * iVector[it]; }

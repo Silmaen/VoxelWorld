@@ -61,7 +61,7 @@ void Window::init(const Properties& iProps) {
 		OWL_PROFILE_SCOPE("glfwCreateWindow")
 		const auto api = renderer::RenderCommand::getApi();
 		if (api == renderer::RenderAPI::Type::Vulkan) {
-			if (!glfwVulkanSupported()) {
+			if (glfwVulkanSupported() == GLFW_FALSE) {
 				OWL_CORE_CRITICAL("No Vulkan support for glfw.")
 				return;
 			}
@@ -117,7 +117,7 @@ void Window::init(const Properties& iProps) {
 			switch (iAction) {
 				case GLFW_PRESS:
 					{
-						event::KeyPressedEvent event(cKey, false);
+						event::KeyPressedEvent event(cKey, 0u);
 						static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 						break;
 					}
@@ -129,7 +129,7 @@ void Window::init(const Properties& iProps) {
 					}
 				case GLFW_REPEAT:
 					{
-						event::KeyPressedEvent event(cKey, true);
+						event::KeyPressedEvent event(cKey, 1u);
 						static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 						break;
 					}
@@ -211,6 +211,6 @@ void Window::setVSync(const bool iEnabled) {
 	m_windowData.vSync = iEnabled;
 }
 
-bool Window::isVSync() const { return m_windowData.vSync; }
+auto Window::isVSync() const -> bool { return m_windowData.vSync; }
 
 }// namespace owl::input::glfw

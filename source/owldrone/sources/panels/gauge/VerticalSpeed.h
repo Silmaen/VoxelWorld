@@ -38,12 +38,12 @@ public:
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	VerticalSpeed& operator=(const VerticalSpeed&) = default;
+	auto operator=(const VerticalSpeed&) -> VerticalSpeed& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	VerticalSpeed& operator=(VerticalSpeed&&) = default;
+	auto operator=(VerticalSpeed&&) -> VerticalSpeed& = default;
 
 	/**
 	 * @brief Draw the  gauge back ground.
@@ -64,9 +64,9 @@ public:
 private:
 	float verticalVelocity = 0.f;
 
-	[[nodiscard]] float velocityToAngle() const;
+	[[nodiscard]] auto velocityToAngle() const -> float;
 
 	owl::shared<owl::renderer::Texture> background = nullptr;
 	owl::shared<owl::renderer::Texture> cursor = nullptr;
 };
-} // namespace drone::panels::gauge
+}// namespace drone::panels::gauge

@@ -16,10 +16,10 @@ namespace owl::renderer {
 class OWL_API UniformBuffer {
 public:
 	UniformBuffer() = default;
-	UniformBuffer(const UniformBuffer &) = default;
-	UniformBuffer(UniformBuffer &&) = default;
-	UniformBuffer &operator=(const UniformBuffer &) = default;
-	UniformBuffer &operator=(UniformBuffer &&) = default;
+	UniformBuffer(const UniformBuffer&) = default;
+	UniformBuffer(UniformBuffer&&) = default;
+	auto operator=(const UniformBuffer&) -> UniformBuffer& = default;
+	auto operator=(UniformBuffer&&) -> UniformBuffer& = default;
 
 	/**
 	 * @brief Destructor.
@@ -32,7 +32,7 @@ public:
 	 * @param[in] iSize The data size.
 	 * @param[in] iOffset The offset to start.
 	 */
-	virtual void setData(const void *iData, uint32_t iSize, uint32_t iOffset) = 0;
+	virtual void setData(const void* iData, uint32_t iSize, uint32_t iOffset) = 0;
 
 	/**
 	 * @brief bind this uniform buffer.
@@ -46,7 +46,7 @@ public:
 	 * @param[in] iRenderer Name of the shader's related renderer.
 	 * @return New instance of UniformBuffer.
 	 */
-	static shared<UniformBuffer> create(uint32_t iSize, uint32_t iBinding, const std::string &iRenderer);
+	static auto create(uint32_t iSize, uint32_t iBinding, const std::string& iRenderer) -> shared<UniformBuffer>;
 };
 
 }// namespace owl::renderer

@@ -36,7 +36,7 @@ void VerticalSpeed::drawCursors() {
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor});
 }
 
-float VerticalSpeed::velocityToAngle() const {
+auto VerticalSpeed::velocityToAngle() const -> float {
 	return -std::clamp(verticalVelocity, -maxVelocity, maxVelocity) / maxVelocity * maxAngle;
 }
 

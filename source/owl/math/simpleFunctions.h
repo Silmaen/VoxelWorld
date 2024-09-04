@@ -23,7 +23,7 @@ namespace owl::math {
  * @return Clamped value.
  */
 template<typename Data>
-constexpr Data clamp(const Data &iValue, const Data &iMinValue, const Data &iMaxValue) {
+constexpr auto clamp(const Data& iValue, const Data& iMinValue, const Data& iMaxValue) -> Data {
 	return iValue < iMinValue ? iMinValue : iValue > iMaxValue ? iMaxValue : iValue;
 }
 
@@ -36,7 +36,7 @@ constexpr Data clamp(const Data &iValue, const Data &iMinValue, const Data &iMax
  * @return Clamped value.
  */
 template<typename Data>
-constexpr Data clampSafe(const Data &iValue, Data iMinValue, Data iMaxValue) {
+constexpr auto clampSafe(const Data& iValue, Data iMinValue, Data iMaxValue) -> Data {
 	if (iMaxValue < iMinValue)
 		std::swap(iMinValue, iMaxValue);
 	return iValue < iMinValue ? iMinValue : iValue > iMaxValue ? iMaxValue : iValue;
@@ -49,7 +49,7 @@ constexpr Data clampSafe(const Data &iValue, Data iMinValue, Data iMaxValue) {
  * @return 1 if input positive, else return 0.
  */
 template<typename Data>
-constexpr Data heaviside(const Data &iValue) {
+constexpr auto heaviside(const Data& iValue) -> Data {
 	return iValue > 0 ? Data{1} : Data{};
 }
 
@@ -60,7 +60,7 @@ constexpr Data heaviside(const Data &iValue) {
  * @return 0 if input is 0 1 if input positive, else return -1.
  */
 template<typename Data>
-constexpr Data sign(const Data &iValue) {
+constexpr auto sign(const Data& iValue) -> Data {
 	return iValue > 0 ? Data{1} : (iValue < 0 ? Data{-1} : 0);
 }
 // NOLINTEND(readability-avoid-nested-conditional-operator)

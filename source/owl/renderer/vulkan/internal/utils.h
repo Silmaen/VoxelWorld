@@ -10,7 +10,7 @@
 #include "../Framebuffer.h"
 
 namespace owl::renderer::vulkan::internal {
-static constexpr std::string resultString(const VkResult iResult) {
+static constexpr auto resultString(const VkResult iResult) -> std::string {
 	switch (iResult) {
 		case VK_SUCCESS:
 			return "VK_SUCCESS";
@@ -112,32 +112,32 @@ static constexpr std::string resultString(const VkResult iResult) {
 	return "VK_RESULT_unknown";
 }
 
-VkFormat attachmentFormatToVulkan(const AttachmentSpecification::Format &iFormat);
+auto attachmentFormatToVulkan(const AttachmentSpecification::Format& iFormat) -> VkFormat;
 
-VkImageAspectFlags attachmentFormatToAspect(const AttachmentSpecification::Format &iFormat);
+auto attachmentFormatToAspect(const AttachmentSpecification::Format& iFormat) -> VkImageAspectFlags;
 
-uint32_t attachmentFormatToSize(const AttachmentSpecification::Format &iFormat);
+auto attachmentFormatToSize(const AttachmentSpecification::Format& iFormat) -> uint32_t;
 
-VkImageTiling attachmentTilingToVulkan(const AttachmentSpecification::Tiling &iTiling);
+auto attachmentTilingToVulkan(const AttachmentSpecification::Tiling& iTiling) -> VkImageTiling;
 
-void copyBuffer(const VkBuffer &iSrcBuffer, const VkBuffer &iDstBuffer, VkDeviceSize iSize);
+void copyBuffer(const VkBuffer& iSrcBuffer, const VkBuffer& iDstBuffer, VkDeviceSize iSize);
 
-void createBuffer(VkDeviceSize iSize, VkBufferUsageFlags iUsage, VkMemoryPropertyFlags iProperties, VkBuffer &iBuffer,
-				  VkDeviceMemory &iBufferMemory);
+void createBuffer(VkDeviceSize iSize, VkBufferUsageFlags iUsage, VkMemoryPropertyFlags iProperties, VkBuffer& iBuffer,
+				  VkDeviceMemory& iBufferMemory);
 
-void freeBuffer(const VkDevice &iDevice, const VkBuffer &iBuffer, const VkDeviceMemory &iBufferMemory);
+void freeBuffer(const VkDevice& iDevice, const VkBuffer& iBuffer, const VkDeviceMemory& iBufferMemory);
 
-void transitionImageLayout(const VkImage &iImage, VkImageLayout iOldLayout, VkImageLayout iNewLayout);
-void transitionImageLayout(const VkCommandBuffer &iCmd, const VkImage &iImage, VkImageLayout iOldLayout,
+void transitionImageLayout(const VkImage& iImage, VkImageLayout iOldLayout, VkImageLayout iNewLayout);
+void transitionImageLayout(const VkCommandBuffer& iCmd, const VkImage& iImage, VkImageLayout iOldLayout,
 						   VkImageLayout iNewLayout);
 
-void copyBufferToImage(const VkBuffer &iBuffer, const VkImage &iImage, const math::vec2ui &iSize,
-					   const math::vec2ui &iOffset = {0, 0});
+void copyBufferToImage(const VkBuffer& iBuffer, const VkImage& iImage, const math::vec2ui& iSize,
+					   const math::vec2ui& iOffset = {0, 0});
 
-void copyImageToBuffer(const VkImage &iImage, const VkBuffer &iBuffer, const math::vec2ui &iSize,
-					   const math::vec2ui &iOffset = {0, 0});
+void copyImageToBuffer(const VkImage& iImage, const VkBuffer& iBuffer, const math::vec2ui& iSize,
+					   const math::vec2ui& iOffset = {0, 0});
 
-static constexpr VkExtent2D toExtent(const math::vec2ui &iSize) { return {iSize.x(), iSize.y()}; }
+static constexpr auto toExtent(const math::vec2ui& iSize) -> VkExtent2D { return {iSize.x(), iSize.y()}; }
 
-static constexpr math::vec2ui toSize(const VkExtent2D &iSize) { return {iSize.width, iSize.height}; }
+static constexpr auto toSize(const VkExtent2D& iSize) -> math::vec2ui { return {iSize.width, iSize.height}; }
 }// namespace owl::renderer::vulkan::internal

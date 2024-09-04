@@ -17,7 +17,7 @@ namespace owl::renderer {
 
 DrawData::~DrawData() = default;
 
-shared<DrawData> DrawData::create() {
+auto DrawData::create() -> shared<DrawData> {
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkShared<null::DrawData>();

@@ -12,7 +12,6 @@
 #include "../GraphContext.h"
 #include "Descriptors.h"
 #include "core/Application.h"
-#include "renderer/utils/shaderFileUtils.h"
 #include "utils.h"
 
 namespace owl::renderer::vulkan::internal {
@@ -81,7 +80,7 @@ void func(const VkResult iResult) {
 }
 }// namespace
 
-ImGui_ImplVulkan_InitInfo VulkanHandler::toImGuiInfo(std::vector<VkFormat>& ioFormats) {
+auto VulkanHandler::toImGuiInfo(std::vector<VkFormat>& ioFormats) -> ImGui_ImplVulkan_InitInfo {
 	const auto& core = VulkanCore::get();
 	auto& vkd = Descriptors::get();
 	vkd.createImguiDescriptorPool();
@@ -124,8 +123,10 @@ void VulkanHandler::createSwapChain() {
 			.size = core.getCurrentSize(),
 			.attachments =
 					{
-							{AttachmentSpecification::Format::Surface, AttachmentSpecification::Tiling::Optimal},
-							{AttachmentSpecification::Format::RedInteger, AttachmentSpecification::Tiling::Optimal},
+							{.format = AttachmentSpecification::Format::Surface,
+							 .tiling = AttachmentSpecification::Tiling::Optimal},
+							{.format = AttachmentSpecification::Format::RedInteger,
+							 .tiling = AttachmentSpecification::Tiling::Optimal},
 							//{AttachmentSpecification::Format::Depth24Stencil8,
 							// AttachmentSpecification::Tiling::Optimal}
 					},
@@ -135,19 +136,19 @@ void VulkanHandler::createSwapChain() {
 	unbindFramebuffer();
 }
 
-VulkanHandler::PipeLineData VulkanHandler::getPipeline(const int32_t iId) const {
+auto VulkanHandler::getPipeline(const int32_t iId) const -> VulkanHandler::PipeLineData {
 	if (m_state == State::Running || !m_pipeLines.contains(iId))
 		return {};
 	return m_pipeLines.at(iId);
 }
 
-VkCommandBuffer VulkanHandler::getCurrentCommandBuffer() const {
+auto VulkanHandler::getCurrentCommandBuffer() const -> VkCommandBuffer {
 	return *m_currentframebuffer->getCurrentCommandbuffer();
 }
 
-int32_t VulkanHandler::pushPipeline(const std::string& iPipeLineName,
-									std::vector<VkPipelineShaderStageCreateInfo>& iShaderStages,
-									VkPipelineVertexInputStateCreateInfo iVertexInputInfo, bool iDoubleSided) {
+auto VulkanHandler::pushPipeline(const std::string& iPipeLineName,
+								 std::vector<VkPipelineShaderStageCreateInfo>& iShaderStages,
+								 VkPipelineVertexInputStateCreateInfo iVertexInputInfo, bool iDoubleSided) -> int32_t {
 	const auto& core = VulkanCore::get();
 	auto& vkd = Descriptors::get();
 	PipeLineData pData;
@@ -501,12 +502,12 @@ void VulkanHandler::unbindFramebuffer() {
 	m_currentframebuffer = m_swapChain.get();
 }
 
-std::string VulkanHandler::getCurrentFrameBufferName() const {
+auto VulkanHandler::getCurrentFrameBufferName() const -> std::string {
 	if (m_currentframebuffer == nullptr)
 		return "none";
 	return m_currentframebuffer->getName();
 }
 
-uint32_t VulkanHandler::getCurrentFrameIndex() const { return m_swapChain->getImageIndex(); }
+auto VulkanHandler::getCurrentFrameIndex() const -> uint32_t { return m_swapChain->getImageIndex(); }
 
 }// namespace owl::renderer::vulkan::internal

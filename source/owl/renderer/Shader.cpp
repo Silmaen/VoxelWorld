@@ -18,7 +18,7 @@
 
 namespace owl::renderer {
 
-shared<Shader> Shader::create(const std::string& iShaderName, const std::string& iRenderer) {
+auto Shader::create(const std::string& iShaderName, const std::string& iRenderer) -> shared<Shader> {
 	const auto type = RenderCommand::getApi();
 	std::filesystem::path shaderDir;
 	if (RenderCommand::requireInit()) {
@@ -35,8 +35,8 @@ shared<Shader> Shader::create(const std::string& iShaderName, const std::string&
 	return create(iShaderName, iRenderer, shaderDir);
 }
 
-shared<Shader> Shader::create(const std::string& iShaderName, const std::string& iRenderer,
-							  const std::filesystem::path& iFile) {
+auto Shader::create(const std::string& iShaderName, const std::string& iRenderer,
+					const std::filesystem::path& iFile) -> shared<Shader> {
 	std::vector<std::filesystem::path> sources;
 	if (is_directory(iFile)) {
 		for (const auto& f: std::filesystem::directory_iterator(iFile)) {

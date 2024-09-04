@@ -18,7 +18,7 @@
  * @return Execution code.
  */
 // NOLINTBEGIN(misc-definitions-in-headers)
-int main(int iArgc, char* iArgv[]) {
+auto main(int iArgc, char* iArgv[]) -> int {
 	owl::core::Log::init();
 	{
 		// Startup

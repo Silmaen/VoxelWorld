@@ -48,8 +48,8 @@ public:
 	Window() = default;
 	Window(const Window&) = delete;
 	Window(Window&&) = delete;
-	Window& operator=(const Window&) = delete;
-	Window& operator=(Window&&) = delete;
+	auto operator=(const Window&) -> Window& = delete;
+	auto operator=(Window&&) -> Window& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -65,25 +65,25 @@ public:
 	 * @brief Get Size attribute of width.
 	 * @return The window's width.
 	 */
-	[[nodiscard]] virtual uint32_t getWidth() const = 0;
+	[[nodiscard]] virtual auto getWidth() const -> uint32_t = 0;
 
 	/**
 	 * @brief Get Size attribute of height.
 	 * @return The window's height.
 	 */
-	[[nodiscard]] virtual uint32_t getHeight() const = 0;
+	[[nodiscard]] virtual auto getHeight() const -> uint32_t = 0;
 
 	/**
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] virtual const math::vec2ui& getSize() const = 0;
+	[[nodiscard]] virtual auto getSize() const -> const math::vec2ui& = 0;
 
 	/**
 	 * @brief Get the type of window manager.
 	 * @return The window manager's type.
 	 */
-	[[nodiscard]] virtual Type getType() const = 0;
+	[[nodiscard]] virtual auto getType() const -> Type = 0;
 
 	/**
 	 * @brief Define the Event Callback function.
@@ -101,26 +101,26 @@ public:
 	 * @brief Check for VSync.
 	 * @return True if VSync enabled.
 	 */
-	[[nodiscard]] virtual bool isVSync() const = 0;
+	[[nodiscard]] virtual auto isVSync() const -> bool = 0;
 
 	/**
 	 * @brief Access to the Native Window.
 	 * @return Native window's raw pointer.
 	 */
-	[[nodiscard]] virtual void* getNativeWindow() const = 0;
+	[[nodiscard]] virtual auto getNativeWindow() const -> void* = 0;
 
 	/**
 	 * @brief Helper for Window creation.
 	 * @param[in] iProps The window properties.
 	 * @return Pointer to the window.
 	 */
-	static uniq<Window> create(const Properties& iProps = Properties());
+	static auto create(const Properties& iProps = Properties()) -> uniq<Window>;
 
 	/**
 	 * @brief Access to the graph context.
 	 * @return Graph context.
 	 */
-	[[nodiscard]] renderer::GraphContext* getGraphContext() const { return mu_context.get(); }
+	[[nodiscard]] auto getGraphContext() const -> renderer::GraphContext* { return mu_context.get(); }
 
 	/**
 	 * @brief Terminate the window.

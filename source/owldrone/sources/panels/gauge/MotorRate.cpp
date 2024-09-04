@@ -51,7 +51,9 @@ void MotorRate::drawCursors() {
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor4});
 }
 
-float MotorRate::rateToAngle(uint8_t idx) const { return -std::clamp(rates[idx], 0.f, maxRate) / maxRate * maxAngle; }
+auto MotorRate::rateToAngle(uint8_t idx) const -> float {
+	return -std::clamp(rates[idx], 0.f, maxRate) / maxRate * maxAngle;
+}
 
 
 }// namespace drone::panels::gauge

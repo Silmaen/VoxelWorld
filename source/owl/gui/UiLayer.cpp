@@ -24,7 +24,7 @@ namespace owl::gui {
 
 namespace {
 
-ImVec4 vec2Im(const math::vec4& iVec) { return {iVec.x(), iVec.y(), iVec.z(), iVec.w()}; }
+auto vec2Im(const math::vec4& iVec) -> ImVec4 { return {iVec.x(), iVec.y(), iVec.z(), iVec.w()}; }
 
 }// namespace
 
@@ -102,12 +102,12 @@ void UiLayer::onDetach() {
 void UiLayer::onEvent(event::Event& ioEvent) {
 	if (m_blockEvent) {
 		const ImGuiIO& io = ImGui::GetIO();
-		ioEvent.handled |= ioEvent.isInCategory(event::Category::Mouse) & io.WantCaptureMouse;
-		ioEvent.handled |= ioEvent.isInCategory(event::Category::Keyboard) & io.WantCaptureKeyboard;
+		ioEvent.handled |= ioEvent.isInCategory(event::Category::Mouse) && io.WantCaptureMouse;
+		ioEvent.handled |= ioEvent.isInCategory(event::Category::Keyboard) && io.WantCaptureKeyboard;
 	}
 }
 
-void UiLayer::begin() {
+void UiLayer::begin() const {
 	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
 		ImGui_ImplOpenGL3_NewFrame();
 	else if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
@@ -145,7 +145,7 @@ void UiLayer::end() const {
 		renderer::RenderCommand::endBatch();
 	}
 
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+	if ((io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
 		GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
@@ -156,6 +156,8 @@ void UiLayer::end() const {
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
+
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 void UiLayer::setTheme(const Theme& iTheme) {
 
 	// Setup Dear ImGui style
@@ -240,7 +242,7 @@ void UiLayer::setTheme(const Theme& iTheme) {
 	auto& style = ImGui::GetStyle();
 	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
 	// windows can look identical to regular ones.
-	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+	if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
 		style.WindowRounding = 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
@@ -271,7 +273,7 @@ void UiLayer::initializeDocking() {
 	}
 	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle
 	// the pass-thru hole, so we ask Begin() to not render a background.
-	if (dockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+	if ((dockSpaceFlags & ImGuiDockNodeFlags_PassthruCentralNode) != 0)
 		windowFlags |= ImGuiWindowFlags_NoBackground;
 	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
 	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
@@ -288,11 +290,12 @@ void UiLayer::initializeDocking() {
 	ImGuiStyle& style = ImGui::GetStyle();
 	const float minWinSizeX = style.WindowMinSize.x;
 	style.WindowMinSize.x = 370.0f;
-	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+	if ((io.ConfigFlags & ImGuiConfigFlags_DockingEnable) != 0) {
 		const ImGuiID dockSpaceId = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), dockSpaceFlags);
 	}
 	style.WindowMinSize.x = minWinSizeX;
 }
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 }// namespace owl::gui

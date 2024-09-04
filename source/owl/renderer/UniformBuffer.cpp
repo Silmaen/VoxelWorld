@@ -15,7 +15,7 @@
 
 namespace owl::renderer {
 
-shared<UniformBuffer> UniformBuffer::create(uint32_t iSize, uint32_t iBinding, const std::string &iRenderer) {
+auto UniformBuffer::create(uint32_t iSize, uint32_t iBinding, const std::string& iRenderer) -> shared<UniformBuffer> {
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
 			return mkShared<null::UniformBuffer>(iSize, iBinding);

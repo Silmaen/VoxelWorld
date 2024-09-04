@@ -18,12 +18,12 @@
 
 namespace owl::input::video::windows {
 
-constexpr uint64_t g_mask32 = 0xffffffff;
-
 namespace {
 
+constexpr uint64_t g_mask32 = 0xffffffff;
+
 struct ComControl {
-	bool addRef() {
+	auto addRef() -> bool {
 		if (refCount == 0) {
 			HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 			if (FAILED(hr)) {
@@ -56,7 +56,7 @@ private:
 
 ComControl cc;
 
-std::string getPixelFormatString(const GUID& videoFormat) {
+auto getPixelFormatString(const GUID& videoFormat) -> std::string {
 	if (videoFormat == MFVideoFormat_AI44)
 		return "AI44";
 	if (videoFormat == MFVideoFormat_ARGB32)
@@ -160,7 +160,7 @@ std::string getPixelFormatString(const GUID& videoFormat) {
 	return "Unknown";
 }
 
-Device::PixelFormat getDevicePixelFormat(const GUID& videoFormat) {
+auto getDevicePixelFormat(const GUID& videoFormat) -> Device::PixelFormat {
 	if (videoFormat == MFVideoFormat_RGB24)
 		return Device::PixelFormat::Rgb24;
 	if (videoFormat == MFVideoFormat_NV12)
@@ -329,7 +329,7 @@ void Device::close() {
 	m_size = {1, 1};
 }
 
-bool Device::isOpened() const { return m_size.surface() > 1; }
+auto Device::isOpened() const -> bool { return m_size.surface() > 1; }
 
 void Device::fillFrame(shared<renderer::Texture>& iFrame) {
 	if (!isOpened())
@@ -347,7 +347,7 @@ void Device::fillFrame(shared<renderer::Texture>& iFrame) {
 	int64_t timestamp = 0;
 	u_long actualIndex = 0;
 	u_long sampleFlags = MF_SOURCE_READERF_STREAMTICK;
-	while (sampleFlags & MF_SOURCE_READERF_STREAMTICK) {
+	while ((sampleFlags & MF_SOURCE_READERF_STREAMTICK) != 0u) {
 		if (const HRESULT hr = m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &actualIndex,
 														  &sampleFlags, &timestamp, sample.addr());
 			FAILED(hr)) {
@@ -378,7 +378,7 @@ void Device::fillFrame(shared<renderer::Texture>& iFrame) {
 	buffer->Unlock();
 }
 
-bool Device::isValid() const { return !m_name.empty() && !m_busInfo.empty(); }
+auto Device::isValid() const -> bool { return !m_name.empty() && !m_busInfo.empty(); }
 
 }// namespace owl::input::video::windows
 

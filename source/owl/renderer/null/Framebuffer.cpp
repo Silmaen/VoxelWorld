@@ -22,15 +22,10 @@ void Framebuffer::bind() {}
 
 void Framebuffer::unbind() {}
 
-void Framebuffer::resize(const math::vec2ui iSize) {
-	m_specs.size = iSize;
-}
+void Framebuffer::resize(const math::vec2ui iSize) { m_specs.size = iSize; }
 
-int Framebuffer::readPixel(uint32_t, int, int) {
-	return 0;
-}
+auto Framebuffer::readPixel(uint32_t, int, int) -> int { return 0; }
 
-void Framebuffer::clearAttachment(uint32_t, int) {
-}
+void Framebuffer::clearAttachment(uint32_t, int) {}
 
 }// namespace owl::renderer::null

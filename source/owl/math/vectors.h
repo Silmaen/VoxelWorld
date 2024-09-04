@@ -15,7 +15,7 @@ namespace owl::math {
 /**
  * @brief Basic class for math vectors.
  * @tparam BaseType The internal data type.
- * @tparam Dim The Vector's dimention.
+ * @tparam Dim The Vector's dimension.
  */
 template<typename BaseType, std::size_t Dim>
 class Vector {
@@ -40,12 +40,12 @@ public:
 	 * @brief Copy affectation operator.
 	 * @return This vector.
 	 */
-	constexpr Vector& operator=(const Vector&) = default;
+	constexpr auto operator=(const Vector&) -> Vector& = default;
 	/**
 	 * @brief Move affectation operator.
 	 * @return This vector.
 	 */
-	constexpr Vector& operator=(Vector&&) = default;
+	constexpr auto operator=(Vector&&) -> Vector& = default;
 	/**
 	 * @brief Constructor with initializer list.
 	 * @param iInitList List for initialization.
@@ -100,7 +100,7 @@ public:
 	 * @return This vector.
 	 */
 	template<size_t Dim2>
-	constexpr Vector& operator=(const Vector<BaseType, Dim2>& iVector) {
+	constexpr auto operator=(const Vector<BaseType, Dim2>& iVector) -> Vector& {
 		std::copy_n(iVector.begin(), std::min(Dim, Dim2), m_data.begin());
 		return *this;
 	}
@@ -109,126 +109,75 @@ public:
 	 * @param iOther Other vector to compare.
 	 * @return true if identical vectors.
 	 */
-	constexpr bool operator==(const Vector& iOther) const { return m_data == iOther.m_data; }
+	constexpr auto operator==(const Vector& iOther) const -> bool { return m_data == iOther.m_data; }
 	/**
 	 * @brief Comparison operator
 	 * @param iOther Other vector to compare.
 	 * @return false if identical vectors.
 	 */
-	constexpr bool operator!=(const Vector& iOther) const { return m_data != iOther.m_data; }
+	constexpr auto operator!=(const Vector& iOther) const -> bool { return m_data != iOther.m_data; }
 	/**
 	 * @brief Access to components values.
 	 * @param i The component's number.
 	 * @return Component's value.
 	 */
-	constexpr BaseType& operator[](std::size_t i) { return m_data[i]; }
+	constexpr auto operator[](std::size_t i) -> BaseType& { return m_data[i]; }
 	/**
 	 * @brief Access to const components values.
 	 * @param i The component's number.
 	 * @return Const component's value.
 	 */
-	constexpr const BaseType& operator[](std::size_t i) const { return m_data[i]; }
-	constexpr BaseType& x()
-		requires(Dim >= 1)
-	{
+	constexpr auto operator[](std::size_t i) const -> const BaseType& { return m_data[i]; }
+	constexpr auto x() -> BaseType& requires(Dim >= 1) {
 		return m_data[0];
-	}
-	constexpr BaseType& y()
-		requires(Dim >= 2)
-	{
+	} constexpr auto y() -> BaseType& requires(Dim >= 2) {
 		return m_data[1];
-	}
-	constexpr BaseType& z()
-		requires(Dim >= 3)
-	{
+	} constexpr auto z() -> BaseType& requires(Dim >= 3) {
 		return m_data[2];
-	}
-	constexpr BaseType& w()
-		requires(Dim >= 4)
-	{
+	} constexpr auto w() -> BaseType& requires(Dim >= 4) {
 		return m_data[3];
-	}
-	constexpr BaseType& r()
-		requires(Dim == 4)
-	{
+	} constexpr auto r() -> BaseType& requires(Dim == 4) {
 		return x();
-	}
-	constexpr BaseType& g()
-		requires(Dim == 4)
-	{
+	} constexpr auto g() -> BaseType& requires(Dim == 4) {
 		return y();
-	}
-	constexpr BaseType& b()
-		requires(Dim == 4)
-	{
+	} constexpr auto b() -> BaseType& requires(Dim == 4) {
 		return z();
-	}
-	constexpr BaseType& a()
-		requires(Dim == 4)
-	{
-		return w();
-	}
-	[[nodiscard]] constexpr const BaseType& x() const
-		requires(Dim >= 1)
-	{
-		return m_data[0];
-	}
-	[[nodiscard]] constexpr const BaseType& y() const
-		requires(Dim >= 2)
-	{
-		return m_data[1];
-	}
-	[[nodiscard]] constexpr const BaseType& z() const
-		requires(Dim >= 3)
-	{
-		return m_data[2];
-	}
-	[[nodiscard]] constexpr const BaseType& w() const
-		requires(Dim >= 4)
-	{
-		return m_data[3];
-	}
-	[[nodiscard]] constexpr const BaseType& r() const
-		requires(Dim == 4)
-	{
-		return x();
-	}
-	[[nodiscard]] constexpr const BaseType& g() const
-		requires(Dim == 4)
-	{
-		return y();
-	}
-	[[nodiscard]] constexpr const BaseType& b() const
-		requires(Dim == 4)
-	{
-		return z();
-	}
-	[[nodiscard]] constexpr const BaseType& a() const
-		requires(Dim == 4)
-	{
-		return w();
-	}
+	} constexpr auto a() -> BaseType& requires(Dim == 4) { return w(); }
+	[[nodiscard]] constexpr auto x() const -> const BaseType& requires(Dim >= 1) { return m_data[0]; }
+	[[nodiscard]] constexpr auto y() const -> const BaseType& requires(Dim >= 2) { return m_data[1]; }
+	[[nodiscard]] constexpr auto z() const -> const BaseType& requires(Dim >= 3) { return m_data[2]; }
+	[[nodiscard]] constexpr auto w() const -> const BaseType& requires(Dim >= 4) { return m_data[3]; }
+	[[nodiscard]] constexpr auto r() const -> const BaseType& requires(Dim == 4) { return x(); }
+	[[nodiscard]] constexpr auto g() const -> const BaseType& requires(Dim == 4) { return y(); }
+	[[nodiscard]] constexpr auto b() const -> const BaseType& requires(Dim == 4) { return z(); }
+	[[nodiscard]] constexpr auto a() const -> const BaseType& requires(Dim == 4) { return w(); }
 	// iterator
-	constexpr typename std::array<BaseType, Dim>::iterator begin() { return m_data.begin(); }
-	constexpr typename std::array<BaseType, Dim>::iterator end() { return m_data.end(); }
-	[[nodiscard]] constexpr typename std::array<BaseType, Dim>::const_iterator begin() const { return m_data.begin(); }
-	[[nodiscard]] constexpr typename std::array<BaseType, Dim>::const_iterator end() const { return m_data.end(); }
+	constexpr auto begin() -> typename std::array<BaseType, Dim>::iterator {
+		return m_data.begin();
+	}
+	constexpr auto end() -> typename std::array<BaseType, Dim>::iterator { return m_data.end(); }
+	[[nodiscard]] constexpr auto begin() const -> typename std::array<BaseType, Dim>::const_iterator {
+		return m_data.begin();
+	}
+	[[nodiscard]] constexpr auto end() const -> typename std::array<BaseType, Dim>::const_iterator {
+		return m_data.end();
+	}
 	// base operator
 	/**
 	 * @brief Self Addition operator.
 	 * @param iOther Other vector to add.
 	 * @return This actualized vector.
 	 */
-	constexpr Vector& operator+=(const Vector& iOther) {
+	constexpr auto operator+=(const Vector& iOther) -> Vector& {
 		for (size_t it = 0; it < Dim; ++it) { m_data[it] += iOther[it]; }
 		return *this;
 	}
 	/**
-	 * @brief Self subtration operator.
+	 * @brief Self subtraction operator.
 	 * @param iOther Other vector to subtract.
 	 * @return This actualized vector.
 	 */
-	constexpr Vector& operator-=(const Vector& iOther) {
+	constexpr auto operator-=(const Vector& iOther) -> Vector& {
 		for (size_t it = 0; it < Dim; ++it) { m_data[it] -= iOther[it]; }
 		return *this;
 	}
@@ -237,17 +186,17 @@ public:
 	 * @param iOther Other vector to add.
 	 * @return This actualized vector.
 	 */
-	constexpr Vector operator+(const Vector& iOther) const {
+	constexpr auto operator+(const Vector& iOther) const -> Vector {
 		Vector res{*this};
 		res += iOther;
 		return res;
 	}
 	/**
-	 * @brief Subtaction.
+	 * @brief Subtraction.
 	 * @param iOther Other vector to subtract.
 	 * @return This actualized vector.
 	 */
-	constexpr Vector operator-(const Vector& iOther) const {
+	constexpr auto operator-(const Vector& iOther) const -> Vector {
 		Vector res{*this};
 		res -= iOther;
 		return res;
@@ -256,7 +205,7 @@ public:
 	 * @brief Unary minus operator.
 	 * @return Opposite vector.
 	 */
-	constexpr Vector operator-() const {
+	constexpr auto operator-() const -> Vector {
 		Vector res{*this};
 		res *= BaseType{-1};
 		return res;
@@ -266,7 +215,7 @@ public:
 	 * @param iScalar the scalar to multiply.
 	 * @return This actualized vector.
 	 */
-	constexpr Vector& operator*=(const BaseType iScalar) {
+	constexpr auto operator*=(const BaseType iScalar) -> Vector& {
 		for (size_t it = 0; it < Dim; ++it) { m_data[it] *= iScalar; }
 		return *this;
 	}
@@ -275,7 +224,7 @@ public:
 	 * @param iScalar The scalar to multiply.
 	 * @return Vector result.
 	 */
-	constexpr Vector operator*(const BaseType iScalar) const {
+	constexpr auto operator*(const BaseType iScalar) const -> Vector {
 		Vector res{*this};
 		res *= iScalar;
 		return res;
@@ -286,7 +235,7 @@ public:
 	 * @param iVector Vector to multiply.
 	 * @return Vector result.
 	 */
-	constexpr friend Vector operator*(const BaseType iScalar, const Vector& iVector) {
+	constexpr friend auto operator*(const BaseType iScalar, const Vector& iVector) -> Vector {
 		Vector res{iVector};
 		res *= iScalar;
 		return res;
@@ -296,7 +245,7 @@ public:
 	 * @param iScalar The scalar to divide.
 	 * @return This actualized vector.
 	 */
-	constexpr Vector& operator/=(const BaseType iScalar) {
+	constexpr auto operator/=(const BaseType iScalar) -> Vector& {
 		for (size_t it = 0; it < Dim; ++it) { m_data[it] /= iScalar; }
 		return *this;
 	}
@@ -305,7 +254,7 @@ public:
 	 * @param iScalar The scalar to divide.
 	 * @return Vector result.
 	 */
-	constexpr Vector operator/(const BaseType iScalar) const {
+	constexpr auto operator/(const BaseType iScalar) const -> Vector {
 		Vector res{*this};
 		res /= iScalar;
 		return res;
@@ -316,21 +265,21 @@ public:
 	 * @param iOther Other vector to multiply.
 	 * @return The dot Product.
 	 */
-	constexpr BaseType operator*(const Vector& iOther) const {
+	constexpr auto operator*(const Vector& iOther) const -> BaseType {
 		BaseType res{};
 		for (size_t it = 0; it < Dim; ++it) { res += m_data[it] * iOther[it]; }
 		return res;
 	}
 	/**
 	 * @brief Compute the square norm.
-	 * @return The sqare norm.
+	 * @return The square norm.
 	 */
-	[[nodiscard]] constexpr BaseType normSq() const { return *this * *this; }
+	[[nodiscard]] constexpr auto normSq() const -> BaseType { return *this * *this; }
 	/**
 	 * @brief Compute the norm.
 	 * @return The norm.
 	 */
-	[[nodiscard]] constexpr BaseType norm() const {
+	[[nodiscard]] constexpr auto norm() const -> BaseType {
 		if constexpr (std::is_floating_point_v<BaseType>) {
 			return std::sqrt(normSq());
 		}
@@ -348,7 +297,7 @@ public:
 	 * @brief Normalize this vector if possible.
 	 * @return This vector.
 	 */
-	constexpr Vector& normalize() {
+	constexpr auto normalize() -> Vector& {
 		if constexpr (std::is_floating_point_v<BaseType>) {
 			const BaseType n = normSq();
 			if (n < std::numeric_limits<BaseType>::epsilon())
@@ -384,17 +333,15 @@ public:
 	 * @brief Create a new normalized vector.
 	 * @return Normalized vector.
 	 */
-	[[nodiscard]] constexpr Vector normalized() const { return Vector{*this}.normalize(); }
+	[[nodiscard]] constexpr auto normalized() const -> Vector { return Vector{*this}.normalize(); }
 	/**
 	 * @brief Self cross product.
 	 * @param iOther Other vector to multiply.
 	 * @return This actualized vector.
 	 */
-	constexpr Vector& operator^=(const Vector& iOther)
-		requires(Dim == 3)
-	{
-		BaseType x = m_data[1] * iOther[2] - m_data[2] * iOther[1];
-		BaseType y = m_data[2] * iOther[0] - m_data[0] * iOther[2];
+	constexpr auto operator^=(const Vector& iOther) -> Vector& requires(Dim == 3) {
+		BaseType x = (m_data[1] * iOther[2]) - (m_data[2] * iOther[1]);
+		BaseType y = (m_data[2] * iOther[0]) - (m_data[0] * iOther[2]);
 		m_data[2] = m_data[0] * iOther[1] - m_data[1] * iOther[0];
 		std::swap(m_data[0], x);
 		std::swap(m_data[1], y);
@@ -405,7 +352,7 @@ public:
 	 * @param iOther Other vector to multiply.
 	 * @return Vector result.
 	 */
-	constexpr Vector operator^(const Vector& iOther)
+	constexpr auto operator^(const Vector& iOther) -> Vector
 		requires(Dim == 3)
 	{
 		Vector res{*this};
@@ -417,16 +364,16 @@ public:
 	 * @brief Compute the surface of a 2D vector;
 	 * @return The surface.
 	 */
-	[[nodiscard]] constexpr BaseType surface() const
+	[[nodiscard]] constexpr auto surface() const -> BaseType
 		requires(Dim == 2)
 	{
 		return x() * y();
 	}
 	/**
-	 * @brief Compute the ratio between dimentions.
-	 * @return The dimentions ratio.
+	 * @brief Compute the ratio between dimensions.
+	 * @return The dimensions ratio.
 	 */
-	[[nodiscard]] constexpr float ratio() const
+	[[nodiscard]] constexpr auto ratio() const -> float
 		requires(Dim == 2)
 	{
 		return static_cast<float>(x()) / static_cast<float>(y());
@@ -436,12 +383,12 @@ public:
 	 * @brief Low level memory access.
 	 * @return Pointer to the data.
 	 */
-	[[nodiscard]] constexpr const BaseType* data() const { return m_data.data(); }
+	[[nodiscard]] constexpr auto data() const -> const BaseType* { return m_data.data(); }
 	/**
 	 * @brief Low level memory access.
 	 * @return Pointer to the data.
 	 */
-	[[nodiscard]] constexpr BaseType* data() { return m_data.data(); }
+	[[nodiscard]] constexpr auto data() -> BaseType* { return m_data.data(); }
 
 private:
 	std::array<BaseType, Dim> m_data;

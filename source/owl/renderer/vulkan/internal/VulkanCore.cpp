@@ -27,21 +27,21 @@ constexpr VkApplicationInfo g_appInfo = {.sType = VK_STRUCTURE_TYPE_APPLICATION_
 										 .engineVersion = {},
 										 .apiVersion = VK_API_VERSION_1_3};
 
-VkBool32 debugUtilsMessageCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT iMessageSeverity,
-								   VkDebugUtilsMessageTypeFlagsEXT,
-								   const VkDebugUtilsMessengerCallbackDataEXT* iPCallbackData, void*) {
+auto debugUtilsMessageCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT iMessageSeverity,
+							   VkDebugUtilsMessageTypeFlagsEXT,
+							   const VkDebugUtilsMessengerCallbackDataEXT* iPCallbackData, void*) -> VkBool32 {
 	auto bufferName = VulkanHandler::get().getCurrentFrameBufferName();
 	auto frameId = core::Application::get().getTimeStep().getFrameNumber();
-	if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+	if ((iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) != 0) {
 		OWL_CORE_TRACE("Vulkan fb({} {}): [{}][{}]: {}", frameId, bufferName, iPCallbackData->messageIdNumber,
 					   iPCallbackData->pMessageIdName, iPCallbackData->pMessage)
-	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+	} else if ((iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) != 0) {
 		OWL_CORE_INFO("Vulkan fb({} {}): [{}][{}]: {}", frameId, bufferName, iPCallbackData->messageIdNumber,
 					  iPCallbackData->pMessageIdName, iPCallbackData->pMessage)
-	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+	} else if ((iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) != 0) {
 		OWL_CORE_WARN("Vulkan fb({} {}): [{}][{}]: {}", frameId, bufferName, iPCallbackData->messageIdNumber,
 					  iPCallbackData->pMessageIdName, iPCallbackData->pMessage)
-	} else if (iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+	} else if ((iMessageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) != 0) {
 		OWL_CORE_ERROR("Vulkan fb({} {}): [{}][{}]: {}", frameId, bufferName, iPCallbackData->messageIdNumber,
 					   iPCallbackData->pMessageIdName, iPCallbackData->pMessage)
 	}
@@ -49,7 +49,7 @@ VkBool32 debugUtilsMessageCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT 
 	// be aborted or not. We return VK_FALSE as we DON'T want Vulkan calls that cause a validation message to abort
 	// If you instead want to have calls abort, pass in VK_TRUE and the function will
 	// return VK_ERROR_VALIDATION_FAILED_EXT
-	return false;
+	return VK_FALSE;
 }
 
 VkDebugUtilsMessengerCreateInfoEXT s_debugUtilsMessagerCi{
@@ -206,7 +206,7 @@ void VulkanCore::createInstance() {
 }
 OWL_DIAG_POP
 
-bool VulkanCore::isHealthy() const {
+auto VulkanCore::isHealthy() const -> bool {
 	return m_instance != nullptr && m_physicalDevice != nullptr && m_logicalDevice != nullptr &&
 		   m_graphicQueue != nullptr && m_presentQueue != nullptr;
 }
@@ -335,7 +335,7 @@ void VulkanCore::createQueues() {
 	vkGetDeviceQueue(m_logicalDevice, m_phyProps->presentQueueIndex, 0, &m_presentQueue);
 }
 
-VkExtent2D VulkanCore::getCurrentExtent() const {
+auto VulkanCore::getCurrentExtent() const -> VkExtent2D {
 	VkExtent2D extent;
 	if (m_phyProps->surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 		extent = m_phyProps->surfaceCapabilities.currentExtent;
@@ -349,7 +349,7 @@ VkExtent2D VulkanCore::getCurrentExtent() const {
 	return extent;
 }
 
-math::vec2ui VulkanCore::getCurrentSize() const {
+auto VulkanCore::getCurrentSize() const -> math::vec2ui {
 	math::vec2ui extent;
 	if (m_phyProps->surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 		extent = toSize(m_phyProps->surfaceCapabilities.currentExtent);
@@ -363,7 +363,7 @@ math::vec2ui VulkanCore::getCurrentSize() const {
 	return extent;
 }
 
-VkSurfaceFormatKHR VulkanCore::getSurfaceFormat() const {
+auto VulkanCore::getSurfaceFormat() const -> VkSurfaceFormatKHR {
 	VkSurfaceFormatKHR surfaceFormat = m_phyProps->surfaceFormats.front();
 	for (const auto& availableFormat: m_phyProps->surfaceFormats) {
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
@@ -374,7 +374,7 @@ VkSurfaceFormatKHR VulkanCore::getSurfaceFormat() const {
 	return surfaceFormat;
 }
 
-VkPresentModeKHR VulkanCore::getPresentMode() const {
+auto VulkanCore::getPresentMode() const -> VkPresentModeKHR {
 	VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
 	for (const auto& availablePresentMode: m_phyProps->presentModes) {
 		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -384,7 +384,7 @@ VkPresentModeKHR VulkanCore::getPresentMode() const {
 	return presentMode;
 }
 
-uint32_t VulkanCore::getImagecount() const {
+auto VulkanCore::getImagecount() const -> uint32_t {
 	uint32_t imageCount = m_phyProps->surfaceCapabilities.minImageCount + 1;
 	if (m_phyProps->surfaceCapabilities.maxImageCount > 0 &&
 		imageCount > m_phyProps->surfaceCapabilities.maxImageCount) {
@@ -393,11 +393,11 @@ uint32_t VulkanCore::getImagecount() const {
 	return imageCount;
 }
 
-VkSurfaceTransformFlagBitsKHR VulkanCore::getCurrentTransform() const {
+auto VulkanCore::getCurrentTransform() const -> VkSurfaceTransformFlagBitsKHR {
 	return m_phyProps->surfaceCapabilities.currentTransform;
 }
 
-std::vector<uint32_t> VulkanCore::getQueueIndicies() const {
+auto VulkanCore::getQueueIndices() const -> std::vector<uint32_t> {
 	return {m_phyProps->graphicQueueIndex, m_phyProps->presentQueueIndex};
 }
 
@@ -405,9 +405,10 @@ void VulkanCore::updateSurfaceInformations() { m_phyProps->updateSurfaceInformat
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
-uint32_t VulkanCore::findMemoryTypeIndex(const uint32_t iTypeFilter, const VkMemoryPropertyFlags iMemProperties) const {
+auto VulkanCore::findMemoryTypeIndex(const uint32_t iTypeFilter,
+									 const VkMemoryPropertyFlags iMemProperties) const -> uint32_t {
 	for (uint32_t i = 0; i < m_phyProps->memoryProperties.memoryTypeCount; i++) {
-		if ((iTypeFilter & (1 << i)) &&
+		if (((iTypeFilter & (1 << i)) != 0u) &&
 			(m_phyProps->memoryProperties.memoryTypes[i].propertyFlags & iMemProperties) == iMemProperties) {
 			return i;
 		}
@@ -417,9 +418,9 @@ uint32_t VulkanCore::findMemoryTypeIndex(const uint32_t iTypeFilter, const VkMem
 }
 OWL_DIAG_POP
 
-float VulkanCore::getMaxSamplerAnisotropy() const { return m_phyProps->properties.limits.maxSamplerAnisotropy; }
+auto VulkanCore::getMaxSamplerAnisotropy() const -> float { return m_phyProps->properties.limits.maxSamplerAnisotropy; }
 
-VkCommandBuffer VulkanCore::beginSingleTimeCommands() const {
+auto VulkanCore::beginSingleTimeCommands() const -> VkCommandBuffer {
 	const auto& core = VulkanCore::get();
 	const VkCommandBufferAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 												.pNext = nullptr,
@@ -476,7 +477,7 @@ void VulkanCore::endSingleTimeCommands(VkCommandBuffer iCommandBuffer) const {
 }
 
 
-[[nodiscard]] VkCommandBuffer VulkanCore::createCommandBuffer() const {
+[[nodiscard]] auto VulkanCore::createCommandBuffer() const -> VkCommandBuffer {
 	VkCommandBuffer cmd = nullptr;
 	const VkCommandBufferAllocateInfo allocInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 												.pNext = nullptr,
@@ -544,28 +545,29 @@ InstanceInformations::InstanceInformations() {
 	}
 }
 
-bool InstanceInformations::hasMinimalVersion(const uint8_t iMajor, const uint8_t iMinor, const uint8_t iPatch) const {
+auto InstanceInformations::hasMinimalVersion(const uint8_t iMajor, const uint8_t iMinor,
+											 const uint8_t iPatch) const -> bool {
 	return VK_API_VERSION_MAJOR(version) > iMajor ||
 		   (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) > iMinor) ||
 		   (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) == iMinor &&
 			VK_API_VERSION_PATCH(version) >= iPatch);
 }
 
-bool InstanceInformations::hasLayer(const std::string& iLayer) const {
+auto InstanceInformations::hasLayer(const std::string& iLayer) const -> bool {
 	return std::ranges::find(supportedLayers.begin(), supportedLayers.end(), iLayer) != supportedLayers.end();
 }
 
-bool InstanceInformations::hasExtension(const std::string& iExtension) const {
+auto InstanceInformations::hasExtension(const std::string& iExtension) const -> bool {
 	return std::ranges::find(supportedExtensions.begin(), supportedExtensions.end(), iExtension) !=
 		   supportedExtensions.end();
 }
 
-bool InstanceInformations::hasLayers(const std::vector<std::string>& iLayers) const {
+auto InstanceInformations::hasLayers(const std::vector<std::string>& iLayers) const -> bool {
 	return std::ranges::all_of(iLayers.begin(), iLayers.end(),
 							   [&](const auto& iLayer) { return this->hasLayer(iLayer); });
 }
 
-bool InstanceInformations::hasExtensions(const std::vector<std::string>& iExtensions) const {
+auto InstanceInformations::hasExtensions(const std::vector<std::string>& iExtensions) const -> bool {
 	return std::ranges::all_of(iExtensions.begin(), iExtensions.end(),
 							   [&](const auto& iExtension) { return this->hasExtension(iExtension); });
 }

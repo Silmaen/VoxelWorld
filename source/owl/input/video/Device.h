@@ -21,10 +21,10 @@ public:
 	 * @brief Default Constructor.
 	 */
 	explicit Device(std::string iName);
-	Device(const Device &) = delete;
-	Device(Device &&) = delete;
-	Device &operator=(const Device &) = delete;
-	Device &operator=(Device &&) = delete;
+	Device(const Device&) = delete;
+	Device(Device&&) = delete;
+	auto operator=(const Device&) -> Device& = delete;
+	auto operator=(Device&&) -> Device& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -35,7 +35,7 @@ public:
 	 * @brief Get the name of the device.
 	 * @return The name of the device.
 	 */
-	[[nodiscard]] const std::string &getName() const { return m_name; }
+	[[nodiscard]] auto getName() const -> const std::string& { return m_name; }
 
 	/**
 	 * @brief Open this device.
@@ -51,19 +51,19 @@ public:
 	 * @brief Check if the device is open.
 	 * @return True if open.
 	 */
-	[[nodiscard]] virtual bool isOpened() const = 0;
+	[[nodiscard]] virtual auto isOpened() const -> bool = 0;
 
 	/**
 	 * @brief Check the validity of the device.
 	 * @return True if valid.
 	 */
-	[[nodiscard]] virtual bool isValid() const = 0;
+	[[nodiscard]] virtual auto isValid() const -> bool = 0;
 
 	/**
 	 * @brief Retrieve a frame.
 	 * @param[in] iFrame The frame to update.
 	 */
-	virtual void fillFrame(shared<renderer::Texture> &iFrame) = 0;
+	virtual void fillFrame(shared<renderer::Texture>& iFrame) = 0;
 
 	/**
 	 * @brief Get the unique bus information.
@@ -71,7 +71,7 @@ public:
 	 *
 	 * @note This bus information identifies the device as unique.
 	 */
-	[[nodiscard]] const std::string &getBusInfo() const { return m_busInfo; }
+	[[nodiscard]] auto getBusInfo() const -> const std::string& { return m_busInfo; }
 
 	/**
 	 * @brief list of PixelFormat
@@ -88,14 +88,14 @@ public:
 	 * @brief Get the pixel format of the device.
 	 * @return The pixel format for this device.
 	 */
-	[[nodiscard]] const PixelFormat &getPixelFormat() const { return m_pixFormat; }
+	[[nodiscard]] auto getPixelFormat() const -> const PixelFormat& { return m_pixFormat; }
 
 	/**
 	 * @brief Check the support for the pixel format.
 	 * @param[in] iPixFormat The pixel format to test.
 	 * @return True if supported.
 	 */
-	[[nodiscard]] static bool isPixelFormatSupported(const PixelFormat &iPixFormat);
+	[[nodiscard]] static auto isPixelFormatSupported(const PixelFormat& iPixFormat) -> bool;
 
 protected:
 	// NOLINTBEGIN(readability-redundant-member-init)
@@ -115,7 +115,7 @@ protected:
 	 * @param[in] iBufferSize The size of the buffer
 	 * @return A converted RGB24 buffer.
 	 */
-	[[nodiscard]] std::vector<uint8_t> getRgbBuffer(const uint8_t *iInputBuffer, int32_t iBufferSize) const;
+	[[nodiscard]] auto getRgbBuffer(const uint8_t* iInputBuffer, int32_t iBufferSize) const -> std::vector<uint8_t>;
 };
 
 }// namespace owl::input::video

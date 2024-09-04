@@ -17,10 +17,10 @@ namespace owl::renderer::vulkan {
  */
 class OWL_API Texture2D final : public ::owl::renderer::Texture2D {
 public:
-	Texture2D(const Texture2D &) = default;
-	Texture2D(Texture2D &&) = default;
-	Texture2D &operator=(const Texture2D &) = default;
-	Texture2D &operator=(Texture2D &&) = default;
+	Texture2D(const Texture2D&) = default;
+	Texture2D(Texture2D&&) = default;
+	auto operator=(const Texture2D&) -> Texture2D& = default;
+	auto operator=(Texture2D&&) -> Texture2D& = default;
 
 	/**
 	 * @brief Default constructor.
@@ -39,7 +39,7 @@ public:
 	 * @param[in] iSize Texture's width.
 	 * @param[in] iWithAlpha If the texture has alpha channel.
 	 */
-	explicit Texture2D(const math::vec2ui &iSize, bool iWithAlpha = true);
+	explicit Texture2D(const math::vec2ui& iSize, bool iWithAlpha = true);
 
 	/**
 	 * @brief Destructor.
@@ -51,13 +51,13 @@ public:
 	 * @param[in] iOther Other texture to compare.
 	 * @return True if same.
 	 */
-	bool operator==(const Texture &iOther) const override;
+	auto operator==(const Texture& iOther) const -> bool override;
 
 	/**
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint64_t getRendererId() const override;
+	[[nodiscard]] auto getRendererId() const -> uint64_t override;
 
 	/**
 	 * @brief Activate the texture in the GPU.
@@ -70,9 +70,10 @@ public:
 	 * @param[in] iData Raw data.
 	 * @param[in] iSize Size of the data.
 	 */
-	void setData(void *iData, uint32_t iSize) override;
+	void setData(void* iData, uint32_t iSize) override;
 
 private:
 	uint32_t m_textureId = 0;
 };
+
 }// namespace owl::renderer::vulkan

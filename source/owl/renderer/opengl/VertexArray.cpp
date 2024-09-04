@@ -14,7 +14,7 @@ namespace owl::renderer::opengl {
 
 namespace utils {
 namespace {
-GLenum toGlBaseType(const ShaderDataType &iType) {
+auto toGlBaseType(const ShaderDataType& iType) -> GLenum {
 	switch (iType) {
 		case ShaderDataType::Float:
 		case ShaderDataType::Float2:
@@ -58,13 +58,13 @@ void VertexArray::bind() const {
 	glBindVertexArray(m_rendererId);
 }
 
-void VertexArray::unbind() const {
+void VertexArray::unbind() {
 	OWL_PROFILE_FUNCTION()
 
 	glBindVertexArray(0);
 }
 
-void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
+void VertexArray::addVertexBuffer(const vertexBuf& iVertexBuffer) {
 	OWL_PROFILE_FUNCTION()
 
 	OWL_CORE_ASSERT(!iVertexBuffer->getLayout().getElements().empty(), "Vertex Buffer has no layout!")
@@ -73,8 +73,8 @@ void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
 	iVertexBuffer->bind();
 
 	// NOLINTBEGIN(performance-no-int-to-ptr)
-	const auto &layout = iVertexBuffer->getLayout();
-	for (const auto &element: layout) {
+	const auto& layout = iVertexBuffer->getLayout();
+	for (const auto& element: layout) {
 		const auto count = static_cast<int32_t>(element.getComponentCount());
 		const auto type = utils::toGlBaseType(element.type);
 		const auto stride = static_cast<int>(layout.getStride());
@@ -86,7 +86,7 @@ void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
 				{
 					glEnableVertexAttribArray(m_vertexBufferIndex);
 					glVertexAttribPointer(m_vertexBufferIndex, count, type, element.normalized ? GL_TRUE : GL_FALSE,
-										  stride, reinterpret_cast<const void *>(element.offset));
+										  stride, reinterpret_cast<const void*>(element.offset));
 					m_vertexBufferIndex++;
 					break;
 				}
@@ -98,7 +98,7 @@ void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
 				{
 					glEnableVertexAttribArray(m_vertexBufferIndex);
 					glVertexAttribIPointer(m_vertexBufferIndex, count, type, stride,
-										   reinterpret_cast<const void *>(element.offset));
+										   reinterpret_cast<const void*>(element.offset));
 					m_vertexBufferIndex++;
 					break;
 				}
@@ -109,8 +109,8 @@ void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
 						glEnableVertexAttribArray(m_vertexBufferIndex);
 						glVertexAttribPointer(
 								m_vertexBufferIndex, count, type, element.normalized ? GL_TRUE : GL_FALSE, stride,
-								reinterpret_cast<const void *>(element.offset +
-															   sizeof(float) * static_cast<uint32_t>(count * i)));
+								reinterpret_cast<const void*>(element.offset +
+															  (sizeof(float) * static_cast<uint32_t>(count * i))));
 						glVertexAttribDivisor(m_vertexBufferIndex, 1);
 						m_vertexBufferIndex++;
 					}
@@ -125,7 +125,7 @@ void VertexArray::addVertexBuffer(const vertexBuf &iVertexBuffer) {
 	m_vertexBuffers.push_back(iVertexBuffer);
 }
 
-void VertexArray::setIndexBuffer(const indexBuf &iIndexBuffer) {
+void VertexArray::setIndexBuffer(const indexBuf& iIndexBuffer) {
 	OWL_PROFILE_FUNCTION()
 
 	glBindVertexArray(m_rendererId);

@@ -29,41 +29,41 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	TextureLibrary(const TextureLibrary &) = default;
+	TextureLibrary(const TextureLibrary&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	TextureLibrary(TextureLibrary &&) = default;
+	TextureLibrary(TextureLibrary&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	TextureLibrary &operator=(const TextureLibrary &) = default;
+	auto operator=(const TextureLibrary&) -> TextureLibrary& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	TextureLibrary &operator=(TextureLibrary &&) = default;
+	auto operator=(TextureLibrary&&) -> TextureLibrary& = default;
 
 	/**
 	 * @brief Add the texture to the library.
 	 * @param[in] iTexture Texture to add.
 	 */
-	void add(const shared<Texture> &iTexture);
+	void add(const shared<Texture>& iTexture);
 
 	/**
 	 * @brief Add the texture to the library and rename it.
 	 * @param[in] iName Name of the texture.
 	 * @param[in] iTexture The Texture to add.
 	 */
-	void addNRename(const std::string &iName, const shared<Texture> &iTexture);
+	void addNRename(const std::string& iName, const shared<Texture>& iTexture);
 
 	/**
 	 * @brief Add the texture to the library from the standard path.
 	 * @param[in] iName Name of the texture.
 	 */
-	void addFromStandardPath(const std::string &iName);
+	void addFromStandardPath(const std::string& iName);
 
 	/**
 	 * @brief Load a texture from a file.
@@ -73,21 +73,21 @@ public:
 	 * The texture's name is determined by the file base name.
 	 * @note 'tex.png' and 'tex.jpg' will be considered as same name.
 	 */
-	shared<Texture> load(const std::filesystem::path &iFile);
+	auto load(const std::filesystem::path& iFile) -> shared<Texture>;
 
 	/**
 	 * @brief Access to the texture of the given name.
 	 * @param[in] iName Texture's name.
 	 * @return Texture's pointer or nullptr if not exists.
 	 */
-	shared<Texture> get(const std::string &iName);
+	auto get(const std::string& iName) -> shared<Texture>;
 
 	/**
 	 * @brief Verify if a texture exists.
 	 * @param[in] iName Texture's name.
 	 * @return True if the texture exists.
 	 */
-	bool exists(const std::string &iName) const;
+	auto exists(const std::string& iName) const -> bool;
 
 private:
 	/// List of textures.

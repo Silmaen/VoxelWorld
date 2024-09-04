@@ -21,13 +21,13 @@ public:
 	 * @brief Get the Key code.
 	 * @return The Event Key code.
 	 */
-	[[nodiscard]] input::KeyCode getKeyCode() const { return m_keyCode; }
+	[[nodiscard]] auto getKeyCode() const -> input::KeyCode { return m_keyCode; }
 
 	/**
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const final;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t final;
 
 protected:
 	explicit KeyEvent(const input::KeyCode iKeyCode) : m_keyCode(iKeyCode) {}
@@ -52,13 +52,13 @@ public:
 	 * @brief Check if the key is repeated
 	 * @return True if repeated
 	 */
-	[[nodiscard]] bool getRepeatCount() const { return m_repeatCount; }
+	[[nodiscard]] auto getRepeatCount() const -> uint16_t { return m_repeatCount; }
 
 	/**
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override {
+	[[nodiscard]] auto toString() const -> std::string override {
 		return fmt::format("KeyPressedEvent: {} (repeat = {})", m_keyCode, m_repeatCount);
 	}
 
@@ -66,19 +66,19 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override;
+	[[nodiscard]] auto getName() const -> std::string override;
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::KeyPressed; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::KeyPressed; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 
 private:
 	/// Counter of repeat.
@@ -100,25 +100,27 @@ public:
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override { return fmt::format("KeyReleasedEvent: {}", m_keyCode); }
+	[[nodiscard]] auto toString() const -> std::string override {
+		return fmt::format("KeyReleasedEvent: {}", m_keyCode);
+	}
 
 	/**
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override;
+	[[nodiscard]] auto getName() const -> std::string override;
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::KeyReleased; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::KeyReleased; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 };
 
 /**
@@ -136,25 +138,25 @@ public:
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override { return fmt::format("KeyTypedEvent: {}", m_keyCode); }
+	[[nodiscard]] auto toString() const -> std::string override { return fmt::format("KeyTypedEvent: {}", m_keyCode); }
 
 	/**
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override;
+	[[nodiscard]] auto getName() const -> std::string override;
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::KeyTyped; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::KeyTyped; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 };
 
 }// namespace owl::event

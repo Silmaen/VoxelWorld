@@ -16,10 +16,10 @@ namespace owl::renderer::null {
  */
 class OWL_API Texture2D final : public ::owl::renderer::Texture2D {
 public:
-	Texture2D(const Texture2D &) = default;
-	Texture2D(Texture2D &&) = default;
-	Texture2D &operator=(const Texture2D &) = default;
-	Texture2D &operator=(Texture2D &&) = default;
+	Texture2D(const Texture2D&) = default;
+	Texture2D(Texture2D&&) = default;
+	auto operator=(const Texture2D&) -> Texture2D& = default;
+	auto operator=(Texture2D&&) -> Texture2D& = default;
 
 	/**
 	 * @brief Default constructor.
@@ -50,15 +50,15 @@ public:
 	 * @param[in] iOther Other texture to compare.
 	 * @return True if same.
 	 */
-	bool operator==(const Texture &iOther) const override {
-		return m_rendererId == (dynamic_cast<const Texture2D &>(iOther)).m_rendererId;
+	auto operator==(const Texture& iOther) const -> bool override {
+		return m_rendererId == (dynamic_cast<const Texture2D&>(iOther)).m_rendererId;
 	}
 
 	/**
 	 * @brief Get renderer id.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] uint64_t getRendererId() const override { return m_rendererId; }
+	[[nodiscard]] auto getRendererId() const -> uint64_t override { return m_rendererId; }
 
 	/**
 	 * @brief Activate the texture in the GPU.
@@ -71,7 +71,7 @@ public:
 	 * @param[in] iData Raw data.
 	 * @param[in] iSize Size of the data.
 	 */
-	void setData(void *iData, uint32_t iSize) override;
+	void setData(void* iData, uint32_t iSize) override;
 
 private:
 	/// OpenGL binding.

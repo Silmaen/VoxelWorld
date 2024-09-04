@@ -14,7 +14,7 @@ namespace drone::panels {
 /**
  * @brief Class Information
  */
-class Information final: public BasePanel {
+class Information final : public BasePanel {
 public:
 	/**
 	 * @brief Constructor.
@@ -29,28 +29,28 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Information(const Information &) = default;
+	Information(const Information&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Information(Information &&) = default;
+	Information(Information&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Information &operator=(const Information &) = default;
+	auto operator=(const Information&) -> Information& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Information &operator=(Information &&) = default;
+	auto operator=(Information&&) -> Information& = default;
 
 	/**
 	 * @brief Update panel Status.
 	 * @param ts The Time delta of the frame.
 	 */
-	void onUpdate(const owl::core::Timestep &ts) override;
+	void onUpdate(const owl::core::Timestep& ts) override;
 
 	/**
 	 * @brief Do the rendering.

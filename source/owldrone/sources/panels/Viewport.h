@@ -28,28 +28,28 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Viewport(const Viewport &) = default;
+	Viewport(const Viewport&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Viewport(Viewport &&) = default;
+	Viewport(Viewport&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Viewport &operator=(const Viewport &) = default;
+	auto operator=(const Viewport&) -> Viewport& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Viewport &operator=(Viewport &&) = default;
+	auto operator=(Viewport&&) -> Viewport& = default;
 
 	/**
 	 * @brief Update panel Status.
 	 * @param iTimeStep The Time delta of the frame.
 	 */
-	void onUpdate(const owl::core::Timestep &iTimeStep) override;
+	void onUpdate(const owl::core::Timestep& iTimeStep) override;
 
 	/**
 	 * @brief Do the rendering.

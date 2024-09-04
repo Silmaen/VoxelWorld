@@ -28,12 +28,12 @@ public:
 	 * @brief Default copy assignation
 	 * @return this
 	 */
-	SceneHierarchy& operator=(const SceneHierarchy&) = default;
+	auto operator=(const SceneHierarchy&) -> SceneHierarchy& = default;
 	/**
 	 * @brief Default move assignation
 	 * @return this
 	 */
-	SceneHierarchy& operator=(SceneHierarchy&&) = default;
+	auto operator=(SceneHierarchy&&) -> SceneHierarchy& = default;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -61,7 +61,7 @@ public:
 	 * @brief Access to the selected entity
 	 * @return The selected entity
 	 */
-	[[nodiscard]] scene::Entity getSelectedEntity() const { return m_selection; }
+	[[nodiscard]] auto getSelectedEntity() const -> scene::Entity { return m_selection; }
 	void setSelectedEntity(const scene::Entity& iEntity) { m_selection = iEntity; }
 
 private:
@@ -80,4 +80,4 @@ private:
 	/// The selected item
 	scene::Entity m_selection;
 };
-} // namespace owl::panel
+}// namespace owl::panel

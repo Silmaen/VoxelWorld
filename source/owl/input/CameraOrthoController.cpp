@@ -12,9 +12,13 @@
 
 namespace owl::input {
 
+namespace {
+
 constexpr float sHalfTurn{180.f};
 constexpr float sFullTurn{360.f};
 constexpr float sZoomScroll{0.25f};
+
+}// namespace
 
 CameraOrthoController::CameraOrthoController(const float iAspectRatio, const bool iRotation)
 	: m_aspectRatio{iAspectRatio},
@@ -59,12 +63,12 @@ void CameraOrthoController::onEvent(event::Event& ioEvent) {
 
 	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::MouseScrolledEvent>(
-			[this](auto&& PH1) { return onMouseScrolled(std::forward<decltype(PH1)>(PH1)); });
+			[this](auto&& PH1) -> bool { return onMouseScrolled(std::forward<decltype(PH1)>(PH1)); });
 	dispatcher.dispatch<event::WindowResizeEvent>(
-			[this](auto&& PH1) { return onWindowResized(std::forward<decltype(PH1)>(PH1)); });
+			[this](auto&& PH1) -> bool { return onWindowResized(std::forward<decltype(PH1)>(PH1)); });
 }
 
-bool CameraOrthoController::onMouseScrolled(const event::MouseScrolledEvent& iEvent) {
+auto CameraOrthoController::onMouseScrolled(const event::MouseScrolledEvent& iEvent) -> bool {
 	OWL_PROFILE_FUNCTION()
 
 	m_zoomLevel -= iEvent.getYOff() * sZoomScroll;
@@ -73,7 +77,7 @@ bool CameraOrthoController::onMouseScrolled(const event::MouseScrolledEvent& iEv
 	return false;
 }
 
-bool CameraOrthoController::onWindowResized(const event::WindowResizeEvent& iEvent) {
+auto CameraOrthoController::onWindowResized(const event::WindowResizeEvent& iEvent) -> bool {
 	OWL_PROFILE_FUNCTION()
 
 	onResize(iEvent.getSize());

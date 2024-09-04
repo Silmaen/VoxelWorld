@@ -23,8 +23,8 @@ public:
 	SceneCamera();
 	SceneCamera(const SceneCamera&) = default;
 	SceneCamera(SceneCamera&&) = default;
-	SceneCamera& operator=(const SceneCamera&) = default;
-	SceneCamera& operator=(SceneCamera&&) = default;
+	auto operator=(const SceneCamera&) -> SceneCamera& = default;
+	auto operator=(SceneCamera&&) -> SceneCamera& = default;
 
 	/**
 	 * @brief Destructor.
@@ -57,7 +57,7 @@ public:
 	 * @brief Get actual orthographic size.
 	 * @return The orthographic size.
 	 */
-	[[nodiscard]] float getOrthographicSize() const { return m_orthographicSize; }
+	[[nodiscard]] auto getOrthographicSize() const -> float { return m_orthographicSize; }
 
 	/**
 	 * @brief Define the orthographic size.
@@ -80,7 +80,7 @@ public:
 	 * @brief Get the projection's type.
 	 * @return The projection's type.
 	 */
-	[[nodiscard]] ProjectionType getProjectionType() const { return m_projectionType; }
+	[[nodiscard]] auto getProjectionType() const -> ProjectionType { return m_projectionType; }
 
 	/**
 	 * @brief Defines the projection's type.
@@ -95,7 +95,7 @@ public:
 	 * @brief Get the orthographic near clip distance.
 	 * @return The orthographic near clip distance.
 	 */
-	[[nodiscard]] float getOrthographicNearClip() const { return m_orthographicNear; }
+	[[nodiscard]] auto getOrthographicNearClip() const -> float { return m_orthographicNear; }
 
 	/**
 	 * @brief Defines orthographic near clip distance.
@@ -110,7 +110,7 @@ public:
 	 * @brief Get the orthographic far clip distance.
 	 * @return The orthographic far clip distance.
 	 */
-	[[nodiscard]] float getOrthographicFarClip() const { return m_orthographicFar; }
+	[[nodiscard]] auto getOrthographicFarClip() const -> float { return m_orthographicFar; }
 
 	/**
 	 * @brief Defines orthographic far clip distance.
@@ -125,7 +125,7 @@ public:
 	 * @brief Get the perspective vertical field of vew.
 	 * @return The perspective vertical field of view.
 	 */
-	[[nodiscard]] float getPerspectiveVerticalFOV() const { return m_perspectiveFOV; }
+	[[nodiscard]] auto getPerspectiveVerticalFOV() const -> float { return m_perspectiveFOV; }
 
 	/**
 	 * @brief Defines perspective vertical field of view.
@@ -140,7 +140,7 @@ public:
 	 * @brief Get the perspective near clip distance.
 	 * @return The perspective near clip distance.
 	 */
-	[[nodiscard]] float getPerspectiveNearClip() const { return m_perspectiveNear; }
+	[[nodiscard]] auto getPerspectiveNearClip() const -> float { return m_perspectiveNear; }
 
 	/**
 	 * @brief Defines perspective near clip distance.
@@ -155,7 +155,7 @@ public:
 	 * @brief Get the perspective far clip distance.
 	 * @return The perspective far clip distance.
 	 */
-	[[nodiscard]] float getPerspectiveFarClip() const { return m_perspectiveFar; }
+	[[nodiscard]] auto getPerspectiveFarClip() const -> float { return m_perspectiveFar; }
 
 	/**
 	 * @brief Defines perspective far clip distance.

@@ -19,10 +19,10 @@ namespace owl {
  */
 class EditorLayer final : public core::layer::Layer {
 public:
-	EditorLayer(const EditorLayer &) = delete;
-	EditorLayer(EditorLayer &&) = delete;
-	EditorLayer &operator=(const EditorLayer &) = delete;
-	EditorLayer &operator=(EditorLayer &&) = delete;
+	EditorLayer(const EditorLayer&) = delete;
+	EditorLayer(EditorLayer&&) = delete;
+	auto operator=(const EditorLayer&) -> EditorLayer& = delete;
+	auto operator=(EditorLayer&&) -> EditorLayer& = delete;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -34,27 +34,27 @@ public:
 
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const core::Timestep &iTimeStep) override;
-	void onEvent(event::Event &ioEvent) override;
-	void onImGuiRender(const core::Timestep &iTimeStep) override;
+	void onUpdate(const core::Timestep& iTimeStep) override;
+	void onEvent(event::Event& ioEvent) override;
+	void onImGuiRender(const core::Timestep& iTimeStep) override;
 
 private:
 	void renderViewport();
 
-	void renderStats(const core::Timestep &iTimeStep);
+	void renderStats(const core::Timestep& iTimeStep);
 	void renderMenu();
 	void renderGizmo();
 	void renderToolbar();
 
 	void newScene();
 	void openScene();
-	void openScene(const std::filesystem::path &iScenePath);
+	void openScene(const std::filesystem::path& iScenePath);
 	void saveSceneAs();
-	void saveSceneAs(const std::filesystem::path &iScenePath);
+	void saveSceneAs(const std::filesystem::path& iScenePath);
 	void saveCurrentScene();
 
-	bool onKeyPressed(const event::KeyPressedEvent &ioEvent);
-	bool onMouseButtonPressed(const event::MouseButtonPressedEvent &ioEvent);
+	auto onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool;
+	auto onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent) -> bool;
 	void onScenePlay();
 	void onSceneStop();
 	void onDuplicateEntity() const;

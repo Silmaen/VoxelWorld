@@ -16,7 +16,7 @@ namespace owl::input::video::windows {
  *
  * Simple class to handle windows object pointers like a unique_ptr
  */
-template <class Ptr>
+template<class Ptr>
 class WPointer final {
 public:
 	/**
@@ -41,14 +41,14 @@ public:
 
 	WPointer(const WPointer&) = default;
 	WPointer(WPointer&&) = default;
-	WPointer& operator=(const WPointer&) = default;
-	WPointer& operator=(WPointer&&) = default;
+	auto operator=(const WPointer&) -> WPointer& = default;
+	auto operator=(WPointer&&) -> WPointer& = default;
 
 	/**
 	 * @brief Overload of the -> operator for using thi object as if it is the pointer.
 	 * @return The backend pointer.
 	 */
-	Ptr* operator->() { return mp_object; }
+	auto operator->() -> Ptr* { return mp_object; }
 
 	// NOLINTBEGIN(google-explicit-constructor,hicpp-explicit-conversions)
 	/**
@@ -62,28 +62,32 @@ public:
 	 * @brief Direct access to the pointer.
 	 * @return The raw pointer.
 	 */
-	Ptr* get() { return mp_object; }
+	auto get() -> Ptr* { return mp_object; }
 	/**
 	 * @brief Direct access to the address of the pointer.
 	 * @return The address of pointer.
 	 */
-	Ptr** addr() { return (&mp_object); }
+	auto addr() -> Ptr** { return (&mp_object); }
 
 	/**
 	 * @brief Direct access to the address of the pointer with type change.
 	 * @tparam Alias The new type.
 	 * @return The raw pointer with the requested type.
 	 */
-	template <class Alias>
-	Alias* getAs() { return reinterpret_cast<Alias*>(mp_object); }
+	template<class Alias>
+	auto getAs() -> Alias* {
+		return reinterpret_cast<Alias*>(mp_object);
+	}
 
 	/**
 	 * @brief Direct access to the address of the pointer with type change.
 	 * @tparam Alias The new type.
 	 * @return The address of pointer with the requested type.
 	 */
-	template <class Alias>
-	Alias** addrAs() { return reinterpret_cast<Alias**>(&mp_object); }
+	template<class Alias>
+	auto addrAs() -> Alias** {
+		return reinterpret_cast<Alias**>(&mp_object);
+	}
 
 	/**
 	 * @brief Request memory release.
@@ -109,7 +113,9 @@ public:
 		if (iOther.isMemoryOwned()) {
 			iOther.leaveOwnership();
 			takeOwnership();
-		} else { leaveOwnership(); }
+		} else {
+			leaveOwnership();
+		}
 	}
 
 	/**
@@ -120,7 +126,7 @@ public:
 	 * @brief Check if the object has memory ownership.
 	 * @return True if this object has memory ownership.
 	 */
-	[[nodiscard]] bool isMemoryOwned() const { return m_owner; }
+	[[nodiscard]] auto isMemoryOwned() const -> bool { return m_owner; }
 	/**
 	 * @brief Defines the ownership of this object on backend object.
 	 * @param[in] iOwn If the object should be owned.
@@ -133,4 +139,5 @@ private:
 	/// Pointer to the object.
 	Ptr* mp_object = nullptr;
 };
-} // namespace owl::input::video::windows
+
+}// namespace owl::input::video::windows

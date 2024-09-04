@@ -17,8 +17,8 @@ class OWL_API DrawData {
 public:
 	DrawData(const DrawData&) = default;
 	DrawData(DrawData&&) = default;
-	DrawData& operator=(const DrawData&) = default;
-	DrawData& operator=(DrawData&&) = default;
+	auto operator=(const DrawData&) -> DrawData& = default;
+	auto operator=(DrawData&&) -> DrawData& = default;
 	DrawData() = default;
 	/**
 	 * @brief Destructor.
@@ -33,7 +33,7 @@ public:
 	 * @param[in] iShaderName The shader name.
 	 */
 	virtual void init(const BufferLayout& iLayout, const std::string& iRenderer, std::vector<uint32_t>& iIndices,
-	                  const std::string& iShaderName) = 0;
+					  const std::string& iShaderName) = 0;
 
 	/**
 	 * @brief Bind this draw data.
@@ -56,13 +56,13 @@ public:
 	 * @brief Get the number of vertex to draw.
 	 * @return Number of vertex to draw
 	 */
-	[[nodiscard]] virtual uint32_t getIndexCount() const = 0;
+	[[nodiscard]] virtual auto getIndexCount() const -> uint32_t = 0;
 
 	/**
 	 * @brief Create a new drax data buffer.
 	 * @return Pointer to the created buffer.
 	 */
-	static shared<DrawData> create();
+	static auto create() -> shared<DrawData>;
 
 	/**
 	 * @brief Define the shader for this object.
@@ -71,4 +71,5 @@ public:
 	 */
 	virtual void setShader(const std::string& iShaderName, const std::string& iRenderer) = 0;
 };
-} // namespace owl::renderer
+
+}// namespace owl::renderer

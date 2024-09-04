@@ -23,8 +23,8 @@ public:
 	Entity() = default;
 	Entity(const Entity&) = default;
 	Entity(Entity&&) = default;
-	Entity& operator=(const Entity&) = default;
-	Entity& operator=(Entity&&) = default;
+	auto operator=(const Entity&) -> Entity& = default;
+	auto operator=(Entity&&) -> Entity& = default;
 
 	/**
 	 * @brief Destructor.
@@ -48,8 +48,8 @@ public:
 	 * @param[in] iArgs Arguments for the component's constructor
 	 * @return The entity's new component.
 	 */
-	template <typename T, typename... Args>
-	T& addComponent(Args&&... iArgs) {
+	template<typename T, typename... Args>
+	auto addComponent(Args&&... iArgs) -> T& {
 		OWL_CORE_ASSERT(!hasComponent<T>(), "Entity already has component!")
 		T& component = mp_scene->registry.emplace<T>(m_entityHandle, std::forward<Args>(iArgs)...);
 		mp_scene->onComponentAdded<T>(*this, component);
@@ -63,8 +63,8 @@ public:
 	 * @param[in] iArgs Arguments for the component's constructor
 	 * @return The entity's new or updated component.
 	 */
-	template <typename T, typename... Args>
-	T& addOrReplaceComponent(Args&&... iArgs) {
+	template<typename T, typename... Args>
+	auto addOrReplaceComponent(Args&&... iArgs) -> T& {
 		T& component = mp_scene->registry.emplace_or_replace<T>(m_entityHandle, std::forward<Args>(iArgs)...);
 		mp_scene->onComponentAdded<T>(*this, component);
 		return component;
@@ -77,8 +77,8 @@ public:
 	 * @tparam T The type of component.
 	 * @return The entity's component.
 	 */
-	template <typename T>
-	[[nodiscard]] T& getComponent() const {
+	template<typename T>
+	[[nodiscard]] auto getComponent() const -> T& {
 		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!")
 		return mp_scene->registry.get<T>(m_entityHandle);
 	}
@@ -88,14 +88,16 @@ public:
 	 * @tparam T The type of component.
 	 * @return true if the entity has the component.
 	 */
-	template <typename T>
-	[[nodiscard]] bool hasComponent() const { return mp_scene->registry.all_of<T>(m_entityHandle); }
+	template<typename T>
+	[[nodiscard]] auto hasComponent() const -> bool {
+		return mp_scene->registry.all_of<T>(m_entityHandle);
+	}
 
 	/**
 	 * @brief Remove the component from entity.
 	 * @tparam T The type of component.
 	 */
-	template <typename T>
+	template<typename T>
 	void removeComponent() const {
 		OWL_CORE_ASSERT(hasComponent<T>(), "Entity does not have component!")
 		mp_scene->registry.remove<T>(m_entityHandle);
@@ -123,20 +125,20 @@ public:
 	 * @brief Get entity's UUID.
 	 * @return Entity's UUID.
 	 */
-	[[nodiscard]] core::UUID getUUID() const { return getComponent<component::ID>().id; }
+	[[nodiscard]] auto getUUID() const -> core::UUID { return getComponent<component::ID>().id; }
 
 	/**
 	 * @brief Get entity's name.
 	 * @return Entity's name.
 	 */
-	[[nodiscard]] std::string getName() const { return getComponent<component::Tag>().tag; }
+	[[nodiscard]] auto getName() const -> std::string { return getComponent<component::Tag>().tag; }
 
 	/**
 	 * @brief Comparison operator.
 	 * @param[in] iOther Other entity to compare
 	 * @return true if entities are the same.
 	 */
-	bool operator==(const Entity& iOther) const {
+	auto operator==(const Entity& iOther) const -> bool {
 		return m_entityHandle == iOther.m_entityHandle && mp_scene == iOther.mp_scene;
 	}
 
@@ -145,7 +147,7 @@ public:
 	 * @param[in] iOther Other entity to compare
 	 * @return true if entities are not the same.
 	 */
-	bool operator!=(const Entity& iOther) const { return !(*this == iOther); }
+	auto operator!=(const Entity& iOther) const -> bool { return !(*this == iOther); }
 
 private:
 	/// Entity's handle.
@@ -154,4 +156,4 @@ private:
 	Scene* mp_scene = nullptr;
 	friend class Scene;
 };
-} // namespace owl::scene
+}// namespace owl::scene

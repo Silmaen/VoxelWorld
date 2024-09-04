@@ -15,12 +15,18 @@
 
 namespace owl::renderer::opengl {
 
+namespace {
+
 constexpr uint32_t g_maxFramebufferSize = 8192;
+
+}// namespace
 
 namespace utils {
 
 namespace {
-GLenum textureTarget(const bool iMultisampled) { return iMultisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D; }
+auto textureTarget(const bool iMultisampled) -> GLenum {
+	return iMultisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+}
 
 void createTextures(const bool iMultisampled, uint32_t* oId, const uint32_t iCount) {
 	glCreateTextures(textureTarget(iMultisampled), static_cast<GLsizei>(iCount), oId);
@@ -63,7 +69,7 @@ void attachDepthTexture(const uint32_t iId, const int iSamples, const GLenum iFo
 	glFramebufferTexture2D(GL_FRAMEBUFFER, iAttachmentType, textureTarget(multisampled), iId, 0);
 }
 
-bool isDepthFormat(const AttachmentSpecification::Format iFormat) {
+auto isDepthFormat(const AttachmentSpecification::Format iFormat) -> bool {
 	switch (iFormat) {
 		case AttachmentSpecification::Format::Depth24Stencil8:
 			return true;
@@ -76,7 +82,7 @@ bool isDepthFormat(const AttachmentSpecification::Format iFormat) {
 	return false;
 }
 
-GLenum FBTextureFormatToGL(const AttachmentSpecification::Format iFormat) {
+auto FBTextureFormatToGL(const AttachmentSpecification::Format iFormat) -> GLenum {
 	switch (iFormat) {
 		case AttachmentSpecification::Format::Rgba8:
 		case AttachmentSpecification::Format::Surface:
@@ -112,7 +118,7 @@ Framebuffer::~Framebuffer() {
 
 void Framebuffer::invalidate() {
 
-	if (m_rendererId) {
+	if (m_rendererId > 0) {
 		glDeleteFramebuffers(1, &m_rendererId);
 		glDeleteTextures(static_cast<GLsizei>(m_colorAttachments.size()), m_colorAttachments.data());
 		glDeleteTextures(1, &m_depthAttachment);
@@ -200,7 +206,7 @@ void Framebuffer::resize(const math::vec2ui iSize) {
 	invalidate();
 }
 
-int Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const int iY) {
+auto Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const int iY) -> int {
 	OWL_CORE_ASSERT(iAttachmentIndex < m_colorAttachments.size(), "ReadPixel bad attachment index")
 
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + iAttachmentIndex);

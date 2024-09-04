@@ -67,8 +67,8 @@ public:
 	Framebuffer() = default;
 	Framebuffer(const Framebuffer&) = default;
 	Framebuffer(Framebuffer&&) = default;
-	Framebuffer& operator=(const Framebuffer&) = default;
-	Framebuffer& operator=(Framebuffer&&) = default;
+	auto operator=(const Framebuffer&) -> Framebuffer& = default;
+	auto operator=(Framebuffer&&) -> Framebuffer& = default;
 
 	/**
 	 * @brief Destructor.
@@ -105,7 +105,7 @@ public:
 	 * @param[in] iY Vertical coordinate.
 	 * @return Pixel index.
 	 */
-	virtual int readPixel(uint32_t iAttachmentIndex, int iX, int iY) = 0;
+	virtual auto readPixel(uint32_t iAttachmentIndex, int iX, int iY) -> int = 0;
 
 	/**
 	 * @brief Reset an attachment with the given value.
@@ -125,37 +125,37 @@ public:
 	 * @param[in] iIndex The color Index.
 	 * @return The renderer ID.
 	 */
-	[[nodiscard]] virtual uint64_t getColorAttachmentRendererId(uint32_t iIndex) const = 0;
+	[[nodiscard]] virtual auto getColorAttachmentRendererId(uint32_t iIndex) const -> uint64_t = 0;
 
 	/**
 	 * @brief Returns true if the first byte is the lowest corner.
 	 * @return True if the data starts by the bottom.
 	 */
-	[[nodiscard]] virtual bool isUpsideDown() const { return false; }
+	[[nodiscard]] virtual auto isUpsideDown() const -> bool { return false; }
 
 	/**
 	 * @brief Get the lower point of the data.
 	 * @return The lower point of the data.
 	 */
-	[[nodiscard]] virtual math::vec2 getLowerData() const { return {0, 0}; }
+	[[nodiscard]] virtual auto getLowerData() const -> math::vec2 { return {0, 0}; }
 	/**
 	 * @brief Get the upper point of the data.
 	 * @return The upper point of the data.
 	 */
-	[[nodiscard]] virtual math::vec2 getUpperData() const { return {1, 1}; }
+	[[nodiscard]] virtual auto getUpperData() const -> math::vec2 { return {1, 1}; }
 
 	/**
 	 * @brief Get the specs.
 	 * @return The specs.
 	 */
-	[[nodiscard]] virtual const FramebufferSpecification& getSpecification() const = 0;
+	[[nodiscard]] virtual auto getSpecification() const -> const FramebufferSpecification& = 0;
 
 	/**
 	 * @brief Create the frame buffer.
 	 * @param[in] iSpec Specifications.
 	 * @return The Frame buffer.
 	 */
-	static shared<Framebuffer> create(const FramebufferSpecification& iSpec);
+	static auto create(const FramebufferSpecification& iSpec) -> shared<Framebuffer>;
 
 private:
 };

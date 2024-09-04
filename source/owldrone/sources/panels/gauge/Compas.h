@@ -13,7 +13,7 @@ namespace drone::panels::gauge {
 /**
  * @brief Class Compas
  */
-class Compas final: public BaseGauge {
+class Compas final : public BaseGauge {
 public:
 	/**
 	 * @brief Constructor.
@@ -28,22 +28,22 @@ public:
 	/**
 	 * @brief Copy constructor.
 	 */
-	Compas(const Compas &) = default;
+	Compas(const Compas&) = default;
 
 	/**
 	 * @brief Move constructor.
 	 */
-	Compas(Compas &&) = default;
+	Compas(Compas&&) = default;
 
 	/**
 	 * @brief Copy affectation operator.
 	 */
-	Compas &operator=(const Compas &) = default;
+	auto operator=(const Compas&) -> Compas& = default;
 
 	/**
 	 * @brief Move affectation operator.
 	 */
-	Compas &operator=(Compas &&) = default;
+	auto operator=(Compas&&) -> Compas& = default;
 
 	/**
 	 * @brief Draw the  gauge back ground.
@@ -63,7 +63,7 @@ public:
 
 private:
 	float heading = 0;
-	float headingToAngle();
+	auto headingToAngle() -> float;
 
 	owl::shared<owl::renderer::Texture> background = nullptr;
 	owl::shared<owl::renderer::Texture> cursor = nullptr;

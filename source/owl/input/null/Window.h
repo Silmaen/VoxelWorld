@@ -20,16 +20,16 @@ namespace owl::input::null {
  */
 class OWL_API Window final : public ::owl::input::Window {
 public:
-	Window(const Window &) = delete;
-	Window(Window &&) = delete;
-	Window &operator=(const Window &) = delete;
-	Window &operator=(Window &&) = delete;
+	Window(const Window&) = delete;
+	Window(Window&&) = delete;
+	auto operator=(const Window&) -> Window& = delete;
+	auto operator=(Window&&) -> Window& = delete;
 
 	/**
 	 * @brief Default constructor.
 	 * @param[in] iProps The window properties.
 	 */
-	explicit Window(const Properties &iProps);
+	explicit Window(const Properties& iProps);
 
 	/**
 	 * @brief Destructor.
@@ -45,31 +45,31 @@ public:
 	 * @brief Get Size attribute of width.
 	 * @return The window's width.
 	 */
-	[[nodiscard]] uint32_t getWidth() const override { return m_windowData.m_size.x(); }
+	[[nodiscard]] auto getWidth() const -> uint32_t override { return m_windowData.m_size.x(); }
 
 	/**
 	 * @brief Get Size attribute of height.
 	 * @return The window's height.
 	 */
-	[[nodiscard]] uint32_t getHeight() const override { return m_windowData.m_size.y(); }
+	[[nodiscard]] auto getHeight() const -> uint32_t override { return m_windowData.m_size.y(); }
 
 	/**
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] const math::vec2ui& getSize() const override { return m_windowData.m_size; }
+	[[nodiscard]] auto getSize() const -> const math::vec2ui& override { return m_windowData.m_size; }
 
 	/**
 	 * @brief Get the type of window manager.
 	 * @return The window manager's type.
 	 */
-	[[nodiscard]] Type getType() const override { return Type::Null; }
+	[[nodiscard]] auto getType() const -> Type override { return Type::Null; }
 
 	/**
 	 * @brief Define the Event Callback function.
 	 * @param[in] iCallback The new callback function.
 	 */
-	void setEventCallback(const EventCallback &iCallback) override { m_windowData.m_eventCallback = iCallback; }
+	void setEventCallback(const EventCallback& iCallback) override { m_windowData.m_eventCallback = iCallback; }
 	/**
 	 * @brief St the VSync.
 	 * @param[in] iEnabled Should VSync enabled.
@@ -80,13 +80,13 @@ public:
 	 * @brief Check for VSync.
 	 * @return True if VSync enabled.
 	 */
-	[[nodiscard]] bool isVSync() const override;
+	[[nodiscard]] auto isVSync() const -> bool override;
 
 	/**
 	 * @brief Access to the Native Window.
 	 * @return Native window's raw pointer.
 	 */
-	[[nodiscard]] void *getNativeWindow() const override { return mp_glfwWindow; }
+	[[nodiscard]] auto getNativeWindow() const -> void* override { return mp_glfwWindow; }
 
 	/**
 	 * @brief Terminate the window.
@@ -98,10 +98,10 @@ private:
 	 * @brief Initialize the window.
 	 * @param[in] iProps Properties of the window.
 	 */
-	void init(const Properties &iProps);
+	void init(const Properties& iProps);
 
 	/// Pointer to the GLFW window.
-	void *mp_glfwWindow = nullptr;
+	void* mp_glfwWindow = nullptr;
 
 	/**
 	 * @brief Window's data.
@@ -110,7 +110,7 @@ private:
 		/// Window's title.
 		std::string m_title;
 		/// Window's size.
-		math::vec2ui m_size {0,0};
+		math::vec2ui m_size{0, 0};
 		/// Window's VSync property.
 		bool m_VSync = false;
 		/// Event Call back.

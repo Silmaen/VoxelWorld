@@ -18,6 +18,6 @@ namespace owl::math {
  * @param[in] iX Denominator.
  * @return Arc tangent with the right quadrant.
  */
-OWL_API float atan2(float iY, float iX);
+OWL_API auto atan2(float iY, float iX) -> float;
 
 }// namespace owl::math

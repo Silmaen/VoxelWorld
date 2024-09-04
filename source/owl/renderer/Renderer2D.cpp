@@ -118,7 +118,7 @@ struct internalData {
 	bool doTriangleDraw = false;
 };
 
-math::mat4 toTransform(const PRS& iTransform) {
+auto toTransform(const PRS& iTransform) -> math::mat4 {
 	return math::translate(math::identity<float, 4>(), iTransform.position) *
 		   math::rotate(math::identity<float, 4>(), math::radians(iTransform.rotation), {0.0f, 0.0f, 1.0f}) *
 		   math::scale(math::identity<float, 4>(), {iTransform.size.x(), iTransform.size.y(), 1.0f});
@@ -309,15 +309,17 @@ void Renderer2D::nextBatch() {
 	startBatch();
 }
 
-float Renderer2D::getLineWidth() { return g_data->lineWidth; }
+auto Renderer2D::getLineWidth() -> float { return g_data->lineWidth; }
 
 void Renderer2D::setLineWidth(const float iWidth) { g_data->lineWidth = iWidth; }
 
 void Renderer2D::drawDebugTriangle() { g_data->doTriangleDraw = true; }
 
 void Renderer2D::drawLine(const LineData& iLineData) {
-	g_data->line.vertexBuf.emplace_back(utils::LineVertex{iLineData.point1, iLineData.color, iLineData.entityID});
-	g_data->line.vertexBuf.emplace_back(utils::LineVertex{iLineData.point2, iLineData.color, iLineData.entityID});
+	g_data->line.vertexBuf.emplace_back(
+			utils::LineVertex{.position = iLineData.point1, .color = iLineData.color, .entityID = iLineData.entityID});
+	g_data->line.vertexBuf.emplace_back(
+			utils::LineVertex{.position = iLineData.point2, .color = iLineData.color, .entityID = iLineData.entityID});
 	g_data->line.indexCount += 2;
 	g_data->stats.drawCalls++;
 }
@@ -327,7 +329,9 @@ void Renderer2D::drawRect(const RectData& iRectData) {
 	std::vector<math::vec3> points;
 	static const std::vector<std::pair<uint8_t, uint8_t>> idx = {{0, 1}, {1, 2}, {2, 3}, {3, 0}};
 	for (const auto& vtx: utils::g_quadVertexPositions) points.emplace_back(trans * vtx);
-	for (const auto& [p1, p2]: idx) drawLine({points[p1], points[p2], iRectData.color, iRectData.entityID});
+	for (const auto& [p1, p2]: idx)
+		drawLine(
+				{.point1 = points[p1], .point2 = points[p2], .color = iRectData.color, .entityID = iRectData.entityID});
 }
 
 void Renderer2D::drawPolyLine(const PolyLineData& iLineData) {
@@ -347,7 +351,9 @@ void Renderer2D::drawPolyLine(const PolyLineData& iLineData) {
 	}
 	if (iLineData.closed)
 		link.emplace_back(iLineData.points.size() - 1, 0);
-	for (const auto& [p1, p2]: link) drawLine({points[p1], points[p2], iLineData.color, iLineData.entityID});
+	for (const auto& [p1, p2]: link)
+		drawLine(
+				{.point1 = points[p1], .point2 = points[p2], .color = iLineData.color, .entityID = iLineData.entityID});
 }
 
 void Renderer2D::drawCircle(const CircleData& iCircleData) {
@@ -424,6 +430,6 @@ void Renderer2D::resetStats() {
 	g_data->stats.quadCount = 0;
 }
 
-Renderer2D::Statistics Renderer2D::getStats() { return g_data->stats; }
+auto Renderer2D::getStats() -> Renderer2D::Statistics { return g_data->stats; }
 
 }// namespace owl::renderer

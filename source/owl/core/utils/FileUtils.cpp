@@ -11,7 +11,7 @@
 
 namespace owl::core::utils {
 
-std::string fileToString(const std::filesystem::path &iFile) {
+auto fileToString(const std::filesystem::path& iFile) -> std::string {
 	if (!exists(iFile)) {
 		OWL_CORE_WARN("Shader file '{}' does not exists", iFile.string())
 		return "";
@@ -21,8 +21,7 @@ std::string fileToString(const std::filesystem::path &iFile) {
 	t.seekg(0, std::ios::end);
 	str.reserve(static_cast<size_t>(t.tellg()));
 	t.seekg(0, std::ios::beg);
-	str.assign((std::istreambuf_iterator<char>(t)),
-	           std::istreambuf_iterator<char>());
+	str.assign((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 	return str;
 }
 

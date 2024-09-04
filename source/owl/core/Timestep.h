@@ -60,7 +60,7 @@ public:
 	 * @brief Get the seconds elapsed since last update.
 	 * @return Seconds elapsed.
 	 */
-	[[nodiscard]] float getSeconds() const {
+	[[nodiscard]] auto getSeconds() const -> float {
 		return static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(m_delta).count()) / sMillis;
 	}
 
@@ -68,7 +68,7 @@ public:
 	 * @brief Get the milliseconds elapsed since last update.
 	 * @return Milliseconds elapsed.
 	 */
-	[[nodiscard]] float getMilliseconds() const {
+	[[nodiscard]] auto getMilliseconds() const -> float {
 		return static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(m_delta).count()) / sMillis;
 	}
 
@@ -76,19 +76,19 @@ public:
 	 * @brief Get the mean number of update call in one second.
 	 * @return The Frame per second number.
 	 */
-	[[nodiscard]] float getFps() const { return sMillis / getMilliseconds(); }
+	[[nodiscard]] auto getFps() const -> float { return sMillis / getMilliseconds(); }
 
 	/**
 	 * @brief Get the mean number of update call in one second.
 	 * @return The Frame per second number.
 	 */
-	[[nodiscard]] float getStabilizedFps() const;
+	[[nodiscard]] auto getStabilizedFps() const -> float;
 
 	/**
 	 * @brief Get the frame number.
 	 * @return The Frame number.
 	 */
-	[[nodiscard]] uint64_t getFrameNumber() const { return m_frameId; }
+	[[nodiscard]] auto getFrameNumber() const -> uint64_t { return m_frameId; }
 
 private:
 	/// Last update call point.

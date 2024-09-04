@@ -18,7 +18,7 @@ using namespace owl;
 
 namespace drone::panels {
 
-constexpr ImVec2 vec(math::vec2 iVec) { return {iVec.x(), iVec.y()}; }
+constexpr auto vec(math::vec2 iVec) -> ImVec2 { return {iVec.x(), iVec.y()}; }
 
 Gauges::Gauges() {
 
@@ -26,10 +26,10 @@ Gauges::Gauges() {
 			.size = {1280, 720},
 			.attachments =
 					{
-							{renderer::AttachmentSpecification::Format::Surface,
-							 renderer::AttachmentSpecification::Tiling::Optimal},
-							{renderer::AttachmentSpecification::Format::RedInteger,
-							 renderer::AttachmentSpecification::Tiling::Optimal},
+							{.format = renderer::AttachmentSpecification::Format::Surface,
+							 .tiling = renderer::AttachmentSpecification::Tiling::Optimal},
+							{.format = renderer::AttachmentSpecification::Format::RedInteger,
+							 .tiling = renderer::AttachmentSpecification::Tiling::Optimal},
 							//{renderer::AttachmentSpecification::Format::Depth24Stencil8,
 							// renderer::AttachmentSpecification::Tiling::Optimal}
 					},
@@ -45,7 +45,7 @@ Gauges::Gauges() {
 	m_gauges.emplace_back(mkShared<gauge::AirSpeed>());
 	// gauge for vertical speed
 	m_gauges.emplace_back(mkShared<gauge::VerticalSpeed>());
-	// gauge for altitude
+	// gauge for m_altitude
 	m_gauges.emplace_back(mkShared<gauge::Altitude>());
 	// gauge for compass
 	m_gauges.emplace_back(mkShared<gauge::Compas>());

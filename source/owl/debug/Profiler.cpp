@@ -15,7 +15,7 @@ Profiler::Profiler() = default;
 
 Profiler::~Profiler() { endSession(); }
 
-void Profiler::beginSession(const std::string &iName, const std::string &iFilepath) {
+void Profiler::beginSession(const std::string& iName, const std::string& iFilepath) {
 	const std::lock_guard<std::mutex> lock(m_profilerMutex);
 	if (m_currentSession) {
 		// If there is already a current session, then close it before beginning
@@ -48,7 +48,7 @@ void Profiler::endSession() {
 	internalEndSession();
 }
 
-void Profiler::writeProfile(const ProfileResult &iResult) {
+void Profiler::writeProfile(const ProfileResult& iResult) {
 	std::stringstream json;
 
 	json << std::setprecision(3) << std::fixed;
@@ -88,7 +88,7 @@ void Profiler::internalEndSession() {
 	}
 }
 
-ProfileTimer::ProfileTimer(const char *iName) : m_name(iName), m_startTimePoint{std::chrono::steady_clock::now()} {}
+ProfileTimer::ProfileTimer(const char* iName) : m_name(iName), m_startTimePoint{std::chrono::steady_clock::now()} {}
 
 ProfileTimer::~ProfileTimer() {
 	if (!m_stopped)

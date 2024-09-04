@@ -29,7 +29,7 @@ enum class ShaderDataType : uint8_t {
 	Bool
 };
 
-static uint32_t shaderDataTypeSize(const ShaderDataType iType) {
+static auto shaderDataTypeSize(const ShaderDataType iType) -> uint32_t {
 	switch (iType) {
 		case ShaderDataType::Float:
 			return 4;
@@ -88,7 +88,7 @@ struct OWL_API BufferElement {
 	 * @brief Get component's count.
 	 * @return Component's count.
 	 */
-	[[nodiscard]] uint32_t getComponentCount() const {
+	[[nodiscard]] auto getComponentCount() const -> uint32_t {
 		switch (type) {
 			case ShaderDataType::Float:
 				return 1;
@@ -142,18 +142,18 @@ public:
 	 * @brief Get buffer stride.
 	 * @return The buffer stride.
 	 */
-	[[nodiscard]] uint32_t getStride() const { return m_stride; }
+	[[nodiscard]] auto getStride() const -> uint32_t { return m_stride; }
 
 	/**
 	 * @brief Get the buffer Elements.
 	 * @return Buffer elements.
 	 */
-	[[nodiscard]] const std::vector<BufferElement>& getElements() const { return m_elements; }
+	[[nodiscard]] auto getElements() const -> const std::vector<BufferElement>& { return m_elements; }
 
-	[[nodiscard]] iterator begin() { return m_elements.begin(); }
-	[[nodiscard]] iterator end() { return m_elements.end(); }
-	[[nodiscard]] const_iterator begin() const { return m_elements.begin(); }
-	[[nodiscard]] const_iterator end() const { return m_elements.end(); }
+	[[nodiscard]] auto begin() -> iterator { return m_elements.begin(); }
+	[[nodiscard]] auto end() -> iterator { return m_elements.end(); }
+	[[nodiscard]] auto begin() const -> const_iterator { return m_elements.begin(); }
+	[[nodiscard]] auto end() const -> const_iterator { return m_elements.end(); }
 
 private:
 	/// List of element in the buffer data.
@@ -181,8 +181,8 @@ class OWL_API VertexBuffer {
 public:
 	VertexBuffer(const VertexBuffer&) = default;
 	VertexBuffer(VertexBuffer&&) = default;
-	VertexBuffer& operator=(const VertexBuffer&) = default;
-	VertexBuffer& operator=(VertexBuffer&&) = default;
+	auto operator=(const VertexBuffer&) -> VertexBuffer& = default;
+	auto operator=(VertexBuffer&&) -> VertexBuffer& = default;
 	VertexBuffer() = default;// ---UNCOVER---
 	/**
 	 * @brief Destructor.
@@ -210,7 +210,7 @@ public:
 	 * @brief Get the buffer data layout.
 	 * @return Data layout.
 	 */
-	[[nodiscard]] const BufferLayout& getLayout() const { return m_layout; }
+	[[nodiscard]] auto getLayout() const -> const BufferLayout& { return m_layout; }
 
 	/**
 	 * @brief Define the data layout.
@@ -230,8 +230,8 @@ class OWL_API IndexBuffer {
 public:
 	IndexBuffer(const IndexBuffer&) = default;
 	IndexBuffer(IndexBuffer&&) = default;
-	IndexBuffer& operator=(const IndexBuffer&) = default;
-	IndexBuffer& operator=(IndexBuffer&&) = default;
+	auto operator=(const IndexBuffer&) -> IndexBuffer& = default;
+	auto operator=(IndexBuffer&&) -> IndexBuffer& = default;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -254,6 +254,6 @@ public:
 	 * @brief Get the number of element in the buffer.
 	 * @return Number of element in the buffer.
 	 */
-	[[nodiscard]] virtual uint32_t getCount() const = 0;
+	[[nodiscard]] virtual auto getCount() const -> uint32_t = 0;
 };
 }// namespace owl::renderer

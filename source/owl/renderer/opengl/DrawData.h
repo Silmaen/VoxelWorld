@@ -20,8 +20,8 @@ class OWL_API DrawData final : public renderer::DrawData {
 public:
 	DrawData(const DrawData&) = default;
 	DrawData(DrawData&&) = default;
-	DrawData& operator=(const DrawData&) = default;
-	DrawData& operator=(DrawData&&) = default;
+	auto operator=(const DrawData&) -> DrawData& = default;
+	auto operator=(DrawData&&) -> DrawData& = default;
 	DrawData() = default;
 	/**
 	 * @brief Destructor.
@@ -36,7 +36,7 @@ public:
 	 * @param[in] iShaderName The shader name.
 	 */
 	void init(const BufferLayout& iLayout, const std::string& iRenderer, std::vector<uint32_t>& iIndices,
-	          const std::string& iShaderName) override;
+			  const std::string& iShaderName) override;
 
 	/**
 	 * @brief Bind this draw data.
@@ -59,7 +59,7 @@ public:
 	 * @brief Get the number of vertex to draw.
 	 * @return Number of vertex to draw
 	 */
-	[[nodiscard]] uint32_t getIndexCount() const override;
+	[[nodiscard]] auto getIndexCount() const -> uint32_t override;
 
 	/**
 	 * @brief Define the shader for this object.
@@ -76,4 +76,4 @@ private:
 	/// Pointer to the shader.
 	shared<Shader> mp_shader;
 };
-} // namespace owl::renderer::opengl
+}// namespace owl::renderer::opengl

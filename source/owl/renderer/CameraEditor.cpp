@@ -46,19 +46,19 @@ void CameraEditor::onEvent(event::Event& ioEvent) {
 			[&](auto&& TZ1) { return onMouseScroll(std::forward<decltype(TZ1)>(TZ1)); });
 }
 
-math::vec3 CameraEditor::getUpDirection() const {
+auto CameraEditor::getUpDirection() const -> math::vec3 {
 	return math::rotate(getOrientation(), math::vec3({0.0f, 1.0f, 0.0f}));
 }
 
-math::vec3 CameraEditor::getRightDirection() const {
+auto CameraEditor::getRightDirection() const -> math::vec3 {
 	return math::rotate(getOrientation(), math::vec3({1.0f, 0.0f, 0.0f}));
 }
 
-math::vec3 CameraEditor::getForwardDirection() const {
+auto CameraEditor::getForwardDirection() const -> math::vec3 {
 	return math::rotate(getOrientation(), math::vec3({0.0f, 0.0f, -1.0f}));
 }
 
-math::quat CameraEditor::getOrientation() const { return {1.0, -m_pitch, -m_yaw, 0.0f}; }
+auto CameraEditor::getOrientation() const -> math::quat { return {1.0, -m_pitch, -m_yaw, 0.0f}; }
 
 void CameraEditor::updateProjection() {
 	m_aspectRatio = m_viewportSize.ratio();
@@ -81,7 +81,7 @@ void CameraEditor::updateView() {
 	m_viewMatrix = math::inverse(m_viewMatrix);
 }
 
-bool CameraEditor::onMouseScroll(const event::MouseScrolledEvent& iEvent) {
+auto CameraEditor::onMouseScroll(const event::MouseScrolledEvent& iEvent) -> bool {
 	const float delta = iEvent.getYOff() * 0.1f;
 	mouseZoom(delta);
 	updateView();
@@ -108,22 +108,22 @@ void CameraEditor::mouseZoom(const float iDelta) {
 	}
 }
 
-math::vec3 CameraEditor::calculatePosition() const { return m_focalPoint - getForwardDirection() * m_distance; }
+auto CameraEditor::calculatePosition() const -> math::vec3 { return m_focalPoint - getForwardDirection() * m_distance; }
 
-std::pair<float, float> CameraEditor::panSpeed() const {
+auto CameraEditor::panSpeed() const -> std::pair<float, float> {
 	const float x = std::min(static_cast<float>(m_viewportSize.x()) / 1000.0f, 2.4f);// max = 2.4f
-	const float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
+	const float xFactor = (0.0366f * (x * x)) - (0.1778f * x) + 0.3021f;
 
 	const float y = std::min(static_cast<float>(m_viewportSize.y()) / 1000.0f, 2.4f);// max = 2.4f
-	const float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
+	const float yFactor = (0.0366f * (y * y)) - (0.1778f * y) + 0.3021f;
 
 	return {xFactor, yFactor};
 }
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-float CameraEditor::rotationSpeed() const { return 0.8f; }
+auto CameraEditor::rotationSpeed() const -> float { return 0.8f; }
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-float CameraEditor::zoomSpeed() const {
+auto CameraEditor::zoomSpeed() const -> float {
 	const float distance = std::max(m_distance * 0.2f, 0.0f);
 	return std::min(distance * distance, 100.0f);// max speed = 100
 }

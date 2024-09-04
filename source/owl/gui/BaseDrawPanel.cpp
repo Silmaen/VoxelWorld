@@ -15,13 +15,17 @@
 
 namespace owl::gui {
 
-constexpr ImVec2 vec(math::vec2 iVec) { return {iVec.x(), iVec.y()}; }
+namespace {
+
+constexpr auto vec(math::vec2 iVec) -> ImVec2 { return {iVec.x(), iVec.y()}; }
+
+}// namespace
 
 BaseDrawPanel::BaseDrawPanel() = default;
 
 BaseDrawPanel::~BaseDrawPanel() = default;
 
-void BaseDrawPanel::onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) { OWL_PROFILE_FUNCTION() }
+void BaseDrawPanel::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) { OWL_PROFILE_FUNCTION() }
 
 // NOLINTBEGIN(performance-no-int-to-ptr)
 void BaseDrawPanel::onRender() {
@@ -42,7 +46,7 @@ void BaseDrawPanel::onRender() {
 	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	m_viewportSize = {static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y)};
 	if (const uint64_t textureId = mp_framebuffer->getColorAttachmentRendererId(0); textureId != 0)
-		ImGui::Image(reinterpret_cast<void *>(textureId), viewportPanelSize, vec(mp_framebuffer->getLowerData()),
+		ImGui::Image(reinterpret_cast<void*>(textureId), viewportPanelSize, vec(mp_framebuffer->getLowerData()),
 					 vec(mp_framebuffer->getUpperData()));
 	else
 		OWL_WARN("No frameBuffer to render...")

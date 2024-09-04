@@ -26,7 +26,7 @@ void operator delete(void* memory, size_t size) OWL_DEALLOC_EXCEPT;
  * @param[in] size Size to allocate.
  * @return Pointer to allocated memory.
  */
-void* operator new(size_t size) {
+auto operator new(size_t size) -> void* {
 	void* mem = malloc(size);
 	owl::debug::TrackerAPI::allocate(mem, size);
 	return mem;

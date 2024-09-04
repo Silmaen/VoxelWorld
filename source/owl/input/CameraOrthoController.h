@@ -21,8 +21,8 @@ class OWL_API CameraOrthoController final {
 public:
 	CameraOrthoController(const CameraOrthoController&) = default;
 	CameraOrthoController(CameraOrthoController&&) = default;
-	CameraOrthoController& operator=(const CameraOrthoController&) = default;
-	CameraOrthoController& operator=(CameraOrthoController&&) = default;
+	auto operator=(const CameraOrthoController&) -> CameraOrthoController& = default;
+	auto operator=(CameraOrthoController&&) -> CameraOrthoController& = default;
 
 	/**
 	 * @brief Constructor.
@@ -58,19 +58,19 @@ public:
 	 * @brief Access to the camera.
 	 * @return The camera.
 	 */
-	renderer::CameraOrtho& getCamera() { return m_camera; }
+	auto getCamera() -> renderer::CameraOrtho& { return m_camera; }
 
 	/**
 	 * @brief Access to the camera.
 	 * @return The camera.
 	 */
-	[[nodiscard]] const renderer::CameraOrtho& getCamera() const { return m_camera; }
+	[[nodiscard]] auto getCamera() const -> const renderer::CameraOrtho& { return m_camera; }
 
 	/**
 	 * @brief Access to the zoom level.
 	 * @return Teh Zoom level.
 	 */
-	[[nodiscard]] float getZoomLevel() const { return m_zoomLevel; }
+	[[nodiscard]] auto getZoomLevel() const -> float { return m_zoomLevel; }
 
 	/**
 	 * @brief Define the new zoom level.
@@ -84,14 +84,14 @@ private:
 	 * @param[in] iEvent The Mouse event.
 	 * @return True if treated.
 	 */
-	bool onMouseScrolled(const event::MouseScrolledEvent& iEvent);
+	auto onMouseScrolled(const event::MouseScrolledEvent& iEvent) -> bool;
 
 	/**
 	 * @brief Action on window resize.
 	 * @param[in] iEvent The Window resize event.
 	 * @return True if treated.
 	 */
-	bool onWindowResized(const event::WindowResizeEvent& iEvent);
+	auto onWindowResized(const event::WindowResizeEvent& iEvent) -> bool;
 
 	/// Aspect ratio of the camera.
 	float m_aspectRatio;

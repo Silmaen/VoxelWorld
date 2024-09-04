@@ -13,7 +13,7 @@ using namespace owl;
 
 namespace drone::panels {
 
-constexpr ImVec2 vec(math::vec2 iVec) { return {iVec.x(), iVec.y()}; }
+constexpr auto vec(math::vec2 iVec) -> ImVec2 { return {iVec.x(), iVec.y()}; }
 
 Viewport::Viewport() {
 	const renderer::FramebufferSpecification specs{

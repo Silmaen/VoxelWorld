@@ -19,7 +19,7 @@ namespace owl::math {
  * @param[in] iScale Scale vector.
  * @return Transformation matrix.
  */
-OWL_API mat4 composeTransform(const vec3& iTranslation, const vec3& iRotation, const vec3& iScale);
+OWL_API auto composeTransform(const vec3& iTranslation, const vec3& iRotation, const vec3& iScale) -> mat4;
 
 /**
  * @brief Decompose transformation's matrix into vector components.
@@ -29,6 +29,6 @@ OWL_API mat4 composeTransform(const vec3& iTranslation, const vec3& iRotation, c
  * @param[out] oScale Scale vector.
  * @return True if decomposition succeed.
  */
-OWL_API bool decomposeTransform(const mat4& iTransform, vec3& oTranslation, vec3& oRotation, vec3& oScale);
+OWL_API auto decomposeTransform(const mat4& iTransform, vec3& oTranslation, vec3& oRotation, vec3& oScale) -> bool;
 
 }// namespace owl::math

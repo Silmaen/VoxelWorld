@@ -33,10 +33,10 @@ public:
 	 * @param[in] iFilepath The file to load.
 	 * @return True if everything works.
 	 */
-	[[nodiscard]] bool deserialize(const std::filesystem::path& iFilepath) const;
+	[[nodiscard]] auto deserialize(const std::filesystem::path& iFilepath) const -> bool;
 
 private:
 	/// Parent Scene.
 	shared<Scene> mp_scene;
 };
-} // namespace owl::scene
+}// namespace owl::scene

@@ -26,25 +26,25 @@ public:
 	 * @brief Get window's width.
 	 * @return The window's width.
 	 */
-	[[nodiscard]] uint32_t getWidth() const { return m_size.x(); }
+	[[nodiscard]] auto getWidth() const -> uint32_t { return m_size.x(); }
 
 	/**
 	 * @brief Get window's height.
 	 * @return The window's height.
 	 */
-	[[nodiscard]] uint32_t getHeight() const { return m_size.y(); }
+	[[nodiscard]] auto getHeight() const -> uint32_t { return m_size.y(); }
 
 	/**
 	 * @brief Get window's size.
 	 * @return The window's size.
 	 */
-	[[nodiscard]] const math::vec2ui& getSize() const { return m_size; }
+	[[nodiscard]] auto getSize() const -> const math::vec2ui& { return m_size; }
 
 	/**
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override {
+	[[nodiscard]] auto toString() const -> std::string override {
 		return fmt::format("WindowResizeEvent: {}, {}", m_size.x(), m_size.y());
 	}
 
@@ -52,25 +52,25 @@ public:
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("WindowResizeEvent"); }
+	[[nodiscard]] auto getName() const -> std::string override { return fmt::format("WindowResizeEvent"); }
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::WindowResize; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::WindowResize; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 
 	/**
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
 
 private:
 	/// New size.
@@ -91,31 +91,31 @@ public:
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override { return fmt::format("WindowCloseEvent"); }
+	[[nodiscard]] auto toString() const -> std::string override { return fmt::format("WindowCloseEvent"); }
 
 	/**
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("WindowCloseEvent"); }
+	[[nodiscard]] auto getName() const -> std::string override { return fmt::format("WindowCloseEvent"); }
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::WindowClose; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::WindowClose; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 
 	/**
 		 * @brief Get the event's category flags.
 		 * @return Event's category flags.
 		 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
 };
 
 /**
@@ -132,31 +132,31 @@ public:
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override { return fmt::format("AppTickEvent"); }
+	[[nodiscard]] auto toString() const -> std::string override { return fmt::format("AppTickEvent"); }
 
 	/**
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("AppTickEvent"); }
+	[[nodiscard]] auto getName() const -> std::string override { return fmt::format("AppTickEvent"); }
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::AppTick; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::AppTick; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 
 	/**
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
 };
 
 /**
@@ -173,31 +173,31 @@ public:
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override { return fmt::format("AppUpdateEvent"); }
+	[[nodiscard]] auto toString() const -> std::string override { return fmt::format("AppUpdateEvent"); }
 
 	/**
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("AppUpdateEvent"); }
+	[[nodiscard]] auto getName() const -> std::string override { return fmt::format("AppUpdateEvent"); }
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::AppUpdate; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::AppUpdate; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 
 	/**
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
 };
 
 /**
@@ -214,30 +214,30 @@ public:
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] std::string toString() const override { return fmt::format("AppRenderEvent"); }
+	[[nodiscard]] auto toString() const -> std::string override { return fmt::format("AppRenderEvent"); }
 
 	/**
 	 * @brief Get the event's name.
 	 * @return Event's name.
 	 */
-	[[nodiscard]] std::string getName() const override { return fmt::format("AppRenderEvent"); }
+	[[nodiscard]] auto getName() const -> std::string override { return fmt::format("AppRenderEvent"); }
 
 	/**
 	 * @brief Get the event's static type.
 	 * @return Event's static type.
 	 */
-	[[nodiscard]] static Type getStaticType() { return Type::AppRender; }
+	[[nodiscard]] static auto getStaticType() -> Type { return Type::AppRender; }
 
 	/**
 	 * @brief Get the event's type.
 	 * @return Event's type.
 	 */
-	[[nodiscard]] Type getType() const override { return getStaticType(); }
+	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
 
 	/**
 	 * @brief Get the event's category flags.
 	 * @return Event's category flags.
 	 */
-	[[nodiscard]] uint8_t getCategoryFlags() const override;
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
 };
 }// namespace owl::event

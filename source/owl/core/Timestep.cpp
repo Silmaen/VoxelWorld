@@ -12,7 +12,7 @@
 
 namespace owl::core {
 
-float Timestep::getStabilizedFps() const {
+auto Timestep::getStabilizedFps() const -> float {
 	return std::accumulate(m_statFps.begin(), m_statFps.end(), 0.f) / static_cast<float>(m_statFps.size());
 }
 

@@ -30,31 +30,33 @@ void EditorLayer::onDetach() {
 	m_viewPort.reset();
 }
 
-void EditorLayer::onUpdate(const core::Timestep &iTimeStep) {
+void EditorLayer::onUpdate(const core::Timestep& iTimeStep) {
 	OWL_PROFILE_FUNCTION()
 
 	m_viewPort->onUpdate(iTimeStep);
 	m_mapWindow->onUpdate(iTimeStep);
 }
 
-void EditorLayer::onEvent(event::Event &ioEvent) {
+void EditorLayer::onEvent(event::Event& ioEvent) {
 	OWL_PROFILE_FUNCTION()
 
 	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::KeyPressedEvent>(
-			[this](auto &&PH1) { return onKeyPressed(std::forward<decltype(PH1)>(PH1)); });
+			[this](auto&& PH1) { return onKeyPressed(std::forward<decltype(PH1)>(PH1)); });
 	dispatcher.dispatch<event::MouseButtonPressedEvent>(
-			[this](auto &&PH1) { return onMouseButtonPressed(std::forward<decltype(PH1)>(PH1)); });
+			[this](auto&& PH1) { return onMouseButtonPressed(std::forward<decltype(PH1)>(PH1)); });
 }
-bool EditorLayer::onKeyPressed(event::KeyPressedEvent &ioEvent) {
+
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
+auto EditorLayer::onKeyPressed(event::KeyPressedEvent& ioEvent) -> bool {
 	// Shortcuts
-	if (ioEvent.getRepeatCount() > 0)
+	if (static_cast<int>(ioEvent.getRepeatCount()) > 0)
 		return false;
 
 	// return non-blocking.
 	return false;
 }
-bool EditorLayer::onMouseButtonPressed(event::MouseButtonPressedEvent &ioEvent) {
+auto EditorLayer::onMouseButtonPressed(event::MouseButtonPressedEvent& ioEvent) -> bool {
 	if (ioEvent.getMouseButton() == input::mouse::ButtonLeft) {
 		return false;
 	}
@@ -62,8 +64,9 @@ bool EditorLayer::onMouseButtonPressed(event::MouseButtonPressedEvent &ioEvent) 
 	// return non-blocking.
 	return false;
 }
+// NOLINTEND(readability-convert-member-functions-to-static)
 
-void EditorLayer::onImGuiRender(const core::Timestep &) {
+void EditorLayer::onImGuiRender(const core::Timestep&) {
 	OWL_PROFILE_FUNCTION()
 	//=============================================================
 	renderMenu();
@@ -72,6 +75,7 @@ void EditorLayer::onImGuiRender(const core::Timestep &) {
 	m_mapWindow->onRender();
 }
 
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 void EditorLayer::renderMenu() {
 	if (ImGui::BeginMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
@@ -85,5 +89,6 @@ void EditorLayer::renderMenu() {
 		ImGui::EndMenuBar();
 	}
 }
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 }// namespace owl::raycaster

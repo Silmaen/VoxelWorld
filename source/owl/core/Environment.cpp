@@ -12,7 +12,7 @@
 
 namespace owl::core {
 
-std::string getEnv(const std::string &iKey) {
+auto getEnv(const std::string& iKey) -> std::string {
 #ifdef OWL_PLATFORM_WINDOWS
 	size_t requiredSize = 0;
 	auto err = getenv_s(&requiredSize, nullptr, 0, iKey.c_str());
@@ -25,14 +25,14 @@ std::string getEnv(const std::string &iKey) {
 		return "";
 	return buffer;
 #else
-	const char *oldPath = getenv(iKey.c_str());
+	const char* oldPath = getenv(iKey.c_str());
 	if (oldPath == nullptr)
 		return "";
 	return oldPath;
 #endif
 }
 
-void setEnv(const std::string &iKey, const std::string &iValue) {
+void setEnv(const std::string& iKey, const std::string& iValue) {
 #ifdef OWL_PLATFORM_WINDOWS
 	_putenv_s(iKey.c_str(), iValue.c_str());
 #else
@@ -40,22 +40,22 @@ void setEnv(const std::string &iKey, const std::string &iValue) {
 #endif
 }
 
-void appendEnv(const std::string &iKey, const std::string &iValue, const std::string &iSepparator) {
+void appendEnv(const std::string& iKey, const std::string& iValue, const std::string& iSeparator) {
 	auto str = getEnv(iKey);
 	if (str.empty())
 		str = iValue;
 	else
-		str = iValue + iSepparator + str;
+		str = iValue + iSeparator + str;
 	setEnv(iKey, str);
 }
 
 template<typename T>
-void setEnvValue(const std::string &iKey, const T &iValue) {
+void setEnvValue(const std::string& iKey, const T& iValue) {
 	setEnv(iKey, fmt::format("{}", iValue));
 }
 
 template<typename T>
-void appendEnvValue(const std::string &iKey, const T &iValue) {
+void appendEnvValue(const std::string& iKey, const T& iValue) {
 	appendEnv(iKey, fmt::format("{}", iValue));
 }
 

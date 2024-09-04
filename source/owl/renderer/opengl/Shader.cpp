@@ -18,7 +18,7 @@ namespace owl::renderer::opengl {
 
 namespace utils {
 namespace {
-uint32_t shaderStageToGlShader(const ShaderType& iStage) {
+auto shaderStageToGlShader(const ShaderType& iStage) -> uint32_t {
 	switch (iStage) {
 		case ShaderType::Vertex:
 			return GL_VERTEX_SHADER;

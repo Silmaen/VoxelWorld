@@ -21,10 +21,10 @@ public:
 	 * @brief Default constructor.
 	 */
 	Base2D();
-	Base2D(const Base2D &) = delete;
-	Base2D(Base2D &&) = delete;
-	Base2D &operator=(const Base2D &) = delete;
-	Base2D &operator=(Base2D &&) = delete;
+	Base2D(const Base2D&) = delete;
+	Base2D(Base2D&&) = delete;
+	auto operator=(const Base2D&) -> Base2D& = delete;
+	auto operator=(Base2D&&) -> Base2D& = delete;
 	/**
 	 * @brief Destructor.
 	 */
@@ -32,9 +32,9 @@ public:
 
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const core::Timestep &iTs) override;
-	void onEvent(event::Event &ioEvent) override;
-	void onImGuiRender(const core::Timestep &iTs) override;
+	void onUpdate(const core::Timestep& iTs) override;
+	void onEvent(event::Event& ioEvent) override;
+	void onImGuiRender(const core::Timestep& iTs) override;
 
 private:
 	input::CameraOrthoController m_cameraController;

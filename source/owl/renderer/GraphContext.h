@@ -17,10 +17,10 @@ namespace owl::renderer {
 class OWL_API GraphContext {
 public:
 	GraphContext() = default;
-	GraphContext(const GraphContext &) = delete;
-	GraphContext(GraphContext &&) = delete;
-	GraphContext &operator=(const GraphContext &) = delete;
-	GraphContext &operator=(GraphContext &&) = delete;
+	GraphContext(const GraphContext&) = delete;
+	GraphContext(GraphContext&&) = delete;
+	auto operator=(const GraphContext&) -> GraphContext& = delete;
+	auto operator=(GraphContext&&) -> GraphContext& = delete;
 
 	/**
 	 * @brief Destructor.
@@ -45,7 +45,7 @@ public:
 	 * @param[in,out] ioWindow The window into render context.
 	 * @return The created context.
 	 */
-	static uniq<GraphContext> create(void *ioWindow);
+	static auto create(void* ioWindow) -> uniq<GraphContext>;
 
 	/**
 	 * @brief Structure for holding version number.
@@ -58,7 +58,7 @@ public:
 		 * @param[in] iOther Version to compare
 		 * @return True if this is equal.
 		 */
-		[[nodiscard]] bool operator==(const Version &iOther) const {
+		[[nodiscard]] auto operator==(const Version& iOther) const -> bool {
 			return major == iOther.major && minor == iOther.minor;
 		}
 
@@ -67,7 +67,7 @@ public:
 		 * @param[in] iOther Version to compare
 		 * @return True if this is lower.
 		 */
-		[[nodiscard]] bool operator<(const Version &iOther) const {
+		[[nodiscard]] auto operator<(const Version& iOther) const -> bool {
 			return major < iOther.major || (major == iOther.major && minor < iOther.minor);
 		}
 
@@ -76,7 +76,7 @@ public:
 		 * @param[in] iOther Version to compare
 		 * @return True if this is lower.
 		 */
-		[[nodiscard]] bool operator<=(const Version &iOther) const {
+		[[nodiscard]] auto operator<=(const Version& iOther) const -> bool {
 			return major <= iOther.major || (major == iOther.major && minor <= iOther.minor);
 		}
 	};
@@ -85,6 +85,6 @@ public:
 	 * @brief Get version number of the backend API.
 	 * @return The version number.
 	 */
-	[[nodiscard]] virtual Version getVersion() const = 0;
+	[[nodiscard]] virtual auto getVersion() const -> Version = 0;
 };
 }// namespace owl::renderer

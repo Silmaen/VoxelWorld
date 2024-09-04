@@ -1,5 +1,5 @@
 /**
- * @file droneLayer.h
+ * @file DroneLayer.h
  * @author Silmaen
  * @date 16/09/2023
  * Copyright (c) 2023 All rights reserved.
@@ -13,37 +13,37 @@
 #include <owl.h>
 
 namespace drone {
-class droneLayer final : public owl::core::layer::Layer {
+class DroneLayer final : public owl::core::layer::Layer {
 public:
-	droneLayer(const droneLayer &) = delete;
-	droneLayer(droneLayer &&) = delete;
-	droneLayer &operator=(const droneLayer &) = delete;
-	droneLayer &operator=(droneLayer &&) = delete;
+	DroneLayer(const DroneLayer&) = delete;
+	DroneLayer(DroneLayer&&) = delete;
+	auto operator=(const DroneLayer&) -> DroneLayer& = delete;
+	auto operator=(DroneLayer&&) -> DroneLayer& = delete;
 	/**
 	 * @brief Default constructor.
 	 */
-	droneLayer();
+	DroneLayer();
 	/**
 	 * @brief Destructor.
 	 */
-	~droneLayer() override = default;
+	~DroneLayer() override = default;
 
 	void onAttach() override;
 	void onDetach() override;
-	void onUpdate(const owl::core::Timestep &iTimeStep) override;
-	void onEvent(owl::event::Event &ioEvent) override;
-	void onImGuiRender(const owl::core::Timestep &iTimeStep) override;
+	void onUpdate(const owl::core::Timestep& iTimeStep) override;
+	void onEvent(owl::event::Event& ioEvent) override;
+	void onImGuiRender(const owl::core::Timestep& iTimeStep) override;
 
 private:
-	void renderStats(const owl::core::Timestep &iTimeStep);
-	void renderFakeDrone(const owl::core::Timestep &iTimeStep);
+	void renderStats(const owl::core::Timestep& iTimeStep);
+	void renderFakeDrone(const owl::core::Timestep& iTimeStep);
 	void renderMenu();
 	void renderToolbar();
 
-	bool onKeyPressed(owl::event::KeyPressedEvent &ioEvent);
-	bool onMouseButtonPressed(owl::event::MouseButtonPressedEvent &ioEvent);
+	auto onKeyPressed(owl::event::KeyPressedEvent& ioEvent) -> bool;
+	auto onMouseButtonPressed(owl::event::MouseButtonPressedEvent& ioEvent) -> bool;
 
-	[[nodiscard]] bool isConnected() const;
+	[[nodiscard]] auto isConnected() const -> bool;
 	void toggleConnect();
 
 	bool connected = false;

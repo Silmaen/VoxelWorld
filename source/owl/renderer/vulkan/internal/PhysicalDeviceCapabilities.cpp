@@ -18,7 +18,7 @@
 
 namespace owl::renderer::vulkan::internal {
 
-PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice &iDev) : device(iDev) {
+PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice& iDev) : device(iDev) {
 	if (device == nullptr)
 		return;
 	vkGetPhysicalDeviceProperties(device, &properties);
@@ -45,14 +45,14 @@ PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice &i
 	if (hasExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME)) {
 		updateSurfaceInformations();
 		uint32_t index = 0;
-		auto *const gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
-		for (const auto &qFam: queueFamilies) {
-			if (qFam.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+		auto* const gc = dynamic_cast<vulkan::GraphContext*>(core::Application::get().getWindow().getGraphContext());
+		for (const auto& qFam: queueFamilies) {
+			if ((qFam.queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0u) {
 				graphicQueueIndex = index;
 			}
 			VkBool32 support = 0;
 			vkGetPhysicalDeviceSurfaceSupportKHR(device, index, gc->getSurface(), &support);
-			if (support) {
+			if (support != 0u) {
 				presentQueueIndex = index;
 			}
 			index++;
@@ -62,46 +62,46 @@ PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice &i
 
 PhysicalDeviceCapabilities::~PhysicalDeviceCapabilities() = default;
 
-bool PhysicalDeviceCapabilities::hasLayer(const std::string &iLayer) const {
+auto PhysicalDeviceCapabilities::hasLayer(const std::string& iLayer) const -> bool {
 	return std::ranges::find_if(supportedLayers.begin(), supportedLayers.end(),
-								[&iLayer](const VkLayerProperties &iLayerProp) {
+								[&iLayer](const VkLayerProperties& iLayerProp) {
 									return iLayerProp.layerName == iLayer;
 								}) != supportedLayers.end();
 }
 
-bool PhysicalDeviceCapabilities::hasExtension(const std::string &iExtension) const {
+auto PhysicalDeviceCapabilities::hasExtension(const std::string& iExtension) const -> bool {
 	return std::ranges::find_if(supportedExtensions.begin(), supportedExtensions.end(),
-								[&iExtension](const VkExtensionProperties &iExtensionProp) {
+								[&iExtension](const VkExtensionProperties& iExtensionProp) {
 									return iExtensionProp.extensionName == iExtension;
 								}) != supportedExtensions.end();
 }
 
-bool PhysicalDeviceCapabilities::hasLayers(const std::vector<std::string> &iLayers) const {
+auto PhysicalDeviceCapabilities::hasLayers(const std::vector<std::string>& iLayers) const -> bool {
 	return std::ranges::all_of(iLayers.begin(), iLayers.end(),
-							   [&](const auto &iLayer) { return this->hasLayer(iLayer); });
+							   [&](const auto& iLayer) { return this->hasLayer(iLayer); });
 }
 
-bool PhysicalDeviceCapabilities::hasExtensions(const std::vector<std::string> &iExtensions) const {
+auto PhysicalDeviceCapabilities::hasExtensions(const std::vector<std::string>& iExtensions) const -> bool {
 	return std::ranges::all_of(iExtensions.begin(), iExtensions.end(),
-							   [&](const auto &extension) { return this->hasExtension(extension); });
+							   [&](const auto& extension) { return this->hasExtension(extension); });
 }
 
-uint32_t PhysicalDeviceCapabilities::getScore() const {
-	if (!features.geometryShader)
+auto PhysicalDeviceCapabilities::getScore() const -> uint32_t {
+	if (features.geometryShader == 0u)
 		return 0;
 	if (surfaceFormats.empty() || presentModes.empty())
 		return 0;
 	uint32_t score = 0;
 	if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-		score += 1000;// favorize graphic card over CPU-integrated GPU
+		score += 1000;// favor graphic card over CPU-integrated GPU
 	score += properties.limits.maxImageDimension2D;
 	// checking the queue families
-	if (graphicQueueIndex == std::numeric_limits<uint32_t>::max() || !features.samplerAnisotropy)
+	if (graphicQueueIndex == std::numeric_limits<uint32_t>::max() || (features.samplerAnisotropy == 0u))
 		score *= 0;
 	return score;
 }
 
-std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance &iInstance) {
+auto enumerateDevices(const VkInstance& iInstance) -> std::vector<PhysicalDeviceCapabilities> {
 	std::vector<PhysicalDeviceCapabilities> resultVec;
 	uint32_t deviceCount = 0;
 	{
@@ -122,18 +122,18 @@ std::vector<PhysicalDeviceCapabilities> enumerateDevices(const VkInstance &iInst
 		return {};
 	}
 	resultVec.reserve(devices.size());
-	for (const auto &device: devices) { resultVec.emplace_back(device); }
+	for (const auto& device: devices) { resultVec.emplace_back(device); }
 	// sort by decreasing score...
 	if (!resultVec.empty())
 		std::ranges::sort(resultVec.begin(), resultVec.cend(),
-						  [](const PhysicalDeviceCapabilities &a, const PhysicalDeviceCapabilities &b) {
+						  [](const PhysicalDeviceCapabilities& a, const PhysicalDeviceCapabilities& b) {
 							  return a.getScore() > b.getScore();
 						  });
 	return resultVec;
 }
 
 void PhysicalDeviceCapabilities::updateSurfaceInformations() {
-	auto *const gc = dynamic_cast<vulkan::GraphContext *>(core::Application::get().getWindow().getGraphContext());
+	auto* const gc = dynamic_cast<vulkan::GraphContext*>(core::Application::get().getWindow().getGraphContext());
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, gc->getSurface(), &surfaceCapabilities);
 	uint32_t formatCount = 0;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, gc->getSurface(), &formatCount, nullptr);
