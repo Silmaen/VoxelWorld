@@ -104,6 +104,71 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       }
+    },
+    {
+      "name": "sanitizer-address",
+      "inherits": "clang-debug-shared",
+      "cacheVariables": {
+        "OWL_ENABLE_ADDRESS_SANITIZER": "ON",
+        "OWL_ENABLE_STACKTRACE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "sanitizer-thread",
+      "inherits": "clang-debug-shared",
+      "cacheVariables": {
+        "OWL_ENABLE_THREAD_SANITIZER": "ON",
+        "OWL_ENABLE_STACKTRACE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "sanitizer-undefined-behavior",
+      "inherits": "clang-debug-shared",
+      "cacheVariables": {
+        "OWL_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER": "ON",
+        "OWL_ENABLE_STACKTRACE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "sanitizer-leak",
+      "inherits": "clang-debug-shared",
+      "cacheVariables": {
+        "OWL_ENABLE_LEAK_SANITIZER": "ON",
+        "OWL_ENABLE_STACKTRACE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "sanitizer-memory",
+      "inherits": "clang-debug-shared",
+      "cacheVariables": {
+        "OWL_ENABLE_MEMORY_SANITIZER": "ON",
+        "OWL_ENABLE_STACKTRACE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     }
   ]
 }

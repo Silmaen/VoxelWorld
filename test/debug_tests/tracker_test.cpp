@@ -5,6 +5,7 @@
 
 using namespace owl::debug;
 
+#ifndef OWL_SANITIZER
 TEST(Tracker, base) {
 	const auto state = TrackerAPI::checkState();
 	EXPECT_TRUE(state.allocationCalls <= TrackerAPI::globals().allocationCalls);
@@ -32,3 +33,4 @@ TEST(Tracker, stacktrace) {
 		EXPECT_LT(std::abs(static_cast<int64_t>(globals.allocs.size()) - static_cast<int64_t>(initialAlloc)), 2);
 	}
 }
+#endif

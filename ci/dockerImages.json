@@ -3,10 +3,31 @@
     "CodeCoverage": {
       "image": "builder-gcc14-ubuntu2404"
     },
+    "CodeCoverage_gcc": {
+      "image": "builder-gcc14-ubuntu2404"
+    },
+    "CodeCoverage_clang": {
+      "image": "builder-clang18-ubuntu2404"
+    },
     "Documentation": {
       "image": "builder-clang18-ubuntu2404"
     },
     "clang-tidy": {
+      "image": "builder-clang18-ubuntu2404"
+    },
+    "sanitizer-address": {
+      "image": "builder-clang18-ubuntu2404"
+    },
+    "sanitizer-thread": {
+      "image": "builder-clang18-ubuntu2404"
+    },
+    "sanitizer-undefined-behavior": {
+      "image": "builder-clang18-ubuntu2404"
+    },
+    "sanitizer-leak": {
+      "image": "builder-clang18-ubuntu2404"
+    },
+    "sanitizer-memory": {
       "image": "builder-clang18-ubuntu2404"
     },
     "linux-gcc-release-static": {
