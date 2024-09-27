@@ -11,7 +11,6 @@
   "configurePresets": [
     {
       "name": "linux-gcc-release-static",
-      "displayName": "linux-gcc-release-static",
       "inherits": [
         "gcc-release-static"
       ],
@@ -23,7 +22,6 @@
     },
     {
       "name": "linux-gcc-debug-static",
-      "displayName": "linux-gcc-debug-static",
       "inherits": [
         "gcc-debug-static"
       ],
@@ -35,7 +33,6 @@
     },
     {
       "name": "linux-clang-release-static",
-      "displayName": "linux-clang-release-static",
       "inherits": [
         "clang-release-static"
       ],
@@ -47,7 +44,6 @@
     },
     {
       "name": "linux-clang-debug-static",
-      "displayName": "linux-clang-debug-static",
       "inherits": [
         "clang-debug-static"
       ],
@@ -59,7 +55,6 @@
     },
     {
       "name": "linux-gcc-release-shared",
-      "displayName": "linux-gcc-release-shared",
       "inherits": [
         "gcc-release-shared"
       ],
@@ -71,7 +66,6 @@
     },
     {
       "name": "linux-gcc-debug-shared",
-      "displayName": "linux-gcc-debug-shared",
       "inherits": [
         "gcc-debug-shared"
       ],
@@ -83,7 +77,6 @@
     },
     {
       "name": "linux-clang-release-shared",
-      "displayName": "linux-clang-release-shared",
       "inherits": [
         "clang-release-shared"
       ],
@@ -95,7 +88,6 @@
     },
     {
       "name": "linux-clang-debug-shared",
-      "displayName": "linux-clang-debug-shared",
       "inherits": [
         "clang-debug-shared"
       ],
