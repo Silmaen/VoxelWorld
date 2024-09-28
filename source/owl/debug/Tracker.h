@@ -84,7 +84,7 @@ struct OWL_API AllocationState {
 	/// Max seen amount of memory.
 	size_t memoryPeek = 0;
 	/// list of allocated chunks of memory.
-	std::list<AllocationInfo> allocs;
+	std::list<AllocationInfo> allocs{};
 	/**
 	 * @brief Reset the database.
 	 */

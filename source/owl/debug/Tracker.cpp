@@ -96,11 +96,21 @@ public:
 		s_globalAllocationState->freeMemory(iLocation, iSize);
 	}
 	static void swapCurrent() {
+		if (!s_lastAllocationState)
+			allocate();
 		s_lastAllocationState->reset();
 		std::swap(s_currentAllocationState, s_lastAllocationState);
 	}
-	[[nodiscard]] static auto getLastAllocationState() -> const AllocationState& { return *s_lastAllocationState; }
-	[[nodiscard]] static auto getGlobalAllocationState() -> const AllocationState& { return *s_globalAllocationState; }
+	[[nodiscard]] static auto getLastAllocationState() -> const AllocationState& {
+		if (!s_lastAllocationState)
+			allocate();
+		return *s_lastAllocationState;
+	}
+	[[nodiscard]] static auto getGlobalAllocationState() -> const AllocationState& {
+		if (!s_globalAllocationState)
+			allocate();
+		return *s_globalAllocationState;
+	}
 
 private:
 	/// Global Memory allocation state's info.
@@ -156,8 +166,8 @@ AllocationInfo::AllocationInfo(void* iLocation, const size_t iSize) : location{i
 #endif
 }
 
-auto AllocationInfo::toStr([[maybe_unused]] const bool iTracePrint,
-						   [[maybe_unused]] const bool iFullTrace) const -> std::string {
+auto AllocationInfo::toStr([[maybe_unused]] const bool iTracePrint, [[maybe_unused]] const bool iFullTrace) const
+		-> std::string {
 	std::string result = fmt::format("memory chunk at {} size ({})", location, size);
 
 #ifdef OWL_STACKTRACE
