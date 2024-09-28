@@ -47,7 +47,6 @@
     },
     {
       "name": "package-engine-static",
-      "displayName": "Package-engine-static",
       "inherits": [
         "packaging-static"
       ],
@@ -62,7 +61,6 @@
     },
     {
       "name": "package-engine-shared",
-      "displayName": "Package-engine-shared",
       "inherits": [
         "packaging-shared"
       ],
@@ -98,7 +96,6 @@
     },
     {
       "name": "package-app-nest-shared",
-      "displayName": "Package-app-nest-shared",
       "inherits": [
         "packaging-app-shared"
       ],
@@ -113,7 +110,6 @@
     },
     {
       "name": "package-app-nest-static",
-      "displayName": "Package-app-nest-shared",
       "inherits": [
         "packaging-app-static"
       ],
@@ -128,7 +124,6 @@
     },
     {
       "name": "package-app-drone-shared",
-      "displayName": "Package-app-drone-shared",
       "inherits": [
         "packaging-app-shared"
       ],
@@ -143,7 +138,6 @@
     },
     {
       "name": "package-app-drone-static",
-      "displayName": "Package-app-drone-shared",
       "inherits": [
         "packaging-static"
       ],

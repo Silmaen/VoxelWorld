@@ -12,7 +12,6 @@
   "configurePresets": [
     {
       "name": "Documentation",
-      "displayName": "Documentation",
       "inherits": "base",
       "cacheVariables": {
         "OWL_DOC_ONLY": "ON",
@@ -21,8 +20,7 @@
       }
     },
     {
-      "name": "CodeCoverage",
-      "displayName": "CodeCoverage",
+      "name": "CodeCoverage_gcc",
       "inherits": "gcc-debug-static",
       "cacheVariables": {
         "OWL_ENABLE_COVERAGE": "ON",
@@ -35,8 +33,24 @@
       }
     },
     {
-      "name": "CodeCoverage_mingw",
-      "displayName": "CodeCoverage_mingw",
+      "name": "CodeCoverage",
+      "inherits": "CodeCoverage_gcc"
+    },
+    {
+      "name": "CodeCoverage_clang",
+      "inherits": "clang-debug-static",
+      "cacheVariables": {
+        "OWL_ENABLE_COVERAGE": "ON",
+        "OWL_ENABLE_STACKTRACE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "CodeCoverage_gcc_mingw",
       "inherits": "mingw-gcc-debug-static",
       "cacheVariables": {
         "OWL_ENABLE_COVERAGE": "ON",
@@ -49,8 +63,24 @@
       }
     },
     {
+      "name": "CodeCoverage_mingw",
+      "inherits": "CodeCoverage_gcc_mingw"
+    },
+    {
+      "name": "CodeCoverage_clang_mingw",
+      "inherits": "mingw-clang-debug-static",
+      "cacheVariables": {
+        "OWL_ENABLE_COVERAGE": "ON",
+        "OWL_ENABLE_STACKTRACE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
       "name": "clang-tidy",
-      "displayName": "clang-tidy",
       "inherits": "clang-debug-shared",
       "cacheVariables": {
         "OWL_ENABLE_CLANG_TIDY": "ON",
@@ -64,7 +94,6 @@
     },
     {
       "name": "clang-tidy_mingw",
-      "displayName": "clang-tidy_mingw",
       "inherits": "mingw-clang-debug-shared",
       "cacheVariables": {
         "OWL_ENABLE_CLANG_TIDY": "ON",
