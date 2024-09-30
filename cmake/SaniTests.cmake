@@ -40,6 +40,7 @@ if (${PRJPREFIX}_ENABLE_ADDRESS_SANITIZER)
     target_link_options(${CMAKE_PROJECT_NAME}_Base INTERFACE -fsanitize=address)
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_SANITIZER)
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_ADDRESS_SANITIZER)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_SANITIZER_CUSTOM_ALLOCATOR)
 endif ()
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -51,6 +52,7 @@ if (${PRJPREFIX}_ENABLE_THREAD_SANITIZER)
     target_link_options(${CMAKE_PROJECT_NAME}_Base INTERFACE -fsanitize=thread)
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_SANITIZER)
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_THREAD_SANITIZER)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_SANITIZER_CUSTOM_ALLOCATOR)
 endif ()
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -73,17 +75,7 @@ if (${PRJPREFIX}_ENABLE_LEAK_SANITIZER)
     target_link_options(${CMAKE_PROJECT_NAME}_Base INTERFACE -fsanitize=leak)
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_SANITIZER)
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_LEAK_SANITIZER)
-endif ()
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Clang sanitizer - Memory Sanitizer
-# ----------------------------------------------------------------------------------------------------------------------
-if (${PRJPREFIX}_ENABLE_MEMORY_SANITIZER)
-    math(EXPR ${PRJPREFIX}_SANITIZER_COUNT "${${PRJPREFIX}_SANITIZER_COUNT} + 1")
-    target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE -fsanitize=memory -fsanitize-recover=memory -O0 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls)
-    target_link_options(${CMAKE_PROJECT_NAME}_Base INTERFACE -fsanitize=memory)
-    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_SANITIZER)
-    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_MEMORY_SANITIZER)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PRJPREFIX}_SANITIZER_CUSTOM_ALLOCATOR)
 endif ()
 
 # ----------------------------------------------------------------------------------------------------------------------

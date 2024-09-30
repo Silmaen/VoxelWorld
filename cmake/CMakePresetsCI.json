@@ -33,10 +33,6 @@
       }
     },
     {
-      "name": "CodeCoverage",
-      "inherits": "CodeCoverage_gcc"
-    },
-    {
       "name": "CodeCoverage_clang",
       "inherits": "clang-debug-static",
       "cacheVariables": {
@@ -61,10 +57,6 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       }
-    },
-    {
-      "name": "CodeCoverage_mingw",
-      "inherits": "CodeCoverage_gcc_mingw"
     },
     {
       "name": "CodeCoverage_clang_mingw",
@@ -149,19 +141,6 @@
       "inherits": "clang-debug-shared",
       "cacheVariables": {
         "OWL_ENABLE_LEAK_SANITIZER": "ON",
-        "OWL_ENABLE_STACKTRACE": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "sanitizer-memory",
-      "inherits": "clang-debug-shared",
-      "cacheVariables": {
-        "OWL_ENABLE_MEMORY_SANITIZER": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
       },
       "condition": {

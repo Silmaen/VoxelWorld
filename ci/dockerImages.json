@@ -27,9 +27,6 @@
     "sanitizer-leak": {
       "image": "builder-clang18-ubuntu2404"
     },
-    "sanitizer-memory": {
-      "image": "builder-clang18-ubuntu2404"
-    },
     "linux-gcc-release-static": {
       "image": "builder-gcc12-ubuntu2204"
     },
