@@ -100,7 +100,7 @@ public:
 	void createSingleImageDescriptorPool();
 
 	[[nodiscard]] auto getSingleImageDescriptorPool() -> VkDescriptorPool {
-		if (m_singleImageDescriptorPool != nullptr)
+		if (m_singleImageDescriptorPool == nullptr)
 			createSingleImageDescriptorPool();
 		return m_singleImageDescriptorPool;
 	}
