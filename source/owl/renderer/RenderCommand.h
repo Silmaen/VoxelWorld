@@ -77,7 +77,14 @@ public:
 	static void drawData(const shared<DrawData>& iData, const uint32_t iIndexCount = 0) {
 		mu_renderAPI->drawData(iData, iIndexCount);
 	}
-
+	/**
+		 * @brief Binding the draw of vertex array as lines.
+		 * @param[in] iData Draw data to render.
+		 * @param[in] iIndexCount Number of vertex to draw (=0 all).
+		 */
+	static void drawLine(const shared<DrawData>& iData, const uint32_t iIndexCount = 0) {
+		mu_renderAPI->drawLine(iData, iIndexCount);
+	}
 	/**
 	 * @brief Define the line width.
 	 * @param[in] iWidth New line width.

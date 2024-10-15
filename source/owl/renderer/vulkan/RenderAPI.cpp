@@ -65,6 +65,13 @@ void RenderAPI::drawData(const shared<DrawData>& iData, const uint32_t iIndexCou
 	vkh.drawData(count, isIndexed);
 }
 
+void RenderAPI::drawLine(const shared<DrawData>& iData, const uint32_t iIndexCount) {
+	auto& vkh = internal::VulkanHandler::get();
+	iData->bind();
+	const uint32_t count = (iIndexCount != 0u) ? iIndexCount : iData->getIndexCount();
+	vkh.drawData(count, false);
+}
+
 void RenderAPI::setLineWidth(float) {}
 
 void RenderAPI::beginFrame() {

@@ -103,12 +103,12 @@ void EditorLayer::onUpdate(const core::Timestep& iTimeStep) {
 				break;
 			}
 	}
-	//if constexpr ((false)) {
 	auto [mx, my] = ImGui::GetMousePos();
 	mx -= m_viewportLower.x();
 	my -= m_viewportLower.y();
 	const math::vec2 viewportSizeInternal = m_viewportUpper - m_viewportLower;
-	my = viewportSizeInternal.y() - my;
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
+		my = viewportSizeInternal.y() - my;
 	const int mouseX = static_cast<int>(mx);
 	const int mouseY = static_cast<int>(my);
 
@@ -118,14 +118,35 @@ void EditorLayer::onUpdate(const core::Timestep& iTimeStep) {
 		m_hoveredEntity = pixelData == -1 ? scene::Entity()
 										  : scene::Entity(static_cast<entt::entity>(pixelData), m_activeScene.get());
 	}
-	//}
+	renderOverlay();
 
 	m_framebuffer->unbind();
 }
 
+void EditorLayer::renderOverlay() const {
+	OWL_PROFILE_FUNCTION()
+	if (m_state == State::Play) {
+		const scene::Entity camera = m_activeScene->getPrimaryCamera();
+		renderer::Renderer2D::beginScene(camera.getComponent<scene::component::Camera>().camera,
+										 camera.getComponent<scene::component::Transform>().getTransform());
+	} else {
+		renderer::Renderer2D::beginScene(m_editorCamera);
+	}
+	// Draw selected entity outline
+	if (const scene::Entity selectedEntity = m_sceneHierarchy.getSelectedEntity()) {
+		const scene::component::Transform transform = selectedEntity.getComponent<scene::component::Transform>();
+		//Red
+		renderer::Renderer2D::drawRect({.transform = transform.getTransform(), .color = math::vec4f(1, 0, 0, 1)});
+	}
+
+	renderer::Renderer2D::endScene();
+}
+
+
 void EditorLayer::onEvent(event::Event& ioEvent) {
 	m_cameraController.onEvent(ioEvent);
-	m_editorCamera.onEvent(ioEvent);
+	if (m_state == State::Edit)
+		m_editorCamera.onEvent(ioEvent);
 
 	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::KeyPressedEvent>(

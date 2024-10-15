@@ -122,7 +122,7 @@ public:
 
 	[[nodiscard]] auto getName() const -> const std::string& { return m_specs.debugName; }
 
-	[[nodiscard]] auto getColorAttachmentformats() const -> std::vector<VkFormat>;
+	[[nodiscard]] auto getColorAttachmentFormats() const -> std::vector<VkFormat>;
 
 	[[nodiscard]] auto isFirstBatch() const -> bool { return m_firstBatch; }
 	void resetBatch() { m_firstBatch = true; }

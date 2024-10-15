@@ -45,6 +45,7 @@ private:
 	void renderMenu();
 	void renderGizmo();
 	void renderToolbar();
+	void renderOverlay() const;
 
 	void newScene();
 	void openScene();
