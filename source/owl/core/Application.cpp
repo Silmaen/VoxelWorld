@@ -68,7 +68,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 
 	// create main window
 	{
-		mu_appWindow = input::Window::create({
+		mp_appWindow = input::Window::create({
 				.winType = m_initParams.isDummy ? input::Type::Null : input::Type::GLFW,
 				.title = m_initParams.name,
 				.iconPath = m_initParams.icon.empty() ? "" : (m_assetDirectory / m_initParams.icon).string(),
@@ -92,7 +92,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 	}
 
 	// set up the callbacks
-	mu_appWindow->setEventCallback([this](auto&& PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
+	mp_appWindow->setEventCallback([this](auto&& PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
 
 	// create the GUI layer
 	if (m_initParams.hasGui) {
@@ -120,12 +120,12 @@ Application::~Application() {
 	if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Error) {
 		m_layerStack.clear();
 		input::Input::invalidate();
-		mu_appWindow->shutdown();
+		mp_appWindow->shutdown();
 		OWL_CORE_TRACE("Application window shut down.")
 		renderer::Renderer::shutdown();
 		renderer::RenderCommand::invalidate();
 		OWL_CORE_TRACE("Renderer shut down and invalidated.")
-		mu_appWindow.reset();
+		mp_appWindow.reset();
 	}
 	invalidate();
 }
@@ -164,7 +164,7 @@ void Application::run() {
 			}
 			renderer::RenderCommand::endFrame();
 		}
-		mu_appWindow->onUpdate();
+		mp_appWindow->onUpdate();
 
 #if OWL_TRACKER_VERBOSITY >= 3
 		{

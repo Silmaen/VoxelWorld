@@ -5,11 +5,10 @@
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include <../../owl/owl.h>
-
-#include <../../owl/core/EntryPoint.h>
+#include <owl.h>
 
 #include "EditorLayer.h"
+#include <core/EntryPoint.h>
 
 namespace owl {
 
@@ -18,15 +17,15 @@ OWL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 class OwlNest final : public core::Application {
 public:
 	OwlNest() = delete;
-	explicit OwlNest(const core::AppParams& param) : core::Application(param) {
-		if (getState() == core::Application::State::Running)
-			pushLayer(mkShared<EditorLayer>());
+	explicit OwlNest(const core::AppParams& iParam) : Application(iParam) {
+		if (getState() == State::Running)
+			pushLayer(mkShared<nest::EditorLayer>());
 	}
 };
 OWL_DIAG_POP
 
-auto core::createApplication(int argc, char** argv) -> shared<core::Application> {
-	return mkShared<OwlNest>(core::AppParams{
+auto core::createApplication(int argc, char** argv) -> shared<Application> {
+	return mkShared<OwlNest>(AppParams{
 			.args = argv,
 			.name = "Owl Nest - Owl Engine Editor",
 #ifdef OWL_ASSETS_LOCATION

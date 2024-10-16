@@ -10,7 +10,7 @@
 
 #include <owl.h>
 
-namespace owl::panel {
+namespace owl::nest::panel {
 /**
  * @brief Class SceneHierarchy
  */
@@ -80,4 +80,4 @@ private:
 	/// The selected item
 	scene::Entity m_selection;
 };
-}// namespace owl::panel
+}// namespace owl::nest::panel

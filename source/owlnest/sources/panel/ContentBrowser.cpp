@@ -10,7 +10,7 @@
 
 #include <algorithm>
 
-namespace owl::panel {
+namespace owl::nest::panel {
 
 namespace {
 std::filesystem::path g_AssetPath;
@@ -112,4 +112,4 @@ void ContentBrowser::onImGuiRender() {
 	ImGui::End();
 }
 
-}// namespace owl::panel
+}// namespace owl::nest::panel

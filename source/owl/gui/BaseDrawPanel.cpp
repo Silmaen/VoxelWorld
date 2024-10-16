@@ -5,12 +5,11 @@
  * Copyright © 2024 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "owlpch.h"
 
 #include "BaseDrawPanel.h"
-
 #include "core/Application.h"
-
-#include <debug/Profiler.h>
+#include "debug/Profiler.h"
 #include <imgui.h>
 
 namespace owl::gui {

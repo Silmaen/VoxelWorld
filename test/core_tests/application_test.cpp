@@ -69,7 +69,7 @@ TEST(Core, AppParamsSerialize) {
 	AppParams paramsIni;
 	paramsIni.width = 785;
 	paramsIni.height = 7415;
-	paramsIni.renderer = owl::renderer::RenderAPI::Type::Vulkan;
+	paramsIni.renderer = owl::renderer::RenderAPI::Type::OpenGL;
 	auto tmpFile = std::filesystem::temp_directory_path() / "param.yml";
 	paramsIni.saveToFile(tmpFile);
 
