@@ -287,7 +287,8 @@ void Renderer2D::flush() {
 				g_data->line.vertexBuf.data(),
 				static_cast<uint32_t>(g_data->line.vertexBuf.size() * sizeof(utils::LineVertex)));
 		// draw call
-		RenderCommand::drawData(g_data->drawLine, g_data->line.indexCount);
+		RenderCommand::setLineWidth(g_data->lineWidth);
+		RenderCommand::drawLine(g_data->drawLine, g_data->line.indexCount);
 		g_data->stats.drawCalls++;
 	}
 	if (g_data->doTriangleDraw) {

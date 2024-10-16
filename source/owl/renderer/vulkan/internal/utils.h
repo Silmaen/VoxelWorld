@@ -132,10 +132,10 @@ void transitionImageLayout(const VkCommandBuffer& iCmd, const VkImage& iImage, V
 						   VkImageLayout iNewLayout);
 
 void copyBufferToImage(const VkBuffer& iBuffer, const VkImage& iImage, const math::vec2ui& iSize,
-					   const math::vec2ui& iOffset = {0, 0});
+					   const math::vec2i& iOffset = {0, 0});
 
 void copyImageToBuffer(const VkImage& iImage, const VkBuffer& iBuffer, const math::vec2ui& iSize,
-					   const math::vec2ui& iOffset = {0, 0});
+					   const math::vec2i& iOffset = {0, 0});
 
 static constexpr auto toExtent(const math::vec2ui& iSize) -> VkExtent2D { return {iSize.x(), iSize.y()}; }
 

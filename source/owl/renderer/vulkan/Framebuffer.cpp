@@ -204,8 +204,7 @@ auto Framebuffer::readPixel(const uint32_t iAttachmentIndex, const int iX, const
 	}
 	internal::transitionImageLayout(m_images[imgIndex].image, VK_IMAGE_LAYOUT_UNDEFINED,
 									VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-	internal::copyImageToBuffer(m_images[imgIndex].image, stagingBuffer, {1, 1},
-								{static_cast<uint32_t>(iX), static_cast<uint32_t>(iY)});
+	internal::copyImageToBuffer(m_images[imgIndex].image, stagingBuffer, {1, 1}, {iX, iY});
 	internal::transitionImageLayout(m_images[imgIndex].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 									m_specs.swapChainTarget ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 															: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
@@ -561,7 +560,7 @@ auto Framebuffer::imgIdxToAtt(const uint32_t iImageIndex) const -> uint32_t {
 	return attachmentIndex;
 }
 
-auto Framebuffer::getColorAttachmentformats() const -> std::vector<VkFormat> {
+auto Framebuffer::getColorAttachmentFormats() const -> std::vector<VkFormat> {
 	std::vector<VkFormat> formats;
 	for (const auto att: m_specs.attachments) {
 		if (att.format != AttachmentSpecification::Format::Depth24Stencil8)

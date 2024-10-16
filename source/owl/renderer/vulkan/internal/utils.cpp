@@ -176,37 +176,35 @@ void transitionImageLayout(const VkCommandBuffer& iCmd, const VkImage& iImage, c
 }
 
 void copyBufferToImage(const VkBuffer& iBuffer, const VkImage& iImage, const math::vec2ui& iSize,
-					   const math::vec2ui& iOffset) {
+					   const math::vec2i& iOffset) {
 	const auto& core = VulkanCore::get();
 	const auto& commandBuffer = core.beginSingleTimeCommands();
-	const VkBufferImageCopy region{
-			.bufferOffset = 0,
-			.bufferRowLength = 0,
-			.bufferImageHeight = 0,
-			.imageSubresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-								 .mipLevel = 0,
-								 .baseArrayLayer = 0,
-								 .layerCount = 1},
-			.imageOffset = {static_cast<int32_t>(iOffset.x()), static_cast<int32_t>(iOffset.y()), 0},
-			.imageExtent = {iSize.x(), iSize.y(), 1}};
+	const VkBufferImageCopy region{.bufferOffset = 0,
+								   .bufferRowLength = 0,
+								   .bufferImageHeight = 0,
+								   .imageSubresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+														.mipLevel = 0,
+														.baseArrayLayer = 0,
+														.layerCount = 1},
+								   .imageOffset = {iOffset.x(), iOffset.y(), 0},
+								   .imageExtent = {iSize.x(), iSize.y(), 1}};
 	vkCmdCopyBufferToImage(commandBuffer, iBuffer, iImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 	core.endSingleTimeCommands(commandBuffer);
 }
 
 void copyImageToBuffer(const VkImage& iImage, const VkBuffer& iBuffer, const math::vec2ui& iSize,
-					   const math::vec2ui& iOffset) {
+					   const math::vec2i& iOffset) {
 	const auto& core = VulkanCore::get();
 	const auto& commandBuffer = core.beginSingleTimeCommands();
-	const VkBufferImageCopy region{
-			.bufferOffset = 0,
-			.bufferRowLength = 0,
-			.bufferImageHeight = 0,
-			.imageSubresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-								 .mipLevel = 0,
-								 .baseArrayLayer = 0,
-								 .layerCount = 1},
-			.imageOffset = {static_cast<int32_t>(iOffset.x()), static_cast<int32_t>(iOffset.y()), 0},
-			.imageExtent = {iSize.x(), iSize.y(), 1}};
+	const VkBufferImageCopy region{.bufferOffset = 0,
+								   .bufferRowLength = 0,
+								   .bufferImageHeight = 0,
+								   .imageSubresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+														.mipLevel = 0,
+														.baseArrayLayer = 0,
+														.layerCount = 1},
+								   .imageOffset = {iOffset.x(), iOffset.y(), 0},
+								   .imageExtent = {iSize.x(), iSize.y(), 1}};
 	vkCmdCopyImageToBuffer(commandBuffer, iImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, iBuffer, 1, &region);
 	core.endSingleTimeCommands(commandBuffer);
 }

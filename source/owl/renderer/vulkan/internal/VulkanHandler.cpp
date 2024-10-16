@@ -84,7 +84,7 @@ auto VulkanHandler::toImGuiInfo(std::vector<VkFormat>& ioFormats) -> ImGui_ImplV
 	const auto& core = VulkanCore::get();
 	auto& vkd = Descriptors::get();
 	vkd.createImguiDescriptorPool();
-	ioFormats = m_swapChain->getColorAttachmentformats();
+	ioFormats = m_swapChain->getColorAttachmentFormats();
 	return {.Instance = core.getInstance(),
 			.PhysicalDevice = core.getPhysicalDevice(),
 			.Device = core.getLogicalDevice(),
@@ -167,12 +167,13 @@ auto VulkanHandler::pushPipeline(const std::string& iPipeLineName,
 		m_state = State::ErrorCreatingPipelineLayout;
 		return -1;
 	}
-
-	constexpr VkPipelineInputAssemblyStateCreateInfo inputAssembly{
+	// TODO(Silmaen): find a better switch.
+	const bool isLine = iPipeLineName == "line";
+	const VkPipelineInputAssemblyStateCreateInfo inputAssembly{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = {},
-			.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+			.topology = isLine ? VK_PRIMITIVE_TOPOLOGY_LINE_LIST : VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
 			.primitiveRestartEnable = VK_FALSE};
 	constexpr VkPipelineViewportStateCreateInfo viewportState{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
@@ -235,7 +236,7 @@ auto VulkanHandler::pushPipeline(const std::string& iPipeLineName,
 			.attachmentCount = static_cast<uint32_t>(att.size()),
 			.pAttachments = att.data(),
 			.blendConstants = {0.f, 0.f, 0.f, 0.f}};
-	const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+	constexpr VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 	const VkPipelineDynamicStateCreateInfo dynamicState{.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
 														.pNext = nullptr,
 														.flags = {},
@@ -439,7 +440,7 @@ void VulkanHandler::endBatch() {
 	}
 	inBatch = false;
 #ifdef OWL_DEBUG
-	// TODO(Silmaen) Investigate why we got a crash in release with wait semaphore
+	// TODO(Silmaen): Investigate why we got a crash in release with wait semaphore
 	if (!alreadyRun)
 		alreadyRun = true;
 #endif

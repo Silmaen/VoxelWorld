@@ -24,12 +24,14 @@ void RenderAPI::init() {
 void RenderAPI::setViewport([[maybe_unused]] const uint32_t iX, [[maybe_unused]] const uint32_t iY,
 							[[maybe_unused]] const uint32_t iWidth, [[maybe_unused]] const uint32_t iHeight) {}
 
-void RenderAPI::setClearColor([[maybe_unused]] const math::vec4 &iColor) {}
+void RenderAPI::setClearColor([[maybe_unused]] const math::vec4& iColor) {}
 
 void RenderAPI::clear() {}
 
-void RenderAPI::drawData([[maybe_unused]]const shared<DrawData> &iData,[[maybe_unused]] uint32_t iIndexCount) {}
+void RenderAPI::drawData([[maybe_unused]] const shared<DrawData>& iData, [[maybe_unused]] uint32_t iIndexCount) {}
 
-void RenderAPI::setLineWidth([[maybe_unused]]float iWidth) {}
+void RenderAPI::drawLine([[maybe_unused]] const shared<DrawData>& iData, [[maybe_unused]] uint32_t iIndexCount) {}
+
+void RenderAPI::setLineWidth([[maybe_unused]] float iWidth) {}
 
 }// namespace owl::renderer::null

@@ -68,6 +68,13 @@ public:
 	virtual void drawData(const shared<DrawData>& iData, uint32_t iIndexCount) = 0;
 
 	/**
+	 * @brief Binding the draw of vertex array as line.
+	 * @param[in] iData Draw data to render.
+	 * @param[in] iIndexCount Number of vertex to draw (=0 all).
+	 */
+	virtual void drawLine(const shared<DrawData>& iData, const uint32_t iIndexCount = 0) = 0;
+
+	/**
 	 * @brief Define the line width.
 	 * @param[in] iWidth New line width.
 	 */
