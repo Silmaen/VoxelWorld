@@ -35,6 +35,7 @@
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
 #include "gui/BaseDrawPanel.h"
+#include "gui/BasePanel.h"
 #include "gui/Theme.h"
 #include "gui/UiLayer.h"
 #include "input/CameraOrthoController.h"

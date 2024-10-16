@@ -10,7 +10,7 @@
 
 #include <owl.h>
 
-namespace owl::panel {
+namespace owl::nest::panel {
 
 /**
  * @brief Class ContentBrowser
@@ -60,4 +60,4 @@ private:
 	shared<renderer::Texture2D> dirIcon{nullptr};
 };
 
-}// namespace owl::panel
+}// namespace owl::nest::panel

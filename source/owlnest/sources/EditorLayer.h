@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include <../../owl/owl.h>
+#include <owl.h>
 
 #include "panel/ContentBrowser.h"
 #include "panel/SceneHierarchy.h"
+#include "panel/Viewport.h"
 
-namespace owl {
+namespace owl::nest {
 /**
  * @brief Class EditorLayer
  */
@@ -38,14 +39,8 @@ public:
 	void onEvent(event::Event& ioEvent) override;
 	void onImGuiRender(const core::Timestep& iTimeStep) override;
 
-private:
-	void renderViewport();
-
-	void renderStats(const core::Timestep& iTimeStep);
-	void renderMenu();
-	void renderGizmo();
-	void renderToolbar();
-	void renderOverlay() const;
+	enum struct State : uint8_t { Edit, Play };
+	[[nodiscard]] auto getState() const -> const State& { return m_state; }
 
 	void newScene();
 	void openScene();
@@ -53,6 +48,16 @@ private:
 	void saveSceneAs();
 	void saveSceneAs(const std::filesystem::path& iScenePath);
 	void saveCurrentScene();
+
+	[[nodiscard]] auto getActiveScene() const -> const shared<scene::Scene>& { return m_activeScene; }
+	auto getSelectedEntity() const -> scene::Entity;
+	void setSelectedEntity(scene::Entity iEntity);
+
+private:
+	void renderStats(const core::Timestep& iTimeStep);
+	void renderMenu();
+	void renderToolbar();
+
 
 	auto onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool;
 	auto onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent) -> bool;
@@ -62,32 +67,20 @@ private:
 
 	input::CameraOrthoController m_cameraController;
 
-	enum struct State : uint8_t { Edit, Play };
-
 	State m_state = State::Edit;
-
-	scene::Entity m_hoveredEntity;
-	renderer::CameraEditor m_editorCamera;
-
-	bool m_viewportFocused = false;
-	bool m_viewportHovered = false;
-	math::vec2ui m_viewportSize = {0, 0};
-	math::vec2 m_viewportLower = {0.0f, 0.0f};
-	math::vec2 m_viewportUpper = {0.0f, 0.0f};
-	shared<renderer::Framebuffer> m_framebuffer;
 
 	shared<scene::Scene> m_activeScene;
 	shared<scene::Scene> m_editorScene;
 
-	int m_gizmoType = -1;
 	std::filesystem::path m_currentScenePath;
 
 	// Panels
 	panel::SceneHierarchy m_sceneHierarchy;
 	panel::ContentBrowser m_contentBrowser;
+	panel::Viewport m_viewport;
 
 	// Editor resources
 	shared<renderer::Texture2D> m_iconPlay;
 	shared<renderer::Texture2D> m_iconStop;
 };
-}// namespace owl
+}// namespace owl::nest

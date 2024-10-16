@@ -10,7 +10,7 @@
 
 #include <imgui_internal.h>
 
-namespace owl::panel {
+namespace owl::nest::panel {
 
 [[maybe_unused]] SceneHierarchy::SceneHierarchy(const shared<scene::Scene>& iScene) { setContext(iScene); }
 
@@ -294,4 +294,4 @@ void SceneHierarchy::drawComponents(scene::Entity& ioEntity) {
 }
 OWL_DIAG_POP
 
-}// namespace owl::panel
+}// namespace owl::nest::panel

@@ -22,9 +22,9 @@ namespace owl::core {
 
 
 /// Default Windows width.
-constexpr uint32_t gDefaultWindowsWidth{1600};
+constexpr uint32_t g_DefaultWindowsWidth{1600};
 /// Default Windows height.
-constexpr uint32_t gDefaultWindowsHeight{960};
+constexpr uint32_t g_DefaultWindowsHeight{960};
 /**
  * @brief Parameters to give to the application.
  */
@@ -41,13 +41,13 @@ struct OWL_API AppParams {
 	/// Application's icon.
 	std::string icon{};
 	/// Windows width.
-	uint32_t width{gDefaultWindowsWidth};
+	uint32_t width{g_DefaultWindowsWidth};
 	/// Windows height.
-	uint32_t height{gDefaultWindowsHeight};
+	uint32_t height{g_DefaultWindowsHeight};
 	/// Number of command line arguments.
 	int argCount{0};
 	/// Renderer's type.
-	renderer::RenderAPI::Type renderer{renderer::RenderAPI::Type::OpenGL};
+	renderer::RenderAPI::Type renderer{renderer::RenderAPI::Type::Vulkan};
 	/// If the application should use ImGui overlay.
 	bool hasGui{true};
 	/// If extra debugging symbols should be loaded.
@@ -136,7 +136,7 @@ public:
 	 * @brief Access to the window.
 	 * @return The Window.
 	 */
-	[[nodiscard]] auto getWindow() const -> const input::Window& { return *mu_appWindow.get(); }
+	[[nodiscard]] auto getWindow() const -> const input::Window& { return *mp_appWindow.get(); }
 
 	/**
 	 * @brief Access to the Gui layer.
@@ -232,7 +232,7 @@ private:
 	auto onWindowResized(const event::WindowResizeEvent& iEvent) -> bool;
 
 	/// Pointer to the window.
-	uniq<input::Window> mu_appWindow;
+	uniq<input::Window> mp_appWindow;
 	/// Pointer to the GUI Layer.
 	shared<gui::UiLayer> mp_imGuiLayer = nullptr;
 	/// Running state.
