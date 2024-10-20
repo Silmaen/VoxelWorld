@@ -209,7 +209,7 @@ if (${PRJPREFIX}_PACKAGE_ENGINE)
                 COMPONENT Engine
         )
     endforeach ()
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/engine_assets/
             DESTINATION assets
             COMPONENT Engine
     )
@@ -221,5 +221,9 @@ else ()
     )
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/
             DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
+    )
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/engine_assets/
+            DESTINATION assets
+            COMPONENT Engine
     )
 endif ()

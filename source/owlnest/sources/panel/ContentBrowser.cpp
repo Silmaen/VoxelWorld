@@ -9,41 +9,53 @@
 #include "ContentBrowser.h"
 
 #include <algorithm>
+#include <imgui_internal.h>
 
 namespace owl::nest::panel {
 
-namespace {
-std::filesystem::path g_AssetPath;
-}// namespace
+namespace {}// namespace
 ContentBrowser::ContentBrowser() { OWL_SCOPE_UNTRACK }
 
 
 void ContentBrowser::detach() {
-	fileIcon.reset();
-	dirIcon.reset();
+	m_fileIcon.reset();
+	m_dirIcon.reset();
 }
 
 void ContentBrowser::attach() {
-	g_AssetPath = core::Application::get().getAssetDirectory();
-	currentPath = g_AssetPath;
-	if (const auto fileIconPath = g_AssetPath / "icons" / "FileIcon.png"; exists(fileIconPath)) {
-		fileIcon = renderer::Texture2D::create(fileIconPath);
+	m_currentRootPath = core::Application::get().getAssetDirectories().front().assetsPath;
+	m_currentPath = m_currentRootPath;
+	if (const auto fileIconPath = core::Application::get().getFullAssetPath("FileIcon.png", "icons");
+		fileIconPath.has_value()) {
+		m_fileIcon = renderer::Texture2D::create(fileIconPath.value());
 	} else {
-		OWL_CORE_WARN("Unable to find file icon at {}", fileIconPath.string())
+		OWL_CORE_WARN("Unable to find file icon.")
 	}
-	if (const auto dirIconPath = g_AssetPath / "icons" / "DirectoryIcon.png"; exists(dirIconPath)) {
-		dirIcon = renderer::Texture2D::create(dirIconPath);
+	if (const auto dirIconPath = core::Application::get().getFullAssetPath("DirectoryIcon.png", "icons");
+		dirIconPath.has_value()) {
+		m_dirIcon = renderer::Texture2D::create(dirIconPath.value());
 	} else {
-		OWL_CORE_WARN("Unable to find directory icon at {}", dirIconPath.string())
+		OWL_CORE_WARN("Unable to find directory icon.")
 	}
 }
 
 void ContentBrowser::onImGuiRender() {
 	ImGui::Begin("Content Browser");
 
-	if (currentPath != std::filesystem::path(g_AssetPath)) {
-		if (ImGui::Button("<-")) {
-			currentPath = currentPath.parent_path();
+	if (m_currentPath != m_currentRootPath) {
+		if (ImGui::Button("Back")) {
+			m_currentPath = m_currentPath.parent_path();
+		}
+	}
+	for (const auto& [title, assetsPath]: core::Application::get().getAssetDirectories()) {
+		ImGui::SameLine();
+		if (assetsPath == m_currentRootPath) {
+			ImGui::Text("%s", title.c_str());
+			continue;
+		}
+		if (ImGui::Button(title.c_str())) {
+			m_currentRootPath = assetsPath;
+			m_currentPath = m_currentRootPath;
 		}
 	}
 
@@ -58,13 +70,13 @@ void ContentBrowser::onImGuiRender() {
 	ImGui::Columns(columnCount, nullptr, false);
 
 	uint32_t item = 0;
-	for (const auto& directoryEntry: std::filesystem::directory_iterator(currentPath)) {
+	for (const auto& directoryEntry: std::filesystem::directory_iterator(m_currentPath)) {
 		++item;
 		const auto& path = directoryEntry.path();
-		auto relativePath = relative(path, g_AssetPath);
+		auto relativePath = relative(path, m_currentRootPath);
 		const std::string filenameString = relativePath.filename().string();
 		ImGui::PushID(filenameString.c_str());
-		const shared<renderer::Texture2D> icon = directoryEntry.is_directory() ? dirIcon : fileIcon;
+		const shared<renderer::Texture2D> icon = directoryEntry.is_directory() ? m_dirIcon : m_fileIcon;
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 		uint64_t textureId = 0;
 		if (icon)
@@ -84,7 +96,7 @@ void ContentBrowser::onImGuiRender() {
 
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 				if (directoryEntry.is_directory())
-					currentPath /= path.filename();
+					m_currentPath /= path.filename();
 			}
 			ImGui::TextWrapped("%s", filenameString.c_str());
 		} else {
@@ -99,7 +111,7 @@ void ContentBrowser::onImGuiRender() {
 
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 				if (directoryEntry.is_directory())
-					currentPath /= path.filename();
+					m_currentPath /= path.filename();
 			}
 			ImGui::TextWrapped("%s", filenameString.c_str());
 		}

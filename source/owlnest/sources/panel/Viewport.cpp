@@ -117,11 +117,11 @@ void Viewport::onRenderInternal() {
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 				const auto* path = static_cast<const char*>(payload->Data);
-				if (const std::filesystem::path scenePath = core::Application::get().getAssetDirectory() / path;
-					scenePath.extension() == ".owl")
-					m_parent->openScene(scenePath);
+				if (const auto scenePath = core::Application::get().getFullAssetPath(path);
+					scenePath.has_value() && scenePath.value().extension() == ".owl")
+					m_parent->openScene(scenePath.value());
 				else
-					OWL_CORE_WARN("Could not load {}: not a scene file", scenePath.string())
+					OWL_CORE_WARN("Could not load {}: not a scene file", path)
 			}
 			ImGui::EndDragDropTarget();
 		}

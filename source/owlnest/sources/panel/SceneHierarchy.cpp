@@ -279,7 +279,7 @@ void SceneHierarchy::drawComponents(scene::Entity& ioEntity) {
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 				const auto* const path = static_cast<const char*>(payload->Data);
-				const std::filesystem::path texturePath = core::Application::get().getAssetDirectory() / path;
+				const std::filesystem::path texturePath = core::Application::get().getFullAssetPath(path).value();
 				component.texture = renderer::Texture2D::create(texturePath);
 			}
 			ImGui::EndDragDropTarget();
