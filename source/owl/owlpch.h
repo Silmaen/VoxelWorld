@@ -24,6 +24,7 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <map>
 #include <memory>
 #include <numeric>
+#include <optional>
 #include <queue>
 #include <random>
 #include <set>

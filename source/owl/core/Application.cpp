@@ -15,6 +15,8 @@
 #include "input/Input.h"
 #include "renderer/Renderer.h"
 
+#include <ranges>
+
 namespace owl::core {
 
 
@@ -51,8 +53,29 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 		}
 
 		Log::setFrameFrequency(m_initParams.frameLogFrequency);
-		[[maybe_unused]] const bool assetFound = searchAssets(m_initParams.assetsPattern);
-		OWL_CORE_ASSERT(assetFound, "Unable to find assets")
+	}
+	// Looking for asset Directories
+	{
+		// first (lowest priority) - Engine assets.
+		if (const auto engineAsset = searchAssets("engine_assets"); engineAsset.has_value()) {
+			m_assetDirectories.push_front({"Engine assets", engineAsset.value()});
+		} else {
+			OWL_CORE_ERROR("Unable to find engine assets")
+		}
+		// second working dir asset directory
+		if (exists(m_workingDirectory / "assets")) {
+			m_assetDirectories.push_front({"working dir assets", m_workingDirectory / "assets"});
+		} else {
+			OWL_CORE_WARN("Unable to find working dir assets")
+		}
+		// third app asset if any.
+		if (!m_initParams.assetsPattern.empty()) {
+			if (const auto engineAsset = searchAssets(m_initParams.assetsPattern); engineAsset.has_value()) {
+				m_assetDirectories.push_front({"App assets", engineAsset.value()});
+			} else {
+				OWL_CORE_ERROR("Unable to find app assets")
+			}
+		}
 	}
 
 	// Create the renderer
@@ -68,10 +91,11 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 
 	// create main window
 	{
+
 		mp_appWindow = input::Window::create({
 				.winType = m_initParams.isDummy ? input::Type::Null : input::Type::GLFW,
 				.title = m_initParams.name,
-				.iconPath = m_initParams.icon.empty() ? "" : (m_assetDirectory / m_initParams.icon).string(),
+				.iconPath = m_initParams.icon.empty() ? "" : getFullAssetPath(m_initParams.icon).value_or("").string(),
 				.width = m_initParams.width,
 				.height = m_initParams.height,
 		});
@@ -92,7 +116,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 	}
 
 	// set up the callbacks
-	mp_appWindow->setEventCallback([this](auto&& PH1) { onEvent(std::forward<decltype(PH1)>(PH1)); });
+	mp_appWindow->setEventCallback([this]<typename T0>(T0&& ioPh1) { onEvent(std::forward<T0>(ioPh1)); });
 
 	// create the GUI layer
 	if (m_initParams.hasGui) {
@@ -191,9 +215,9 @@ void Application::onEvent(event::Event& ioEvent) {
 
 	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::WindowCloseEvent>(
-			[this](auto&& PH1) { return onWindowClosed(std::forward<decltype(PH1)>(PH1)); });
+			[this]<typename T0>(T0&& ioPh1) { return onWindowClosed(std::forward<T0>(ioPh1)); });
 	dispatcher.dispatch<event::WindowResizeEvent>(
-			[this](auto&& PH1) { return onWindowResized(std::forward<decltype(PH1)>(PH1)); });
+			[this]<typename T0>(T0&& ioPh1) { return onWindowResized(std::forward<T0>(ioPh1)); });
 
 #if defined(__clang__) and __clang_major__ < 16
 	for (auto it2 = m_layerStack.rbegin(); it2 != m_layerStack.rend(); ++it2) {
@@ -240,21 +264,48 @@ void Application::pushOverlay(shared<layer::Layer>&& iOverlay) {
 	m_layerStack.pushOverlay(std::move(iOverlay));
 }
 
-auto Application::searchAssets(const std::string& iPattern) -> bool {
+auto Application::searchAssets(const std::string& iPattern) const -> std::optional<std::filesystem::path> {
 	OWL_PROFILE_FUNCTION()
+
 	OWL_SCOPE_UNTRACK
 	std::filesystem::path parent = m_workingDirectory;
 	std::filesystem::path assets = parent / iPattern;
 	while (parent != parent.root_path()) {
 		if (exists(assets)) {
-			m_assetDirectory = assets;
-			return true;
+			return assets;
 		}
 		parent = parent.parent_path();
 		assets = parent / iPattern;
 	}
-	m_assetDirectory = m_workingDirectory;
-	return false;
+	return std::nullopt;
+}
+
+auto Application::getFullAssetPath(const std::string& iAssetName, const std::string& iAssetCategory) const
+		-> std::optional<std::filesystem::path> {
+	OWL_PROFILE_FUNCTION()
+	OWL_SCOPE_UNTRACK
+
+	for (const auto& [title, assetsPath]: m_assetDirectories) {
+		auto searchDir = assetsPath;
+		if (!iAssetCategory.empty()) {
+			if (!exists(searchDir / iAssetCategory))
+				continue;
+			searchDir /= iAssetCategory;
+		}
+		const std::filesystem::path name{iAssetName};
+		searchDir /= name.parent_path();
+		for (const auto& entry: std::filesystem::recursive_directory_iterator{searchDir}) {
+			if (name.has_extension()) {
+				if (entry.is_regular_file() && entry.path().filename() == name.filename())
+					return entry.path();
+			} else {
+				if (entry.is_regular_file() && entry.path().stem() == name.stem())
+					return entry.path();
+			}
+		}
+	}
+	// nothing found.
+	return std::nullopt;
 }
 
 void AppParams::loadFromFile(const std::filesystem::path& iFile) {

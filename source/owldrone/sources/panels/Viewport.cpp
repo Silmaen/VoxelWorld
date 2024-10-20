@@ -94,14 +94,16 @@ void Viewport::onRender() {
 		ImGui::Image(reinterpret_cast<void*>(textureId), viewportPanelSize, vec(mp_framebuffer->getLowerData()),
 					 vec(mp_framebuffer->getUpperData()));
 
-	if (ImGui::BeginDragDropTarget()) {
+	/*if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 			const auto* const path = static_cast<const char*>(payload->Data);
-			const std::filesystem::path scenePath = core::Application::get().getAssetDirectory() / path;
-			OWL_CORE_WARN("Could not load file {}: unsupported format.", scenePath.string())
+			auto data = core::Application::get().getFullAssetPath(path);
+			if (!data.has_value())
+				OWL_CORE_WARN("Could not load file {}: unsupported format.", path)
+
 		}
 		ImGui::EndDragDropTarget();
-	}
+	}*/
 
 	ImGui::End();
 	ImGui::PopStyleVar();

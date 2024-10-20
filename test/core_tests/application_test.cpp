@@ -25,13 +25,21 @@ TEST(Core, ApplicationDummy) {
 
 TEST(Core, ApplicationBasic) {
 	Log::init(spdlog::level::off);
-	AppParams params;
-	params.isDummy = true;
-	params.renderer = owl::renderer::RenderAPI::Type::Null;
-	params.hasGui = false;
-	params.useDebugging = true;
+	const AppParams params{.args = nullptr,
+						   .frameLogFrequency = 0,
+						   .name = "test",
+						   .assetsPattern = "",
+						   .icon = "",
+						   .width = 0,
+						   .height = 0,
+						   .argCount = 0,
+						   .renderer = owl::renderer::RenderAPI::Type::Null,
+						   .hasGui = false,
+						   .useDebugging = false,
+						   .isDummy = true};
 	auto app = owl::mkShared<Application>(params);
-	EXPECT_EQ(app->getAssetDirectory().filename(), "assets");
+	ASSERT_FALSE(app->getAssetDirectories().empty());
+	EXPECT_EQ(app->getAssetDirectories().front().assetsPath.filename(), "engine_assets");
 	EXPECT_FALSE(app->getWorkingDirectory().filename().string().empty());
 	EXPECT_EQ(app->getState(), Application::State::Running);
 	app->enableDocking();
@@ -48,9 +56,10 @@ TEST(Core, ApplicationBasic) {
 	app.reset();
 	Log::invalidate();
 }
+
 TEST(Core, App) {
 	Log::init(spdlog::level::off);
-	AppParams const params{.name = "super boby",
+	const AppParams params{.name = "super boby",
 						   .renderer = owl::renderer::RenderAPI::Type::Null,
 						   .hasGui = false,
 						   .isDummy = true};

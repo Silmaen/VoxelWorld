@@ -30,9 +30,10 @@ void EditorLayer::onAttach() {
 	m_viewport.attach();
 	m_viewport.attachParent(this);
 
-	const auto iconPath = core::Application::get().getAssetDirectory() / "icons";
-	m_iconPlay = renderer::Texture2D::create(iconPath / "PlayButton.png");
-	m_iconStop = renderer::Texture2D::create(iconPath / "StopButton.png");
+	m_iconPlay = renderer::Texture2D::create(
+			core::Application::get().getFullAssetPath("PlayButton.png", "icons").value_or(std::filesystem::path{}));
+	m_iconStop = renderer::Texture2D::create(
+			core::Application::get().getFullAssetPath("StopButton.png", "icons").value_or(std::filesystem::path{}));
 	m_contentBrowser.attach();
 }
 

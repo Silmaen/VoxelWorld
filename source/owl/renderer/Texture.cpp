@@ -71,7 +71,12 @@ auto Texture2D::create(const std::filesystem::path& iFile) -> shared<Texture2D> 
 }
 
 auto Texture2D::create(const std::string& iTextureName) -> shared<Texture2D> {
-	return create(core::Application::get().getAssetDirectory() / (iTextureName + ".png"));
+	const auto location = core::Application::get().getFullAssetPath(iTextureName + ".png");
+	if (!location.has_value()) {
+		OWL_CORE_ERROR("Texture2D: Failed to load texture '{}'! no asset found.", iTextureName)
+		return nullptr;
+	}
+	return create(location.value());
 }
 
 auto Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha) -> shared<Texture2D> {

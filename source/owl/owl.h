@@ -11,6 +11,7 @@
 // -------- STD ------------
 #include <filesystem>
 #include <fstream>
+#include <optional>
 // -------------------------
 
 // ------- 3rd party -------

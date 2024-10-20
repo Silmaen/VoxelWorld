@@ -37,9 +37,9 @@ struct OWL_API AppParams {
 	/// Application's title.
 	std::string name{"Owl Engine"};
 	/// Application's assets pattern.
-	std::string assetsPattern{"assets"};
+	std::string assetsPattern{""};
 	/// Application's icon.
-	std::string icon{};
+	std::string icon{""};
 	/// Windows width.
 	uint32_t width{g_DefaultWindowsWidth};
 	/// Windows height.
@@ -161,17 +161,29 @@ public:
 	[[nodiscard]] auto getWorkingDirectory() const -> const std::filesystem::path& { return m_workingDirectory; }
 
 	/**
+	 * @brief Structure holding asset directory information
+	 */
+	struct AssetDirectory {
+		/// Asset directory name.
+		std::string title{"assets"};
+		/// Asset path.
+		std::filesystem::path assetsPath;
+	};
+
+	/**
 	 * @brief Get the working directory.
 	 * @return The current working directory.
 	 */
-	[[nodiscard]] auto getAssetDirectory() const -> const std::filesystem::path& { return m_assetDirectory; }
+	[[nodiscard]] auto getAssetDirectories() const -> const std::list<AssetDirectory>& { return m_assetDirectories; }
 
 	/**
-	 * @brief Helper function used to redefine assets location.
-	 * @param[in] iPattern The pattern to search for.
-	 * @return True if found the assets.
+	 * @brief Search across the assets directories for a specific asset.
+	 * @param iAssetName the asset name with or without extension.
+	 * @param iAssetCategory The optional subdir of the asset.
+	 * @return Full path to asset or invalid path if not found.
 	 */
-	auto searchAssets(const std::string& iPattern) -> bool;
+	[[nodiscard]] auto getFullAssetPath(const std::string& iAssetName, const std::string& iAssetCategory = "") const
+			-> std::optional<std::filesystem::path>;
 
 	/**
 		 * @brief Enable the docking environment.
@@ -213,6 +225,13 @@ public:
 
 private:
 	/**
+	 * @brief Helper function used to search for assets location.
+	 * @param[in] iPattern The pattern to search for.
+	 * @return Optional path for the asse if found.
+	 */
+	[[nodiscard]] auto searchAssets(const std::string& iPattern) const -> std::optional<std::filesystem::path>;
+
+	/**
 	 * @brief Runs the application.
 	 */
 	void run();
@@ -244,7 +263,7 @@ private:
 	/// Base Path to the working Directory.
 	std::filesystem::path m_workingDirectory;
 	/// Base Path to the asset Directory.
-	std::filesystem::path m_assetDirectory;
+	std::list<AssetDirectory> m_assetDirectories;
 	/// Time steps management.
 	Timestep m_stepper;
 	/// Initialization parameters.

@@ -54,10 +54,11 @@ public:
 
 private:
 	/// The actual folder
-	std::filesystem::path currentPath;
+	std::filesystem::path m_currentPath;
+	std::filesystem::path m_currentRootPath;
 
-	shared<renderer::Texture2D> fileIcon{nullptr};
-	shared<renderer::Texture2D> dirIcon{nullptr};
+	shared<renderer::Texture2D> m_fileIcon{nullptr};
+	shared<renderer::Texture2D> m_dirIcon{nullptr};
 };
 
 }// namespace owl::nest::panel

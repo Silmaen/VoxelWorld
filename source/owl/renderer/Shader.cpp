@@ -22,8 +22,7 @@ auto Shader::create(const std::string& iShaderName, const std::string& iRenderer
 	const auto type = RenderCommand::getApi();
 	std::filesystem::path shaderDir;
 	if (RenderCommand::requireInit()) {
-		shaderDir = core::Application::get().getAssetDirectory();
-		shaderDir /= std::filesystem::path{"shaders"};
+		shaderDir = std::filesystem::path{"shaders"};
 		if (!iRenderer.empty()) {
 			shaderDir /= iRenderer;
 			if (type == RenderAPI::Type::OpenGL)
@@ -31,12 +30,18 @@ auto Shader::create(const std::string& iShaderName, const std::string& iRenderer
 			else if (type == RenderAPI::Type::Vulkan)
 				shaderDir /= "vulkan";
 		}
+		const auto result = core::Application::get().getFullAssetPath(iShaderName, shaderDir.string());
+		if (!result.has_value()) {
+			OWL_CORE_ERROR("Shader::Create: Failed to load shader {}, unable to find assets", iShaderName)
+			return nullptr;
+		}
+		shaderDir = result.value().parent_path();
 	}
 	return create(iShaderName, iRenderer, shaderDir);
 }
 
-auto Shader::create(const std::string& iShaderName, const std::string& iRenderer,
-					const std::filesystem::path& iFile) -> shared<Shader> {
+auto Shader::create(const std::string& iShaderName, const std::string& iRenderer, const std::filesystem::path& iFile)
+		-> shared<Shader> {
 	std::vector<std::filesystem::path> sources;
 	if (is_directory(iFile)) {
 		for (const auto& f: std::filesystem::directory_iterator(iFile)) {
