@@ -198,7 +198,7 @@ void Application::run() {
 				OWL_CORE_TRACE("Frame Leak Detected")
 				OWL_CORE_TRACE("-----------------------------------")
 				OWL_CORE_TRACE("")
-				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory,
+				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory.str(),
 							   memState.allocs.size())
 				for (const auto& chunk: memState.allocs) { OWL_CORE_TRACE(" ** {}", chunk.toStr()) }
 				OWL_CORE_TRACE("----------------------------------")
@@ -294,6 +294,8 @@ auto Application::getFullAssetPath(const std::string& iAssetName, const std::str
 		}
 		const std::filesystem::path name{iAssetName};
 		searchDir /= name.parent_path();
+		if (!exists(searchDir))
+			continue;
 		for (const auto& entry: std::filesystem::recursive_directory_iterator{searchDir}) {
 			if (name.has_extension()) {
 				if (entry.is_regular_file() && entry.path().filename() == name.filename())

@@ -168,7 +168,7 @@ AllocationInfo::AllocationInfo(void* iLocation, const size_t iSize) : location{i
 
 auto AllocationInfo::toStr([[maybe_unused]] const bool iTracePrint, [[maybe_unused]] const bool iFullTrace) const
 		-> std::string {
-	std::string result = fmt::format("memory chunk at {} size ({})", location, size);
+	std::string result = fmt::format("memory chunk at {} size ({})", location, size.str());
 
 #ifdef OWL_STACKTRACE
 	if (fullTrace.empty()) {
@@ -214,8 +214,8 @@ AllocationState::~AllocationState() { s_antiLoop = true; }
 
 void AllocationState::pushMemory(void* iLocation, size_t iSize) {
 	allocationCalls++;
-	allocatedMemory += iSize;
-	memoryPeek = std::max(memoryPeek, allocatedMemory);
+	allocatedMemory.size += iSize;
+	memoryPeek.size = std::max(memoryPeek.size, allocatedMemory.size);
 	if (!s_antiLoop)
 		fmt::println("Problème d'antiloop!!!");
 	allocs.emplace_back(iLocation, iSize);
@@ -227,20 +227,20 @@ void AllocationState::freeMemory(void* iLocation, size_t iSize) {
 				[&iLocation](const AllocationInfo& iAllocInfo) { return iAllocInfo.location == iLocation; });
 		chunk != allocs.end()) {
 		if (iSize == 0) {
-			iSize = chunk->size;
+			iSize = chunk->size.size;
 		}
 		allocs.erase(chunk);
 		deallocationCalls++;
-		allocatedMemory -= iSize;
+		allocatedMemory.size -= iSize;
 	}
 }
 
 void AllocationState::reset() {
 	allocs.clear();
-	allocatedMemory = 0;
+	allocatedMemory.size = 0;
 	allocationCalls = 0;
 	deallocationCalls = 0;
-	memoryPeek = 0;
+	memoryPeek.size = 0;
 }
 
 // =========================== scopes ==============================
