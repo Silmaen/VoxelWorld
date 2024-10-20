@@ -1,7 +1,7 @@
 
 #include "testHelper.h"
 
-#include <core/Core.h>
+#include <math/vectors.h>
 
 using namespace owl::math;
 
@@ -15,8 +15,8 @@ TEST(math, vectorsBase) {
 	EXPECT_NEAR(vect.y(), 5, 0.001);
 }
 TEST(math, vectorsAddition) {
-	vec2 const vect{4, 5};
-	vec2 const vect2{1, 2};
+	constexpr vec2 vect{4, 5};
+	constexpr vec2 vect2{1, 2};
 	EXPECT_NEAR((vect + vect2).x(), 5, 0.0001);
 	EXPECT_NEAR((vect + vect2).y(), 7, 0.0001);
 	EXPECT_NEAR((vect - vect2).x(), 3, 0.0001);

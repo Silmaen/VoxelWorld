@@ -138,8 +138,9 @@ void Viewport::renderOverlay() const {
 
 	if (m_parent->getState() == EditorLayer::State::Play) {
 		const scene::Entity camera = m_parent->getActiveScene()->getPrimaryCamera();
-		renderer::Renderer2D::beginScene(camera.getComponent<scene::component::Camera>().camera,
-										 camera.getComponent<scene::component::Transform>().getTransform());
+		auto& cam = camera.getComponent<scene::component::Camera>().camera;
+		cam.setTransform(camera.getComponent<scene::component::Transform>().getTransform());
+		renderer::Renderer2D::beginScene(cam);
 	} else {
 		renderer::Renderer2D::beginScene(m_editorCamera);
 	}
@@ -180,7 +181,7 @@ void Viewport::renderGizmo() {
 		math::mat4 cameraProjection = m_editorCamera.getProjection();
 		if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan)
 			cameraProjection(1, 1) *= -1.f;
-		math::mat4 cameraView = m_editorCamera.getViewMatrix();
+		math::mat4 cameraView = m_editorCamera.getView();
 
 		// Entity transform
 		auto& tc = selectedEntity.getComponent<scene::component::Transform>();
@@ -213,7 +214,7 @@ void Viewport::renderGizmo() {
 }
 
 void Viewport::onEvent(event::Event& ioEvent) {
-	if (m_parent->getState() == EditorLayer::State::Edit)
+	if (m_parent->getState() == EditorLayer::State::Edit && isHovered())
 		m_editorCamera.onEvent(ioEvent);
 
 	event::EventDispatcher dispatcher(ioEvent);

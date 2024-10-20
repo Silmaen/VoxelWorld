@@ -9,6 +9,7 @@
 #pragma once
 
 #include "DrawData.h"
+#include "math/vectors.h"
 
 namespace owl::renderer {
 
@@ -72,7 +73,7 @@ public:
 	 * @param[in] iData Draw data to render.
 	 * @param[in] iIndexCount Number of vertex to draw (=0 all).
 	 */
-	virtual void drawLine(const shared<DrawData>& iData, const uint32_t iIndexCount = 0) = 0;
+	virtual void drawLine(const shared<DrawData>& iData, uint32_t iIndexCount = 0) = 0;
 
 	/**
 	 * @brief Get the maximum number of texture slots.

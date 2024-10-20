@@ -12,6 +12,7 @@
 #include "CameraEditor.h"
 #include "CameraOrtho.h"
 #include "Texture.h"
+#include "fonts/Font.h"
 #include "scene/component/SpriteRenderer.h"
 
 
@@ -141,6 +142,26 @@ struct OWL_API PolyLineData {
 };
 
 /**
+ * @brief Data for drawing a string.
+ */
+struct OWL_API StringData {
+	/// Transformation of the render.
+	utils::Transform2D transform;
+	/// Test to render
+	std::string text;
+	/// font to use (or default one)
+	shared<fonts::Font> font = nullptr;
+	/// Color to render.
+	math::vec4 color = math::vec4{1.f, 1.f, 1.f, 1.f};
+	/// The kerning.
+	float kerning = 0.f;
+	/// The line spacing.
+	float lineSpacing = 0.f;
+	/// unique ID for the entity.
+	int entityId = -1;
+};
+
+/**
  * @brief Class Renderer2D.
  */
 class OWL_API Renderer2D {
@@ -170,20 +191,7 @@ public:
 	 * @brief Begins a scene.
 	 * @param[in] iCamera The camera.
 	 */
-	static void beginScene(const CameraOrtho& iCamera);
-
-	/**
-	 * @brief Begins a scene.
-	 * @param[in] iCamera The camera.
-	 */
-	static void beginScene(const CameraEditor& iCamera);
-
-	/**
-	 * @brief Begins a scene.
-	 * @param[in] iCamera The camera.
-	 * @param[in] iTransform The transformation.
-	 */
-	static void beginScene(const Camera& iCamera, const math::mat4& iTransform);
+	static void beginScene(const Camera& iCamera);
 
 	/**
 	 * @brief Ends a scene.
@@ -225,6 +233,12 @@ public:
 	 * @param[in] iQuadData Quad's properties.
 	 */
 	static void drawQuad(const Quad2DData& iQuadData);
+
+	/**
+	 * @brief Draws a Quad on the screen.
+	 * @param[in] iStringData String's properties.
+	 */
+	static void drawString(const StringData& iStringData);
 
 	/**
 	 * @brief Statistics.

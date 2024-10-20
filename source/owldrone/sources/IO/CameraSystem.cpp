@@ -8,6 +8,8 @@
 #include "CameraSystem.h"
 #include "DroneSettings.h"
 
+#include <spirv_cross/spirv.hpp>
+
 namespace drone::IO {
 
 CameraSystem::CameraSystem() { resize({1, 1}); }
@@ -62,7 +64,8 @@ void CameraSystem::resize(const owl::math::vec2ui& iSize) {
 		return;
 	m_size = iSize;
 	m_frame.reset();
-	m_frame = owl::renderer::Texture2D::create(m_size, false);
+	m_frame = owl::renderer::Texture2D::create(
+			{.size = m_size, .format = owl::renderer::ImageFormat::RGB8, .generateMips = false});
 }
 
 // NOLINTBEGIN(readability-convert-member-functions-to-static)

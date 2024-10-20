@@ -27,10 +27,7 @@ void createImage(const uint32_t iIndex, const math::vec2ui& iDimensions) {
 
 }// namespace
 
-Texture2D::Texture2D(const math::vec2ui& iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {}
-
-Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
-	: renderer::Texture2D{iWidth, iHeight, iWithAlpha} {}
+Texture2D::Texture2D(const Specification& iSpecs) : renderer::Texture2D{iSpecs} {}
 
 Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {
 	int width = 0;
@@ -51,9 +48,9 @@ Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::mov
 		OWL_CORE_ERROR("Vulkan Texture: Impossible to load {}, invalid number of channels {}: must be 3 or 4.")
 		return;
 	}
-	m_hasAlpha = channels == 4;
-	m_size = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
-	setData(data, m_size.surface() * static_cast<uint32_t>(channels));
+	m_specification.format = channels == 4 ? ImageFormat::RGBA8 : ImageFormat::RGB8;
+	m_specification.size = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+	setData(data, m_specification.size.surface() * static_cast<uint32_t>(channels));
 
 	stbi_image_free(data);
 }
@@ -74,23 +71,23 @@ OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void Texture2D::setData(void* iData, const uint32_t iSize) {
 	const auto& vkc = internal::VulkanCore::get();
-	if (const uint32_t expected = m_hasAlpha ? m_size.surface() * 4 : m_size.surface() * 3; iSize != expected) {
+	if (const uint32_t expected = m_specification.getPixelSize() * m_specification.size.surface(); iSize != expected) {
 		OWL_CORE_ERROR("Vulkan Texture {}: Image size missmatch: expect {}, got {}", m_path.string(), expected, iSize)
 		return;
 	}
 	VkBuffer stagingBuffer = nullptr;
 	VkDeviceMemory stagingBufferMemory = nullptr;
 
-	const VkDeviceSize imageSize = m_size.surface() * 4ull;
+	const VkDeviceSize imageSize = m_specification.size.surface() * 4ull;
 	internal::createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 						   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
 						   stagingBufferMemory);
 	void* dataPixel = nullptr;
 	vkMapMemory(vkc.getLogicalDevice(), stagingBufferMemory, 0, imageSize, 0, &dataPixel);
-	if (m_hasAlpha) {
+	if (m_specification.format == ImageFormat::RGBA8) {
 		// input data already in the right format, just copy
 		memcpy(dataPixel, iData, imageSize);
-	} else {
+	} else if (m_specification.format == ImageFormat::RGB8) {
 		// need to insert alpha chanel.
 		const auto* dataChar = static_cast<uint8_t*>(iData);
 		auto* dataPixelChar = static_cast<uint8_t*>(dataPixel);
@@ -98,16 +95,19 @@ void Texture2D::setData(void* iData, const uint32_t iSize) {
 			memcpy(dataPixelChar + i, dataChar + j, 3);
 			*(dataPixelChar + i + 3) = 0xFFu;
 		}
+	} else {
+		OWL_CORE_ERROR("Vulkan Texture, image format {} not supported.", magic_enum::enum_name(m_specification.format))
+		return;
 	}
 	vkUnmapMemory(vkc.getLogicalDevice(), stagingBufferMemory);
 	auto& vkd = internal::Descriptors::get();
 	if (!vkd.isTextureRegistered(m_textureId)) {
 		m_textureId = vkd.registerNewTexture();
-		createImage(m_textureId, m_size);
+		createImage(m_textureId, m_specification.size);
 	}
 	auto& data = vkd.getTextureData(m_textureId);
 	internal::transitionImageLayout(data.textureImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	internal::copyBufferToImage(stagingBuffer, data.textureImage, m_size);
+	internal::copyBufferToImage(stagingBuffer, data.textureImage, m_specification.size);
 	internal::transitionImageLayout(data.textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 									VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 

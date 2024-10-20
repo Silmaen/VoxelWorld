@@ -16,7 +16,7 @@
 namespace owl::renderer::vulkan::internal {
 
 
-void TextureData::freeTrexture() {
+void TextureData::freeTexture() {
 	const auto& core = internal::VulkanCore::get();
 	const auto& pool = Descriptors::get().getSingleImageDescriptorPool();
 	vkDeviceWaitIdle(core.getLogicalDevice());
@@ -141,7 +141,7 @@ void TextureData::createSampler() {
 	}
 }
 void TextureData::createImage(const math::vec2ui& iDimensions) {
-	freeTrexture();
+	freeTexture();
 	const auto& vkc = internal::VulkanCore::get();
 	const VkImageCreateInfo imageInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -189,7 +189,7 @@ void Descriptors::release() {
 	m_textureBind.shrink_to_fit();
 	if (!m_textures.empty()) {
 		for (auto& tex: m_textures) {
-			tex.second->freeTrexture();
+			tex.second->freeTexture();
 			tex.second.reset();
 		}
 	}
@@ -450,7 +450,7 @@ void Descriptors::TextureList::unregisterTexture(uint32_t iIndex) {
 							 [&iIndex](const auto& iElem) { return iElem.first == iIndex; });
 	if (iter == textures.end())
 		return;
-	iter->second->freeTrexture();
+	iter->second->freeTexture();
 	textures.erase(iter);
 }
 auto Descriptors::TextureList::getTextureData(uint32_t iIndex) -> Descriptors::TextureList::tex {

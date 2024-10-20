@@ -58,7 +58,7 @@ TEST(Renderer2D, fakeCircleRectScene) {
 	Renderer::init();
 	const CameraEditor cam;
 	Renderer2D::resetStats();
-	Renderer2D::beginScene(cam, owl::math::identity<float, 4>());
+	Renderer2D::beginScene(cam);
 	Renderer2D::drawRect({.transform = utils::Transform2D{owl::math::identity<float, 4>()}});
 	Renderer2D::nextBatch();
 	Renderer2D::drawCircle({.transform = utils::Transform2D{owl::math::identity<float, 4>()}});
@@ -83,7 +83,7 @@ TEST(Renderer2D, fakeQuadSpriteScene) {
 	Renderer2D::beginScene(cam);
 	constexpr utils::PRS tr{.position = {0.f, 1.f, 5.f}, .rotation = 12, .size = {1.f, 2.f}};
 	owl::scene::component::SpriteRenderer spr;
-	spr.texture = Texture2D::create(2, 2);
+	spr.texture = Texture2D::create(Texture2D::Specification{.size = {2, 2}});
 	Renderer2D::drawQuad({.transform = toTransform(tr),
 						  .color = spr.color,
 						  .texture = spr.texture,

@@ -7,10 +7,10 @@ struct VertexOutput {
     vec4 Color;
 };
 
-layout (location = 0) in VertexOutput Input;
-layout (location = 1) in flat int v_EntityID;
+layout (location = 0) in VertexOutput i_Vertex;
+layout (location = 1) in flat int i_EntityID;
 
 void main() {
-    o_Color = Input.Color;
-    o_EntityID = v_EntityID;
+    o_Color = i_Vertex.Color;
+    o_EntityID = i_EntityID;
 }

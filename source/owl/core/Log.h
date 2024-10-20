@@ -8,8 +8,8 @@
 
 #pragma once
 
+#include "Core.h"
 #include "external/spdlog.h"
-#include "math/linAlgebra.h"
 
 /**
  * @brief Namespace for the core objects.

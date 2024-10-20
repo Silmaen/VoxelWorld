@@ -11,17 +11,14 @@
 
 namespace owl::renderer::null {
 
-Texture2D::Texture2D(const math::vec2ui iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {}
-
-Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
-	: renderer::Texture2D{iWidth, iHeight, iWithAlpha} {}
-
 Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {}
+
+Texture2D::Texture2D(const Specification& iSpecs) : renderer::Texture2D{iSpecs} {}
 
 Texture2D::~Texture2D() = default;
 
 void Texture2D::bind(uint32_t) const {}
 
-void Texture2D::setData(void *, uint32_t) {}
+void Texture2D::setData(void*, uint32_t) {}
 
 }// namespace owl::renderer::null

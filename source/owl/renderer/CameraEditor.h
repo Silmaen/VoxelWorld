@@ -29,7 +29,7 @@ public:
 	/**
 	 * @brief Constructor
 	 * @param[in] iFov Field of view.
-	 * @param[in] iAspectRatio Aspect rtio.
+	 * @param[in] iAspectRatio Aspect ratio.
 	 * @param[in] iNearClip Near clip distance.
 	 * @param[in] iFarClip Far clip distance.
 	 */
@@ -67,18 +67,6 @@ public:
 		m_viewportSize = iSize;
 		updateProjection();
 	}
-
-	/**
-	 * @brief Get the camera view matrix.
-	 * @return Camera view matrix.
-	 */
-	[[nodiscard]] auto getViewMatrix() const -> const math::mat4& { return m_viewMatrix; }
-
-	/**
-	 * @brief Get the camera view projection matrix.
-	 * @return Camera view projection matrix.
-	 */
-	[[nodiscard]] auto getViewProjection() const -> math::mat4 { return m_projection * m_viewMatrix; }
 
 	/**
 	 * @brief Get the camera up vector.
@@ -191,8 +179,6 @@ private:
 	/// Far clipping distance.
 	float m_farClip = 1000.0f;
 
-	/// Internal view matrix.
-	math::mat4 m_viewMatrix;
 	/// Camera position.
 	math::vec3 m_position = {0.0f, 0.0f, 0.0f};
 	/// Camera Focal point.

@@ -17,12 +17,10 @@
 
 namespace owl::renderer {
 
+
 Texture::Texture(std::filesystem::path iPath) : m_path{std::move(iPath)} {}
 
-Texture::Texture(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
-	: m_size{iWidth, iHeight}, m_hasAlpha{iWithAlpha} {}
-
-Texture::Texture(const math::vec2ui& iSize, const bool iWithAlpha) : m_size{iSize}, m_hasAlpha{iWithAlpha} {}
+Texture::Texture(const Specification& iSpecs) : m_specification{iSpecs} {}
 
 [[nodiscard]] auto Texture::getSerializeString() const -> std::string {
 	if (!isLoaded()) {
@@ -34,15 +32,44 @@ Texture::Texture(const math::vec2ui& iSize, const bool iWithAlpha) : m_size{iSiz
 	if (!m_path.empty()) {
 		return "pat:" + m_path.string();
 	}
-	return fmt::format("siz:{}:{}:{}", m_size.x(), m_size.y(), m_hasAlpha);
+	return fmt::format("spec:{}", m_specification.toString());
+}
+
+auto Texture::Specification::toString() const -> std::string {
+	return fmt::format("{}:{}:{}:{}", size.x(), size.y(), magic_enum::enum_name(format), generateMips);
+}
+void Texture::Specification::fromString(const std::string& iString) {
+	std::stringstream ss(iString);
+	std::string token;
+	std::getline(ss, token, ':');
+	size.x() = static_cast<uint32_t>(std::stoul(token));
+	std::getline(ss, token, ':');
+	size.y() = static_cast<uint32_t>(std::stoul(token));
+	std::getline(ss, token, ':');
+	format = magic_enum::enum_cast<ImageFormat>(token).value_or(ImageFormat::RGB8);
+	std::getline(ss, token, ':');
+	generateMips = token != "false";
+}
+
+auto Texture::Specification::getPixelSize() const -> uint8_t {
+	switch (format) {
+		case ImageFormat::RGB8:
+			return 3;
+		case ImageFormat::RGBA8:
+			return 4;
+		case ImageFormat::R8:
+			return 1;
+		case ImageFormat::RGBA32F:
+			return 16;
+		case ImageFormat::None:
+			return 0;
+	}
+	return 0;
 }
 
 Texture2D::Texture2D(std::filesystem::path iPath) : Texture{std::move(iPath)} {}
 
-Texture2D::Texture2D(const uint32_t iWidth, const uint32_t iHeight, const bool iWithAlpha)
-	: Texture{iWidth, iHeight, iWithAlpha} {}
-
-Texture2D::Texture2D(const math::vec2ui& iSize, const bool iWithAlpha) : Texture{iSize, iWithAlpha} {}
+Texture2D::Texture2D(const Specification& iSpecs) : Texture{iSpecs} {}
 
 auto Texture2D::create(const std::filesystem::path& iFile) -> shared<Texture2D> {
 	switch (RenderCommand::getApi()) {
@@ -79,35 +106,20 @@ auto Texture2D::create(const std::string& iTextureName) -> shared<Texture2D> {
 	return create(location.value());
 }
 
-auto Texture2D::create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha) -> shared<Texture2D> {
-	switch (RenderCommand::getApi()) {
-		case RenderAPI::Type::Null:
-			return mkShared<null::Texture2D>(iWidth, iHeight);
-		case RenderAPI::Type::OpenGL:
-			return mkShared<opengl::Texture2D>(iWidth, iHeight, iWithAlpha);
-		case RenderAPI::Type::Vulkan:
-			return mkShared<vulkan::Texture2D>(iWidth, iHeight, iWithAlpha);
-	}
-
-	OWL_CORE_ERROR("Unknown RendererAPI!")
-	return nullptr;
-}
-
-auto Texture2D::create(const math::vec2ui& iSize, bool iWithAlpha) -> shared<Texture2D> {
+auto Texture2D::create(const Specification& iSpecs) -> shared<Texture2D> {
 	shared<Texture2D> tex;
 	switch (RenderCommand::getApi()) {
 		case RenderAPI::Type::Null:
-			tex = mkShared<null::Texture2D>(iSize);
+			tex = mkShared<null::Texture2D>(iSpecs);
 			break;
 		case RenderAPI::Type::OpenGL:
-			tex = mkShared<opengl::Texture2D>(iSize, iWithAlpha);
+			tex = mkShared<opengl::Texture2D>(iSpecs);
 			break;
 		case RenderAPI::Type::Vulkan:
-			tex = mkShared<vulkan::Texture2D>(iSize, iWithAlpha);
+			tex = mkShared<vulkan::Texture2D>(iSpecs);
 			break;
 	}
 	if (tex) {
-		tex->m_hasAlpha = iWithAlpha;
 		return tex;
 	}
 
@@ -121,21 +133,15 @@ auto Texture2D::createFromSerialized(const std::string& iTextureSerializedName) 
 	const auto key = iTextureSerializedName.substr(0, 4);
 	const auto val = iTextureSerializedName.substr(4);
 	if (key == "emp:")
-		return create(0, 0, false);
+		return create(Specification{.size = {0, 0}, .format = ImageFormat::RGB8});
 	if (key == "nam:")
 		return create(val);
 	if (key == "pat:")
 		return create(std::filesystem::path(val));
 	if (key == "siz:") {
-		std::stringstream ss(val);
-		std::string token;
-		std::getline(ss, token, ':');
-		const auto w = static_cast<uint32_t>(std::stoul(token));
-		std::getline(ss, token, ':');
-		const auto h = static_cast<uint32_t>(std::stoul(token));
-		std::getline(ss, token, ':');
-		const bool a = token != "false";
-		return create(w, h, a);
+		Specification specs;
+		specs.fromString(val);
+		return create(specs);
 	}
 	return nullptr;
 }

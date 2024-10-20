@@ -17,5 +17,11 @@ packages:
   nfd:
   vulkan_sdk:
     kind: "shared"
+  msdfgen:
+    kind: "static"
+  msdf-atlas-gen:
+    kind: "static"
+  tinyxml2:
+    kind: "static"
   zstd:
   zlib:

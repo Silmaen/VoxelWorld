@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Event.h"
+#include "math/vectors.h"
 
 namespace owl::event {
 /**

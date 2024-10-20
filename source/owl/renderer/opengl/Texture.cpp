@@ -13,22 +13,38 @@
 
 namespace owl::renderer::opengl {
 
-Texture2D::Texture2D(math::vec2ui iSize, const bool iWithAlpha) : renderer::Texture2D{iSize, iWithAlpha} {
-	OWL_PROFILE_FUNCTION()
-
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_textureId);
-	glTextureStorage2D(m_textureId, 1, m_hasAlpha ? GL_RGBA8 : GL_RGB8, static_cast<GLsizei>(m_size.x()),
-					   static_cast<GLsizei>(m_size.y()));
-
-	glTextureParameteri(m_textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(m_textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	glTextureParameteri(m_textureId, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(m_textureId, GL_TEXTURE_WRAP_T, GL_REPEAT);
+namespace {
+auto glDataFormat(const ImageFormat& iFormat) -> GLenum {
+	switch (iFormat) {
+		case ImageFormat::RGBA8:
+			return GL_RGBA;
+		case ImageFormat::RGB8:
+			return GL_RGB;
+		case ImageFormat::R8:
+			return GL_RED;
+		case ImageFormat::RGBA32F:
+			return GL_RGBA32F;
+		case ImageFormat::None:
+			return GL_NONE;
+	}
+	return GL_NONE;
 }
-
-Texture2D::Texture2D(uint32_t iWidth, uint32_t iHeight, const bool iWithAlpha)
-	: Texture2D({iWidth, iHeight}, iWithAlpha) {}
+auto glInternalDataFormat(const ImageFormat& iFormat) -> GLenum {
+	switch (iFormat) {
+		case ImageFormat::RGBA8:
+			return GL_RGBA8;
+		case ImageFormat::RGB8:
+			return GL_RGB8;
+		case ImageFormat::R8:
+			return GL_RED_INTEGER;
+		case ImageFormat::RGBA32F:
+			return GL_RGBA32F;
+		case ImageFormat::None:
+			return GL_NONE;
+	}
+	return GL_NONE;
+}
+}// namespace
 
 Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {
 	OWL_PROFILE_FUNCTION()
@@ -52,12 +68,12 @@ Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::mov
 		OWL_CORE_ERROR("OpenGL Texture: Impossible to load {}, invalid number of channels {}: must be 3 or 4.")
 		return;
 	}
-	m_hasAlpha = channels == 4;
-	m_size = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+	m_specification.format = channels == 4 ? ImageFormat::RGBA8 : ImageFormat::RGB8;
+	m_specification.size = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_textureId);
-	glTextureStorage2D(m_textureId, 1, m_hasAlpha ? GL_RGBA8 : GL_RGB8, static_cast<GLsizei>(m_size.x()),
-					   static_cast<GLsizei>(m_size.y()));
+	glTextureStorage2D(m_textureId, 1, glInternalDataFormat(m_specification.format),
+					   static_cast<GLsizei>(m_specification.size.x()), static_cast<GLsizei>(m_specification.size.y()));
 
 	glTextureParameteri(m_textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTextureParameteri(m_textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -65,10 +81,25 @@ Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::mov
 	glTextureParameteri(m_textureId, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTextureParameteri(m_textureId, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTextureSubImage2D(m_textureId, 0, 0, 0, static_cast<GLsizei>(m_size.x()), static_cast<GLsizei>(m_size.y()),
-						m_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTextureSubImage2D(m_textureId, 0, 0, 0, static_cast<GLsizei>(m_specification.size.x()),
+						static_cast<GLsizei>(m_specification.size.y()), glDataFormat(m_specification.format),
+						GL_UNSIGNED_BYTE, data);
 
 	stbi_image_free(data);
+}
+
+Texture2D::Texture2D(const Specification& iSpecs) : renderer::Texture2D{iSpecs} {
+	OWL_PROFILE_FUNCTION()
+
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_textureId);
+	glTextureStorage2D(m_textureId, 1, glInternalDataFormat(m_specification.format),
+					   static_cast<GLsizei>(m_specification.size.x()), static_cast<GLsizei>(m_specification.size.y()));
+
+	glTextureParameteri(m_textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureParameteri(m_textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glTextureParameteri(m_textureId, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(m_textureId, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 Texture2D::~Texture2D() {
@@ -86,9 +117,11 @@ void Texture2D::bind(const uint32_t iSlot) const {
 void Texture2D::setData(void* iData, [[maybe_unused]] const uint32_t iSize) {
 	OWL_PROFILE_FUNCTION()
 
-	OWL_CORE_ASSERT(iSize == m_size.surface() * (m_hasAlpha ? 4 : 3), "Data size missmatch texture size!")
-	glTextureSubImage2D(m_textureId, 0, 0, 0, static_cast<GLsizei>(m_size.x()), static_cast<GLsizei>(m_size.y()),
-						m_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, iData);
+	OWL_CORE_ASSERT(iSize == m_specification.size.surface() * m_specification.getPixelSize(),
+					"Data size missmatch texture size!")
+	glTextureSubImage2D(m_textureId, 0, 0, 0, static_cast<GLsizei>(m_specification.size.x()),
+						static_cast<GLsizei>(m_specification.size.y()), glDataFormat(m_specification.format),
+						GL_UNSIGNED_BYTE, iData);
 }
 
 }// namespace owl::renderer::opengl

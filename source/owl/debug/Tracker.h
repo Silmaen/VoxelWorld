@@ -36,15 +36,15 @@ struct MemorySize {
 			return fmt::format("{} bytes", size);
 		float fsize = static_cast<float>(size) / 1024.0f;
 		if (fsize < 1024.0f)
-			return fmt::format("{:.2} kB", fsize);
+			return fmt::format("{:.3} kB", fsize);
 		fsize /= 1024.0f;
 		if (fsize < 1024.0f)
-			return fmt::format("{:.2} MB", fsize);
+			return fmt::format("{:.3} MB", fsize);
 		fsize /= 1024.0f;
 		if (fsize < 1024.0f)
-			return fmt::format("{:.2} GB", fsize);
+			return fmt::format("{:.3} GB", fsize);
 		fsize /= 1024.0f;
-		return fmt::format("{:.2} TB", fsize);
+		return fmt::format("{:.3} TB", fsize);
 	}
 };
 //using size_t = std::size_t;
@@ -121,6 +121,9 @@ struct OWL_API AllocationState {
 	void freeMemory(void* iLocation, size_t iSize);
 };
 
+/**
+ * @brief Simple API to manipulate the memory tracker.
+ */
 class OWL_API TrackerAPI {
 public:
 	/**

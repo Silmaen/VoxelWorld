@@ -8,19 +8,20 @@
 
 #pragma once
 
+#include "Camera.h"
 #include "core/Core.h"
 
 namespace owl::renderer {
 /**
  * @brief Orthographic camera.
  */
-class OWL_API CameraOrtho {
+class OWL_API CameraOrtho final : public Camera {
 public:
 	CameraOrtho(const CameraOrtho&) = default;
 	CameraOrtho(CameraOrtho&&) = default;
 	auto operator=(const CameraOrtho&) -> CameraOrtho& = default;
 	auto operator=(CameraOrtho&&) -> CameraOrtho& = default;
-	~CameraOrtho() = default;
+	~CameraOrtho() override;
 	/**
 	 * @brief Create the camera giving coordinates of corners.
 	 * @param[in] iLeft Left of the screen's coordinate.
@@ -71,36 +72,12 @@ public:
 		recalculateViewMatrix();
 	}
 
-	/**
-	 * @brief Access to projection matrix.
-	 * @return The projection matrix.
-	 */
-	[[nodiscard]] auto getProjectionMatrix() const -> const math::mat4& { return m_projectionMatrix; }
-
-	/**
-	 * @brief Access to view matrix.
-	 * @return The view matrix.
-	 */
-	[[nodiscard]] auto getViewMatrix() const -> const math::mat4& { return m_viewMatrix; }
-
-	/**
-	 * @brief Access to view projection matrix.
-	 * @return The view position matrix.
-	 */
-	[[nodiscard]] auto getViewProjectionMatrix() const -> const math::mat4& { return m_viewProjectionMatrix; }
-
 private:
 	/**
 	 * @brief Recompute the matrices.
 	 */
 	void recalculateViewMatrix();
 
-	/// The projection matrix.
-	math::mat4 m_projectionMatrix;
-	/// The view matrix.
-	math::mat4 m_viewMatrix;
-	/// The view projection matrix.
-	math::mat4 m_viewProjectionMatrix;
 	/// Camera's position.
 	math::vec3 m_position = {0.0f, 0.0f, 0.0f};
 	/// Camera's rotation.

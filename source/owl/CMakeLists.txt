@@ -115,6 +115,11 @@ find_package(magic_enum REQUIRED)
 message(STATUS "Found magic_enum version ${magic_enum_VERSION} @ ${magic_enum_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE magic_enum::magic_enum)
 
+# msdf-atlas-gen
+find_package(msdf-atlas-gen REQUIRED)
+message(STATUS "Found msdf-atlas-gen version ${msdf-atlas-gen_VERSION} @ ${msdf-atlas-gen_DIR}")
+target_link_libraries(${ENGINE_NAME} PUBLIC msdf-atlas-gen::msdf-atlas-gen)
+
 # yaml
 find_package(yaml-cpp REQUIRED)
 message(STATUS "Found yaml-cpp version ${yaml-cpp_VERSION} @ ${yaml-cpp_DIR}")

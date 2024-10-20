@@ -304,7 +304,7 @@ void Device::fillFrame(shared<renderer::Texture>& ioFrame) {
 		return;// need to be open and ready!
 	// recreate the frame if not the right size.
 	if (!ioFrame || ioFrame->getSize() != m_size) {
-		ioFrame = renderer::Texture2D::create(m_size, false);
+		ioFrame = renderer::Texture2D::create({m_size, renderer::ImageFormat::RGB8});
 	}
 	// dequeue the buffer
 	if (ioctl(m_fileHandler, VIDIOC_DQBUF, &m_bufferInfo) < 0) {

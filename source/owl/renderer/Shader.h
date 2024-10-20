@@ -9,6 +9,7 @@
 #pragma once
 
 #include "core/Core.h"
+#include "math/matrices.h"
 
 #include <filesystem>
 
@@ -71,8 +72,8 @@ public:
 	 * @param[in] iFile Source of the shader.
 	 * @return Pointer to the shader.
 	 */
-	static auto create(const std::string& iShaderName, const std::string& iRenderer,
-					   const std::filesystem::path& iFile) -> shared<Shader>;
+	static auto create(const std::string& iShaderName, const std::string& iRenderer, const std::filesystem::path& iFile)
+			-> shared<Shader>;
 
 	/**
 	 * @brief Set shader's internal int variable.

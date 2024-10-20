@@ -10,6 +10,7 @@
 
 #include "core/Timestep.h"
 #include "event/Event.h"
+#include "math/vectors.h"
 
 namespace owl::gui {
 

@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <math/Transform.h>
+#include <math/matrixCreation.h>
 
 using namespace owl::math;
 

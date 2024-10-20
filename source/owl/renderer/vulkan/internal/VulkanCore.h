@@ -9,9 +9,10 @@
 #pragma once
 
 #include "PhysicalDeviceCapabilities.h"
+#include "math/vectors.h"
 
 /**
- * @brief Namespace for vulkan intenal functions
+ * @brief Namespace for vulkan internal functions
  */
 namespace owl::renderer::vulkan::internal {
 
@@ -20,13 +21,13 @@ constexpr uint32_t g_maxFrameInFlight = 2;
 /**
  * @brief Simple struct to gather the vulkan configurations.
  */
-struct VulkanConfiguraton {
+struct VulkanConfiguration {
 	/// If the validation layers should be activated.
 	bool activeValidation = false;
 };
 
 /**
- * @brief Informations about the vulkan's instance.
+ * @brief Information about the vulkan's instance.
  */
 struct InstanceInformations {
 	InstanceInformations();
@@ -97,7 +98,7 @@ public:
 	 * @brief Initialize the vulkan core.
 	 * @param[in] iConfiguration The Given configuratio.
 	 */
-	void init(const VulkanConfiguraton& iConfiguration);
+	void init(const VulkanConfiguration& iConfiguration);
 
 	/**
 	 * @brief Release the vulkan core.
@@ -215,8 +216,8 @@ public:
 	 * @param[in] iMemProperties Memory properties.
 	 * @return The memory type index.
 	 */
-	[[nodiscard]] auto findMemoryTypeIndex(uint32_t iTypeFilter,
-										   VkMemoryPropertyFlags iMemProperties) const -> uint32_t;
+	[[nodiscard]] auto findMemoryTypeIndex(uint32_t iTypeFilter, VkMemoryPropertyFlags iMemProperties) const
+			-> uint32_t;
 
 	[[nodiscard]] auto getMaxSamplerAnisotropy() const -> float;
 
@@ -233,7 +234,7 @@ private:
 	VulkanCore();
 
 	/// Vulkan requested configuation.
-	VulkanConfiguraton m_config{};
+	VulkanConfiguration m_config{};
 
 	/// Vulkan instance.
 	VkInstance m_instance = nullptr;

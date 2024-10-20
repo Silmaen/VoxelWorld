@@ -43,6 +43,7 @@ Window::~Window() {
 
 void Window::init(const Properties& iProps) {
 	OWL_PROFILE_FUNCTION()
+	OWL_SCOPE_UNTRACK
 
 	// Initializations
 	{
@@ -75,7 +76,6 @@ void Window::init(const Properties& iProps) {
 		if (api == renderer::RenderAPI::Type::Vulkan)
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		{
-			OWL_SCOPE_UNTRACK
 			mp_glfwWindow = glfwCreateWindow(static_cast<int>(iProps.width), static_cast<int>(iProps.height),
 											 m_windowData.title.c_str(), nullptr, nullptr);
 		}

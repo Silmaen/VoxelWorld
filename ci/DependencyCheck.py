@@ -10,6 +10,8 @@ dependencies = [
     {"name": "debugbreak", "version": "*", "header": True},
     {"name": "entt", "version": "*", "header": True},
     {"name": "magic_enum", "version": "*", "header": True},
+    {"name": "msdfgen", "version": "*", "header": False},
+    {"name": "msdf-atlas-gen", "version": "*", "header": False},
     {"name": "stb_image", "version": "*", "header": True},
     {"name": "fmt", "version": "*", "header": False},
     {"name": "glad", "version": "*", "header": False},
@@ -21,6 +23,7 @@ dependencies = [
     {"name": "yaml-cpp", "version": "*", "header": False},
     {"name": "nfd", "version": "*", "header": False},
     {"name": "googletest", "version": "*", "header": False},
+    {"name": "tinyxml2", "version": "*", "header": False},
     {"name": "vulkan_sdk", "version": "*", "header": False, "kind": "shared"},
 ]
 

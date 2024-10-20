@@ -7,7 +7,9 @@
  */
 
 #pragma once
-#include "core/Core.h"
+
+#include "math/linAlgebra.h"
+
 namespace owl::scene::component {
 
 /**

@@ -12,6 +12,8 @@
 #include "DrawData.h"
 #include "RenderCommand.h"
 #include "UniformBuffer.h"
+#include "core/Application.h"
+#include "math/linAlgebra.h"
 
 namespace owl::renderer {
 
@@ -22,11 +24,10 @@ constexpr uint32_t g_maxQuads = 20000;
 constexpr size_t g_quadVertexCount = 4;
 constexpr uint32_t g_maxVertices = g_maxQuads * g_quadVertexCount;
 constexpr uint32_t g_maxIndices = g_maxQuads * 6;
-constexpr math::vec2 g_textureCoords[] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
-constexpr math::vec4 g_quadVertexPositions[] = {{-0.5f, -0.5f, 0.0f, 1.0f},
-												{0.5f, -0.5f, 0.0f, 1.0f},
-												{0.5f, 0.5f, 0.0f, 1.0f},
-												{-0.5f, 0.5f, 0.0f, 1.0f}};
+constexpr std::array g_textureCoords{math::vec2{0.0f, 0.0f}, math::vec2{1.0f, 0.0f}, math::vec2{1.0f, 1.0f},
+									 math::vec2{0.0f, 1.0f}};
+constexpr std::array g_quadVertexPositions = {math::vec4{-0.5f, -0.5f, 0.0f, 1.0f}, math::vec4{0.5f, -0.5f, 0.0f, 1.0f},
+											  math::vec4{0.5f, 0.5f, 0.0f, 1.0f}, math::vec4{-0.5f, 0.5f, 0.0f, 1.0f}};
 
 uint32_t g_MaxTextureSlots = 0;
 }// namespace
@@ -61,6 +62,18 @@ struct CircleVertex {
 struct LineVertex {
 	math::vec3 position;
 	math::vec4 color;
+	int entityId;
+};
+
+/**
+ * @brief Structure holding text vertex information.
+ */
+struct TextVertex {
+	math::vec3 position;
+	math::vec4 color;
+	math::vec2 texCoord;
+	float texIndex;
+	// todo bg color
 	int entityId;
 };
 
@@ -101,6 +114,9 @@ struct InternalData {
 	/// Line Data
 	VertexData<LineVertex> line;
 	shared<DrawData> drawLine;
+	/// text Data
+	VertexData<TextVertex> text;
+	shared<DrawData> drawText;
 	/// Statistics
 	Renderer2D::Statistics stats;
 	// Textures Data
@@ -155,37 +171,48 @@ void Renderer2D::init() {
 	g_data->drawQuad = DrawData::create();
 	g_data->drawQuad->init(
 			{
-					{"a_Position", ShaderDataType::Float3},
-					{"a_Color", ShaderDataType::Float4},
-					{"a_TexCoord", ShaderDataType::Float2},
-					{"a_TexIndex", ShaderDataType::Float},
-					{"a_TilingFactor", ShaderDataType::Float},
-					{"a_EntityID", ShaderDataType::Int},
+					{"i_Position", ShaderDataType::Float3},
+					{"i_Color", ShaderDataType::Float4},
+					{"i_TexCoord", ShaderDataType::Float2},
+					{"i_TexIndex", ShaderDataType::Float},
+					{"i_TilingFactor", ShaderDataType::Float},
+					{"i_EntityID", ShaderDataType::Int},
 			},
 			"renderer2D", quadIndices, "quad");
 	// circles
 	g_data->drawCircle = DrawData::create();
 	g_data->drawCircle->init(
 			{
-					{"a_WorldPosition", ShaderDataType::Float3},
-					{"a_LocalPosition", ShaderDataType::Float3},
-					{"a_Color", ShaderDataType::Float4},
-					{"a_Thickness", ShaderDataType::Float},
-					{"a_Fade", ShaderDataType::Float},
-					{"a_EntityID", ShaderDataType::Int},
+					{"i_WorldPosition", ShaderDataType::Float3},
+					{"i_LocalPosition", ShaderDataType::Float3},
+					{"i_Color", ShaderDataType::Float4},
+					{"i_Thickness", ShaderDataType::Float},
+					{"i_Fade", ShaderDataType::Float},
+					{"i_EntityID", ShaderDataType::Int},
 			},
 			"renderer2D", quadIndices, "circle");
 	// Lines
 	g_data->drawLine = DrawData::create();
 	g_data->drawLine->init(
 			{
-					{"a_Position", ShaderDataType::Float3},
-					{"a_Color", ShaderDataType::Float4},
-					{"a_EntityID", ShaderDataType::Int},
+					{"i_Position", ShaderDataType::Float3},
+					{"i_Color", ShaderDataType::Float4},
+					{"i_EntityID", ShaderDataType::Int},
 			},
 			"renderer2D", quadIndices, "line");
+	// Text
+	g_data->drawText = DrawData::create();
+	g_data->drawText->init(
+			{
+					{"i_Position", ShaderDataType::Float3},
+					{"i_Color", ShaderDataType::Float4},
+					{"i_TexCoord", ShaderDataType::Float2},
+					{"i_TexIndex", ShaderDataType::Float},
+					{"i_EntityID", ShaderDataType::Int},
+			},
+			"renderer2D", quadIndices, "text");
 
-	g_data->whiteTexture = Texture2D::create(1, 1);
+	g_data->whiteTexture = Texture2D::create(Texture2D::Specification{.size = {1, 1}, .format = ImageFormat::RGBA8});
 	uint32_t whiteTextureData = 0xffffffff;
 	g_data->whiteTexture->setData(&whiteTextureData, sizeof(uint32_t));
 
@@ -220,26 +247,10 @@ void Renderer2D::shutdown() {
 	g_data.reset();
 }
 
-void Renderer2D::beginScene(const CameraOrtho& iCamera) {
-	OWL_PROFILE_FUNCTION()
-
-	g_data->cameraBuffer.viewProjection = iCamera.getViewProjectionMatrix();
-	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::InternalData::CameraData), 0);
-	startBatch();
-}
-
-void Renderer2D::beginScene(const CameraEditor& iCamera) {
+void Renderer2D::beginScene(const Camera& iCamera) {
 	OWL_PROFILE_FUNCTION()
 
 	g_data->cameraBuffer.viewProjection = iCamera.getViewProjection();
-	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::InternalData::CameraData), 0);
-	startBatch();
-}
-
-void Renderer2D::beginScene(const Camera& iCamera, const math::mat4& iTransform) {
-	OWL_PROFILE_FUNCTION()
-
-	g_data->cameraBuffer.viewProjection = iCamera.getProjection() * math::inverse(iTransform);
 	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::InternalData::CameraData), 0);
 	startBatch();
 }
@@ -282,6 +293,14 @@ void Renderer2D::flush() {
 		RenderCommand::drawLine(g_data->drawLine, g_data->line.indexCount);
 		g_data->stats.drawCalls++;
 	}
+	if (g_data->text.indexCount > 0) {
+		g_data->drawText->setVertexData(
+				g_data->text.vertexBuf.data(),
+				static_cast<uint32_t>(g_data->text.vertexBuf.size() * sizeof(utils::TextVertex)));
+		// draw call
+		RenderCommand::drawData(g_data->drawText, g_data->text.indexCount);
+		g_data->stats.drawCalls++;
+	}
 	RenderCommand::endBatch();
 }
 
@@ -289,6 +308,7 @@ void Renderer2D::startBatch() {
 	utils::resetDrawData(g_data->quad);
 	utils::resetDrawData(g_data->circle);
 	utils::resetDrawData(g_data->line);
+	utils::resetDrawData(g_data->text);
 	g_data->textureSlotIndex = 1;
 }
 
@@ -296,7 +316,6 @@ void Renderer2D::nextBatch() {
 	flush();
 	startBatch();
 }
-
 
 void Renderer2D::drawLine(const LineData& iLineData) {
 	g_data->line.vertexBuf.emplace_back(
@@ -361,8 +380,6 @@ void Renderer2D::drawCircle(const CircleData& iCircleData) {
 	g_data->stats.quadCount++;
 }
 
-OWL_DIAG_PUSH
-OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 void Renderer2D::drawQuad(const Quad2DData& iQuadData) {
 	OWL_PROFILE_FUNCTION()
 	if (g_data->quad.indexCount >= utils::g_maxIndices)
@@ -392,11 +409,105 @@ void Renderer2D::drawQuad(const Quad2DData& iQuadData) {
 								  .tilingFactor = iQuadData.tilingFactor,
 								  .entityId = iQuadData.entityId});
 	}
-
 	g_data->quad.indexCount += 6;
 	g_data->stats.quadCount++;
 }
-OWL_DIAG_POP
+
+void Renderer2D::drawString(const StringData& iStringData) {
+	if (iStringData.font == nullptr) {
+		OWL_CORE_ERROR("Renderer2D::drawString: Font not set")
+		return;
+	}
+
+	// Manage texture
+	const shared<Texture2D> fontAtlas = iStringData.font->getAtlasTexture();
+	float textureIndex = 0.0f;
+	for (uint32_t i = 1; i < g_data->textureSlotIndex; i++) {
+		if (*g_data->textureSlots[i] == *fontAtlas) {
+			textureIndex = static_cast<float>(i);
+			break;
+		}
+	}
+	if (textureIndex == 0.0f) {
+		if (g_data->textureSlotIndex >= utils::g_MaxTextureSlots)
+			nextBatch();
+		textureIndex = static_cast<float>(g_data->textureSlotIndex);
+		g_data->textureSlots[g_data->textureSlotIndex] = fontAtlas;
+		g_data->textureSlotIndex++;
+	}
+	// compute extent.
+	math::box2f extents;
+	{
+		math::vec2 cursor{0.f, 0.f};
+		for (size_t i = 0; i < iStringData.text.size(); i++) {
+			const char character = iStringData.text[i];
+			if (character == '\r')
+				continue;
+			if (character == '\n') {
+				cursor.x() = 0;
+				cursor.y() -= iStringData.font->getScaledLineHeight() + iStringData.lineSpacing;
+				continue;
+			}
+			auto [quad, uv] = iStringData.font->getGlyphBox(character);
+			quad.translate(cursor);
+			extents.update(quad);
+			if (i < iStringData.text.size() - 1) {
+				cursor.x() += iStringData.font->getAdvance(iStringData.text[i], iStringData.text[i + 1]) +
+							  iStringData.kerning;
+			}
+		}
+	}
+	// compute offset and scale to fit the 2D quad -1,1
+	math::vec2 scale = extents.diagonal();
+	scale.x() = 1.f / scale.x();
+	scale.y() = 1.f / scale.y();
+	const math::vec2 offset = -extents.diagonal() / 2.f;
+	math::vec2 cursor{0.f, 0.f};
+	for (size_t i = 0; i < iStringData.text.size(); i++) {
+		const char character = iStringData.text[i];
+		if (character == '\r')
+			continue;
+		if (character == '\n') {
+			cursor.x() = 0;
+			cursor.y() -= iStringData.font->getScaledLineHeight() + iStringData.lineSpacing;
+			continue;
+		}
+		auto [quad, uv] = iStringData.font->getGlyphBox(character);
+		quad.translate(cursor + offset);
+		quad.scale(scale);
+		// render here
+		const math::vec3 p1 = iStringData.transform.transform * math::vec4(quad.min().x(), quad.min().y(), 0, 1.f);
+		const math::vec3 p2 = iStringData.transform.transform * math::vec4(quad.min().x(), quad.max().y(), 0, 1.f);
+		const math::vec3 p3 = iStringData.transform.transform * math::vec4(quad.max().x(), quad.max().y(), 0, 1.f);
+		const math::vec3 p4 = iStringData.transform.transform * math::vec4(quad.max().x(), quad.min().y(), 0, 1.f);
+		g_data->text.vertexBuf.emplace_back(utils::TextVertex{.position = p1,
+															  .color = iStringData.color,
+															  .texCoord = uv.min(),
+															  .texIndex = textureIndex,
+															  .entityId = iStringData.entityId});
+		g_data->text.vertexBuf.emplace_back(utils::TextVertex{.position = p2,
+															  .color = iStringData.color,
+															  .texCoord = {uv.min().x(), uv.max().y()},
+															  .texIndex = textureIndex,
+															  .entityId = iStringData.entityId});
+		g_data->text.vertexBuf.emplace_back(utils::TextVertex{.position = p3,
+															  .color = iStringData.color,
+															  .texCoord = uv.max(),
+															  .texIndex = textureIndex,
+															  .entityId = iStringData.entityId});
+		g_data->text.vertexBuf.emplace_back(utils::TextVertex{.position = p4,
+															  .color = iStringData.color,
+															  .texCoord = {uv.max().x(), uv.min().y()},
+															  .texIndex = textureIndex,
+															  .entityId = iStringData.entityId});
+		g_data->stats.quadCount++;
+		g_data->text.indexCount += 6;
+		if (i < iStringData.text.size() - 1) {
+			cursor.x() +=
+					iStringData.font->getAdvance(iStringData.text[i], iStringData.text[i + 1]) + iStringData.kerning;
+		}
+	}
+}
 
 void Renderer2D::resetStats() {
 	g_data->stats.drawCalls = 0;
@@ -404,6 +515,6 @@ void Renderer2D::resetStats() {
 	g_data->stats.lineCount = 0;
 }
 
-auto Renderer2D::getStats() -> Renderer2D::Statistics { return g_data->stats; }
+auto Renderer2D::getStats() -> Statistics { return g_data->stats; }
 
 }// namespace owl::renderer

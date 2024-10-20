@@ -8,6 +8,8 @@
 
 #include "EditorLayer.h"
 
+#include "fonts/Font.h"
+
 // must be included AFTER imgui
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
@@ -15,9 +17,7 @@ OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
 OWL_DIAG_POP
 
 namespace owl::nest {
-
-constexpr auto vec(math::vec2 iVec) -> ImVec2 { return {iVec.x(), iVec.y()}; }
-
+namespace {}// namespace
 EditorLayer::EditorLayer() : Layer("EditorLayer"), m_cameraController{1280.0f / 720.0f} {}
 
 void EditorLayer::onAttach() {
