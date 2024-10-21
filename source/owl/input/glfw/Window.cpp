@@ -44,18 +44,20 @@ Window::~Window() {
 void Window::init(const Properties& iProps) {
 	OWL_PROFILE_FUNCTION()
 
-	m_windowData.title = iProps.title;
-	m_windowData.size = {iProps.width, iProps.height};
+	// Initializations
+	{
+		m_windowData.title = iProps.title;
+		m_windowData.size = {iProps.width, iProps.height};
 
-	OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width, iProps.height)
+		OWL_CORE_INFO("Creating window {} ({}, {})", iProps.title, iProps.width, iProps.height)
 
-	if (s_glfwWindowCount == 0) {
-		OWL_PROFILE_SCOPE("glfwInit")
-		[[maybe_unused]] const int success = glfwInit();
-		OWL_CORE_ASSERT(success, "Could not initialize GLFW!")
-		glfwSetErrorCallback(glfwErrorCallback);
+		if (s_glfwWindowCount == 0) {
+			OWL_PROFILE_SCOPE("glfwInit")
+			[[maybe_unused]] const int success = glfwInit();
+			OWL_CORE_ASSERT(success, "Could not initialize GLFW!")
+			glfwSetErrorCallback(glfwErrorCallback);
+		}
 	}
-
 	// window creation.
 	{
 		OWL_PROFILE_SCOPE("glfwCreateWindow")
@@ -80,22 +82,23 @@ void Window::init(const Properties& iProps) {
 		++s_glfwWindowCount;
 	}
 	// Set icon
-#ifndef OWL_PLATFORM_LINUX
-	GLFWimage icon;
-	int channels = 0;
-	if (!iProps.iconPath.empty()) {
-		icon.pixels = stbi_load(iProps.iconPath.c_str(), &icon.width, &icon.height, &channels, 4);
-		glfwSetWindowIcon(mp_glfwWindow, 1, &icon);
-		stbi_image_free(icon.pixels);
+	{
+		GLFWimage icon;
+		int channels = 0;
+		if (!iProps.iconPath.empty()) {
+			icon.pixels = stbi_load(iProps.iconPath.c_str(), &icon.width, &icon.height, &channels, 4);
+			glfwSetWindowIcon(mp_glfwWindow, 1, &icon);
+			stbi_image_free(icon.pixels);
+		}
 	}
-#endif
+	// Graph context
+	{
+		mu_context = renderer::GraphContext::create(mp_glfwWindow);
+		mu_context->init();
 
-	mu_context = renderer::GraphContext::create(mp_glfwWindow);
-	mu_context->init();
-
-	glfwSetWindowUserPointer(mp_glfwWindow, &m_windowData);
-	setVSync(true);
-
+		glfwSetWindowUserPointer(mp_glfwWindow, &m_windowData);
+		setVSync(true);
+	}
 	// Set GLFW callbacks
 	{
 		glfwSetWindowSizeCallback(mp_glfwWindow, [](GLFWwindow* iWindow, const int iWidth, const int iHeight) {

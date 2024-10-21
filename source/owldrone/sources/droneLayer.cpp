@@ -130,8 +130,9 @@ void DroneLayer::renderStats(const core::Timestep& iTimeStep) {
 	ImGui::Begin("Stats");
 	ImGui::Text("%s", fmt::format("FPS: {:.2f}", iTimeStep.getFps()).c_str());
 	ImGui::Separator();
-	ImGui::Text("%s", fmt::format("Current used memory: {}", debug::TrackerAPI::globals().allocatedMemory).c_str());
-	ImGui::Text("%s", fmt::format("Max used memory: {}", debug::TrackerAPI::globals().memoryPeek).c_str());
+	ImGui::Text("%s",
+				fmt::format("Current used memory: {}", debug::TrackerAPI::globals().allocatedMemory.str()).c_str());
+	ImGui::Text("%s", fmt::format("Max used memory: {}", debug::TrackerAPI::globals().memoryPeek.str()).c_str());
 	ImGui::Text("%s", fmt::format("Allocation calls: {}", debug::TrackerAPI::globals().allocationCalls).c_str());
 	ImGui::Text("%s", fmt::format("Deallocation calls: {}", debug::TrackerAPI::globals().deallocationCalls).c_str());
 	ImGui::Separator();

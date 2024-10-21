@@ -43,7 +43,7 @@ auto main(int iArgc, char* iArgv[]) -> int {
 				OWL_CORE_TRACE("Leak Detected during App release")
 				OWL_CORE_TRACE("-----------------------------------")
 				OWL_CORE_TRACE("")
-				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory,
+				OWL_CORE_TRACE(" LEAK Amount: {} in {} Unallocated chunks", memState.allocatedMemory.str(),
 							   memState.allocs.size())
 #if OWL_TRACKER_VERBOSITY >= 2
 				for (const auto& chunk: memState.allocs) { OWL_CORE_TRACE(" ** {}", chunk.toStr()) }
@@ -61,8 +61,8 @@ auto main(int iArgc, char* iArgv[]) -> int {
 #if OWL_TRACKER_VERBOSITY >= 1
 		OWL_CORE_INFO("Memory State at the end of execution:")
 		const auto& memoryState = owl::debug::TrackerAPI::globals();
-		OWL_CORE_INFO("Residual memory          : {}", memoryState.allocatedMemory)
-		OWL_CORE_INFO("Memory peek              : {}", memoryState.memoryPeek)
+		OWL_CORE_INFO("Residual memory          : {}", memoryState.allocatedMemory.str())
+		OWL_CORE_INFO("Memory peek              : {}", memoryState.memoryPeek.str())
 		OWL_CORE_INFO("Total Allocation calls   : {}", memoryState.allocationCalls)
 		OWL_CORE_INFO("Total Deallocation calls : {}", memoryState.deallocationCalls)
 #endif

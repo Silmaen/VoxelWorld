@@ -405,8 +405,8 @@ void VulkanCore::updateSurfaceInformations() { m_phyProps->updateSurfaceInformat
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
-auto VulkanCore::findMemoryTypeIndex(const uint32_t iTypeFilter,
-									 const VkMemoryPropertyFlags iMemProperties) const -> uint32_t {
+auto VulkanCore::findMemoryTypeIndex(const uint32_t iTypeFilter, const VkMemoryPropertyFlags iMemProperties) const
+		-> uint32_t {
 	for (uint32_t i = 0; i < m_phyProps->memoryProperties.memoryTypeCount; i++) {
 		if (((iTypeFilter & (1 << i)) != 0u) &&
 			(m_phyProps->memoryProperties.memoryTypes[i].propertyFlags & iMemProperties) == iMemProperties) {
@@ -519,7 +519,9 @@ InstanceInformations::InstanceInformations() {
 			result == VK_SUCCESS) {
 			for (const auto& [layerName, specVersion, implementationVersion, description]: layers) {
 				supportedLayers.emplace_back(layerName);
+#ifdef OWL_RENDERER_VERBOSE_CAPABILITIES
 				OWL_CORE_TRACE("Vulkan: Instance layer: {} version {} // {}", layerName, specVersion, description)
+#endif
 			}
 		} else {
 			OWL_CORE_WARN("Vulkan: unable to enumerate instance layers ({}).", resultString(result))
@@ -536,7 +538,9 @@ InstanceInformations::InstanceInformations() {
 				result == VK_SUCCESS) {
 				for (const auto& [extensionName, specVersion]: extensions) {
 					supportedExtensions.emplace_back(extensionName);
+#ifdef OWL_RENDERER_VERBOSE_CAPABILITIES
 					OWL_CORE_TRACE("Vulkan: Supported instance extension: {} version: {}", extensionName, specVersion)
+#endif
 				}
 			} else {
 				OWL_CORE_WARN("Vulkan: unable to enumerate instance extensions ({}).", resultString(result))
@@ -545,8 +549,8 @@ InstanceInformations::InstanceInformations() {
 	}
 }
 
-auto InstanceInformations::hasMinimalVersion(const uint8_t iMajor, const uint8_t iMinor,
-											 const uint8_t iPatch) const -> bool {
+auto InstanceInformations::hasMinimalVersion(const uint8_t iMajor, const uint8_t iMinor, const uint8_t iPatch) const
+		-> bool {
 	return VK_API_VERSION_MAJOR(version) > iMajor ||
 		   (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) > iMinor) ||
 		   (VK_API_VERSION_MAJOR(version) == iMajor && VK_API_VERSION_MINOR(version) == iMinor &&

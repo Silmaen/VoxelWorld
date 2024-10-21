@@ -112,12 +112,12 @@ auto shaderStageToShaderC(const ShaderType& iStage) -> shaderc_shader_kind {
 }
 
 void shaderReflect(const std::string& iShaderName, const std::string& iRenderer, const std::string& iRendererApi,
-				   const ShaderType iStage, const std::vector<uint32_t>& iShaderData) {
-	const spirv_cross::Compiler compiler(iShaderData);
-	const spirv_cross::ShaderResources resources = compiler.get_shader_resources();
-
+				   const ShaderType iStage, [[maybe_unused]] const std::vector<uint32_t>& iShaderData) {
 	OWL_CORE_TRACE("Shader reflect - {0} : <assets>/{1}", magic_enum::enum_name(iStage),
 				   renderer::utils::getRelativeShaderPath(iShaderName, iRenderer, iRendererApi, iStage).string())
+#ifdef OWL_SHADER_REFLECT_RESOURCES
+	const spirv_cross::Compiler compiler(iShaderData);
+	const spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 	OWL_CORE_TRACE("    {} resources", resources.sampled_images.size())
 	if (resources.uniform_buffers.empty()) {
 		OWL_CORE_TRACE("  No Uniform buffer")
@@ -131,6 +131,7 @@ void shaderReflect(const std::string& iShaderName, const std::string& iRenderer,
 			OWL_CORE_TRACE("     Members = {}", bufferType.member_types.size())
 		}
 	}
+#endif
 }
 
 }// namespace owl::renderer::utils

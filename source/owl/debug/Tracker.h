@@ -29,7 +29,25 @@
 #include <cpptrace/cpptrace.hpp>
 #endif
 
-using size_t = std::size_t;
+struct MemorySize {
+	std::size_t size = 0;
+	[[nodiscard]] auto str() const -> std::string {
+		if (size < 1024)
+			return fmt::format("{} bytes", size);
+		float fsize = static_cast<float>(size) / 1024.0f;
+		if (fsize < 1024.0f)
+			return fmt::format("{:.2} kB", fsize);
+		fsize /= 1024.0f;
+		if (fsize < 1024.0f)
+			return fmt::format("{:.2} MB", fsize);
+		fsize /= 1024.0f;
+		if (fsize < 1024.0f)
+			return fmt::format("{:.2} GB", fsize);
+		fsize /= 1024.0f;
+		return fmt::format("{:.2} TB", fsize);
+	}
+};
+//using size_t = std::size_t;
 
 /**
  * @namespace owl
@@ -48,7 +66,7 @@ struct OWL_API AllocationInfo {
 	/// Location in memory.
 	void* location = nullptr;
 	/// Size of the memory chunk.
-	size_t size = 0;
+	MemorySize size{0};
 #ifdef OWL_STACKTRACE
 	/// Stack trace of the allocation.
 	cpptrace::stacktrace fullTrace;
@@ -76,13 +94,13 @@ struct OWL_API AllocationState {
 	auto operator=(const AllocationState&) -> AllocationState& = default;
 	auto operator=(AllocationState&&) -> AllocationState& = default;
 	/// Amount of allocated memory.
-	size_t allocatedMemory = 0;
+	MemorySize allocatedMemory{0};
 	/// Amount of memory allocation calls.
-	size_t allocationCalls = 0;
+	size_t allocationCalls{0};
 	/// Amount of de-allocation calls.
-	size_t deallocationCalls = 0;
+	size_t deallocationCalls{0};
 	/// Max seen amount of memory.
-	size_t memoryPeek = 0;
+	MemorySize memoryPeek{0};
 	/// list of allocated chunks of memory.
 	std::list<AllocationInfo> allocs{};
 	/**
