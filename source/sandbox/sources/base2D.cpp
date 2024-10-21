@@ -82,7 +82,7 @@ void Base2D::onUpdate(const core::Timestep& iTs) {
 						{.transform = renderer::utils::PRS{.position = {x, y, -0.05f},
 														   .size = {scalex * marg, scaley * marg}},
 						 .color = color,
-						 .entityID = id});
+						 .entityId = id});
 				id++;
 			}
 		}

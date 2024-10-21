@@ -32,6 +32,4 @@ void RenderAPI::drawData([[maybe_unused]] const shared<DrawData>& iData, [[maybe
 
 void RenderAPI::drawLine([[maybe_unused]] const shared<DrawData>& iData, [[maybe_unused]] uint32_t iIndexCount) {}
 
-void RenderAPI::setLineWidth([[maybe_unused]] float iWidth) {}
-
 }// namespace owl::renderer::null

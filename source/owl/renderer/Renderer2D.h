@@ -79,7 +79,7 @@ struct OWL_API Quad2DData {
 	/// Tilling factor of the texture.
 	float tilingFactor = 1.f;
 	/// unique ID for the entity.
-	int entityID = -1;
+	int entityId = -1;
 };
 
 /**
@@ -95,7 +95,7 @@ struct OWL_API CircleData {
 	/// Fading of the circle.
 	float fade = 0.005f;
 	/// unique ID for the entity.
-	int entityID = -1;
+	int entityId = -1;
 };
 
 /**
@@ -109,7 +109,7 @@ struct OWL_API LineData {
 	/// Color to apply to the line.
 	math::vec4 color = math::vec4{1.f, 1.f, 1.f, 1.f};
 	/// unique ID for the entity.
-	int entityID = -1;
+	int entityId = -1;
 };
 
 /**
@@ -121,7 +121,7 @@ struct OWL_API RectData {
 	/// Color to apply to the rect.
 	math::vec4 color = math::vec4{1.f, 1.f, 1.f, 1.f};
 	/// unique ID for the entity.
-	int entityID = -1;
+	int entityId = -1;
 };
 
 /**
@@ -137,7 +137,7 @@ struct OWL_API PolyLineData {
 	/// Color to apply to the rect.
 	math::vec4 color = math::vec4{1.f, 1.f, 1.f, 1.f};
 	/// unique ID for the entity.
-	int entityID = -1;
+	int entityId = -1;
 };
 
 /**
@@ -197,18 +197,6 @@ public:
 
 	// Primitives
 	/**
-	 * @brief Access to the actual line width.
-	 * @return Actual line width.
-	 */
-	static auto getLineWidth() -> float;
-
-	/**
-	 * @brief Define the line width.
-	 * @param[in] iWidth New line width.
-	 */
-	static void setLineWidth(float iWidth);
-
-	/**
 	 * @brief Draw a line on the screen.
 	 * @param[in] iLineData The data to draw the line.
 	 */
@@ -239,18 +227,6 @@ public:
 	static void drawQuad(const Quad2DData& iQuadData);
 
 	/**
-	 * @brief Draws a Debug triangle on the screen.
-	 */
-	static void drawDebugTriangle();
-	/**
-	 * @brief Draw a sprite entity on the screen.
-	 * @param[in] iTransform Sprite transformations.
-	 * @param[in] iSrc The sprite to render.
-	 * @param[in] iEntityID The entity ID.
-	 */
-	static void drawSprite(const math::mat4& iTransform, const scene::component::SpriteRenderer& iSrc, int iEntityID);
-
-	/**
 	 * @brief Statistics.
 	 */
 	struct OWL_API Statistics {
@@ -258,10 +234,12 @@ public:
 		uint32_t drawCalls = 0;
 		/// Amount of quad drawn.
 		uint32_t quadCount = 0;
+		/// Amount of lines drawn.
+		uint32_t lineCount = 0;
 		/// Compute the amount of vertices.
-		[[nodiscard]] auto getTotalVertexCount() const -> uint32_t { return quadCount * 4; }
+		[[nodiscard]] auto getTotalVertexCount() const -> uint32_t { return quadCount * 4 + lineCount * 2; }
 		/// Compute the amount of indices.
-		[[nodiscard]] auto getTotalIndexCount() const -> uint32_t { return quadCount * 6; }
+		[[nodiscard]] auto getTotalIndexCount() const -> uint32_t { return quadCount * 6 + lineCount * 2; }
 	};
 
 	/**

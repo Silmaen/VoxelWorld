@@ -28,7 +28,7 @@ constexpr math::vec4 g_quadVertexPositions[] = {{-0.5f, -0.5f, 0.0f, 1.0f},
 												{0.5f, 0.5f, 0.0f, 1.0f},
 												{-0.5f, 0.5f, 0.0f, 1.0f}};
 
-uint32_t g_maxTextureSlots = 0;
+uint32_t g_MaxTextureSlots = 0;
 }// namespace
 
 /**
@@ -40,7 +40,7 @@ struct QuadVertex {
 	math::vec2 texCoord;
 	float texIndex;
 	float tilingFactor;
-	int entityID;
+	int entityId;
 };
 
 /**
@@ -52,7 +52,7 @@ struct CircleVertex {
 	math::vec4 color;
 	float thickness;
 	float fade;
-	int entityID;
+	int entityId;
 };
 
 /**
@@ -61,7 +61,7 @@ struct CircleVertex {
 struct LineVertex {
 	math::vec3 position;
 	math::vec4 color;
-	int entityID;
+	int entityId;
 };
 
 /**
@@ -78,14 +78,14 @@ template<typename VertexType>
 void resetDrawData(VertexData<VertexType>& iData) {
 	iData.indexCount = 0;
 	iData.vertexBuf.clear();
-	iData.vertexBuf.reserve(utils::g_maxVertices);
+	iData.vertexBuf.reserve(g_maxVertices);
 }
 }// namespace
 
 /**
  * @brief Structure holding static internal g_data
  */
-struct internalData {
+struct InternalData {
 	/// Camera Data
 	struct CameraData {
 		/// Camera projection
@@ -94,17 +94,15 @@ struct internalData {
 	CameraData cameraBuffer{};
 	/// Quad Data
 	VertexData<QuadVertex> quad;
+	shared<DrawData> drawQuad;
 	/// Circle Data
 	VertexData<CircleVertex> circle;
+	shared<DrawData> drawCircle;
 	/// Line Data
 	VertexData<LineVertex> line;
+	shared<DrawData> drawLine;
 	/// Statistics
 	Renderer2D::Statistics stats;
-	shared<DrawData> drawQuad;
-	shared<DrawData> drawCircle;
-	shared<DrawData> drawLine;
-	/// Debug Triangle
-	shared<DrawData> drawDataTriangle;
 	// Textures Data
 	/// One white texture for coloring
 	shared<Texture2D> whiteTexture;
@@ -112,22 +110,20 @@ struct internalData {
 	shared<UniformBuffer> cameraUniformBuffer;
 	/// Array of textures
 	std::vector<shared<Texture2D>> textureSlots;
-	float lineWidth = 2.0f;
 	/// next texture index
 	uint32_t textureSlotIndex = 1;// 0 = white texture
-	bool doTriangleDraw = false;
 };
 
 auto toTransform(const PRS& iTransform) -> math::mat4 {
-	return math::translate(math::identity<float, 4>(), iTransform.position) *
-		   math::rotate(math::identity<float, 4>(), math::radians(iTransform.rotation), {0.0f, 0.0f, 1.0f}) *
-		   math::scale(math::identity<float, 4>(), {iTransform.size.x(), iTransform.size.y(), 1.0f});
+	return translate(math::identity<float, 4>(), iTransform.position) *
+		   rotate(math::identity<float, 4>(), math::radians(iTransform.rotation), {0.0f, 0.0f, 1.0f}) *
+		   scale(math::identity<float, 4>(), {iTransform.size.x(), iTransform.size.y(), 1.0f});
 }
 
 }// namespace utils
 
 namespace {
-shared<utils::internalData> g_data;
+shared<utils::InternalData> g_data;
 }// namespace
 
 void Renderer2D::init() {
@@ -137,7 +133,7 @@ void Renderer2D::init() {
 		OWL_CORE_WARN("Renderer2D already initiated.")
 		g_data.reset();
 	}
-	g_data = mkShared<utils::internalData>();
+	g_data = mkShared<utils::InternalData>();
 
 	std::vector<uint32_t> quadIndices;
 	{
@@ -195,15 +191,11 @@ void Renderer2D::init() {
 
 
 	// Set all texture slots to 0
-	utils::g_maxTextureSlots = RenderCommand::getMaxTextureSlots();
-	g_data->textureSlots.resize(utils::g_maxTextureSlots);
+	utils::g_MaxTextureSlots = RenderCommand::getMaxTextureSlots();
+	g_data->textureSlots.resize(utils::g_MaxTextureSlots);
 	g_data->textureSlots[0] = g_data->whiteTexture;
-	g_data->cameraUniformBuffer = UniformBuffer::create(sizeof(utils::internalData::CameraData), 0, "Renderer2D");
+	g_data->cameraUniformBuffer = UniformBuffer::create(sizeof(utils::InternalData::CameraData), 0, "Renderer2D");
 	g_data->cameraUniformBuffer->bind();
-
-	// debug
-	g_data->drawDataTriangle = DrawData::create();
-	g_data->drawDataTriangle->init({}, "renderer2D", quadIndices, "triangle");
 }
 
 void Renderer2D::shutdown() {
@@ -232,7 +224,7 @@ void Renderer2D::beginScene(const CameraOrtho& iCamera) {
 	OWL_PROFILE_FUNCTION()
 
 	g_data->cameraBuffer.viewProjection = iCamera.getViewProjectionMatrix();
-	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::internalData::CameraData), 0);
+	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::InternalData::CameraData), 0);
 	startBatch();
 }
 
@@ -240,7 +232,7 @@ void Renderer2D::beginScene(const CameraEditor& iCamera) {
 	OWL_PROFILE_FUNCTION()
 
 	g_data->cameraBuffer.viewProjection = iCamera.getViewProjection();
-	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::internalData::CameraData), 0);
+	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::InternalData::CameraData), 0);
 	startBatch();
 }
 
@@ -248,7 +240,7 @@ void Renderer2D::beginScene(const Camera& iCamera, const math::mat4& iTransform)
 	OWL_PROFILE_FUNCTION()
 
 	g_data->cameraBuffer.viewProjection = iCamera.getProjection() * math::inverse(iTransform);
-	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::internalData::CameraData), 0);
+	g_data->cameraUniformBuffer->setData(&g_data->cameraBuffer, sizeof(utils::InternalData::CameraData), 0);
 	startBatch();
 }
 
@@ -287,12 +279,8 @@ void Renderer2D::flush() {
 				g_data->line.vertexBuf.data(),
 				static_cast<uint32_t>(g_data->line.vertexBuf.size() * sizeof(utils::LineVertex)));
 		// draw call
-		RenderCommand::setLineWidth(g_data->lineWidth);
 		RenderCommand::drawLine(g_data->drawLine, g_data->line.indexCount);
 		g_data->stats.drawCalls++;
-	}
-	if (g_data->doTriangleDraw) {
-		RenderCommand::drawData(g_data->drawDataTriangle, 3);
 	}
 	RenderCommand::endBatch();
 }
@@ -301,7 +289,6 @@ void Renderer2D::startBatch() {
 	utils::resetDrawData(g_data->quad);
 	utils::resetDrawData(g_data->circle);
 	utils::resetDrawData(g_data->line);
-	g_data->doTriangleDraw = false;
 	g_data->textureSlotIndex = 1;
 }
 
@@ -310,17 +297,13 @@ void Renderer2D::nextBatch() {
 	startBatch();
 }
 
-auto Renderer2D::getLineWidth() -> float { return g_data->lineWidth; }
-
-void Renderer2D::setLineWidth(const float iWidth) { g_data->lineWidth = iWidth; }
-
-void Renderer2D::drawDebugTriangle() { g_data->doTriangleDraw = true; }
 
 void Renderer2D::drawLine(const LineData& iLineData) {
 	g_data->line.vertexBuf.emplace_back(
-			utils::LineVertex{.position = iLineData.point1, .color = iLineData.color, .entityID = iLineData.entityID});
+			utils::LineVertex{.position = iLineData.point1, .color = iLineData.color, .entityId = iLineData.entityId});
 	g_data->line.vertexBuf.emplace_back(
-			utils::LineVertex{.position = iLineData.point2, .color = iLineData.color, .entityID = iLineData.entityID});
+			utils::LineVertex{.position = iLineData.point2, .color = iLineData.color, .entityId = iLineData.entityId});
+
 	g_data->line.indexCount += 2;
 	g_data->stats.drawCalls++;
 }
@@ -332,12 +315,12 @@ void Renderer2D::drawRect(const RectData& iRectData) {
 	for (const auto& vtx: utils::g_quadVertexPositions) points.emplace_back(trans * vtx);
 	for (const auto& [p1, p2]: idx)
 		drawLine(
-				{.point1 = points[p1], .point2 = points[p2], .color = iRectData.color, .entityID = iRectData.entityID});
+				{.point1 = points[p1], .point2 = points[p2], .color = iRectData.color, .entityId = iRectData.entityId});
 }
 
 void Renderer2D::drawPolyLine(const PolyLineData& iLineData) {
 	if (iLineData.points.size() < 2) {
-		OWL_CORE_WARN("Too few points in the multiline with ID {}", iLineData.entityID)
+		OWL_CORE_WARN("Too few points in the multiline with ID {}", iLineData.entityId)
 		return;
 	}
 	const math::mat4 trans = iLineData.transform.transform;
@@ -354,7 +337,7 @@ void Renderer2D::drawPolyLine(const PolyLineData& iLineData) {
 		link.emplace_back(iLineData.points.size() - 1, 0);
 	for (const auto& [p1, p2]: link)
 		drawLine(
-				{.point1 = points[p1], .point2 = points[p2], .color = iLineData.color, .entityID = iLineData.entityID});
+				{.point1 = points[p1], .point2 = points[p2], .color = iLineData.color, .entityId = iLineData.entityId});
 }
 
 void Renderer2D::drawCircle(const CircleData& iCircleData) {
@@ -371,14 +354,12 @@ void Renderer2D::drawCircle(const CircleData& iCircleData) {
 									.color = iCircleData.color,
 									.thickness = iCircleData.thickness,
 									.fade = iCircleData.fade,
-									.entityID = iCircleData.entityID});
+									.entityId = iCircleData.entityId});
 	}
 
 	g_data->circle.indexCount += 6;
-
 	g_data->stats.quadCount++;
 }
-
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
@@ -395,7 +376,7 @@ void Renderer2D::drawQuad(const Quad2DData& iQuadData) {
 			}
 		}
 		if (textureIndex == 0.0f) {
-			if (g_data->textureSlotIndex >= utils::g_maxTextureSlots)
+			if (g_data->textureSlotIndex >= utils::g_MaxTextureSlots)
 				nextBatch();
 			textureIndex = static_cast<float>(g_data->textureSlotIndex);
 			g_data->textureSlots[g_data->textureSlotIndex] = std::static_pointer_cast<Texture2D>(iQuadData.texture);
@@ -409,26 +390,18 @@ void Renderer2D::drawQuad(const Quad2DData& iQuadData) {
 								  .texCoord = utils::g_textureCoords[i],
 								  .texIndex = textureIndex,
 								  .tilingFactor = iQuadData.tilingFactor,
-								  .entityID = iQuadData.entityID});
+								  .entityId = iQuadData.entityId});
 	}
-	g_data->quad.indexCount += 6;
 
+	g_data->quad.indexCount += 6;
 	g_data->stats.quadCount++;
 }
 OWL_DIAG_POP
 
-void Renderer2D::drawSprite(const math::mat4& iTransform, const scene::component::SpriteRenderer& iSrc,
-							const int iEntityID) {
-	drawQuad({.transform = iTransform,
-			  .color = iSrc.color,
-			  .texture = iSrc.texture,
-			  .tilingFactor = iSrc.tilingFactor,
-			  .entityID = iEntityID});
-}
-
 void Renderer2D::resetStats() {
 	g_data->stats.drawCalls = 0;
 	g_data->stats.quadCount = 0;
+	g_data->stats.lineCount = 0;
 }
 
 auto Renderer2D::getStats() -> Renderer2D::Statistics { return g_data->stats; }

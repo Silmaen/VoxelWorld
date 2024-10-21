@@ -75,12 +75,6 @@ public:
 	virtual void drawLine(const shared<DrawData>& iData, const uint32_t iIndexCount = 0) = 0;
 
 	/**
-	 * @brief Define the line width.
-	 * @param[in] iWidth New line width.
-	 */
-	virtual void setLineWidth(float iWidth) = 0;
-
-	/**
 	 * @brief Get the maximum number of texture slots.
 	 * @return Number of texture slots.
 	 */

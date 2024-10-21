@@ -146,8 +146,13 @@ void Viewport::renderOverlay() const {
 	// Draw selected entity outline
 	if (const scene::Entity selectedEntity = m_parent->getSelectedEntity()) {
 		const scene::component::Transform transform = selectedEntity.getComponent<scene::component::Transform>();
-		//Red
-		renderer::Renderer2D::drawRect({.transform = transform.getTransform(), .color = math::vec4f(1, 0, 0, 1)});
+		// Orange
+		// surrounding square
+		renderer::Renderer2D::drawRect(
+				{.transform = transform.getTransform(), .color = math::vec4(0.95f, 0.55f, 0.f, 1)});
+		// Overlay
+		renderer::Renderer2D::drawQuad(
+				{.transform = transform.getTransform(), .color = math::vec4{0.95f, 0.55f, 0.f, 0.2f}});
 	}
 
 	renderer::Renderer2D::endScene();
