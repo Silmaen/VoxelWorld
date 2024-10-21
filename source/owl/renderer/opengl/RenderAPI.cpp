@@ -86,10 +86,9 @@ void RenderAPI::drawData(const shared<DrawData>& iData, const uint32_t iIndexCou
 void RenderAPI::drawLine(const shared<DrawData>& iData, const uint32_t iIndexCount) {
 	iData->bind();
 	const uint32_t count = (iIndexCount != 0u) ? iIndexCount : iData->getIndexCount();
+	glLineWidth(2.0f);
 	glDrawArrays(GL_LINES, 0, static_cast<int32_t>(count));
 }
-
-void RenderAPI::setLineWidth(const float iWidth) { glLineWidth(iWidth); }
 
 auto RenderAPI::getMaxTextureSlots() const -> uint32_t {
 	int32_t textureUnits = 0;

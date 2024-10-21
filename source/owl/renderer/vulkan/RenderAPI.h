@@ -68,11 +68,6 @@ public:
 	 * @param[in] iIndexCount Number of vertex to draw (=0 all).
 	 */
 	void drawLine(const shared<DrawData>& iData, uint32_t iIndexCount) override;
-	/**
-	 * @brief Define the line width.
-	 * @param[in] iWidth New line width.
-	 */
-	void setLineWidth(float iWidth) override;
 
 	/**
 	 * @brief Get the maximum number of texture slots.

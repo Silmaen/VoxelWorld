@@ -144,7 +144,11 @@ void Scene::render() {
 	for (const auto group = registry.group<component::Transform>(entt::get<component::SpriteRenderer>);
 		 auto entity: group) {
 		auto [transform, sprite] = group.get<component::Transform, component::SpriteRenderer>(entity);
-		renderer::Renderer2D::drawSprite(transform.getTransform(), sprite, static_cast<int>(entity));
+		renderer::Renderer2D::drawQuad({.transform = transform.getTransform(),
+										.color = sprite.color,
+										.texture = sprite.texture,
+										.tilingFactor = sprite.tilingFactor,
+										.entityId = static_cast<int>(entity)});
 	}
 	// Draw circles
 	for (const auto view = registry.view<component::Transform, component::CircleRenderer>(); auto entity: view) {
@@ -153,7 +157,7 @@ void Scene::render() {
 										  .color = circle.color,
 										  .thickness = circle.thickness,
 										  .fade = circle.fade,
-										  .entityID = static_cast<int>(entity)});
+										  .entityId = static_cast<int>(entity)});
 	}
 }
 

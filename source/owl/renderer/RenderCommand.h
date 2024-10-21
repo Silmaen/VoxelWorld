@@ -85,11 +85,6 @@ public:
 	static void drawLine(const shared<DrawData>& iData, const uint32_t iIndexCount = 0) {
 		mu_renderAPI->drawLine(iData, iIndexCount);
 	}
-	/**
-	 * @brief Define the line width.
-	 * @param[in] iWidth New line width.
-	 */
-	static void setLineWidth(const float iWidth) { mu_renderAPI->setLineWidth(iWidth); }
 
 	/**
 	 * @brief Create or replace the API base on it type.

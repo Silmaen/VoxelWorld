@@ -18,7 +18,6 @@ TEST(RenderAPI, RenderComamand) {
 	RenderCommand::create(RenderAPI::Type::Null);
 	EXPECT_EQ(RenderCommand::getState(), RenderAPI::State::Created);
 	EXPECT_EQ(RenderCommand::getApi(), RenderAPI::Type::Null);
-	RenderCommand::setLineWidth(2.f);
 	RenderCommand::setClearColor({.4f, .4f, .4f, 1.f});
 	RenderCommand::clear();
 	RenderCommand::init();

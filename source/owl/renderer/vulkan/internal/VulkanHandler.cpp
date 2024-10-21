@@ -197,7 +197,7 @@ auto VulkanHandler::pushPipeline(const std::string& iPipeLineName,
 			.depthBiasConstantFactor = 0.0f,
 			.depthBiasClamp = 0.0,
 			.depthBiasSlopeFactor = 0.0f,
-			.lineWidth = 1.0f};
+			.lineWidth = 2.0f};
 	constexpr VkPipelineMultisampleStateCreateInfo multisampling{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
 			.pNext = nullptr,

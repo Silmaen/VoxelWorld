@@ -70,12 +70,6 @@ public:
 	void drawLine(const shared<DrawData>& iData, uint32_t iIndexCount) override;
 
 	/**
-	 * @brief Define the line width.
-	 * @param[in] iWidth New line width.
-	 */
-	void setLineWidth(float iWidth) override;
-
-	/**
 	 * @brief Get the maximum number of texture slots.
 	 * @return Number of texture slots.
 	 */
