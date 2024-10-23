@@ -402,7 +402,6 @@ private:
 	std::array<BaseType, Dim> m_data;
 };
 
-
 // Specialization.
 using vec2f = Vector<float, 2>;
 using vec3f = Vector<float, 3>;

@@ -9,7 +9,7 @@
 #pragma once
 
 #include "core/Core.h"
-#include "math/linAlgebra.h"
+#include "math/trigonometry.h"
 #include "renderer/Camera.h"
 
 namespace owl::scene {

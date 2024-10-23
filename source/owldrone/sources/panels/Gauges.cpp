@@ -91,7 +91,7 @@ void Gauges::onUpdate(const core::Timestep&) {
 	// defines pos an scale
 	math::vec3 pos = {-0.5f * scaling, 1.f * scaling, 0};
 	for (const auto& gauge: m_gauges) {
-		gauge->setScale({scaling, scaling});
+		gauge->setScale({scaling, scaling, 0});
 		gauge->setPosition(pos);
 		pos.x() *= -1;
 		if (pos.x() < 0)

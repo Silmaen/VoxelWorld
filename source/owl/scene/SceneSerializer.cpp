@@ -66,16 +66,16 @@ struct convert<owl::math::vec4> {
 };
 
 // NOLINTBEGIN(misc-use-anonymous-namespace)
-static auto operator<<(Emitter& out, const owl::math::vec3& v) -> Emitter& {
-	out << Flow;
-	out << BeginSeq << v.x() << v.y() << v.z() << EndSeq;
-	return out;
+static auto operator<<(Emitter& ioOut, const owl::math::vec3& iVect) -> Emitter& {
+	ioOut << Flow;
+	ioOut << BeginSeq << iVect.x() << iVect.y() << iVect.z() << EndSeq;
+	return ioOut;
 }
 
-static auto operator<<(Emitter& out, const owl::math::vec4& v) -> Emitter& {
-	out << Flow;
-	out << BeginSeq << v.x() << v.y() << v.z() << v.w() << EndSeq;
-	return out;
+static auto operator<<(Emitter& ioOut, const owl::math::vec4& iVect) -> Emitter& {
+	ioOut << Flow;
+	ioOut << BeginSeq << iVect.x() << iVect.y() << iVect.z() << iVect.w() << EndSeq;
+	return ioOut;
 }
 // NOLINTEND(misc-use-anonymous-namespace)
 
@@ -85,82 +85,82 @@ namespace owl::scene {
 SceneSerializer::SceneSerializer(const shared<Scene>& iScene) : mp_scene(iScene) {}
 
 namespace {
-void serializeEntity(YAML::Emitter& out, const Entity& iEntity) {
-	out << YAML::BeginMap;// Entity
-	out << YAML::Key << "Entity" << YAML::Value << iEntity.getUUID();
+void serializeEntity(YAML::Emitter& ioOut, const Entity& iEntity) {
+	ioOut << YAML::BeginMap;// Entity
+	ioOut << YAML::Key << "Entity" << YAML::Value << iEntity.getUUID();
 
 	if (iEntity.hasComponent<component::Tag>()) {
-		out << YAML::Key << "Tag";
-		out << YAML::BeginMap;// Tag
+		ioOut << YAML::Key << "Tag";
+		ioOut << YAML::BeginMap;// Tag
 		const auto& tag = iEntity.getComponent<component::Tag>().tag;
-		out << YAML::Key << "tag" << YAML::Value << tag;
-		out << YAML::EndMap;// Tag
+		ioOut << YAML::Key << "tag" << YAML::Value << tag;
+		ioOut << YAML::EndMap;// Tag
 	}
 
 	if (iEntity.hasComponent<component::Transform>()) {
-		out << YAML::Key << "Transform";
-		out << YAML::BeginMap;// Transform
-		const auto& [translation, rotation, scale] = iEntity.getComponent<component::Transform>();
-		out << YAML::Key << "translation" << YAML::Value << translation;
-		out << YAML::Key << "rotation" << YAML::Value << rotation;
-		out << YAML::Key << "scale" << YAML::Value << scale;
-		out << YAML::EndMap;// Transform
+		ioOut << YAML::Key << "Transform";
+		ioOut << YAML::BeginMap;// Transform
+		const auto& [transformation] = iEntity.getComponent<component::Transform>();
+		ioOut << YAML::Key << "translation" << YAML::Value << transformation.translation();
+		ioOut << YAML::Key << "rotation" << YAML::Value << transformation.rotation();
+		ioOut << YAML::Key << "scale" << YAML::Value << transformation.scale();
+		ioOut << YAML::EndMap;// Transform
 	}
 
 	if (iEntity.hasComponent<component::Camera>()) {
-		out << YAML::Key << "Camera";
-		out << YAML::BeginMap;// CameraComponent
+		ioOut << YAML::Key << "Camera";
+		ioOut << YAML::BeginMap;// CameraComponent
 		const auto& [primary, fixedAspectRatio, camera] = iEntity.getComponent<component::Camera>();
-		out << YAML::Key << "camera" << YAML::Value;
-		out << YAML::BeginMap;// Camera
-		out << YAML::Key << "projectionType" << YAML::Value
-			<< std::string(magic_enum::enum_name(camera.getProjectionType()));
-		out << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
-		out << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
-		out << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
-		out << YAML::Key << "orthographicSize" << YAML::Value << camera.getOrthographicSize();
-		out << YAML::Key << "orthographicNear" << YAML::Value << camera.getOrthographicNearClip();
-		out << YAML::Key << "orthographicFar" << YAML::Value << camera.getOrthographicFarClip();
-		out << YAML::EndMap;// Camera
-		out << YAML::Key << "primary" << YAML::Value << primary;
-		out << YAML::Key << "fixedAspectRatio" << YAML::Value << fixedAspectRatio;
-		out << YAML::EndMap;// Camera
+		ioOut << YAML::Key << "camera" << YAML::Value;
+		ioOut << YAML::BeginMap;// Camera
+		ioOut << YAML::Key << "projectionType" << YAML::Value
+			  << std::string(magic_enum::enum_name(camera.getProjectionType()));
+		ioOut << YAML::Key << "perspectiveFOV" << YAML::Value << camera.getPerspectiveVerticalFOV();
+		ioOut << YAML::Key << "perspectiveNear" << YAML::Value << camera.getPerspectiveNearClip();
+		ioOut << YAML::Key << "perspectiveFar" << YAML::Value << camera.getPerspectiveFarClip();
+		ioOut << YAML::Key << "orthographicSize" << YAML::Value << camera.getOrthographicSize();
+		ioOut << YAML::Key << "orthographicNear" << YAML::Value << camera.getOrthographicNearClip();
+		ioOut << YAML::Key << "orthographicFar" << YAML::Value << camera.getOrthographicFarClip();
+		ioOut << YAML::EndMap;// Camera
+		ioOut << YAML::Key << "primary" << YAML::Value << primary;
+		ioOut << YAML::Key << "fixedAspectRatio" << YAML::Value << fixedAspectRatio;
+		ioOut << YAML::EndMap;// Camera
 	}
 
 	if (iEntity.hasComponent<component::SpriteRenderer>()) {
-		out << YAML::Key << "SpriteRenderer";
-		out << YAML::BeginMap;// SpriteRenderer
+		ioOut << YAML::Key << "SpriteRenderer";
+		ioOut << YAML::BeginMap;// SpriteRenderer
 		const auto& [color, texture, tilingFactor] = iEntity.getComponent<component::SpriteRenderer>();
-		out << YAML::Key << "color" << YAML::Value << color;
+		ioOut << YAML::Key << "color" << YAML::Value << color;
 		if (texture) {
-			out << YAML::Key << "tilingFactor" << YAML::Value << tilingFactor;
-			out << YAML::Key << "texture" << YAML::Value << texture->getSerializeString();
+			ioOut << YAML::Key << "tilingFactor" << YAML::Value << tilingFactor;
+			ioOut << YAML::Key << "texture" << YAML::Value << texture->getSerializeString();
 		}
-		out << YAML::EndMap;// SpriteRenderer
+		ioOut << YAML::EndMap;// SpriteRenderer
 	}
 	if (iEntity.hasComponent<component::CircleRenderer>()) {
-		out << YAML::Key << "CircleRenderer";
-		out << YAML::BeginMap;// CircleRenderer
+		ioOut << YAML::Key << "CircleRenderer";
+		ioOut << YAML::BeginMap;// CircleRenderer
 		const auto& [color, thickness, fade] = iEntity.getComponent<component::CircleRenderer>();
-		out << YAML::Key << "color" << YAML::Value << color;
-		out << YAML::Key << "thickness" << YAML::Value << thickness;
-		out << YAML::Key << "fade" << YAML::Value << fade;
-		out << YAML::EndMap;// CircleRenderer
+		ioOut << YAML::Key << "color" << YAML::Value << color;
+		ioOut << YAML::Key << "thickness" << YAML::Value << thickness;
+		ioOut << YAML::Key << "fade" << YAML::Value << fade;
+		ioOut << YAML::EndMap;// CircleRenderer
 	}
 	if (iEntity.hasComponent<component::Text>()) {
-		out << YAML::Key << "TextRenderer";
-		out << YAML::BeginMap;// TextRenderer
+		ioOut << YAML::Key << "TextRenderer";
+		ioOut << YAML::BeginMap;// TextRenderer
 		const auto& textComponent = iEntity.getComponent<component::Text>();
-		out << YAML::Key << "color" << YAML::Value << textComponent.color;
-		out << YAML::Key << "kerning" << YAML::Value << textComponent.kerning;
-		out << YAML::Key << "lineSpacing" << YAML::Value << textComponent.lineSpacing;
-		out << YAML::Key << "text" << YAML::Value << textComponent.text;
+		ioOut << YAML::Key << "color" << YAML::Value << textComponent.color;
+		ioOut << YAML::Key << "kerning" << YAML::Value << textComponent.kerning;
+		ioOut << YAML::Key << "lineSpacing" << YAML::Value << textComponent.lineSpacing;
+		ioOut << YAML::Key << "text" << YAML::Value << textComponent.text;
 		// Todo: manage fonts
 		//out << YAML::Key << "font" << YAML::Value << circleRendererComponent.font;
-		out << YAML::EndMap;// CircleRenderer
+		ioOut << YAML::EndMap;// CircleRenderer
 	}
 
-	out << YAML::EndMap;// Entity
+	ioOut << YAML::EndMap;// Entity
 }
 }// namespace
 
@@ -203,43 +203,43 @@ auto SceneSerializer::deserialize(const std::filesystem::path& iFilepath) const 
 				Entity deserializedEntity = mp_scene->createEntityWithUUID(core::UUID{uuid}, name);
 				if (auto transformComponent = entity["Transform"]; transformComponent) {
 					// Entities always have transforms
-					auto& tc = deserializedEntity.getComponent<component::Transform>();
-					tc.translation = transformComponent["translation"].as<math::vec3>();
-					tc.rotation = transformComponent["rotation"].as<math::vec3>();
-					tc.scale = transformComponent["scale"].as<math::vec3>();
+					auto& [transform] = deserializedEntity.getComponent<component::Transform>();
+					transform.translation() = transformComponent["translation"].as<math::vec3>();
+					transform.rotation() = transformComponent["rotation"].as<math::vec3>();
+					transform.scale() = transformComponent["scale"].as<math::vec3>();
 				}
 				if (auto cameraComponent = entity["Camera"]; cameraComponent) {
-					auto& cc = deserializedEntity.addComponent<component::Camera>();
+					auto& [primary, fixedAspectRatio, camera] = deserializedEntity.addComponent<component::Camera>();
 					auto cameraProps = cameraComponent["camera"];
 					auto projType = magic_enum::enum_cast<SceneCamera::ProjectionType>(
 							cameraProps["projectionType"].as<std::string>());
 					if (projType.has_value())
-						cc.camera.setProjectionType(projType.value());
-					cc.camera.setPerspectiveVerticalFOV(cameraProps["perspectiveFOV"].as<float>());
-					cc.camera.setPerspectiveNearClip(cameraProps["perspectiveNear"].as<float>());
-					cc.camera.setPerspectiveFarClip(cameraProps["perspectiveFar"].as<float>());
+						camera.setProjectionType(projType.value());
+					camera.setPerspectiveVerticalFOV(cameraProps["perspectiveFOV"].as<float>());
+					camera.setPerspectiveNearClip(cameraProps["perspectiveNear"].as<float>());
+					camera.setPerspectiveFarClip(cameraProps["perspectiveFar"].as<float>());
 
-					cc.camera.setOrthographicSize(cameraProps["orthographicSize"].as<float>());
-					cc.camera.setOrthographicNearClip(cameraProps["orthographicNear"].as<float>());
-					cc.camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
+					camera.setOrthographicSize(cameraProps["orthographicSize"].as<float>());
+					camera.setOrthographicNearClip(cameraProps["orthographicNear"].as<float>());
+					camera.setOrthographicFarClip(cameraProps["orthographicFar"].as<float>());
 
-					cc.primary = cameraComponent["primary"].as<bool>();
-					cc.fixedAspectRatio = cameraComponent["fixedAspectRatio"].as<bool>();
+					primary = cameraComponent["primary"].as<bool>();
+					fixedAspectRatio = cameraComponent["fixedAspectRatio"].as<bool>();
 				}
 				if (auto spriteRendererComponent = entity["SpriteRenderer"]; spriteRendererComponent) {
-					auto& src = deserializedEntity.addComponent<component::SpriteRenderer>();
-					src.color = spriteRendererComponent["color"].as<math::vec4>();
+					auto& [color, texture, tilingFactor] = deserializedEntity.addComponent<component::SpriteRenderer>();
+					color = spriteRendererComponent["color"].as<math::vec4>();
 					if (spriteRendererComponent["tilingFactor"])
-						src.tilingFactor = spriteRendererComponent["tilingFactor"].as<float>();
+						tilingFactor = spriteRendererComponent["tilingFactor"].as<float>();
 					if (spriteRendererComponent["texture"])
-						src.texture = renderer::Texture2D::createFromSerialized(
+						texture = renderer::Texture2D::createFromSerialized(
 								spriteRendererComponent["texture"].as<std::string>());
 				}
 				if (auto circleRendererComponent = entity["CircleRenderer"]; circleRendererComponent) {
-					auto& src = deserializedEntity.addComponent<component::CircleRenderer>();
-					src.color = circleRendererComponent["color"].as<math::vec4>();
-					src.thickness = circleRendererComponent["thickness"].as<float>();
-					src.fade = circleRendererComponent["fade"].as<float>();
+					auto& [color, thickness, fade] = deserializedEntity.addComponent<component::CircleRenderer>();
+					color = circleRendererComponent["color"].as<math::vec4>();
+					thickness = circleRendererComponent["thickness"].as<float>();
+					fade = circleRendererComponent["fade"].as<float>();
 				}
 				if (auto testRendererComponent = entity["TextRenderer"]; testRendererComponent) {
 					auto& src = deserializedEntity.addComponent<component::Text>();

@@ -64,7 +64,7 @@ void Viewport::onUpdate(const core::Timestep& iTimeStep) {
 	// ===============================================================
 	renderer::Renderer2D::beginScene(*m_camera);
 	const float ratio = cam.getFrame()->getSize().ratio();
-	const renderer::utils::PRS tran{.position = {0, 0, 0}, .rotation = 180, .size = {ratio * scaling, 1 * scaling}};
+	const math::Transform tran{{0, 0, 0}, {0, 0, 180}, {ratio * scaling, 1 * scaling, 0}};
 	renderer::Renderer2D::drawQuad({.transform = tran, .texture = cam.getFrame()});
 	renderer::Renderer2D::endScene();
 	// ===============================================================

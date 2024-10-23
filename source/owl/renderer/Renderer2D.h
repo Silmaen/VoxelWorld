@@ -13,66 +13,18 @@
 #include "CameraOrtho.h"
 #include "Texture.h"
 #include "fonts/Font.h"
+#include "math/Transform.h"
 #include "scene/component/SpriteRenderer.h"
 
 
 namespace owl::renderer {
-/**
- * @brief Utility functions.
- */
-namespace utils {
-/**
- * @brief Structure holding Position Rotation Scale.
- */
-struct PRS {
-	/// The position.
-	math::vec3 position = math::vec3{0.f, 0.f, 0.f};
-	/// The rotation.
-	float rotation = 0.f;
-	/// The size.
-	math::vec2 size = math::vec2{1.f, 1.f};
-};
-
-/**
- * @brief Convert PRS structure int transformation matrix.
- * @param[in] iTransform The input PRS Structure.
- * @return The corresponding Transformation matrix.
- */
-OWL_API auto toTransform(const PRS& iTransform) -> math::mat4;
-
-/**
- * @brief 2D transformation structure.
- */
-struct Transform2D {
-	Transform2D() = delete;
-
-	// NOLINTBEGIN(google-explicit-constructor)
-	// NOLINTBEGIN(hicpp-explicit-conversions)
-	/**
-	 * @brief Constructor by transformation matrix.
-	 * @param[in] iMatrix Input transformation matrix.
-	 */
-	Transform2D(const math::mat4& iMatrix) : transform{iMatrix} {}
-
-	/**
-	 * @brief Constructor by PRS.
-	 * @param[in] iTransform Input PRS.
-	 */
-	Transform2D(const PRS& iTransform) : transform{toTransform(iTransform)} {}
-	// NOLINTEND(hicpp-explicit-conversions)
-	// NOLINTEND(google-explicit-constructor)
-
-	/// The transformation matrix.
-	math::mat4 transform;
-};
-}// namespace utils
 
 /**
  * @brief Data for drawing a quad.
  */
 struct OWL_API Quad2DData {
 	/// Transformation of the square.
-	utils::Transform2D transform;
+	math::Transform transform;
 	/// Color to apply to the quad.
 	math::vec4 color = math::vec4{1.f, 1.f, 1.f, 1.f};
 	/// Eventually the texture of the quad (plain color if nullptr).
@@ -88,7 +40,7 @@ struct OWL_API Quad2DData {
  */
 struct OWL_API CircleData {
 	/// Transformation of the circle.
-	utils::Transform2D transform;
+	math::Transform transform;
 	/// Color to apply to the circle.
 	math::vec4 color = math::vec4{1.f, 1.f, 1.f, 1.f};
 	/// Thickness of the line.
@@ -118,7 +70,7 @@ struct OWL_API LineData {
  */
 struct OWL_API RectData {
 	/// Transformation of the rectangle.
-	utils::Transform2D transform;
+	math::Transform transform;
 	/// Color to apply to the rect.
 	math::vec4 color = math::vec4{1.f, 1.f, 1.f, 1.f};
 	/// unique ID for the entity.
@@ -130,7 +82,7 @@ struct OWL_API RectData {
  */
 struct OWL_API PolyLineData {
 	/// Transformation of the rectangle.
-	utils::Transform2D transform;
+	math::Transform transform;
 	/// Set of points.
 	std::vector<math::vec3> points;
 	/// If the ending point connected to starting point.
@@ -146,7 +98,7 @@ struct OWL_API PolyLineData {
  */
 struct OWL_API StringData {
 	/// Transformation of the render.
-	utils::Transform2D transform;
+	math::Transform transform;
 	/// Test to render
 	std::string text;
 	/// font to use (or default one)

@@ -29,25 +29,23 @@ MotorRate::MotorRate() {
 MotorRate::~MotorRate() = default;
 
 void MotorRate::drawBack() {
-	owl::renderer::utils::PRS tran{.position = getTransform().position, .rotation = 0, .size = getTransform().size};
-	tran.position.z() = -0.1f;
+	owl::math::Transform tran{getPosition(), {0, 0, 0}, getScale()};
+	tran.translation().z() = -0.1f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = background});
 }
 
 void MotorRate::drawCursors() {
-	owl::renderer::utils::PRS tran{.position = getTransform().position,
-								   .rotation = -rateToAngle(0),
-								   .size = getTransform().size};
-	tran.position.z() = -0.08f;
+	owl::math::Transform tran{getPosition(), {0, 0, -rateToAngle(0)}, getScale()};
+	tran.translation().z() = -0.08f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor1});
-	tran.rotation = rateToAngle(1);
-	tran.position.z() = -0.07f;
+	tran.rotation().z() = rateToAngle(1);
+	tran.translation().z() = -0.07f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor2});
-	tran.rotation = rateToAngle(2);
-	tran.position.z() = -0.06f;
+	tran.rotation().z() = rateToAngle(2);
+	tran.translation().z() = -0.06f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor3});
-	tran.rotation = -rateToAngle(3);
-	tran.position.z() = -0.05f;
+	tran.rotation().z() = -rateToAngle(3);
+	tran.translation().z() = -0.05f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor4});
 }
 

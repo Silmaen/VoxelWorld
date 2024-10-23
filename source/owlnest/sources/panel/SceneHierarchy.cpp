@@ -233,11 +233,11 @@ void SceneHierarchy::drawComponents(scene::Entity& ioEntity) {
 	ImGui::PopItemWidth();
 
 	drawComponent<scene::component::Transform>("Transform", ioEntity, [](auto& ioComponent) {
-		drawVec3Control("Translation", ioComponent.translation);
-		math::vec3 rotation = math::degrees(ioComponent.rotation);
+		drawVec3Control("Translation", ioComponent.transform.translation());
+		math::vec3 rotation = math::degrees(ioComponent.transform.rotation());
 		drawVec3Control("Rotation", rotation);
-		ioComponent.rotation = math::radians(rotation);
-		drawVec3Control("Scale", ioComponent.scale, 1.0f);
+		ioComponent.transform.rotation() = math::radians(rotation);
+		drawVec3Control("Scale", ioComponent.transform.scale(), 1.0f);
 	});
 	drawComponent<scene::component::Camera>("Camera", ioEntity, [](auto& ioComponent) {
 		auto& camera = ioComponent.camera;

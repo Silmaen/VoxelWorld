@@ -9,7 +9,6 @@
 
 #include "CameraOrtho.h"
 #include "RenderCommand.h"
-#include "math/linAlgebra.h"
 
 namespace owl::renderer {
 

@@ -22,21 +22,21 @@ Altitude::Altitude() {
 }
 
 void Altitude::drawBack() {
-	owl::renderer::utils::PRS tran{.position = getTransform().position, .rotation = 0, .size = getTransform().size};
-	tran.position.z() = -0.1f;
+	owl::math::Transform tran{getPosition(), {0, 0, 0}, getScale()};
+	tran.translation().z() = -0.1f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = background});
 }
 void Altitude::drawCursors() {
-	owl::renderer::utils::PRS tran{.position = getTransform().position, .rotation = 0, .size = getTransform().size};
+	owl::math::Transform tran{getPosition(), {0, 0, 0}, getScale()};
 
-	tran.rotation = altitudeToAngle(100);
-	tran.position.z() = -0.07f;
+	tran.rotation().z() = altitudeToAngle(100);
+	tran.translation().z() = -0.07f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor100});
-	tran.rotation = altitudeToAngle(10);
-	tran.position.z() = -0.06f;
+	tran.rotation().z() = altitudeToAngle(10);
+	tran.translation().z() = -0.06f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor10});
-	tran.rotation = altitudeToAngle(1);
-	tran.position.z() = -0.05f;
+	tran.rotation().z() = altitudeToAngle(1);
+	tran.translation().z() = -0.05f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor});
 }
 

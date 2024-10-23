@@ -13,7 +13,6 @@
 #include "RenderCommand.h"
 #include "UniformBuffer.h"
 #include "core/Application.h"
-#include "math/linAlgebra.h"
 
 namespace owl::renderer {
 
@@ -129,12 +128,12 @@ struct InternalData {
 	/// next texture index
 	uint32_t textureSlotIndex = 1;// 0 = white texture
 };
-
+/*
 auto toTransform(const PRS& iTransform) -> math::mat4 {
 	return translate(math::identity<float, 4>(), iTransform.position) *
 		   rotate(math::identity<float, 4>(), math::radians(iTransform.rotation), {0.0f, 0.0f, 1.0f}) *
 		   scale(math::identity<float, 4>(), {iTransform.size.x(), iTransform.size.y(), 1.0f});
-}
+}*/
 
 }// namespace utils
 
@@ -328,7 +327,7 @@ void Renderer2D::drawLine(const LineData& iLineData) {
 }
 
 void Renderer2D::drawRect(const RectData& iRectData) {
-	const math::mat4 trans = iRectData.transform.transform;
+	const math::mat4 trans = iRectData.transform();
 	std::vector<math::vec3> points;
 	static const std::vector<std::pair<uint8_t, uint8_t>> idx = {{0, 1}, {1, 2}, {2, 3}, {3, 0}};
 	for (const auto& vtx: utils::g_quadVertexPositions) points.emplace_back(trans * vtx);
@@ -342,7 +341,7 @@ void Renderer2D::drawPolyLine(const PolyLineData& iLineData) {
 		OWL_CORE_WARN("Too few points in the multiline with ID {}", iLineData.entityId)
 		return;
 	}
-	const math::mat4 trans = iLineData.transform.transform;
+	const math::mat4 trans = iLineData.transform();
 	std::vector<math::vec3> points;
 	std::vector<std::pair<uint32_t, uint32_t>> link;
 	uint32_t i = 0;
@@ -367,13 +366,12 @@ void Renderer2D::drawCircle(const CircleData& iCircleData) {
 	// 	nextBatch();
 
 	for (const auto& vtx: utils::g_quadVertexPositions) {
-		g_data->circle.vertexBuf.emplace_back(
-				utils::CircleVertex{.worldPosition = iCircleData.transform.transform * vtx,
-									.localPosition = vtx * 2.0f,
-									.color = iCircleData.color,
-									.thickness = iCircleData.thickness,
-									.fade = iCircleData.fade,
-									.entityId = iCircleData.entityId});
+		g_data->circle.vertexBuf.emplace_back(utils::CircleVertex{.worldPosition = iCircleData.transform() * vtx,
+																  .localPosition = vtx * 2.0f,
+																  .color = iCircleData.color,
+																  .thickness = iCircleData.thickness,
+																  .fade = iCircleData.fade,
+																  .entityId = iCircleData.entityId});
 	}
 
 	g_data->circle.indexCount += 6;
@@ -402,7 +400,7 @@ void Renderer2D::drawQuad(const Quad2DData& iQuadData) {
 	}
 	for (size_t i = 0; i < utils::g_quadVertexCount; i++) {
 		g_data->quad.vertexBuf.emplace_back(
-				utils::QuadVertex{.position = iQuadData.transform.transform * utils::g_quadVertexPositions[i],
+				utils::QuadVertex{.position = iQuadData.transform() * utils::g_quadVertexPositions[i],
 								  .color = iQuadData.color,
 								  .texCoord = utils::g_textureCoords[i],
 								  .texIndex = textureIndex,
@@ -476,10 +474,10 @@ void Renderer2D::drawString(const StringData& iStringData) {
 		quad.translate(cursor + offset);
 		quad.scale(scale);
 		// render here
-		const math::vec3 p1 = iStringData.transform.transform * math::vec4(quad.min().x(), quad.min().y(), 0, 1.f);
-		const math::vec3 p2 = iStringData.transform.transform * math::vec4(quad.min().x(), quad.max().y(), 0, 1.f);
-		const math::vec3 p3 = iStringData.transform.transform * math::vec4(quad.max().x(), quad.max().y(), 0, 1.f);
-		const math::vec3 p4 = iStringData.transform.transform * math::vec4(quad.max().x(), quad.min().y(), 0, 1.f);
+		const math::vec3 p1 = iStringData.transform() * math::vec4(quad.min().x(), quad.min().y(), 0, 1.f);
+		const math::vec3 p2 = iStringData.transform() * math::vec4(quad.min().x(), quad.max().y(), 0, 1.f);
+		const math::vec3 p3 = iStringData.transform() * math::vec4(quad.max().x(), quad.max().y(), 0, 1.f);
+		const math::vec3 p4 = iStringData.transform() * math::vec4(quad.max().x(), quad.min().y(), 0, 1.f);
 		g_data->text.vertexBuf.emplace_back(utils::TextVertex{.position = p1,
 															  .color = iStringData.color,
 															  .texCoord = uv.min(),

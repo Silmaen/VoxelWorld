@@ -12,7 +12,6 @@
 #include "RenderAPI.h"
 #include "RenderCommand.h"
 #include "input/Input.h"
-#include "math/linAlgebra.h"
 
 namespace owl::renderer {
 

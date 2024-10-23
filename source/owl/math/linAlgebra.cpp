@@ -11,5 +11,3 @@
 #include "linAlgebra.h"
 
 namespace owl::math {}
-
-namespace owl::math {}

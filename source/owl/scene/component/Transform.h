@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "math/linAlgebra.h"
+#include "math/Transform.h"
 
 namespace owl::scene::component {
 
@@ -16,21 +16,8 @@ namespace owl::scene::component {
  * @brief The transformation component.
  */
 struct OWL_API Transform {
-	/// The translation.
-	math::vec3 translation = {0.f, 0.f, 0.f};
-	/// The rotation.
-	math::vec3 rotation = {0.f, 0.f, 0.f};
-	/// The scale.
-	math::vec3 scale = {1.f, 1.f, 1.f};
-
-	/**
-	 * @brief Get the transformation matrix based on TRS.
-	 * @return The transformation matrix.
-	 */
-	[[nodiscard]] auto getTransform() const -> math::mat4 {
-		return math::translate(math::identity<float, 4>(), translation) * math::toMat4(math::quat(rotation)) *
-			   math::scale(math::identity<float, 4>(), scale);
-	}
+	/// The transformation.
+	math::Transform transform;
 };
 
 }// namespace owl::scene::component

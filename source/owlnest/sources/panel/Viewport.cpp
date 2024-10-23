@@ -139,21 +139,19 @@ void Viewport::renderOverlay() const {
 	if (m_parent->getState() == EditorLayer::State::Play) {
 		const scene::Entity camera = m_parent->getActiveScene()->getPrimaryCamera();
 		auto& cam = camera.getComponent<scene::component::Camera>().camera;
-		cam.setTransform(camera.getComponent<scene::component::Transform>().getTransform());
+		cam.setTransform(camera.getComponent<scene::component::Transform>().transform());
 		renderer::Renderer2D::beginScene(cam);
 	} else {
 		renderer::Renderer2D::beginScene(m_editorCamera);
 	}
 	// Draw selected entity outline
 	if (const scene::Entity selectedEntity = m_parent->getSelectedEntity()) {
-		const scene::component::Transform transform = selectedEntity.getComponent<scene::component::Transform>();
+		const auto [transform] = selectedEntity.getComponent<scene::component::Transform>();
 		// Orange
 		// surrounding square
-		renderer::Renderer2D::drawRect(
-				{.transform = transform.getTransform(), .color = math::vec4(0.95f, 0.55f, 0.f, 1)});
+		renderer::Renderer2D::drawRect({.transform = transform, .color = math::vec4(0.95f, 0.55f, 0.f, 1)});
 		// Overlay
-		renderer::Renderer2D::drawQuad(
-				{.transform = transform.getTransform(), .color = math::vec4{0.95f, 0.55f, 0.f, 0.2f}});
+		renderer::Renderer2D::drawQuad({.transform = transform, .color = math::vec4{0.95f, 0.55f, 0.f, 0.2f}});
 	}
 
 	renderer::Renderer2D::endScene();
@@ -185,7 +183,7 @@ void Viewport::renderGizmo() {
 
 		// Entity transform
 		auto& tc = selectedEntity.getComponent<scene::component::Transform>();
-		math::mat4 transform = tc.getTransform();
+		math::mat4 transform = tc.transform();
 
 		// Snapping
 		const bool snap = input::Input::isKeyPressed(input::key::LeftControl);
@@ -200,15 +198,12 @@ void Viewport::renderGizmo() {
 				   ImGuizmo::LOCAL, transform.data(), nullptr, snap ? snapValues : nullptr);
 
 		if (ImGuizmo::IsUsing()) {
-			math::vec3 translation;
-			math::vec3 rotation;
-			math::vec3 scale;
-			decomposeTransform(transform, translation, rotation, scale);
+			math::Transform newTransform(transform);
 
-			const math::vec3 deltaRotation = rotation - tc.rotation;
-			tc.translation = translation;
-			tc.rotation += deltaRotation;
-			tc.scale = scale;
+			const math::vec3 deltaRotation = newTransform.rotation() - tc.transform.rotation();
+			tc.transform.translation() = newTransform.translation();
+			tc.transform.rotation() += deltaRotation;
+			tc.transform.scale() = newTransform.scale();
 		}
 	}
 }

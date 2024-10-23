@@ -1,7 +1,7 @@
 
 #include "testHelper.h"
 
-#include <math/linAlgebra.h>
+#include <math/math.h>
 
 using namespace owl::math;
 

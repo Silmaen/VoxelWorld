@@ -44,10 +44,10 @@ public:
 	/**
 	 * @brief Draw the cover of the gauge.
 	 */
-	void drawCover();
+	void drawCover() const;
 
 	/**
-	 * @brief Draw the  gauge back ground.
+	 * @brief Draw the  gauge background.
 	 */
 	virtual void drawBack() = 0;
 
@@ -60,38 +60,33 @@ public:
 	 * @brief Define the scale of the gauge
 	 * @param sc New gauge's scale.
 	 */
-	void setScale(const owl::math::vec2& sc) { transform.size = sc; }
+	void setScale(const owl::math::vec3& sc) { m_scale = sc; }
 
 	/**
 	 * @brief Read the gauge's scale.
 	 * @return The gauge's scale.
 	 */
-	[[nodiscard]] auto getScale() const -> const owl::math::vec2& { return transform.size; }
+	[[nodiscard]] auto getScale() const -> const owl::math::vec3& { return m_scale; }
 
 	/**
 	 * @brief Define the position of the gauge
 	 * @param pos New gauge's position.
 	 */
-	void setPosition(const owl::math::vec3& pos) { transform.position = pos; }
+	void setPosition(const owl::math::vec3& pos) { m_position = pos; }
 
 	/**
 	 * @brief Read the gauge's position.
 	 * @return The gauge's position.
 	 */
-	[[nodiscard]] auto getPosition() const -> const owl::math::vec3& { return transform.position; }
-
-	/**
-	 * @brief Access to the object's transformation.
-	 * @return The transformation.
-	 */
-	[[nodiscard]] auto getTransform() const -> const owl::renderer::utils::PRS& { return transform; }
+	[[nodiscard]] auto getPosition() const -> const owl::math::vec3& { return m_position; }
 
 
 private:
 	/// The front texture
-	owl::shared<owl::renderer::Texture> coverTexture;
+	owl::shared<owl::renderer::Texture> m_coverTexture;
 	/// the object transformation
-	owl::renderer::utils::PRS transform;
+	owl::math::vec3 m_position;
+	owl::math::vec3 m_scale;
 };
 
 }// namespace drone::panels::gauge
