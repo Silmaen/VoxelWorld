@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "math/vectors.h"
 #include <vulkan/vulkan.h>
 
 namespace owl::renderer::vulkan::internal {
@@ -23,7 +24,7 @@ struct TextureData {
 	VkDescriptorSet textureDescriptorSet = nullptr;
 	VkDescriptorSetLayout textureDescriptorSetLayout = nullptr;
 
-	void freeTrexture();
+	void freeTexture();
 	void createDescriptorSet();
 	void createView();
 	void createSampler();

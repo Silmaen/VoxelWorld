@@ -7,6 +7,7 @@
 #include <scene/component/CircleRenderer.h>
 #include <scene/component/NativeScript.h>
 #include <scene/component/SpriteRenderer.h>
+#include <scene/component/Text.h>
 #include <scene/component/Transform.h>
 
 using namespace owl::scene;
@@ -47,6 +48,7 @@ TEST(Scene, Copy) {
 	ent2.addOrReplaceComponent<component::Transform>();
 	ent2.addOrReplaceComponent<component::NativeScript>();
 	ent2.addOrReplaceComponent<component::SpriteRenderer>();
+	ent2.addOrReplaceComponent<component::Text>();
 	auto ent3 = sc->createEntityWithUUID(88, "circle");
 	ent3.addOrReplaceComponent<component::Transform>();
 	ent3.addOrReplaceComponent<component::CircleRenderer>();

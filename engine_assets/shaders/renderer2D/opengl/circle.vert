@@ -1,11 +1,11 @@
 #version 450 core
 
-layout(location = 0) in vec3 a_WorldPosition;
-layout(location = 1) in vec3 a_LocalPosition;
-layout(location = 2) in vec4 a_Color;
-layout(location = 3) in float a_Thickness;
-layout(location = 4) in float a_Fade;
-layout(location = 5) in int a_EntityID;
+layout(location = 0) in vec3 i_WorldPosition;
+layout(location = 1) in vec3 i_LocalPosition;
+layout(location = 2) in vec4 i_Color;
+layout(location = 3) in float i_Thickness;
+layout(location = 4) in float i_Fade;
+layout(location = 5) in int i_EntityID;
 
 layout(std140, binding = 0) uniform Camera {
     mat4 u_ViewProjection;
@@ -18,16 +18,16 @@ struct VertexOutput {
     float Fade;
 };
 
-layout (location = 0) out VertexOutput Output;
-layout (location = 4) out flat int v_EntityID;
+layout (location = 0) out VertexOutput o_vertex;
+layout (location = 4) out flat int o_EntityID;
 
 void main() {
-    Output.LocalPosition = a_LocalPosition;
-    Output.Color = a_Color;
-    Output.Thickness = a_Thickness;
-    Output.Fade = a_Fade;
+    o_vertex.LocalPosition = i_LocalPosition;
+    o_vertex.Color = i_Color;
+    o_vertex.Thickness = i_Thickness;
+    o_vertex.Fade = i_Fade;
 
-    v_EntityID = a_EntityID;
+    i_EntityID = i_EntityID;
 
-    gl_Position = u_ViewProjection * vec4(a_WorldPosition, 1.0);
+    gl_Position = u_ViewProjection * vec4(i_WorldPosition, 1.0);
 }

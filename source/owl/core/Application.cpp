@@ -125,6 +125,10 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 		OWL_CORE_TRACE("GUI Layer created.")
 	}
 
+	// update the state here. (required for font initialization)
+	m_state = State::Running;
+	m_fontLibrary.init();
+
 	OWL_CORE_TRACE("Application creation done.")
 }
 

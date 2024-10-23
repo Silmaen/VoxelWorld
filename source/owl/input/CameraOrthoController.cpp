@@ -9,6 +9,7 @@
 
 #include "CameraOrthoController.h"
 #include "Input.h"
+#include "math/linAlgebra.h"
 
 namespace owl::input {
 

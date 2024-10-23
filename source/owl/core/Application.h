@@ -10,6 +10,7 @@
 
 #include "Timestep.h"
 #include "event/AppEvent.h"
+#include "fonts/FontLibrary.h"
 #include "gui/UiLayer.h"
 #include "input/Window.h"
 #include "layer/LayerStack.h"
@@ -110,6 +111,12 @@ public:
 	static auto get() -> Application& { return *s_instance; }
 
 	/**
+	 * @brief Only check for app existence.
+	 * @return True if application is instanced.
+	 */
+	static auto instanced() -> bool { return s_instance != nullptr; }
+
+	/**
 	 * @brief Destructor.
 	 */
 	virtual ~Application();
@@ -205,6 +212,7 @@ public:
 	 * @brief State of the application.
 	 */
 	enum struct State : uint8_t {
+		Created,/// Application just created.
 		Running,/// Application is running.
 		Stopped,/// Application Stopped.
 		Error/// Application in error.
@@ -222,6 +230,18 @@ public:
 	 * @return The application's time stepper.
 	 */
 	[[nodiscard]] auto getTimeStep() const -> const Timestep& { return m_stepper; }
+
+	/**
+	 * @brief Access to the font library.
+	 * @return The Font Library.
+	 */
+	[[nodiscard]] auto getFontLibrary() -> fonts::FontLibrary& { return m_fontLibrary; }
+
+	/**
+	 * @brief Access to the font library.
+	 * @return The Font Library.
+	 */
+	[[nodiscard]] auto getFontLibrary() const -> const fonts::FontLibrary& { return m_fontLibrary; }
 
 private:
 	/**
@@ -255,7 +275,7 @@ private:
 	/// Pointer to the GUI Layer.
 	shared<gui::UiLayer> mp_imGuiLayer = nullptr;
 	/// Running state.
-	State m_state = State::Running;
+	State m_state = State::Created;
 	/// If Window minimized.
 	bool m_minimized = false;
 	/// The stack of layers.
@@ -268,6 +288,8 @@ private:
 	Timestep m_stepper;
 	/// Initialization parameters.
 	AppParams m_initParams;
+	/// The font library.
+	fonts::FontLibrary m_fontLibrary;
 	/// The application Instance.
 	static Application* s_instance;
 

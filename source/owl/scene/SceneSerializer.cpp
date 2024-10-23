@@ -10,6 +10,7 @@
 #include "SceneSerializer.h"
 
 #include "Entity.h"
+#include "component/Text.h"
 #include "scene/component/Camera.h"
 #include "scene/component/CircleRenderer.h"
 #include "scene/component/SpriteRenderer.h"
@@ -99,18 +100,17 @@ void serializeEntity(YAML::Emitter& out, const Entity& iEntity) {
 	if (iEntity.hasComponent<component::Transform>()) {
 		out << YAML::Key << "Transform";
 		out << YAML::BeginMap;// Transform
-		auto& tc = iEntity.getComponent<component::Transform>();
-		out << YAML::Key << "translation" << YAML::Value << tc.translation;
-		out << YAML::Key << "rotation" << YAML::Value << tc.rotation;
-		out << YAML::Key << "scale" << YAML::Value << tc.scale;
+		const auto& [translation, rotation, scale] = iEntity.getComponent<component::Transform>();
+		out << YAML::Key << "translation" << YAML::Value << translation;
+		out << YAML::Key << "rotation" << YAML::Value << rotation;
+		out << YAML::Key << "scale" << YAML::Value << scale;
 		out << YAML::EndMap;// Transform
 	}
 
 	if (iEntity.hasComponent<component::Camera>()) {
 		out << YAML::Key << "Camera";
 		out << YAML::BeginMap;// CameraComponent
-		const auto& cameraComponent = iEntity.getComponent<component::Camera>();
-		const auto& camera = cameraComponent.camera;
+		const auto& [primary, fixedAspectRatio, camera] = iEntity.getComponent<component::Camera>();
 		out << YAML::Key << "camera" << YAML::Value;
 		out << YAML::BeginMap;// Camera
 		out << YAML::Key << "projectionType" << YAML::Value
@@ -122,29 +122,41 @@ void serializeEntity(YAML::Emitter& out, const Entity& iEntity) {
 		out << YAML::Key << "orthographicNear" << YAML::Value << camera.getOrthographicNearClip();
 		out << YAML::Key << "orthographicFar" << YAML::Value << camera.getOrthographicFarClip();
 		out << YAML::EndMap;// Camera
-		out << YAML::Key << "primary" << YAML::Value << cameraComponent.primary;
-		out << YAML::Key << "fixedAspectRatio" << YAML::Value << cameraComponent.fixedAspectRatio;
+		out << YAML::Key << "primary" << YAML::Value << primary;
+		out << YAML::Key << "fixedAspectRatio" << YAML::Value << fixedAspectRatio;
 		out << YAML::EndMap;// Camera
 	}
 
 	if (iEntity.hasComponent<component::SpriteRenderer>()) {
 		out << YAML::Key << "SpriteRenderer";
 		out << YAML::BeginMap;// SpriteRenderer
-		auto& spriteRendererComponent = iEntity.getComponent<component::SpriteRenderer>();
-		out << YAML::Key << "color" << YAML::Value << spriteRendererComponent.color;
-		if (spriteRendererComponent.texture) {
-			out << YAML::Key << "tilingFactor" << YAML::Value << spriteRendererComponent.tilingFactor;
-			out << YAML::Key << "texture" << YAML::Value << spriteRendererComponent.texture->getSerializeString();
+		const auto& [color, texture, tilingFactor] = iEntity.getComponent<component::SpriteRenderer>();
+		out << YAML::Key << "color" << YAML::Value << color;
+		if (texture) {
+			out << YAML::Key << "tilingFactor" << YAML::Value << tilingFactor;
+			out << YAML::Key << "texture" << YAML::Value << texture->getSerializeString();
 		}
 		out << YAML::EndMap;// SpriteRenderer
 	}
 	if (iEntity.hasComponent<component::CircleRenderer>()) {
 		out << YAML::Key << "CircleRenderer";
 		out << YAML::BeginMap;// CircleRenderer
-		auto& circleRendererComponent = iEntity.getComponent<component::CircleRenderer>();
-		out << YAML::Key << "color" << YAML::Value << circleRendererComponent.color;
-		out << YAML::Key << "thickness" << YAML::Value << circleRendererComponent.thickness;
-		out << YAML::Key << "fade" << YAML::Value << circleRendererComponent.fade;
+		const auto& [color, thickness, fade] = iEntity.getComponent<component::CircleRenderer>();
+		out << YAML::Key << "color" << YAML::Value << color;
+		out << YAML::Key << "thickness" << YAML::Value << thickness;
+		out << YAML::Key << "fade" << YAML::Value << fade;
+		out << YAML::EndMap;// CircleRenderer
+	}
+	if (iEntity.hasComponent<component::Text>()) {
+		out << YAML::Key << "TextRenderer";
+		out << YAML::BeginMap;// TextRenderer
+		const auto& textComponent = iEntity.getComponent<component::Text>();
+		out << YAML::Key << "color" << YAML::Value << textComponent.color;
+		out << YAML::Key << "kerning" << YAML::Value << textComponent.kerning;
+		out << YAML::Key << "lineSpacing" << YAML::Value << textComponent.lineSpacing;
+		out << YAML::Key << "text" << YAML::Value << textComponent.text;
+		// Todo: manage fonts
+		//out << YAML::Key << "font" << YAML::Value << circleRendererComponent.font;
 		out << YAML::EndMap;// CircleRenderer
 	}
 
@@ -184,15 +196,11 @@ auto SceneSerializer::deserialize(const std::filesystem::path& iFilepath) const 
 			for (auto entity: entities) {
 				auto uuid = entity["Entity"].as<uint64_t>();
 				std::string name;
-
 				if (auto tagComponent = entity["Tag"]; tagComponent)
 					name = tagComponent["tag"].as<std::string>();
 
 				OWL_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name)
-
 				Entity deserializedEntity = mp_scene->createEntityWithUUID(core::UUID{uuid}, name);
-
-
 				if (auto transformComponent = entity["Transform"]; transformComponent) {
 					// Entities always have transforms
 					auto& tc = deserializedEntity.getComponent<component::Transform>();
@@ -200,8 +208,6 @@ auto SceneSerializer::deserialize(const std::filesystem::path& iFilepath) const 
 					tc.rotation = transformComponent["rotation"].as<math::vec3>();
 					tc.scale = transformComponent["scale"].as<math::vec3>();
 				}
-
-
 				if (auto cameraComponent = entity["Camera"]; cameraComponent) {
 					auto& cc = deserializedEntity.addComponent<component::Camera>();
 					auto cameraProps = cameraComponent["camera"];
@@ -220,8 +226,6 @@ auto SceneSerializer::deserialize(const std::filesystem::path& iFilepath) const 
 					cc.primary = cameraComponent["primary"].as<bool>();
 					cc.fixedAspectRatio = cameraComponent["fixedAspectRatio"].as<bool>();
 				}
-
-
 				if (auto spriteRendererComponent = entity["SpriteRenderer"]; spriteRendererComponent) {
 					auto& src = deserializedEntity.addComponent<component::SpriteRenderer>();
 					src.color = spriteRendererComponent["color"].as<math::vec4>();
@@ -231,13 +235,20 @@ auto SceneSerializer::deserialize(const std::filesystem::path& iFilepath) const 
 						src.texture = renderer::Texture2D::createFromSerialized(
 								spriteRendererComponent["texture"].as<std::string>());
 				}
-
-
 				if (auto circleRendererComponent = entity["CircleRenderer"]; circleRendererComponent) {
 					auto& src = deserializedEntity.addComponent<component::CircleRenderer>();
 					src.color = circleRendererComponent["color"].as<math::vec4>();
 					src.thickness = circleRendererComponent["thickness"].as<float>();
 					src.fade = circleRendererComponent["fade"].as<float>();
+				}
+				if (auto testRendererComponent = entity["TextRenderer"]; testRendererComponent) {
+					auto& src = deserializedEntity.addComponent<component::Text>();
+					src.color = testRendererComponent["color"].as<math::vec4>();
+					src.kerning = testRendererComponent["kerning"].as<float>();
+					src.lineSpacing = testRendererComponent["lineSpacing"].as<float>();
+					src.text = testRendererComponent["text"].as<std::string>();
+					// TODO: manage fonts.
+					//src.font = testRendererComponent["font"].as<std::string>();
 				}
 			}
 		}

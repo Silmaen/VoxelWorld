@@ -2,6 +2,7 @@
 #include "testHelper.h"
 
 #include <debug/TrackerClient.h>
+#include <math/matrices.h>
 
 using namespace owl::debug;
 
@@ -41,4 +42,19 @@ TEST(Tracker, stacktrace) {
 				  2);
 		EXPECT_LT(std::abs(static_cast<int64_t>(globals.allocs.size()) - static_cast<int64_t>(initialAlloc)), 2);
 	}
+}
+
+TEST(MemorySize, formating) {
+	MemorySize st{.size = 488};
+	EXPECT_STREQ(st.str().c_str(), "488 bytes");
+	st.size += 1024;
+	EXPECT_STREQ(st.str().c_str(), "1.48 kB");
+	st.size *= 410;
+	st.size += 1024ull * 1024ull;
+	EXPECT_STREQ(st.str().c_str(), "1.59 MB");
+	st.size *= 154;
+	st.size += 77 * 1024ull * 1024ull * 1024ull;
+	EXPECT_STREQ(st.str().c_str(), "77.2 GB");
+	st.size += 1024ull * 1024ull * 1024ull * 1024ull;
+	EXPECT_STREQ(st.str().c_str(), "1.08 TB");
 }

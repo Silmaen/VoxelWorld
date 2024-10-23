@@ -75,7 +75,7 @@ VulkanCore::VulkanCore() = default;
 
 VulkanCore::~VulkanCore() = default;
 
-void VulkanCore::init(const VulkanConfiguraton& iConfiguration) {
+void VulkanCore::init(const VulkanConfiguration& iConfiguration) {
 	m_config = iConfiguration;
 	m_instanceInfo = mkUniq<InstanceInformations>();
 	if (!m_instanceInfo->hasMinimalVersion(1, 3)) {

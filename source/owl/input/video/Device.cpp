@@ -8,6 +8,7 @@
 #include "owlpch.h"
 
 #include "Device.h"
+#include "math/matrices.h"
 #include "math/simpleFunctions.h"
 #include <stb_image.h>
 

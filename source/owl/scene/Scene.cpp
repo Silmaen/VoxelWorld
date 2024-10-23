@@ -19,19 +19,21 @@
 #include "component/NativeScript.h"
 #include "component/SpriteRenderer.h"
 #include "component/Tag.h"
+#include "component/Text.h"
 #include "component/Transform.h"
+#include "core/Application.h"
 
 namespace owl::scene {
 namespace {
 template<typename Component>
 void copyComponent(entt::registry& oDst, const entt::registry& iSrc,
-				   const std::unordered_map<core::UUID, entt::entity>& enttMap) {
+				   const std::unordered_map<core::UUID, entt::entity>& iEnttMap) {
 	for (auto view = iSrc.view<Component>(); auto e: view) {
 		const core::UUID uuid = iSrc.get<component::ID>(e).id;
-		OWL_CORE_ASSERT(enttMap.contains(uuid), "Error: Component not found in map.")
-		const entt::entity dstEnttID = enttMap.at(uuid);
+		OWL_CORE_ASSERT(iEnttMap.contains(uuid), "Error: Component not found in map.")
+		const entt::entity dstEnttId = iEnttMap.at(uuid);
 		auto& component = iSrc.get<Component>(e);
-		oDst.emplace_or_replace<Component>(dstEnttID, component);
+		oDst.emplace_or_replace<Component>(dstEnttId, component);
 	}
 }
 
@@ -70,6 +72,7 @@ auto Scene::copy(const shared<Scene>& iOther) -> shared<Scene> {
 	copyComponent<component::CircleRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
 	copyComponent<component::Camera>(dstSceneRegistry, srcSceneRegistry, enttMap);
 	copyComponent<component::NativeScript>(dstSceneRegistry, srcSceneRegistry, enttMap);
+	copyComponent<component::Text>(dstSceneRegistry, srcSceneRegistry, enttMap);
 	//copyComponent<component::Rigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 	//copyComponent<component::BoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 
@@ -81,10 +84,10 @@ auto Scene::createEntity(const std::string& iName) -> Entity { return createEnti
 auto Scene::createEntityWithUUID(const core::UUID iUuid, const std::string& iName) -> Entity {
 	Entity entity = {registry.create(), this};
 	entity.addComponent<component::Transform>();
-	auto& id = entity.addComponent<component::ID>();
-	id.id = iUuid;
-	auto& tag = entity.addComponent<component::Tag>();
-	tag.tag = iName.empty() ? "Entity" : iName;
+	auto& [id] = entity.addComponent<component::ID>();
+	id = iUuid;
+	auto& [tag] = entity.addComponent<component::Tag>();
+	tag = iName.empty() ? "Entity" : iName;
 	return entity;
 }
 
@@ -95,17 +98,17 @@ void Scene::destroyEntity(Entity& ioEntity) {
 
 void Scene::onUpdateRuntime(const core::Timestep& iTimeStep) {
 	// update scripts
-	registry.view<component::NativeScript>().each([iTimeStep, this](auto entity, auto& nsc) {
-		if (!nsc.instance) {
-			nsc.instance = nsc.instantiateScript();
-			nsc.instance->entity = Entity{entity, this};
-			nsc.instance->onCreate();
+	registry.view<component::NativeScript>().each([iTimeStep, this](auto ioEntity, auto& ioNsc) {
+		if (!ioNsc.instance) {
+			ioNsc.instance = ioNsc.instantiateScript();
+			ioNsc.instance->entity = Entity{ioEntity, this};
+			ioNsc.instance->onCreate();
 		}
-		nsc.instance->onUpdate(iTimeStep);
+		ioNsc.instance->onUpdate(iTimeStep);
 	});
 
 	// Render 2D
-	const renderer::Camera* mainCamera = nullptr;
+	renderer::Camera* mainCamera = nullptr;
 	math::mat4 cameraTransform;
 	for (const auto view = registry.view<component::Transform, component::Camera>(); const auto entity: view) {
 		auto [transform, camera] = view.get<component::Transform, component::Camera>(entity);
@@ -117,27 +120,20 @@ void Scene::onUpdateRuntime(const core::Timestep& iTimeStep) {
 	}
 
 	if (mainCamera != nullptr) {
+		mainCamera->setTransform(cameraTransform);
 		renderer::Renderer2D::resetStats();
-		renderer::Renderer2D::beginScene(*mainCamera, cameraTransform);
+		renderer::Renderer2D::beginScene(*mainCamera);
 		render();
 		renderer::Renderer2D::endScene();
 	}
 }
 
-void Scene::onUpdateEditor([[maybe_unused]] const core::Timestep& iTimeStep, const renderer::CameraEditor& iCamera) {
+void Scene::onUpdateEditor([[maybe_unused]] const core::Timestep& iTimeStep, const renderer::Camera& iCamera) {
 	renderer::Renderer2D::resetStats();
 	renderer::Renderer2D::beginScene(iCamera);
 	render();
 	renderer::Renderer2D::endScene();
 }
-
-void Scene::onUpdateOrtho([[maybe_unused]] const core::Timestep& iTimeStep, const renderer::CameraOrtho& iCamera) {
-	renderer::Renderer2D::resetStats();
-	renderer::Renderer2D::beginScene(iCamera);
-	render();
-	renderer::Renderer2D::endScene();
-}
-
 
 void Scene::render() {
 	// Draw sprites
@@ -157,6 +153,17 @@ void Scene::render() {
 										  .color = circle.color,
 										  .thickness = circle.thickness,
 										  .fade = circle.fade,
+										  .entityId = static_cast<int>(entity)});
+	}
+	// Draw text
+	for (const auto view = registry.view<component::Transform, component::Text>(); auto entity: view) {
+		auto [transform, text] = view.get<component::Transform, component::Text>(entity);
+		renderer::Renderer2D::drawString({.transform = transform.getTransform(),
+										  .text = text.text,
+										  .font = text.font,
+										  .color = text.color,
+										  .kerning = text.kerning,
+										  .lineSpacing = text.lineSpacing,
 										  .entityId = static_cast<int>(entity)});
 	}
 }
@@ -179,6 +186,7 @@ auto Scene::duplicateEntity(const Entity& iEntity) -> Entity {
 	copyComponentIfExists<component::CircleRenderer>(newEntity, iEntity);
 	copyComponentIfExists<component::Camera>(newEntity, iEntity);
 	copyComponentIfExists<component::NativeScript>(newEntity, iEntity);
+	copyComponentIfExists<component::Text>(newEntity, iEntity);
 	//copyComponentIfExists<component::Rigidbody2D>(newEntity, iEntity);
 	//copyComponentIfExists<component::BoxCollider2D>(newEntity, iEntity);
 
@@ -230,5 +238,15 @@ Scene::onComponentAdded<component::CircleRenderer>([[maybe_unused]] const Entity
 template<>
 OWL_API void Scene::onComponentAdded<component::NativeScript>([[maybe_unused]] const Entity& iEntity,
 															  [[maybe_unused]] component::NativeScript& ioComponent) {}
+
+template<>
+OWL_API void Scene::onComponentAdded<component::Text>([[maybe_unused]] const Entity& iEntity,
+													  [[maybe_unused]] component::Text& ioComponent) {
+	if (ioComponent.font == nullptr) {
+		if (core::Application::instanced()) {
+			ioComponent.font = core::Application::get().getFontLibrary().getDefaultFont();
+		}
+	}
+}
 
 }// namespace owl::scene

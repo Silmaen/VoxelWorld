@@ -9,10 +9,23 @@
 #pragma once
 
 #include "core/Core.h"
+#include "math/vectors.h"
 
 #include <filesystem>
 
 namespace owl::renderer {
+
+/**
+ * @brief Pixel format of images.
+ */
+enum struct ImageFormat : uint8_t {
+	None,///< Nothing.
+	R8,///< One 8bits channel
+	RGB8,///< Three 8bits-channels.
+	RGBA8,///< Four 8bits-channels.
+	RGBA32F,///< Four float channels.
+};
+
 class TextureLibrary;
 /**
  * @brief Class Texture.
@@ -33,20 +46,36 @@ public:
 	 * @param[in] iPath path to the texture image file.
 	 */
 	explicit Texture(std::filesystem::path iPath);
-	/**
-	 * @brief Constructor by size.
-	 * @param[in] iWidth Texture's width.
-	 * @param[in] iHeight Texture's height.
-	 * @param[in] iWithAlpha Texture has alpha channel.
-	 */
-	Texture(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha);
-	/**
-	 * @brief Constructor by size.
-	 * @param[in] iSize Texture's width.
-	 * @param[in] iWithAlpha Texture has alpha channel.
-	 */
-	explicit Texture(const math::vec2ui& iSize, bool iWithAlpha = true);
 
+	/// Texture Specifications.
+	struct Specification {
+		/// Texture size.
+		math::vec2ui size;
+		/// Pixel format.
+		ImageFormat format = ImageFormat::RGBA8;
+		/// If mips should be generated
+		bool generateMips = true;
+		/**
+		 * @brief Express specifications as strings.
+		 * @return Specs as string.
+		 */
+		[[nodiscard]] auto toString() const -> std::string;
+		/**
+		 * @brief Decode a string to set specifications.
+		 * @param iString String to decode.
+		 */
+		void fromString(const std::string& iString);
+		/**
+		 * @brief Compute size of data per pixel.
+		 * @return Pixel's data size..
+		 */
+		[[nodiscard]] auto getPixelSize() const -> uint8_t;
+	};
+	/**
+	 * @brief Constructor by specifications.
+	 * @param[in] iSpecs The texture's specification.
+	 */
+	explicit Texture(const Specification& iSpecs);
 	/**
 	 * @brief Comparison operator.
 	 * @param[in] iOther Other texture to compare.
@@ -58,13 +87,13 @@ public:
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] auto getSize() const -> math::vec2ui { return m_size; }
+	[[nodiscard]] auto getSize() const -> math::vec2ui { return m_specification.size; }
 
 	/**
 	 * @brief Tells if the data effectively loaded.
 	 * @return True if texture contains data.
 	 */
-	[[nodiscard]] auto isLoaded() const -> bool { return m_size.surface() > 0; }
+	[[nodiscard]] auto isLoaded() const -> bool { return m_specification.size.surface() > 0; }
 
 	/**
 	 * @brief Get renderer id.
@@ -103,13 +132,17 @@ public:
 	 */
 	[[nodiscard]] auto getSerializeString() const -> std::string;
 
+	/**
+	 * @brief Access to the texture's specifications.
+	 * @return Specifications.
+	 */
+	[[nodiscard]] auto getSpecification() const -> const Specification& { return m_specification; }
+
 protected:
-	/// Texture's size.
-	math::vec2ui m_size = {0, 0};
+	/// Eventually the specifications.
+	Specification m_specification;
 	/// Path to the texture file.
 	std::filesystem::path m_path;
-	/// If texture has alpha.
-	bool m_hasAlpha{false};
 
 private:
 	/// The texture's name.
@@ -131,18 +164,10 @@ public:
 	 */
 	explicit Texture2D(std::filesystem::path iPath);
 	/**
-	 * @brief Constructor by size.
-	 * @param[in] iWidth Texture's width.
-	 * @param[in] iHeight Texture's height.
-	 * @param[in] iWithAlpha Texture has alpha channel.
+	 * @brief Constructor by specifications.
+	 * @param[in] iSpecs The texture's specification.
 	 */
-	Texture2D(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true);
-	/**
-	 * @brief Constructor by size.
-	 * @param[in] iSize Texture's width.
-	 * @param[in] iWithAlpha Texture has alpha channel.
-	 */
-	explicit Texture2D(const math::vec2ui& iSize, bool iWithAlpha = true);
+	explicit Texture2D(const Specification& iSpecs);
 	/**
 	 * @brief Creates the texture with the given filename.
 	 * @param[in] iFile The path to the file to load.
@@ -166,19 +191,10 @@ public:
 
 	/**
 	 * @brief Creates the texture with the given size.
-	 * @param[in] iSize The texture's size.
-	 * @param[in] iWithAlpha If the texture has alpha channel.
+	 * @param[in] iSpecs The texture's specification.
 	 * @return Resulting texture.
 	 */
-	static auto create(const math::vec2ui& iSize, bool iWithAlpha = true) -> shared<Texture2D>;
-	/**
-	 * @brief Creates the texture with the given size.
-	 * @param[in] iWidth The texture's width.
-	 * @param[in] iHeight The texture's height.
-	 * @param[in] iWithAlpha If the texture has alpha channel.
-	 * @return Resulting texture.
-	 */
-	static auto create(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true) -> shared<Texture2D>;
+	static auto create(const Specification& iSpecs) -> shared<Texture2D>;
 };
 OWL_DIAG_POP
 

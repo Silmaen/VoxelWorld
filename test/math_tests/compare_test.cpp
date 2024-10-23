@@ -1,5 +1,7 @@
 #include "testHelper.h"
 
+#include "math/linAlgebra.h"
+#include "math/matrixCreation.h"
 #include "mathHelpers.h"
 
 using namespace owl;

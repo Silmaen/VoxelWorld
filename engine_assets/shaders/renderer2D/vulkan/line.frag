@@ -7,8 +7,8 @@ struct VertexOutput {
     vec4 Color;
 };
 
-layout (location = 0) in VertexOutput Input;
-layout (location = 1) in flat int v_EntityID;
+layout (location = 0) in VertexOutput i_Vertex;
+layout (location = 1) in flat int i_EntityID;
 
 // convert color space to linear!
 vec4 sRGBToLinear(vec4 srgbColor) {
@@ -22,6 +22,6 @@ vec4 sRGBToLinear(vec4 srgbColor) {
 }
 
 void main() {
-    o_Color = sRGBToLinear(Input.Color);
-    o_EntityID = v_EntityID;
+    o_Color = sRGBToLinear(i_Vertex.Color);
+    o_EntityID = i_EntityID;
 }

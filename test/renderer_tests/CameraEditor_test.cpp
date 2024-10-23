@@ -7,10 +7,10 @@
 using namespace owl::renderer;
 
 TEST(CameraEditor, defaultCreation) {
-	CameraEditor const cam;
+	const CameraEditor cam;
 	EXPECT_EQ(cam.getDistance(), 10.f);
 	const auto proj = cam.getViewProjection();
-	const auto view = cam.getViewMatrix();
+	const auto view = cam.getView();
 	EXPECT_EQ(proj(0, 0), view(0, 0));
 	EXPECT_TRUE(cam.getPosition() == owl::math::vec3({0.f, 0.f, 0.f}));
 	EXPECT_EQ(cam.getPitch(), 0.f);
@@ -23,10 +23,10 @@ TEST(CameraEditor, defaultCreation) {
 }
 
 TEST(CameraEditor, fovCreation) {
-	CameraEditor const cam(45, 1.5f, 0.1f, 15);
+	const CameraEditor cam(45, 1.5f, 0.1f, 15);
 	EXPECT_EQ(cam.getDistance(), 10.f);
 	const auto proj = cam.getViewProjection();
-	const auto view = cam.getViewMatrix();
+	const auto view = cam.getView();
 	EXPECT_EQ(view(0, 0), 1.f);
 	EXPECT_NEAR(proj(0, 0), 1.6094f, 0.001);
 	EXPECT_TRUE(cam.getPosition() == owl::math::vec3({0.f, 0.f, 10.f}));

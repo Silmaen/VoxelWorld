@@ -9,6 +9,7 @@
 #pragma once
 #include "core/Core.h"
 #include "event/Event.h"
+#include "math/vectors.h"
 #include "renderer/GraphContext.h"
 
 namespace owl::input {

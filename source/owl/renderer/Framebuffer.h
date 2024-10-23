@@ -9,6 +9,7 @@
 #pragma once
 
 #include "core/Core.h"
+#include "math/vectors.h"
 
 namespace owl::renderer {
 /**
@@ -24,7 +25,7 @@ struct AttachmentSpecification {
 		RedInteger,
 		/// Depth/stencil.
 		Depth24Stencil8,
-		/// Surface for swapchain.
+		/// Surface for swap chain.
 		Surface,
 	};
 
@@ -53,9 +54,9 @@ struct FramebufferSpecification {
 	std::vector<AttachmentSpecification> attachments;
 	/// Amount of sample.
 	uint32_t samples = 1;
-	/// If chained target must be swap.
+	/// If chained target must be swapped.
 	bool swapChainTarget = false;
-	/// Name that can be use to identify the frame buffer in debug.
+	/// Name that can be used to identify the frame buffer in debug.
 	std::string debugName = "main";
 };
 

@@ -48,8 +48,8 @@ void Renderer::reset() {
 	m_textureLibrary.reset();
 }
 
-void Renderer::beginScene(const CameraOrtho &iCamera) {
-	m_sceneData->viewProjectionMatrix = iCamera.getViewProjectionMatrix();
+void Renderer::beginScene(const Camera &iCamera) {
+	m_sceneData->viewProjectionMatrix = iCamera.getViewProjection();
 }
 
 void Renderer::endScene() {}

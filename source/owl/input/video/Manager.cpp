@@ -8,6 +8,7 @@
 #include "owlpch.h"
 
 #include "Manager.h"
+#include "math/vectors.h"
 
 #if defined(OWL_PLATFORM_WINDOWS)
 #include "windows/Device.h"

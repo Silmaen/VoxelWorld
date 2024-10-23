@@ -14,7 +14,7 @@ namespace owl::renderer::null {
 /**
  * @brief Class Texture.
  */
-class OWL_API Texture2D final : public ::owl::renderer::Texture2D {
+class OWL_API Texture2D final : public renderer::Texture2D {
 public:
 	Texture2D(const Texture2D&) = default;
 	Texture2D(Texture2D&&) = default;
@@ -26,19 +26,12 @@ public:
 	 * @param[in] iPath path to the texture image file.
 	 */
 	explicit Texture2D(std::filesystem::path iPath);
+
 	/**
-	 * @brief Constructor by size.
-	 * @param[in] iWidth Texture's width.
-	 * @param[in] iHeight Texture's height.
-	 * @param[in] iWithAlpha Texture has alpha channel.
+	 * @brief Constructor by specifications.
+	 * @param[in] iSpecs The texture's specification.
 	 */
-	Texture2D(uint32_t iWidth, uint32_t iHeight, bool iWithAlpha = true);
-	/**
-	 * @brief Constructor by size.
-	 * @param[in] iSize Texture's width.
-	 * @param[in] iWithAlpha Texture has alpha channel.
-	 */
-	explicit Texture2D(math::vec2ui iSize, bool iWithAlpha = true);
+	explicit Texture2D(const Specification& iSpecs);
 
 	/**
 	 * @brief Destructor.

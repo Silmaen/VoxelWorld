@@ -1,14 +1,15 @@
 
-#include "renderer/null/Texture.h"
 #include "testHelper.h"
 
 #include <renderer/Texture.h>
+#include <renderer/null/Texture.h>
 #include <scene/Entity.h>
 #include <scene/Scene.h>
 #include <scene/SceneSerializer.h>
 #include <scene/component/Camera.h>
 #include <scene/component/CircleRenderer.h>
 #include <scene/component/SpriteRenderer.h>
+#include <scene/component/Text.h>
 #include <scene/component/Transform.h>
 
 using namespace owl::scene;
@@ -40,8 +41,10 @@ TEST(SceneSerializer, SaveLoadFULL) {
 	ent.addOrReplaceComponent<component::CircleRenderer>();
 	ent.addOrReplaceComponent<component::SpriteRenderer>();
 	auto ent2 = sc->createEntityWithUUID(7, "bobObject2");
-	auto &spr = ent2.addOrReplaceComponent<component::SpriteRenderer>();
-	spr.texture = owl::mkShared<owl::renderer::null::Texture2D>(1, 1);
+	auto& spr = ent2.addOrReplaceComponent<component::SpriteRenderer>();
+	ent2.addOrReplaceComponent<component::Text>();
+	spr.texture =
+			owl::mkShared<owl::renderer::null::Texture2D>(owl::renderer::Texture2D::Specification{.size = {1, 1}});
 	spr.tilingFactor = 12.3f;
 
 	const SceneSerializer saver(sc);
@@ -66,7 +69,7 @@ TEST(SceneSerializer, badScene) {
 	// write bad file
 	{
 		std::ofstream file(fs);
-		file << "Bob: toto" << std::endl;
+		file << "Bob: toto\n";
 		file.close();
 		const auto sc = owl::mkShared<Scene>();
 		const SceneSerializer loader(sc);
@@ -76,8 +79,8 @@ TEST(SceneSerializer, badScene) {
 	// write bad file
 	{
 		std::ofstream file(fs);
-		file << "Scene: untitled" << std::endl;
-		file << "  - je suis une fougère.:" << std::endl;
+		file << "Scene: untitled\n";
+		file << "  - je suis une fougère.:\n";
 		file.close();
 		const auto sc = owl::mkShared<Scene>();
 		const SceneSerializer loader(sc);
@@ -87,13 +90,13 @@ TEST(SceneSerializer, badScene) {
 	// write another bad file
 	{
 		std::ofstream file(fs);
-		file << "Scene: untitled" << std::endl;
-		file << "Entities:" << std::endl;
-		file << "  - Entity: 1" << std::endl;
-		file << "  - Entity: 2" << std::endl;
-		file << "    SpriteRenderer:" << std::endl;
-		file << "      color: 0.949019611" << std::endl;
-		file << "  - Entity: 3" << std::endl;
+		file << "Scene: untitled\n";
+		file << "Entities:\n";
+		file << "  - Entity: 1\n";
+		file << "  - Entity: 2\n";
+		file << "    SpriteRenderer:\n";
+		file << "      color: 0.949019611\n";
+		file << "  - Entity: 3\n";
 		file.close();
 		const auto sc = owl::mkShared<Scene>();
 		const SceneSerializer loader(sc);
@@ -103,12 +106,12 @@ TEST(SceneSerializer, badScene) {
 	// write another bad file
 	{
 		std::ofstream file(fs);
-		file << "Scene: untitled" << std::endl;
-		file << "Entities:" << std::endl;
-		file << "  - Entity: 1" << std::endl;
-		file << "  - Entity: 2" << std::endl;
-		file << "    Transform:" << std::endl;
-		file << "      translation: 0.353553385" << std::endl;
+		file << "Scene: untitled\n";
+		file << "Entities:\n";
+		file << "  - Entity: 1\n";
+		file << "  - Entity: 2\n";
+		file << "    Transform:\n";
+		file << "      translation: 0.353553385\n";
 		file.close();
 		const auto sc = owl::mkShared<Scene>();
 		const SceneSerializer loader(sc);
@@ -118,12 +121,12 @@ TEST(SceneSerializer, badScene) {
 	// write another bad file
 	{
 		std::ofstream file(fs);
-		file << "Scene: untitled" << std::endl;
-		file << "Entities:" << std::endl;
-		file << "  - Entity: 1" << std::endl;
-		file << "  - Entity: 3" << std::endl;
-		file << "    Transform:" << std::endl;
-		file << "      translation: [0.353553385, 0]" << std::endl;
+		file << "Scene: untitled\n";
+		file << "Entities:\n";
+		file << "  - Entity: 1\n";
+		file << "  - Entity: 3\n";
+		file << "    Transform:\n";
+		file << "      translation: [0.353553385, 0]\n";
 		file.close();
 		const auto sc = owl::mkShared<Scene>();
 		const SceneSerializer loader(sc);
@@ -133,12 +136,12 @@ TEST(SceneSerializer, badScene) {
 	// write another bad file
 	{
 		std::ofstream file(fs);
-		file << "Scene: untitled" << std::endl;
-		file << "Entities:" << std::endl;
-		file << "  - Entity: 1" << std::endl;
-		file << "  - Entity: 3" << std::endl;
-		file << "    SpriteRenderer:" << std::endl;
-		file << "      color: [0, 0.949019611]" << std::endl;
+		file << "Scene: untitled\n";
+		file << "Entities:\n";
+		file << "  - Entity: 1\n";
+		file << "  - Entity: 3\n";
+		file << "    SpriteRenderer:\n";
+		file << "      color: [0, 0.949019611]\n";
 		file.close();
 		const auto sc = owl::mkShared<Scene>();
 		const SceneSerializer loader(sc);

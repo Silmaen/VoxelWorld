@@ -69,7 +69,7 @@ auto main(int iArgc, char* iArgv[]) -> int {
 #if OWL_TRACKER_VERBOSITY >= 2
 		if (memoryState.allocationCalls > memoryState.deallocationCalls) {
 			OWL_CORE_INFO("Remaining memory chunks  :", memoryState.allocationCalls)
-			for (const auto& alloc: memoryState.allocs) { OWL_CORE_INFO("* {}", alloc.toStr(true, true)) }
+			for (const auto& alloc: memoryState.allocs) { OWL_CORE_INFO("* {}", alloc.toStr(false, false)) }
 		}
 #endif
 	}

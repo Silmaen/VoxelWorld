@@ -1,12 +1,13 @@
 
+#include "math/matrixCreation.h"
 #include "testHelper.h"
 
-#include <core/Core.h>
+#include <math/linAlgebra.h>
 
 using namespace owl::math;
 
 TEST(math, matrixBase) {
-	mat3 const mat{1, 2, 3, 4, 5, 6, 7, 8, 9};
+	const mat3 mat{1, 2, 3, 4, 5, 6, 7, 8, 9};
 	EXPECT_NEAR(mat.norm(), 16.15549, 0.001);
 	EXPECT_FALSE(mat == mat3({9, 8, 7, 6, 5, 4, 3, 2, 1}));
 	EXPECT_TRUE(mat != mat3({9, 8, 7, 6, 5, 4, 3, 2, 1}));
@@ -24,8 +25,8 @@ TEST(math, matrixBase) {
 }
 
 TEST(math, matrixAddition) {
-	mat3 const mat1{1, 2, 3, 4, 5, 6, 7, 8, 9};
-	mat3 const mat2{9, 8, 7, 6, 5, 4, 3, 2, 1};
+	const mat3 mat1{1, 2, 3, 4, 5, 6, 7, 8, 9};
+	const mat3 mat2{9, 8, 7, 6, 5, 4, 3, 2, 1};
 	mat3 madd = mat1 + mat2;
 	EXPECT_NEAR(madd(1, 1), 10, 0.0001);
 	madd = mat2 - mat1;
@@ -33,7 +34,7 @@ TEST(math, matrixAddition) {
 }
 
 TEST(math, matrixScalar) {
-	mat3 const mat1{1, 2, 3, 4, 5, 6, 7, 8, 9};
+	const mat3 mat1{1, 2, 3, 4, 5, 6, 7, 8, 9};
 	mat3 madd = mat1 * 2;
 	EXPECT_NEAR(madd(1, 1), 10, 0.0001);
 	madd = 7 * mat1;
@@ -44,11 +45,11 @@ TEST(math, matrixScalar) {
 
 
 TEST(math, matrixProduct) {
-	mat3 const mat1{1, 2, 3, 4, 5, 6, 7, 8, 9};
-	mat3 const mat2{9, 8, 7, 6, 5, 4, 3, 2, 1};
+	const mat3 mat1{1, 2, 3, 4, 5, 6, 7, 8, 9};
+	const mat3 mat2{9, 8, 7, 6, 5, 4, 3, 2, 1};
 	mat3 madd = mat1 * mat2;
 	EXPECT_NEAR(madd(1, 1), 69, 0.0001);
-	mat3 const mat3{1, 0, 0, 0, 1, 0, 0, 0, 1};
+	const mat3 mat3{1, 0, 0, 0, 1, 0, 0, 0, 1};
 	madd = mat1 * mat3;
 	EXPECT_NEAR(madd(1, 1), 5, 0.0001);
 	madd *= mat1;

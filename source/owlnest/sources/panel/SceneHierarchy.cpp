@@ -9,6 +9,7 @@
 #include "SceneHierarchy.h"
 
 #include <imgui_internal.h>
+#include <scene/component/Text.h>
 
 namespace owl::nest::panel {
 
@@ -158,12 +159,12 @@ void drawComponent(const std::string& iName, scene::Entity& ioEntity, UIFunction
 		auto& component = ioEntity.getComponent<T>();
 		const ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
-		const float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		const float lineHeight = GImGui->Font->FontSize + (GImGui->Style.FramePadding.y * 2.0f);
 		ImGui::Separator();
 		const bool open =
 				ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(T).hash_code()), treeNodeFlags, "%s", iName.c_str());
 		ImGui::PopStyleVar();
-		ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+		ImGui::SameLine(contentRegionAvailable.x - (lineHeight * 0.5f));
 		if (ImGui::Button("+", ImVec2{lineHeight, lineHeight})) {
 			ImGui::OpenPopup("ComponentSettings");
 		}
@@ -221,23 +222,30 @@ void SceneHierarchy::drawComponents(scene::Entity& ioEntity) {
 				ImGui::CloseCurrentPopup();
 			}
 		}
+		if (!m_selection.hasComponent<scene::component::Text>()) {
+			if (ImGui::MenuItem("Text Renderer")) {
+				m_selection.addComponent<scene::component::Text>();
+				ImGui::CloseCurrentPopup();
+			}
+		}
 		ImGui::EndPopup();
 	}
 	ImGui::PopItemWidth();
 
-	drawComponent<scene::component::Transform>("Transform", ioEntity, [](auto& component) {
-		drawVec3Control("Translation", component.translation);
-		math::vec3 rotation = math::degrees(component.rotation);
+	drawComponent<scene::component::Transform>("Transform", ioEntity, [](auto& ioComponent) {
+		drawVec3Control("Translation", ioComponent.translation);
+		math::vec3 rotation = math::degrees(ioComponent.rotation);
 		drawVec3Control("Rotation", rotation);
-		component.rotation = math::radians(rotation);
-		drawVec3Control("Scale", component.scale, 1.0f);
+		ioComponent.rotation = math::radians(rotation);
+		drawVec3Control("Scale", ioComponent.scale, 1.0f);
 	});
-	drawComponent<scene::component::Camera>("Camera", ioEntity, [](auto& component) {
-		auto& camera = component.camera;
-		ImGui::Checkbox("Primary", &component.primary);
+	drawComponent<scene::component::Camera>("Camera", ioEntity, [](auto& ioComponent) {
+		auto& camera = ioComponent.camera;
+		ImGui::Checkbox("Primary", &ioComponent.primary);
 		const char* projectionTypeStrings[] = {"Perspective", "Orthographic"};
-		const char* currentProjectionTypeString = projectionTypeStrings[static_cast<int>(camera.getProjectionType())];
-		if (ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
+		if (const char* currentProjectionTypeString =
+					projectionTypeStrings[static_cast<int>(camera.getProjectionType())];
+			ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
 			for (int i = 0; i < 2; i++) {
 				const bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
 				if (ImGui::Selectable(projectionTypeStrings[i], isSelected)) {
@@ -270,26 +278,37 @@ void SceneHierarchy::drawComponents(scene::Entity& ioEntity) {
 			float orthoFar = camera.getOrthographicFarClip();
 			if (ImGui::DragFloat("Far", &orthoFar))
 				camera.setOrthographicFarClip(orthoFar);
-			ImGui::Checkbox("Fixed Aspect Ratio", &component.fixedAspectRatio);
+			ImGui::Checkbox("Fixed Aspect Ratio", &ioComponent.fixedAspectRatio);
 		}
 	});
-	drawComponent<scene::component::SpriteRenderer>("Sprite Renderer", ioEntity, [](auto& component) {
-		ImGui::ColorEdit4("Color", component.color.data());
+	drawComponent<scene::component::SpriteRenderer>("Sprite Renderer", ioEntity, [](auto& ioComponent) {
+		ImGui::ColorEdit4("Color", ioComponent.color.data());
 		ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 				const auto* const path = static_cast<const char*>(payload->Data);
 				const std::filesystem::path texturePath = core::Application::get().getFullAssetPath(path).value();
-				component.texture = renderer::Texture2D::create(texturePath);
+				ioComponent.texture = renderer::Texture2D::create(texturePath);
 			}
 			ImGui::EndDragDropTarget();
 		}
-		ImGui::DragFloat("Tiling Factor", &component.tilingFactor, 0.1f, 0.0f, 100.0f);
+		ImGui::DragFloat("Tiling Factor", &ioComponent.tilingFactor, 0.1f, 0.0f, 100.0f);
 	});
-	drawComponent<scene::component::CircleRenderer>("Circle Renderer", ioEntity, [](auto& component) {
-		ImGui::ColorEdit4("Color", component.color.data());
-		ImGui::DragFloat("Thickness", &component.thickness, 0.025f, 0.0f, 1.0f);
-		ImGui::DragFloat("Fade", &component.fade, 0.00025f, 0.0f, 1.0f);
+	drawComponent<scene::component::CircleRenderer>("Circle Renderer", ioEntity, [](auto& ioComponent) {
+		ImGui::ColorEdit4("Color", ioComponent.color.data());
+		ImGui::DragFloat("Thickness", &ioComponent.thickness, 0.025f, 0.0f, 1.0f);
+		ImGui::DragFloat("Fade", &ioComponent.fade, 0.00025f, 0.0f, 1.0f);
+	});
+	drawComponent<scene::component::Text>("Text Renderer", ioEntity, [](auto& ioComponent) {
+		const size_t size = 500 + ioComponent.text.size();
+		std::string temp{ioComponent.text};
+		temp.reserve(size);
+		if (ImGui::InputTextMultiline("Text String", temp.data(), size)) {
+			ioComponent.text = temp.c_str();
+		}
+		ImGui::ColorEdit4("Color", ioComponent.color.data());
+		ImGui::DragFloat("Kerning", &ioComponent.kerning, 0.025f);
+		ImGui::DragFloat("Line Spacing", &ioComponent.lineSpacing, 0.025f);
 	});
 }
 OWL_DIAG_POP

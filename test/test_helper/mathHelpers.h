@@ -7,8 +7,8 @@
  */
 
 #pragma once
-#include <core/Core.h>
-
+#include <math/matrices.h>
+#include <math/quaternion.h>
 
 static constexpr bool matrixCompare(const owl::math::mat4& gmat, const owl::math::mat4& mmat) {
 	bool same = true;

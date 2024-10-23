@@ -72,7 +72,7 @@ public:
 	 * @brief Begins a scene.
 	 * @param[in] iCamera The camera.
 	 */
-	static void beginScene(const CameraOrtho& iCamera);
+	static void beginScene(const Camera& iCamera);
 
 	/**
 	 * @brief Ends a scene.

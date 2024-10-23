@@ -12,10 +12,13 @@
 #include "RenderAPI.h"
 #include "RenderCommand.h"
 #include "input/Input.h"
+#include "math/linAlgebra.h"
 
 namespace owl::renderer {
 
 Camera::~Camera() = default;
+
+void Camera::updateViewProjection() { m_viewProjection = m_projection * m_view; }
 
 CameraEditor::CameraEditor(const float iFov, const float iAspectRatio, const float iNearClip, const float iFarClip)
 	: Camera(math::perspective(math::radians(iFov), iAspectRatio, iNearClip, iFarClip)), m_fov(iFov),
@@ -43,19 +46,19 @@ void CameraEditor::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) {
 void CameraEditor::onEvent(event::Event& ioEvent) {
 	event::EventDispatcher dispatcher(ioEvent);
 	dispatcher.dispatch<event::MouseScrolledEvent>(
-			[&](auto&& TZ1) { return onMouseScroll(std::forward<decltype(TZ1)>(TZ1)); });
+			[&]<typename T0>(T0&& ioTz1) { return onMouseScroll(std::forward<T0>(ioTz1)); });
 }
 
 auto CameraEditor::getUpDirection() const -> math::vec3 {
-	return math::rotate(getOrientation(), math::vec3({0.0f, 1.0f, 0.0f}));
+	return rotate(getOrientation(), math::vec3({0.0f, 1.0f, 0.0f}));
 }
 
 auto CameraEditor::getRightDirection() const -> math::vec3 {
-	return math::rotate(getOrientation(), math::vec3({1.0f, 0.0f, 0.0f}));
+	return rotate(getOrientation(), math::vec3({1.0f, 0.0f, 0.0f}));
 }
 
 auto CameraEditor::getForwardDirection() const -> math::vec3 {
-	return math::rotate(getOrientation(), math::vec3({0.0f, 0.0f, -1.0f}));
+	return rotate(getOrientation(), math::vec3({0.0f, 0.0f, -1.0f}));
 }
 
 auto CameraEditor::getOrientation() const -> math::quat { return {1.0, -m_pitch, -m_yaw, 0.0f}; }
@@ -70,6 +73,7 @@ void CameraEditor::updateProjection() {
 		m_projection = biasMatrix * m_projection;
 		m_projection(1, 1) *= -1.f;
 	}
+	updateViewProjection();
 }
 
 void CameraEditor::updateView() {
@@ -77,8 +81,9 @@ void CameraEditor::updateView() {
 	m_position = calculatePosition();
 
 	const math::quat orientation = getOrientation();
-	m_viewMatrix = math::translate(math::identity<float, 4>(), m_position) * math::toMat4(orientation);
-	m_viewMatrix = math::inverse(m_viewMatrix);
+	m_view = translate(math::identity<float, 4>(), m_position) * toMat4(orientation);
+	m_view = inverse(m_view);
+	updateViewProjection();
 }
 
 auto CameraEditor::onMouseScroll(const event::MouseScrolledEvent& iEvent) -> bool {

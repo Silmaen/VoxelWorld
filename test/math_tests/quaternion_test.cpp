@@ -1,5 +1,6 @@
 #include "testHelper.h"
 
+#include "math/matrixCreation.h"
 #include "mathHelpers.h"
 
 using namespace owl;
@@ -20,7 +21,7 @@ TEST(math, quaternionBase) {
 TEST(math, quaternionRotation) {
 	const math::quat qr({0, 0, 0});
 	EXPECT_TRUE(quatCompare(qr, {1, 0, 0, 0}));
-	const math::mat4 mat = math::toMat4(qr);
+	const math::mat4 mat = toMat4(qr);
 	EXPECT_TRUE(matrixCompare(mat, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}));
 }
 

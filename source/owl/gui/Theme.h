@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include "math/vectors.h"
+
 namespace owl::gui {
 
 /**

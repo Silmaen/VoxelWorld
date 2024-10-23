@@ -10,8 +10,7 @@
 
 #include "core/Timestep.h"
 #include "core/UUID.h"
-#include "renderer/CameraEditor.h"
-#include "renderer/CameraOrtho.h"
+#include "renderer/Camera.h"
 
 #include <entt/entt.hpp>
 /**
@@ -74,18 +73,11 @@ public:
 	void onUpdateRuntime(const core::Timestep& iTimeStep);
 
 	/**
-	 * @brief Update action in the editor.
+	 * @brief Update actions in the editor, external camera, no gameplay.
 	 * @param[in] iTimeStep The time step.
 	 * @param[in] iCamera The editor camera.
 	 */
-	void onUpdateEditor(const core::Timestep& iTimeStep, const renderer::CameraEditor& iCamera);
-
-	/**
-	 * @brief Update action in the editor.
-	 * @param[in] iTimeStep The time step.
-	 * @param[in] iCamera The ortho camera.
-	 */
-	void onUpdateOrtho(const core::Timestep& iTimeStep, const renderer::CameraOrtho& iCamera);
+	void onUpdateEditor(const core::Timestep& iTimeStep, const renderer::Camera& iCamera);
 
 	/**
 	 * @brief Action when viewport resized.
@@ -127,4 +119,5 @@ private:
 	friend class Entity;
 	friend class ScriptableEntity;
 };
+
 }// namespace owl::scene

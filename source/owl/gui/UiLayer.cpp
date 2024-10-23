@@ -124,8 +124,8 @@ void UiLayer::begin() const {
 
 void UiLayer::end() const {
 	OWL_PROFILE_FUNCTION()
-	if ((renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL) &&
-		(renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::Vulkan))
+	if (renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL &&
+		renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::Vulkan)
 		return;
 	if (m_dockingEnable) {
 		ImGui::End();

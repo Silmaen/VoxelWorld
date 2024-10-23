@@ -1,6 +1,7 @@
 
 #include "testHelper.h"
 
+#include <math/vectors.h>
 #include <ranges>
 #include <renderer/null/Buffer.h>
 #include <renderer/null/DrawData.h>

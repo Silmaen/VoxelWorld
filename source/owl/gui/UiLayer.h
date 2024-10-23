@@ -87,6 +87,12 @@ public:
 	 */
 	void disableApp() { m_withApp = false; }
 
+	/**
+	 * @brief Get the active widget id.
+	 * @return The active widget id.
+	 */
+	static auto getActiveWidgetId() -> uint32_t;
+
 private:
 	/// If event should be bocked.
 	bool m_blockEvent = true;
