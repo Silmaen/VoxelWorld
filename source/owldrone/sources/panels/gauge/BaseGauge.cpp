@@ -9,18 +9,21 @@
 
 namespace drone::panels::gauge {
 namespace {
-const char *texName = "textures/GaugeCover";
+const char* texName = "textures/GaugeCover";
 }// namespace
 
 BaseGauge::BaseGauge() {
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
 	if (!textureLib.exists(texName))
 		textureLib.addFromStandardPath(texName);
-	coverTexture = textureLib.get(texName);
+	m_coverTexture = textureLib.get(texName);
 }
 
 BaseGauge::~BaseGauge() = default;
 
-void BaseGauge::drawCover() { owl::renderer::Renderer2D::drawQuad({.transform = transform, .texture = coverTexture}); }
+void BaseGauge::drawCover() const {
+	const owl::math::Transform transform{getPosition(), {0, 0, 0}, getScale()};
+	owl::renderer::Renderer2D::drawQuad({.transform = transform, .texture = m_coverTexture});
+}
 
 }// namespace drone::panels::gauge

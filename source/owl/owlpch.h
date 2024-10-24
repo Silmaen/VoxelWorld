@@ -39,8 +39,11 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include <ranges>
 #endif
 
+// Internal debug includes
 #include "debug/Profiler.h"
 #include "debug/Tracker.h"
+// Internal Math library
+#include "math/math.h"
 
 // third party
 #include <entt/entt.hpp>

@@ -59,10 +59,9 @@ void Base2D::onUpdate(const core::Timestep& iTs) {
 	// Background
 	{
 		renderer::Renderer2D::beginScene(m_cameraController.getCamera());
-		renderer::Renderer2D::drawQuad(
-				{.transform = renderer::utils::PRS{.position = {0.0f, 0.0f, -0.1f}, .size = {20.0f, 20.0f}},
-				 .texture = m_checkerboardTexture,
-				 .tilingFactor = 10.f});
+		renderer::Renderer2D::drawQuad({.transform = math::Transform{{0.0f, 0.0f, -0.1f}, {}, {20.0f, 20.0f, 0.f}},
+										.texture = m_checkerboardTexture,
+										.tilingFactor = 10.f});
 		renderer::Renderer2D::endScene();
 	}
 	// First part of the scene
@@ -79,8 +78,7 @@ void Base2D::onUpdate(const core::Timestep& iTs) {
 				const float y = -5.0f + static_cast<float>(idy) * scaley;
 				const math::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f};
 				renderer::Renderer2D::drawQuad(
-						{.transform = renderer::utils::PRS{.position = {x, y, -0.05f},
-														   .size = {scalex * marg, scaley * marg}},
+						{.transform = math::Transform{{x, y, -0.05f}, {}, {scalex * marg, scaley * marg, 0}},
 						 .color = color,
 						 .entityId = id});
 				id++;
@@ -93,31 +91,26 @@ void Base2D::onUpdate(const core::Timestep& iTs) {
 		OWL_PROFILE_SCOPE("Render Draws 1")
 		renderer::Renderer2D::beginScene(m_cameraController.getCamera());
 		renderer::Renderer2D::drawQuad({
-				.transform =
-						renderer::utils::PRS{.position = {1.0f, 0.0f, 0.0f}, .rotation = -45.f, .size = {0.8f, 0.8f}},
+				.transform = math::Transform{{1.0f, 0.0f, 0.0f}, {0, 0, -45.f}, {0.8f, 0.8f, 0}},
 				.color = {0.8f, 0.2f, 0.3f, 1.0f},
 		});
+		renderer::Renderer2D::drawQuad({.transform = math::Transform{{-1.0f, 0.0f, 0.0f}, {}, {0.8f, 0.8f, 0}},
+										.color = {0.8f, 0.2f, 0.3f, 1.0f}});
 		renderer::Renderer2D::drawQuad(
-				{.transform = renderer::utils::PRS{.position = {-1.0f, 0.0f, 0.0f}, .size = {0.8f, 0.8f}},
-				 .color = {0.8f, 0.2f, 0.3f, 1.0f}});
+				{.transform = math::Transform{{0.5f, -0.5f, 0.0f}, {}, {0.5f, 0.75f, 0}}, .color = m_squareColor});
 		renderer::Renderer2D::drawQuad(
-				{.transform = renderer::utils::PRS{.position = {0.5f, -0.5f, 0.0f}, .size = {0.5f, 0.75f}},
-				 .color = m_squareColor});
-		renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = {-2.0f, 0.0f, 0.0f},
-																		  .rotation = rotation,
-																		  .size = {1.0f, 1.0f}},
-										.texture = m_checkerboardTexture,
-										.tilingFactor = 20.f});
+				{.transform = math::Transform{{-2.0f, 0.0f, 0.0f}, {0, 0, rotation}, {1.0f, 1.0f, 0}},
+				 .texture = m_checkerboardTexture,
+				 .tilingFactor = 20.f});
 		renderer::Renderer2D::endScene();
 	}
 	// third part of the scene Movable sprite.
 	{
 		renderer::Renderer2D::beginScene(m_cameraController.getCamera());
-		renderer::Renderer2D::drawQuad({.transform = renderer::utils::PRS{.position = m_spritePosition,
-																		  .rotation = m_spriteRotation,
-																		  .size = {1.0f, 1.0f}},
-										.texture = m_spriteTexture,
-										.tilingFactor = 1.f});
+		renderer::Renderer2D::drawQuad(
+				{.transform = math::Transform{m_spritePosition, {0, 0, m_spriteRotation}, {1.0f, 1.0f, 0}},
+				 .texture = m_spriteTexture,
+				 .tilingFactor = 1.f});
 		renderer::Renderer2D::endScene();
 	}
 }

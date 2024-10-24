@@ -114,7 +114,7 @@ void Scene::onUpdateRuntime(const core::Timestep& iTimeStep) {
 		auto [transform, camera] = view.get<component::Transform, component::Camera>(entity);
 		if (camera.primary) {
 			mainCamera = &camera.camera;
-			cameraTransform = transform.getTransform();
+			cameraTransform = transform.transform();
 			break;
 		}
 	}
@@ -140,7 +140,7 @@ void Scene::render() {
 	for (const auto group = registry.group<component::Transform>(entt::get<component::SpriteRenderer>);
 		 auto entity: group) {
 		auto [transform, sprite] = group.get<component::Transform, component::SpriteRenderer>(entity);
-		renderer::Renderer2D::drawQuad({.transform = transform.getTransform(),
+		renderer::Renderer2D::drawQuad({.transform = transform.transform,
 										.color = sprite.color,
 										.texture = sprite.texture,
 										.tilingFactor = sprite.tilingFactor,
@@ -149,7 +149,7 @@ void Scene::render() {
 	// Draw circles
 	for (const auto view = registry.view<component::Transform, component::CircleRenderer>(); auto entity: view) {
 		auto [transform, circle] = view.get<component::Transform, component::CircleRenderer>(entity);
-		renderer::Renderer2D::drawCircle({.transform = transform.getTransform(),
+		renderer::Renderer2D::drawCircle({.transform = transform.transform,
 										  .color = circle.color,
 										  .thickness = circle.thickness,
 										  .fade = circle.fade,
@@ -158,7 +158,7 @@ void Scene::render() {
 	// Draw text
 	for (const auto view = registry.view<component::Transform, component::Text>(); auto entity: view) {
 		auto [transform, text] = view.get<component::Transform, component::Text>(entity);
-		renderer::Renderer2D::drawString({.transform = transform.getTransform(),
+		renderer::Renderer2D::drawString({.transform = transform.transform,
 										  .text = text.text,
 										  .font = text.font,
 										  .color = text.color,

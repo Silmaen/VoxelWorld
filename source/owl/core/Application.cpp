@@ -15,8 +15,6 @@
 #include "input/Input.h"
 #include "renderer/Renderer.h"
 
-#include <ranges>
-
 namespace owl::core {
 
 
@@ -223,11 +221,11 @@ void Application::onEvent(event::Event& ioEvent) {
 	dispatcher.dispatch<event::WindowResizeEvent>(
 			[this]<typename T0>(T0&& ioPh1) { return onWindowResized(std::forward<T0>(ioPh1)); });
 
-#if defined(__clang__) and __clang_major__ < 16
+#if !defined(__clang__) or __clang_major__ > 15
+	for (const auto& it: std::ranges::reverse_view(m_layerStack)) {
+#else
 	for (auto it2 = m_layerStack.rbegin(); it2 != m_layerStack.rend(); ++it2) {
 		auto it = (*it2);
-#else
-	for (const auto& it: std::ranges::reverse_view(m_layerStack)) {
 #endif
 		if (ioEvent.handled)
 			break;

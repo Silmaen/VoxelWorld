@@ -23,16 +23,14 @@ VerticalSpeed::VerticalSpeed() {
 VerticalSpeed::~VerticalSpeed() = default;
 
 void VerticalSpeed::drawBack() {
-	owl::renderer::utils::PRS tran{.position = getTransform().position, .rotation = 0, .size = getTransform().size};
-	tran.position.z() = -0.1f;
+	owl::math::Transform tran{getPosition(), {0, 0, 0}, getScale()};
+	tran.translation().z() = -0.1f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = background});
 }
 
 void VerticalSpeed::drawCursors() {
-	owl::renderer::utils::PRS tran{.position = getTransform().position,
-								   .rotation = velocityToAngle(),
-								   .size = getTransform().size};
-	tran.position.z() = -0.05f;
+	owl::math::Transform tran{getPosition(), {0, 0, velocityToAngle()}, getScale()};
+	tran.translation().z() = -0.05f;
 	owl::renderer::Renderer2D::drawQuad({.transform = tran, .texture = cursor});
 }
 

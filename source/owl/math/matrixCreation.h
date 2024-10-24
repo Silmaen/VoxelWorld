@@ -8,7 +8,6 @@
 
 #pragma once
 
-
 #include "matrices.h"
 #include "quaternion.h"
 
@@ -83,7 +82,7 @@ constexpr auto toMat4(const Quaternion<BaseType>& iQuaternion) -> Matrix<BaseTyp
 }
 
 /**
- * @brief Generate perspective projection matrix.
+ * @brief Generate a perspective projection matrix.
  * @tparam BaseType The internal Data type.
  * @param iFovy The Y field of view.
  * @param iAspect The aspect ratio.
@@ -92,14 +91,14 @@ constexpr auto toMat4(const Quaternion<BaseType>& iQuaternion) -> Matrix<BaseTyp
  * @return Perspective Matrix.
  */
 template<typename BaseType>
-constexpr auto perspective(BaseType iFovy, BaseType iAspect, BaseType iZNear,
-						   BaseType iZFar) -> Matrix<BaseType, 4, 4> {
+constexpr auto perspective(BaseType iFovy, BaseType iAspect, BaseType iZNear, BaseType iZFar)
+		-> Matrix<BaseType, 4, 4> {
 	static constexpr BaseType one{1};
 	static constexpr BaseType two{2};
 	Matrix<BaseType, 4, 4> result{};
-	BaseType const tanHalfFovy = std::tan(iFovy / two);
+	const BaseType tanHalfFovy = std::tan(iFovy / two);
 	result(0, 0) = one / (iAspect * tanHalfFovy);
-	result(1, 1) = one / (tanHalfFovy);
+	result(1, 1) = one / tanHalfFovy;
 	result(2, 2) = -(iZFar + iZNear) / (iZFar - iZNear);
 	result(3, 2) = -one;
 	result(2, 3) = -(two * iZFar * iZNear) / (iZFar - iZNear);
@@ -107,14 +106,14 @@ constexpr auto perspective(BaseType iFovy, BaseType iAspect, BaseType iZNear,
 }
 
 /**
- * @brief Construct a orthogonal projection matrix.
+ * @brief Construct an orthogonal projection matrix.
  * @tparam BaseType The internal data type.
  * @param iLeft The left limit.
  * @param iRight The right limit.
  * @param iBottom The bottom limit.
  * @param iTop The top limit.
  * @param iNear The nearest depth.
- * @param iFar The fartest depth.
+ * @param iFar The farthest depth.
  * @return The orthogonal matrix.
  */
 template<typename BaseType>
@@ -140,8 +139,8 @@ constexpr auto ortho(const BaseType iLeft, const BaseType iRight, const BaseType
  * @return The translated matrix.
  */
 template<typename BaseType>
-constexpr auto translate(const Matrix<BaseType, 4, 4>& iMatrix,
-						 const Vector<BaseType, 3>& iVector) -> Matrix<BaseType, 4, 4> {
+constexpr auto translate(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseType, 3>& iVector)
+		-> Matrix<BaseType, 4, 4> {
 	Matrix<BaseType, 4, 4> result(iMatrix);
 	result.setColumn(3, iMatrix.column(0) * iVector[0] + iMatrix.column(1) * iVector[1] +
 								iMatrix.column(2) * iVector[2] + iMatrix.column(3));
@@ -157,10 +156,10 @@ constexpr auto translate(const Matrix<BaseType, 4, 4>& iMatrix,
  * @return Rotated matrix.
  */
 template<typename BaseType>
-constexpr auto rotate(Matrix<BaseType, 4, 4> const& iMatrix, const BaseType iAngle,
-					  const Vector<BaseType, 3>& iAxis) -> Matrix<BaseType, 4, 4> {
-	BaseType const c = std::cos(iAngle);
-	BaseType const s = std::sin(iAngle);
+constexpr auto rotate(const Matrix<BaseType, 4, 4>& iMatrix, const BaseType iAngle, const Vector<BaseType, 3>& iAxis)
+		-> Matrix<BaseType, 4, 4> {
+	const BaseType c = std::cos(iAngle);
+	const BaseType s = std::sin(iAngle);
 	Vector<BaseType, 3> axis(iAxis.normalized());
 	Vector<BaseType, 3> temp((BaseType(1) - c) * axis);
 	Matrix<BaseType, 4, 4> rotate{};
@@ -192,8 +191,8 @@ constexpr auto rotate(Matrix<BaseType, 4, 4> const& iMatrix, const BaseType iAng
  * @return The transformed matrix.
  */
 template<typename BaseType>
-constexpr auto scale(const Matrix<BaseType, 4, 4>& iMatrix,
-					 const Vector<BaseType, 3>& iScale) -> Matrix<BaseType, 4, 4> {
+constexpr auto scale(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseType, 3>& iScale)
+		-> Matrix<BaseType, 4, 4> {
 	Matrix<BaseType, 4, 4> result{};
 	result.setColumn(0, iMatrix.column(0) * iScale[0]);
 	result.setColumn(1, iMatrix.column(1) * iScale[1]);
@@ -220,7 +219,7 @@ constexpr auto shear(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseTyp
 	Vector<BaseType, 3> pointLambda{(iLambdaX[0] + iLambdaX[1]), (iLambdaY[0] + iLambdaY[1]),
 									(iLambdaZ[0] + iLambdaZ[1])};
 
-	Matrix<BaseType, 4, 4> Shear{1,
+	Matrix<BaseType, 4, 4> shear{1,
 								 iLambdaY[0],
 								 iLambdaZ[0],
 								 0,
@@ -238,23 +237,23 @@ constexpr auto shear(const Matrix<BaseType, 4, 4>& iMatrix, const Vector<BaseTyp
 								 1};
 
 	Matrix<BaseType, 4, 4> result{};
-	result.setColumn(0) = iMatrix.column(0) * Shear(0, 0) + iMatrix.column(1) * Shear(1, 0) +
-						  iMatrix.column(2) * Shear(2, 0) + iMatrix.column(3) * Shear(3, 0);
-	result.setColumn(1) = iMatrix.column(0) * Shear(0, 1) + iMatrix.column(1) * Shear(1, 1) +
-						  iMatrix.column(2) * Shear(2, 1) + iMatrix.column(3) * Shear(3, 1);
-	result.setColumn(2) = iMatrix.column(0) * Shear(0, 2) + iMatrix.column(1) * Shear(1, 2) +
-						  iMatrix.column(2) * Shear(2, 2) + iMatrix.column(3) * Shear(3, 2);
-	result.setColumn(3) = iMatrix.column(0) * Shear(0, 3) + iMatrix.column(1) * Shear(1, 3) +
-						  iMatrix.column(2) * Shear(2, 3) + iMatrix.column(3) * Shear(3, 3);
+	result.setColumn(0) = iMatrix.column(0) * shear(0, 0) + iMatrix.column(1) * shear(1, 0) +
+						  iMatrix.column(2) * shear(2, 0) + iMatrix.column(3) * shear(3, 0);
+	result.setColumn(1) = iMatrix.column(0) * shear(0, 1) + iMatrix.column(1) * shear(1, 1) +
+						  iMatrix.column(2) * shear(2, 1) + iMatrix.column(3) * shear(3, 1);
+	result.setColumn(2) = iMatrix.column(0) * shear(0, 2) + iMatrix.column(1) * shear(1, 2) +
+						  iMatrix.column(2) * shear(2, 2) + iMatrix.column(3) * shear(3, 2);
+	result.setColumn(3) = iMatrix.column(0) * shear(0, 3) + iMatrix.column(1) * shear(1, 3) +
+						  iMatrix.column(2) * shear(2, 3) + iMatrix.column(3) * shear(3, 3);
 	return result;
 }
 
 /**
  * @brief Inverse a matrix.
  * @tparam BaseType The internal data type.
- * @tparam Dim The matrix dimention.
+ * @tparam Dim The matrix dimension.
  * @param iMatrix The matrix to inverse.
- * @return Inversed matrix.
+ * @return Inverse matrix.
  */
 template<typename BaseType, size_t Dim>
 constexpr auto inverse(const Matrix<BaseType, Dim, Dim>& iMatrix) -> Matrix<BaseType, Dim, Dim>
@@ -274,9 +273,9 @@ constexpr auto inverse(const Matrix<BaseType, Dim, Dim>& iMatrix) -> Matrix<Base
 /**
  * @brief Inverse a matrix.
  * @tparam BaseType The internal data type.
- * @tparam Dim The matrix dimention.
+ * @tparam Dim The matrix dimension.
  * @param iMatrix The matrix to inverse.
- * @return Inversed matrix.
+ * @return Inverse matrix.
  */
 template<typename BaseType, size_t Dim>
 constexpr auto inverse(const Matrix<BaseType, Dim, Dim>& iMatrix) -> Matrix<BaseType, Dim, Dim>
@@ -303,67 +302,67 @@ constexpr auto inverse(const Matrix<BaseType, Dim, Dim>& iMatrix) -> Matrix<Base
 /**
  * @brief Inverse a matrix.
  * @tparam BaseType The internal data type.
- * @tparam Dim The matrix dimention.
+ * @tparam Dim The matrix dimension.
  * @param iMatrix The matrix to inverse.
- * @return Inversed matrix.
+ * @return Inverse matrix.
  */
 template<typename BaseType, size_t Dim>
 constexpr auto inverse(const Matrix<BaseType, Dim, Dim>& iMatrix) -> Matrix<BaseType, Dim, Dim>
 	requires(Dim == 4)
 {
-	BaseType Coef00 = iMatrix(2, 2) * iMatrix(3, 3) - iMatrix(2, 3) * iMatrix(3, 2);
-	BaseType Coef02 = iMatrix(2, 1) * iMatrix(3, 3) - iMatrix(2, 3) * iMatrix(3, 1);
-	BaseType Coef03 = iMatrix(2, 1) * iMatrix(3, 2) - iMatrix(2, 2) * iMatrix(3, 1);
+	const BaseType coef00 = iMatrix(2, 2) * iMatrix(3, 3) - iMatrix(2, 3) * iMatrix(3, 2);
+	const BaseType coef02 = iMatrix(2, 1) * iMatrix(3, 3) - iMatrix(2, 3) * iMatrix(3, 1);
+	const BaseType coef03 = iMatrix(2, 1) * iMatrix(3, 2) - iMatrix(2, 2) * iMatrix(3, 1);
 
-	BaseType Coef04 = iMatrix(1, 2) * iMatrix(3, 3) - iMatrix(1, 3) * iMatrix(3, 2);
-	BaseType Coef06 = iMatrix(1, 1) * iMatrix(3, 3) - iMatrix(1, 3) * iMatrix(3, 1);
-	BaseType Coef07 = iMatrix(1, 1) * iMatrix(3, 2) - iMatrix(1, 2) * iMatrix(3, 1);
+	const BaseType coef04 = iMatrix(1, 2) * iMatrix(3, 3) - iMatrix(1, 3) * iMatrix(3, 2);
+	const BaseType coef06 = iMatrix(1, 1) * iMatrix(3, 3) - iMatrix(1, 3) * iMatrix(3, 1);
+	const BaseType coef07 = iMatrix(1, 1) * iMatrix(3, 2) - iMatrix(1, 2) * iMatrix(3, 1);
 
-	BaseType Coef08 = iMatrix(1, 2) * iMatrix(2, 3) - iMatrix(1, 3) * iMatrix(2, 2);
-	BaseType Coef10 = iMatrix(1, 1) * iMatrix(2, 3) - iMatrix(1, 3) * iMatrix(2, 1);
-	BaseType Coef11 = iMatrix(1, 1) * iMatrix(2, 2) - iMatrix(1, 2) * iMatrix(2, 1);
+	const BaseType coef08 = iMatrix(1, 2) * iMatrix(2, 3) - iMatrix(1, 3) * iMatrix(2, 2);
+	const BaseType coef10 = iMatrix(1, 1) * iMatrix(2, 3) - iMatrix(1, 3) * iMatrix(2, 1);
+	const BaseType coef11 = iMatrix(1, 1) * iMatrix(2, 2) - iMatrix(1, 2) * iMatrix(2, 1);
 
-	BaseType Coef12 = iMatrix(0, 2) * iMatrix(3, 3) - iMatrix(0, 3) * iMatrix(3, 2);
-	BaseType Coef14 = iMatrix(0, 1) * iMatrix(3, 3) - iMatrix(0, 3) * iMatrix(3, 1);
-	BaseType Coef15 = iMatrix(0, 1) * iMatrix(3, 2) - iMatrix(0, 2) * iMatrix(3, 1);
+	const BaseType coef12 = iMatrix(0, 2) * iMatrix(3, 3) - iMatrix(0, 3) * iMatrix(3, 2);
+	const BaseType coef14 = iMatrix(0, 1) * iMatrix(3, 3) - iMatrix(0, 3) * iMatrix(3, 1);
+	const BaseType coef15 = iMatrix(0, 1) * iMatrix(3, 2) - iMatrix(0, 2) * iMatrix(3, 1);
 
-	BaseType Coef16 = iMatrix(0, 2) * iMatrix(2, 3) - iMatrix(0, 3) * iMatrix(2, 2);
-	BaseType Coef18 = iMatrix(0, 1) * iMatrix(2, 3) - iMatrix(0, 3) * iMatrix(2, 1);
-	BaseType Coef19 = iMatrix(0, 1) * iMatrix(2, 2) - iMatrix(0, 2) * iMatrix(2, 1);
+	const BaseType coef16 = iMatrix(0, 2) * iMatrix(2, 3) - iMatrix(0, 3) * iMatrix(2, 2);
+	const BaseType coef18 = iMatrix(0, 1) * iMatrix(2, 3) - iMatrix(0, 3) * iMatrix(2, 1);
+	const BaseType coef19 = iMatrix(0, 1) * iMatrix(2, 2) - iMatrix(0, 2) * iMatrix(2, 1);
 
-	BaseType Coef20 = iMatrix(0, 2) * iMatrix(1, 3) - iMatrix(0, 3) * iMatrix(1, 2);
-	BaseType Coef22 = iMatrix(0, 1) * iMatrix(1, 3) - iMatrix(0, 3) * iMatrix(1, 1);
-	BaseType Coef23 = iMatrix(0, 1) * iMatrix(1, 2) - iMatrix(0, 2) * iMatrix(1, 1);
+	const BaseType coef20 = iMatrix(0, 2) * iMatrix(1, 3) - iMatrix(0, 3) * iMatrix(1, 2);
+	const BaseType coef22 = iMatrix(0, 1) * iMatrix(1, 3) - iMatrix(0, 3) * iMatrix(1, 1);
+	const BaseType coef23 = iMatrix(0, 1) * iMatrix(1, 2) - iMatrix(0, 2) * iMatrix(1, 1);
 
-	Vector<BaseType, Dim> Fac0{Coef00, Coef00, Coef02, Coef03};
-	Vector<BaseType, Dim> Fac1{Coef04, Coef04, Coef06, Coef07};
-	Vector<BaseType, Dim> Fac2{Coef08, Coef08, Coef10, Coef11};
-	Vector<BaseType, Dim> Fac3{Coef12, Coef12, Coef14, Coef15};
-	Vector<BaseType, Dim> Fac4{Coef16, Coef16, Coef18, Coef19};
-	Vector<BaseType, Dim> Fac5{Coef20, Coef20, Coef22, Coef23};
+	const Vector<BaseType, Dim> fac0{coef00, coef00, coef02, coef03};
+	const Vector<BaseType, Dim> fac1{coef04, coef04, coef06, coef07};
+	const Vector<BaseType, Dim> fac2{coef08, coef08, coef10, coef11};
+	const Vector<BaseType, Dim> fac3{coef12, coef12, coef14, coef15};
+	const Vector<BaseType, Dim> fac4{coef16, coef16, coef18, coef19};
+	const Vector<BaseType, Dim> fac5{coef20, coef20, coef22, coef23};
 
-	Vector<BaseType, Dim> Vec0{iMatrix(0, 1), iMatrix(0, 0), iMatrix(0, 0), iMatrix(0, 0)};
-	Vector<BaseType, Dim> Vec1{iMatrix(1, 1), iMatrix(1, 0), iMatrix(1, 0), iMatrix(1, 0)};
-	Vector<BaseType, Dim> Vec2{iMatrix(2, 1), iMatrix(2, 0), iMatrix(2, 0), iMatrix(2, 0)};
-	Vector<BaseType, Dim> Vec3{iMatrix(3, 1), iMatrix(3, 0), iMatrix(3, 0), iMatrix(3, 0)};
+	const Vector<BaseType, Dim> vec0{iMatrix(0, 1), iMatrix(0, 0), iMatrix(0, 0), iMatrix(0, 0)};
+	const Vector<BaseType, Dim> vec1{iMatrix(1, 1), iMatrix(1, 0), iMatrix(1, 0), iMatrix(1, 0)};
+	const Vector<BaseType, Dim> vec2{iMatrix(2, 1), iMatrix(2, 0), iMatrix(2, 0), iMatrix(2, 0)};
+	const Vector<BaseType, Dim> vec3{iMatrix(3, 1), iMatrix(3, 0), iMatrix(3, 0), iMatrix(3, 0)};
 
-	Vector<BaseType, Dim> Inv0{};
-	Vector<BaseType, Dim> Inv1{};
-	Vector<BaseType, Dim> Inv2{};
-	Vector<BaseType, Dim> Inv3{};
+	Vector<BaseType, Dim> inv0{};
+	Vector<BaseType, Dim> inv1{};
+	Vector<BaseType, Dim> inv2{};
+	Vector<BaseType, Dim> inv3{};
 	for (size_t it = 0; it < Dim; ++it) {
-		Inv0[it] = Vec1[it] * Fac0[it] - Vec2[it] * Fac1[it] + Vec3[it] * Fac2[it];
-		Inv1[it] = Vec0[it] * Fac0[it] - Vec2[it] * Fac3[it] + Vec3[it] * Fac4[it];
-		Inv2[it] = Vec0[it] * Fac1[it] - Vec1[it] * Fac3[it] + Vec3[it] * Fac5[it];
-		Inv3[it] = Vec0[it] * Fac2[it] - Vec1[it] * Fac4[it] + Vec2[it] * Fac5[it];
+		inv0[it] = vec1[it] * fac0[it] - vec2[it] * fac1[it] + vec3[it] * fac2[it];
+		inv1[it] = vec0[it] * fac0[it] - vec2[it] * fac3[it] + vec3[it] * fac4[it];
+		inv2[it] = vec0[it] * fac1[it] - vec1[it] * fac3[it] + vec3[it] * fac5[it];
+		inv3[it] = vec0[it] * fac2[it] - vec1[it] * fac4[it] + vec2[it] * fac5[it];
 	}
 
-	Matrix<BaseType, Dim, Dim> inverse{Inv0[0], -Inv0[1], Inv0[2], -Inv0[3], -Inv1[0], Inv1[1], -Inv1[2], Inv1[3],
-									   Inv2[0], -Inv2[1], Inv2[2], -Inv2[3], -Inv3[0], Inv3[1], -Inv3[2], Inv3[3]};
+	Matrix<BaseType, Dim, Dim> inverse{inv0[0], -inv0[1], inv0[2], -inv0[3], -inv1[0], inv1[1], -inv1[2], inv1[3],
+									   inv2[0], -inv2[1], inv2[2], -inv2[3], -inv3[0], inv3[1], -inv3[2], inv3[3]};
 
-	Vector<BaseType, Dim> Row0 = inverse.row(0);
+	Vector<BaseType, Dim> row0 = inverse.row(0);
 	BaseType determinant =
-			iMatrix(0, 0) * Row0[0] + iMatrix(1, 0) * Row0[1] + iMatrix(2, 0) * Row0[2] + iMatrix(3, 0) * Row0[3];
+			iMatrix(0, 0) * row0[0] + iMatrix(1, 0) * row0[1] + iMatrix(2, 0) * row0[2] + iMatrix(3, 0) * row0[3];
 	BaseType oneOverDeterminant = BaseType{1} / determinant;
 	inverse *= oneOverDeterminant;
 	return inverse;

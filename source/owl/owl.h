@@ -43,9 +43,7 @@
 #include "input/Input.h"
 #include "input/Window.h"
 #include "input/video/Manager.h"
-#include "math/Transform.h"
-#include "math/linAlgebra.h"
-#include "math/simpleFunctions.h"
+#include "math/math.h"
 
 // ------- scene -----------
 #include "scene/Entity.h"

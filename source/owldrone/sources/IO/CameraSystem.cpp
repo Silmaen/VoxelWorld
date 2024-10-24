@@ -8,8 +8,6 @@
 #include "CameraSystem.h"
 #include "DroneSettings.h"
 
-#include <spirv_cross/spirv.hpp>
-
 namespace drone::IO {
 
 CameraSystem::CameraSystem() { resize({1, 1}); }

@@ -8,7 +8,6 @@
 #include "owlpch.h"
 
 #include "Manager.h"
-#include "math/vectors.h"
 
 #if defined(OWL_PLATFORM_WINDOWS)
 #include "windows/Device.h"
@@ -72,6 +71,5 @@ auto Manager::getCurrentDeviceId() const -> int8_t {
 		return -1;
 	return static_cast<int8_t>(m_currentDevice);
 }
-
 
 }// namespace owl::input::video

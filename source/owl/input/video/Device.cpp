@@ -8,11 +8,7 @@
 #include "owlpch.h"
 
 #include "Device.h"
-#include "math/matrices.h"
-#include "math/simpleFunctions.h"
 #include <stb_image.h>
-
-#include <cstddef>
 
 namespace owl::input::video {
 
@@ -22,27 +18,25 @@ OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
 // NOLINTBEGIN(*-magic-numbers)
 void convertNv12ToRgb24(const uint8_t* iNv12Buffer, const math::vec2ui& iSize, uint8_t* oRgb24Buffer) {
-	// Chaque composant Y occupe width * height octets
+	// Each component Y occupy width * height bytes.
 	const uint32_t ySize = iSize.surface();
 
-	// Pointeurs vers les composants Y, U et V dans le tampon NV12
+	// Pointers to component Y, U and V in buffer NV12
 	const uint8_t* yComponent = iNv12Buffer;
 	const uint8_t* uvComponent = iNv12Buffer + ySize;
 
-	// Parcourir chaque ligne
 	for (uint32_t i = 0; i < iSize.y(); i++) {
-		// Parcourir chaque pixel de la ligne
 		for (uint32_t j = 0; j < iSize.x(); j++) {
-			// Indices dans le tampon NV12
+			// index in buffer NV12
 			const uint32_t yIndex = i * iSize.x() + j;
 			const uint32_t uvIndex = (i / 2ul * iSize.x()) + (j & ~1ul);
-			// Indices dans le tampon RGB24
+			// index in buffer RGB24
 			const uint32_t rgbIndex = ((i + 1) * iSize.x() - j - 1) * 3;
-			// Conversion YUV vers RGB
+			// Convert YUV to RGB
 			const int32_t c = yComponent[yIndex] - 16;
 			const int32_t d = uvComponent[uvIndex] - 128;
 			const int32_t e = uvComponent[uvIndex + 1] - 128;
-			// Calcul des composantes RGB, Limiter les valeurs à l'intervalle [0, 255]
+			// Compute RGB component, limit values in range [0, 255]
 			oRgb24Buffer[rgbIndex] = static_cast<uint8_t>(math::clamp((298 * c + 409 * e + 128) >> 8, 0, 255));
 			oRgb24Buffer[rgbIndex + 1] =
 					static_cast<uint8_t>(math::clamp((298 * c - 100 * d - 208 * e + 128) >> 8, 0, 255));
@@ -52,21 +46,20 @@ void convertNv12ToRgb24(const uint8_t* iNv12Buffer, const math::vec2ui& iSize, u
 }
 
 void convertYuYvToRgb24(const uint8_t* iYuYvBuffer, const math::vec2ui& iSize, uint8_t* oRgb24Buffer) {
-	// Chaque composant YUV prend deux octets dans le format YUYV
+	// Each component YUV takes 2 bytes in YUYV format.
 	const uint32_t yuyvSize = iSize.surface() * 2;
 
-	// Parcourir chaque paire de pixels YUYV
 	for (uint32_t i = 0; i < yuyvSize; i += 4) {
-		// Conversion YUV vers RGB pour le premier pixel
+		// Convert YUV to RGB for first pixel
 		const int32_t c0 = iYuYvBuffer[i] - 16;
 		const int32_t d0 = iYuYvBuffer[i + 1] - 128;
 		const int32_t e0 = iYuYvBuffer[i + 3] - 128;
-		// Conversion YUV vers RGB pour le deuxième pixel
+		// Convert YUV to RGB for second pixel
 		const int32_t c1 = iYuYvBuffer[i + 2] - 16;
 		// Indices dans le tampon RGB24
 		const uint32_t rgbIndex = i * 3 / 2;
 
-		// Stocker les composantes RGB dans le tampon RGB24 pour les deux pixels
+		// Store RGB component in RGB24 buffer for the 2 pixels.
 		oRgb24Buffer[rgbIndex] = static_cast<uint8_t>(math::clamp((298 * c0 + 409 * e0 + 128) >> 8, 0, 255));
 		oRgb24Buffer[rgbIndex + 1] =
 				static_cast<uint8_t>(math::clamp((298 * c0 - 100 * d0 - 208 * e0 + 128) >> 8, 0, 255));
