@@ -464,7 +464,8 @@ void VulkanHandler::swapFrame() {
 									   .pImageIndices = m_currentframebuffer->getCurrentImage(),
 									   .pResults = nullptr};
 	const auto& core = VulkanCore::get();
-	if (const VkResult result = vkQueuePresentKHR(core.getPresentQueue(), &presentInfo); result != VK_SUCCESS) {
+	if (const VkResult result = vkQueuePresentKHR(core.getPresentQueue(), &presentInfo);
+		m_resize || result != VK_SUCCESS) {
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_resize) {
 			m_resize = false;
 			m_currentframebuffer->resize(toSize(core.getCurrentExtent()));
@@ -491,7 +492,7 @@ void VulkanHandler::bindPipeline(const int32_t iId) {
 
 void VulkanHandler::setResize() {
 	auto& core = VulkanCore::get();
-	core.updateSurfaceInformations();
+	core.updateSurfaceInformation();
 	m_resize = true;
 }
 

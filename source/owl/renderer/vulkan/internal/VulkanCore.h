@@ -208,7 +208,7 @@ public:
 	/**
 	 * @brief Force to check for surface changes.
 	 */
-	void updateSurfaceInformations();
+	void updateSurfaceInformation();
 
 	/**
 	 * @brief Search for a memory type index.

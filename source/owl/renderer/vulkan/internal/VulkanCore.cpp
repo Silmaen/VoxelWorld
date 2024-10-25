@@ -401,7 +401,7 @@ auto VulkanCore::getQueueIndices() const -> std::vector<uint32_t> {
 	return {m_phyProps->graphicQueueIndex, m_phyProps->presentQueueIndex};
 }
 
-void VulkanCore::updateSurfaceInformations() { m_phyProps->updateSurfaceInformations(); }
+void VulkanCore::updateSurfaceInformation() { m_phyProps->updateSurfaceInformation(); }
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
