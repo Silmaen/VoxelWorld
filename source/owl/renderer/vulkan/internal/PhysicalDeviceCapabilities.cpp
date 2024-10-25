@@ -43,7 +43,7 @@ PhysicalDeviceCapabilities::PhysicalDeviceCapabilities(const VkPhysicalDevice& i
 		vkGetPhysicalDeviceQueueFamilyProperties(device, &count, queueFamilies.data());
 	}
 	if (hasExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME)) {
-		updateSurfaceInformations();
+		updateSurfaceInformation();
 		uint32_t index = 0;
 		auto* const gc = dynamic_cast<vulkan::GraphContext*>(core::Application::get().getWindow().getGraphContext());
 		for (const auto& qFam: queueFamilies) {
@@ -132,8 +132,8 @@ auto enumerateDevices(const VkInstance& iInstance) -> std::vector<PhysicalDevice
 	return resultVec;
 }
 
-void PhysicalDeviceCapabilities::updateSurfaceInformations() {
-	auto* const gc = dynamic_cast<vulkan::GraphContext*>(core::Application::get().getWindow().getGraphContext());
+void PhysicalDeviceCapabilities::updateSurfaceInformation() {
+	const auto* gc = dynamic_cast<GraphContext*>(core::Application::get().getWindow().getGraphContext());
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, gc->getSurface(), &surfaceCapabilities);
 	uint32_t formatCount = 0;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, gc->getSurface(), &formatCount, nullptr);

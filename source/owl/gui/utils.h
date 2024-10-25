@@ -32,15 +32,15 @@ inline auto imTexture(const shared<renderer::Texture>& iTexture) -> std::optiona
 
 /**
  * @brief Convert Texture to imgui texture.
- * @param iFrameBufer The texture to convert.
+ * @param iFrameBuffer The texture to convert.
  * @param iIndex The attachment index.
  * @return The Texture id for ImGui.
  */
-inline auto imTexture(const shared<renderer::Framebuffer>& iFrameBufer, uint32_t iIndex) -> std::optional<ImTextureID> {
-	if (iFrameBufer == nullptr)
+inline auto imTexture(const shared<renderer::Framebuffer>& iFrameBuffer, const uint32_t iIndex) -> std::optional<ImTextureID> {
+	if (iFrameBuffer == nullptr)
 		return std::nullopt;
 	// NOLINTBEGIN(performance-no-int-to-ptr)
-	auto texture = reinterpret_cast<ImTextureID>(iFrameBufer->getColorAttachmentRendererId(iIndex));
+	auto texture = reinterpret_cast<ImTextureID>(iFrameBuffer->getColorAttachmentRendererId(iIndex));
 	// NOLINTEND(performance-no-int-to-ptr)
 	if (texture == nullptr)
 		return std::nullopt;

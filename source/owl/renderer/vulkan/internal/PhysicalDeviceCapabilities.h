@@ -77,7 +77,7 @@ public:
 	/**
 	 * @brief Force to check for surface changes.
 	 */
-	void updateSurfaceInformations();
+	void updateSurfaceInformation();
 
 	/// The physical device.
 	VkPhysicalDevice device = nullptr;
