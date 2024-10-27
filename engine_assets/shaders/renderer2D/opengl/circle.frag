@@ -25,6 +25,7 @@ void main() {
     // Set output color
     o_Color = i_Vertex.Color;
     o_Color.a *= circle;
+    if (o_Color.a == 0)discard;
 
     o_EntityID = i_EntityID;
 }

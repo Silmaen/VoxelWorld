@@ -9,11 +9,13 @@
 #include "owlpch.h"
 
 #include "UiLayer.h"
+
 #include "core/Application.h"
 #include "core/external/glfw3.h"
 #include "core/external/imgui.h"
 #include "renderer/RenderCommand.h"
 #include "renderer/vulkan/internal/VulkanHandler.h"
+#include "utils.h"
 
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
@@ -22,12 +24,7 @@ OWL_DIAG_POP
 
 namespace owl::gui {
 
-namespace {
-
-auto vec2Im(const math::vec4& iVec) -> ImVec4 { return {iVec.x(), iVec.y(), iVec.z(), iVec.w()}; }
-
-}// namespace
-
+/// memory fonts...
 #include "Roboto-Bold.embed"
 #include "Roboto-Italic.embed"
 #include "Roboto-Regular.embed"
@@ -44,12 +41,15 @@ void UiLayer::onAttach() {
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
 	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad
-	// Controls
+
+	// Docking configuration
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;// Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport /
-	// Platform Windows
-	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-	// io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+	io.ConfigDockingWithShift = true;
+	io.ConfigDockingTransparentPayload = true;
+	// ViewPort configuration
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport
+	io.ConfigViewportsNoDecoration = true;
+	io.ConfigViewportsNoAutoMerge = false;
 
 	// Better fonts
 	ImFontConfig fontConfig;
@@ -124,17 +124,17 @@ void UiLayer::begin() const {
 
 void UiLayer::end() const {
 	OWL_PROFILE_FUNCTION()
-	if (renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL &&
-		renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::Vulkan)
-		return;
 	if (m_dockingEnable) {
 		ImGui::End();
 	}
 	ImGuiIO& io = ImGui::GetIO();
 	const core::Application& app = core::Application::get();
-	io.DisplaySize =
-			ImVec2(static_cast<float>(app.getWindow().getWidth()), static_cast<float>(app.getWindow().getHeight()));
+	io.DisplaySize = vec(app.getWindow().getSize());
+	ImGui::EndFrame();
 	// Rendering
+	if (renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL &&
+		renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::Vulkan)
+		return;
 	ImGui::Render();
 	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -167,88 +167,109 @@ void UiLayer::setTheme(const Theme& iTheme) {
 	// ======================
 	// Colors
 
-	// Text
-	colors[ImGuiCol_Text] = vec2Im(iTheme.text);
-	// 1 ImGuiCol_TextDisabled
+	// Text 1 2
+	colors[ImGuiCol_Text] = vec(iTheme.text);
+	// colors[ImGuiCol_TextDisabled] = vec(iTheme.textDisabled);
 	// Window Background 2 3 4 5
-	colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.105f, 0.11f, 1.0f};
-	colors[ImGuiCol_ChildBg] = vec2Im(iTheme.background);
-	colors[ImGuiCol_PopupBg] = vec2Im(iTheme.backgroundPopup);
-	colors[ImGuiCol_Border] = vec2Im(iTheme.backgroundDark);
-	// 6 ImGuiCol_BorderShadow
+	colors[ImGuiCol_WindowBg] = vec(iTheme.windowBackground);
+	colors[ImGuiCol_ChildBg] = vec(iTheme.childBackground);
+	colors[ImGuiCol_PopupBg] = vec(iTheme.backgroundPopup);
+	colors[ImGuiCol_Border] = vec(iTheme.border);
+	// colors[ImGuiCol_BorderShadow] = vec(iTheme.border);
 	// Frame BG 7 8 9
-	colors[ImGuiCol_FrameBg] = vec2Im(iTheme.propertyField);
-	colors[ImGuiCol_FrameBgHovered] = vec2Im(iTheme.propertyField);
-	colors[ImGuiCol_FrameBgActive] = vec2Im(iTheme.propertyField);
+	colors[ImGuiCol_FrameBg] = vec(iTheme.frameBackground);
+	colors[ImGuiCol_FrameBgHovered] = vec(iTheme.frameBackgroundHovered);
+	colors[ImGuiCol_FrameBgActive] = vec(iTheme.frameBackgroundActive);
 	// Title 10 11 12
-	colors[ImGuiCol_TitleBg] = vec2Im(iTheme.titleBar);
-	colors[ImGuiCol_TitleBgActive] = vec2Im(iTheme.titleBar);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+	colors[ImGuiCol_TitleBg] = vec(iTheme.titleBar);
+	colors[ImGuiCol_TitleBgActive] = vec(iTheme.titleBarActive);
+	colors[ImGuiCol_TitleBgCollapsed] = vec(iTheme.titleBarCollapsed);
 	// Menubar 13
-	colors[ImGuiCol_MenuBarBg] = ImVec4{0.0f, 0.0f, 0.0f, 0.0f};
+	colors[ImGuiCol_MenuBarBg] = vec(iTheme.menubarBackground);
 	// Scrollbar 14 15 16 17
-	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-	colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.0f);
-	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.0f);
-	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.0f);
+	colors[ImGuiCol_ScrollbarBg] = vec(iTheme.scrollbarBackground);
+	colors[ImGuiCol_ScrollbarGrab] = vec(iTheme.scrollbarGrab);
+	colors[ImGuiCol_ScrollbarGrabHovered] = vec(iTheme.scrollbarGrabHovered);
+	colors[ImGuiCol_ScrollbarGrabActive] = vec(iTheme.scrollbarGrabActive);
 	// Checkbox 18
-	colors[ImGuiCol_CheckMark] = vec2Im(iTheme.text);
+	colors[ImGuiCol_CheckMark] = vec(iTheme.checkMark);
 	// Slider 19 20
-	colors[ImGuiCol_SliderGrab] = ImVec4(0.51f, 0.51f, 0.51f, 0.7f);
-	colors[ImGuiCol_SliderGrabActive] = ImVec4(0.66f, 0.66f, 0.66f, 1.0f);
+	colors[ImGuiCol_SliderGrab] = vec(iTheme.sliderGrab);
+	colors[ImGuiCol_SliderGrabActive] = vec(iTheme.sliderGrabActive);
 	// Buttons 21 22 23
-	colors[ImGuiCol_Button] = ImVec4{0.22f, 0.22f, 0.22f, 0.784f};
-	colors[ImGuiCol_ButtonHovered] = ImVec4{0.275f, 0.275f, 0.275f, 1.0f};
-	colors[ImGuiCol_ButtonActive] = ImVec4{0.22f, 0.22f, 0.22f, 0.588f};
+	colors[ImGuiCol_Button] = vec(iTheme.button);
+	colors[ImGuiCol_ButtonHovered] = vec(iTheme.buttonHovered);
+	colors[ImGuiCol_ButtonActive] = vec(iTheme.buttonActive);
 	// Headers 24 25 26
-	colors[ImGuiCol_Header] = vec2Im(iTheme.groupHeader);
-	colors[ImGuiCol_HeaderHovered] = vec2Im(iTheme.groupHeader);
-	colors[ImGuiCol_HeaderActive] = vec2Im(iTheme.groupHeader);
+	colors[ImGuiCol_Header] = vec(iTheme.groupHeader);
+	colors[ImGuiCol_HeaderHovered] = vec(iTheme.groupHeaderHovered);
+	colors[ImGuiCol_HeaderActive] = vec(iTheme.groupHeaderActive);
 	// Separator 27 28 29
-	colors[ImGuiCol_Separator] = vec2Im(iTheme.backgroundDark);
-	colors[ImGuiCol_SeparatorActive] = vec2Im(iTheme.highlight);
-	colors[ImGuiCol_SeparatorHovered] = ImColor(39, 185, 242, 150);
+	colors[ImGuiCol_Separator] = vec(iTheme.separator);
+	colors[ImGuiCol_SeparatorActive] = vec(iTheme.separatorActive);
+	colors[ImGuiCol_SeparatorHovered] = vec(iTheme.separatorHovered);
 	// Resize Grip 30 31 32
-	colors[ImGuiCol_ResizeGrip] = ImVec4(0.91f, 0.91f, 0.91f, 0.25f);
-	colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.81f, 0.81f, 0.81f, 0.67f);
-	colors[ImGuiCol_ResizeGripActive] = ImVec4(0.46f, 0.46f, 0.46f, 0.95f);
-	// Tabs 33 34 35 36 37
-	colors[ImGuiCol_Tab] = vec2Im(iTheme.titleBar);
-	colors[ImGuiCol_TabHovered] = ImVec4{0.38f, 0.3805f, 0.381f, 1.0f};
-	colors[ImGuiCol_TabActive] = ImVec4{0.28f, 0.2805f, 0.281f, 1.0f};
-	colors[ImGuiCol_TabUnfocused] = vec2Im(iTheme.titleBar);
-	colors[ImGuiCol_TabUnfocusedActive] = colors[ImGuiCol_TabHovered];
-	// 38 ImGuiCol_DockingPreview
-	// 39 ImGuiCol_DockingEmptyBg
-	// 40 ImGuiCol_PlotLines
-	// 41 ImGuiCol_PlotLinesHovered
-	// 42 ImGuiCol_PlotHistogram
-	// 43 ImGuiCol_PlotHistogramHovered
-	/// Tables 44 46
-	colors[ImGuiCol_TableHeaderBg] = vec2Im(iTheme.groupHeader);
-	// 45 ImGuiCol_TableBorderStrong
-	colors[ImGuiCol_TableBorderLight] = vec2Im(iTheme.backgroundDark);
-	// 47 ImGuiCol_TableRowBg
-	// 48 ImGuiCol_TableRowBgAlt
-	// 49 ImGuiCol_TextSelectedBg
-	// 50 ImGuiCol_DragDropTarget
-	// 51 ImGuiCol_NavHighlight
-	// 52 ImGuiCol_NavWindowingHighlight
-	// 53 ImGuiCol_NavWindowingDimBg
-	// 54 ImGuiCol_ModalWindowDimBg
+	colors[ImGuiCol_ResizeGrip] = vec(iTheme.resizeGrip);
+	colors[ImGuiCol_ResizeGripHovered] = vec(iTheme.resizeGripHovered);
+	colors[ImGuiCol_ResizeGripActive] = vec(iTheme.resizeGripActive);
+	// Tabs 33 34 35 36 37 38 39
+	colors[ImGuiCol_TabHovered] = vec(iTheme.tabHovered);
+	colors[ImGuiCol_Tab] = vec(iTheme.tab);
+	colors[ImGuiCol_TabSelected] = vec(iTheme.tabSelected);
+	colors[ImGuiCol_TabSelectedOverline] = vec(iTheme.tabSelectedOverline);
+	colors[ImGuiCol_TabDimmed] = vec(iTheme.tabDimmed);
+	colors[ImGuiCol_TabDimmedSelected] = vec(iTheme.tabDimmedSelected);
+	colors[ImGuiCol_TabDimmedSelectedOverline] = vec(iTheme.tabDimmedSelectedOverline);
+	// Docking 40 41
+	colors[ImGuiCol_DockingPreview] = vec(iTheme.dockingPreview);
+	colors[ImGuiCol_DockingEmptyBg] = vec(iTheme.dockingEmptyBackground);
+	// PlotLines 42 43 44 44
+	// colors[ImGuiCol_PlotLines] = vec(iTheme.Text);
+	// colors[ImGuiCol_PlotLinesHovered] = vec(iTheme.Text);
+	// colors[ImGuiCol_PlotHistogram] = vec(iTheme.Text);
+	// colors[ImGuiCol_PlotHistogramHovered] = vec(iTheme.Text);
+	/// Tables 46 47 48 49 50
+	colors[ImGuiCol_TableHeaderBg] = vec(iTheme.groupHeader);
+	// colors[ImGuiCol_TableBorderStrong] = vec.(iTheme.Text);
+	colors[ImGuiCol_TableBorderLight] = vec(iTheme.border);
+	// colors[ImGuiCol_TableRowBg] = vec.(iTheme.Text);
+	// colors[ImGuiCol_TableRowBgAlt] = vec.(iTheme.Text);
+	// Text Selected 51
+	// colors[ImGuiCol_TextSelectedBg] = vec.(iTheme.Text);
+	// Drag n DRop 52
+	// colors[ImGuiCol_DragDropTarget] = vec.(iTheme.Text);
+	// Nav 53 54 55
+	// colors[ImGuiCol_NavHighlight] = vec.(iTheme.Text);
+	// colors[ImGuiCol_NavWindowingHighlight] = vec.(iTheme.Text);
+	// colors[ImGuiCol_NavWindowingDimBg] = vec.(iTheme.Text);
+	// Modal window 56
+	// colors[ImGuiCol_ModalWindowDimBg] = vec.(iTheme.Text);
 
 	//========================================================
 	// Style
 	auto& style = ImGui::GetStyle();
+
+	// rounding
+	style.WindowRounding = iTheme.windowRounding;
+	style.FrameRounding = iTheme.frameRounding;
+	style.FrameBorderSize = iTheme.frameBorderSize;
+
+	style.TabRounding = iTheme.tabRounding;
+	style.TabBarOverlineSize = iTheme.tabOverline;
+	style.TabBorderSize = iTheme.tabBorder;
+
+	style.GrabRounding = iTheme.controlsRounding;
+	style.ScrollbarRounding = iTheme.controlsRounding;
+
+	style.IndentSpacing = iTheme.indentSpacing;
+	style.WindowMenuButtonPosition = ImGuiDir_Right;
+	style.ColorButtonPosition = ImGuiDir_Left;
 	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
 	// windows can look identical to regular ones.
 	if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
 		style.WindowRounding = 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
-	style.FrameRounding = 2.5f;
-	style.FrameBorderSize = 1.0f;
-	style.IndentSpacing = 11.0f;
 }
 OWL_DIAG_POP
 
@@ -281,7 +302,7 @@ void UiLayer::initializeDocking() {
 	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
 	// any change of dock space/settings would lead to windows being stuck in limbo and never being visible.
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("DockSpace Demo", &dockSpaceOpen, windowFlags);
+	ImGui::Begin("OwlDockSpace", &dockSpaceOpen, windowFlags);
 	ImGui::PopStyleVar();
 	if (optFullScreen)
 		ImGui::PopStyleVar(2);
@@ -291,7 +312,7 @@ void UiLayer::initializeDocking() {
 	const float minWinSizeX = style.WindowMinSize.x;
 	style.WindowMinSize.x = 370.0f;
 	if ((io.ConfigFlags & ImGuiConfigFlags_DockingEnable) != 0) {
-		const ImGuiID dockSpaceId = ImGui::GetID("MyDockSpace");
+		const ImGuiID dockSpaceId = ImGui::GetID("OwlDockSpace");
 		ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), dockSpaceFlags);
 	}
 	style.WindowMinSize.x = minWinSizeX;

@@ -22,7 +22,7 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	BasePanel();
+	BasePanel(std::string&& iName);
 	/**
 	 * @brief Default destructor.
 	 */
@@ -38,11 +38,11 @@ public:
 	/**
 	 * @brief Default copy affectation operator.
 	 */
-	BasePanel& operator=(const BasePanel&) = default;
+	auto operator=(const BasePanel&) -> BasePanel& = default;
 	/**
 	 * @brief Default move affectation operator.
 	 */
-	BasePanel& operator=(BasePanel&&) = default;
+	auto operator=(BasePanel&&) -> BasePanel& = default;
 	/**
 	 * @brief Initialization when attached.
 	 */
@@ -74,18 +74,19 @@ public:
 	/**
 	 * @brief get the panel size.
 	 */
-	const math::vec2ui& getSize() const { return m_size; }
+	[[nodiscard]] auto getSize() const -> const math::vec2ui& { return m_size; }
 
 	/**
 	 * @brief If the panel is hovered.
 	 */
-	bool isHovered() const { return m_hovered; }
+	[[nodiscard]] auto isHovered() const -> bool { return m_hovered; }
 	/**
 	 * @brief If the panel is focused.
 	 */
-	bool isFocused() const { return m_focused; }
+	[[nodiscard]] auto isFocused() const -> bool { return m_focused; }
 
 protected:
+	std::string m_name;
 	/// Panel size.
 	math::vec2ui m_size = {0, 0};
 	/// Panel bounds.

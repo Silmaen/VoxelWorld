@@ -211,11 +211,16 @@ void renderProps(Camera& ioComponent) {
 
 void renderProps(SpriteRenderer& ioComponent) {
 	ImGui::ColorEdit4("Color", ioComponent.color.data());
-	if (const auto tex = gui::imTexture(ioComponent.texture); tex.has_value())
-		ImGui::ImageButton("Texture", tex.value(), ImVec2(100.0f, 100.0f), ImVec2(0, 1), ImVec2(1, 0));
-	else
-		ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-
+	if (const auto tex = gui::imTexture(ioComponent.texture); tex.has_value()) {
+		if (ImGui::ImageButton("Texture", tex.value(), ImVec2(100.0f, 100.0f), ImVec2(0, 1), ImVec2(1, 0)) &&
+			ioComponent.texture != nullptr) {
+			ImGui::OpenPopup("TextureSettings");
+		}
+	} else {
+		if (ImGui::Button("Texture", ImVec2(100.0f, 100.0f)) && ioComponent.texture != nullptr) {
+			ImGui::OpenPopup("TextureSettings");
+		}
+	}
 	if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 			const auto* const path = static_cast<const char*>(payload->Data);
@@ -224,6 +229,14 @@ void renderProps(SpriteRenderer& ioComponent) {
 		}
 		ImGui::EndDragDropTarget();
 	}
+	bool removeTexture = false;
+	if (ImGui::BeginPopup("TextureSettings")) {
+		if (ImGui::MenuItem("Remove texture"))
+			removeTexture = true;
+		ImGui::EndPopup();
+	}
+	if (removeTexture)
+		ioComponent.texture.reset();
 	ImGui::DragFloat("Tiling Factor", &ioComponent.tilingFactor, 0.1f, 0.0f, 100.0f);
 }
 
@@ -297,13 +310,13 @@ void SceneHierarchy::drawComponents(scene::Entity& ioEntity) {
 		auto& tag = ioEntity.getComponent<Tag>().tag;
 		std::string buffer{tag};
 		buffer.resize(256);
-		if (ImGui::InputText("##Tag", &buffer[0], 256)) {
+		if (ImGui::InputText("##Tag", buffer.data(), 256)) {
 			buffer.resize(strlen(buffer.c_str()));
 			tag = buffer;
 		}
 	}
-
 	ImGui::SameLine();
+	ImGui::Text("Entity name");
 	ImGui::PushItemWidth(-1);
 	if (ImGui::Button("Add Component"))
 		ImGui::OpenPopup("AddComponent");

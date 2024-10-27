@@ -15,7 +15,16 @@ OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
 OWL_DIAG_POP
 
 namespace owl::nest {
-namespace {}// namespace
+namespace {
+void loadIcons() {
+	auto& textureLibrary = renderer::Renderer::getTextureLibrary();
+	textureLibrary.addFromStandardPath("icons/control/ctrl_rotation");
+	textureLibrary.addFromStandardPath("icons/control/ctrl_scale");
+	textureLibrary.addFromStandardPath("icons/control/ctrl_translation");
+	textureLibrary.addFromStandardPath("icons/PlayButton");
+	textureLibrary.addFromStandardPath("icons/StopButton");
+}
+}// namespace
 EditorLayer::EditorLayer() : Layer("EditorLayer"), m_cameraController{1280.0f / 720.0f} {}
 
 void EditorLayer::onAttach() {
@@ -23,16 +32,50 @@ void EditorLayer::onAttach() {
 
 	core::Application::get().enableDocking();
 
-	m_activeScene = mkShared<scene::Scene>();
 
 	m_viewport.attach();
 	m_viewport.attachParent(this);
 
-	m_iconPlay = renderer::Texture2D::create(
-			core::Application::get().getFullAssetPath("PlayButton.png", "icons").value_or(std::filesystem::path{}));
-	m_iconStop = renderer::Texture2D::create(
-			core::Application::get().getFullAssetPath("StopButton.png", "icons").value_or(std::filesystem::path{}));
+	loadIcons();
+
+
+	m_controlBar.init(gui::widgets::ButtonBarData{{.id = "##controlBar", .visible = true}, false, false, true});
+	m_controlBar.addButton({{.id = "##ctrlTranslation", .visible = true},
+							"icons/control/ctrl_translation",
+							"T",
+							[this]() { return m_viewport.getGuizmoType() == panel::Viewport::GuizmoType::Translation; },
+							[this]() {
+								if (m_viewport.getGuizmoType() == panel::Viewport::GuizmoType::Translation)
+									m_viewport.setGuizmoType(panel::Viewport::GuizmoType::None);
+								else
+									m_viewport.setGuizmoType(panel::Viewport::GuizmoType::Translation);
+							},
+							{32, 32}});
+	m_controlBar.addButton({{.id = "##ctrlRotation", .visible = true},
+							"icons/control/ctrl_rotation",
+							"T",
+							[this]() { return m_viewport.getGuizmoType() == panel::Viewport::GuizmoType::Rotation; },
+							[this]() {
+								if (m_viewport.getGuizmoType() == panel::Viewport::GuizmoType::Rotation)
+									m_viewport.setGuizmoType(panel::Viewport::GuizmoType::None);
+								else
+									m_viewport.setGuizmoType(panel::Viewport::GuizmoType::Rotation);
+							},
+							{32, 32}});
+	m_controlBar.addButton({{.id = "##ctrlScale", .visible = true},
+							"icons/control/ctrl_scale",
+							"T",
+							[this]() { return m_viewport.getGuizmoType() == panel::Viewport::GuizmoType::Scale; },
+							[this]() {
+								if (m_viewport.getGuizmoType() == panel::Viewport::GuizmoType::Scale)
+									m_viewport.setGuizmoType(panel::Viewport::GuizmoType::None);
+								else
+									m_viewport.setGuizmoType(panel::Viewport::GuizmoType::Scale);
+							},
+							{32, 32}});
+
 	m_contentBrowser.attach();
+	newScene();
 }
 
 void EditorLayer::onDetach() {
@@ -41,11 +84,10 @@ void EditorLayer::onDetach() {
 	m_viewport.detach();
 	OWL_TRACE("EditorLayer: viewport freed.")
 	m_contentBrowser.detach();
-	OWL_TRACE("EditorLayer: content browser resources freed.")
-	m_iconPlay.reset();
-	OWL_TRACE("EditorLayer: deleted iconPlay Texture.")
-	m_iconStop.reset();
 	OWL_TRACE("EditorLayer: deleted editor FrameBuffer.")
+
+	m_controlBar.clearButtons();
+
 	m_activeScene.reset();
 	OWL_TRACE("EditorLayer: deleted activeScene.")
 }
@@ -91,9 +133,12 @@ void EditorLayer::onImGuiRender(const core::Timestep& iTimeStep) {
 	m_viewport.onRender();
 	//=============================================================
 	renderToolbar();
+	m_controlBar.onRender();
 }
 
 void EditorLayer::renderStats(const core::Timestep& iTimeStep) {
+	if (!m_showStats)
+		return;
 	ImGui::Begin("Stats");
 	ImGui::Text("%s", fmt::format("FPS: {:.2f}", iTimeStep.getFps()).c_str());
 	ImGui::Separator();
@@ -102,9 +147,17 @@ void EditorLayer::renderStats(const core::Timestep& iTimeStep) {
 	ImGui::Text("%s", fmt::format("Max used memory: {}", debug::TrackerAPI::globals().memoryPeek.str()).c_str());
 	ImGui::Text("%s", fmt::format("Allocation calls: {}", debug::TrackerAPI::globals().allocationCalls).c_str());
 	ImGui::Text("%s", fmt::format("Deallocation calls: {}", debug::TrackerAPI::globals().deallocationCalls).c_str());
+	ImGui::Text("%s",
+				fmt::format("Frame allocation: {}", debug::TrackerAPI::globals().allocationCalls - m_lastAllocCalls)
+						.c_str());
+	ImGui::Text("%s", fmt::format("Frame deallocation: {}",
+								  debug::TrackerAPI::globals().deallocationCalls - m_lastDeallocCalls)
+							  .c_str());
+	m_lastAllocCalls = debug::TrackerAPI::globals().allocationCalls;
+	m_lastDeallocCalls = debug::TrackerAPI::globals().deallocationCalls;
 	ImGui::Separator();
 	std::string name = "None";
-	if (auto ent = m_viewport.getHoveredEntity()) {
+	if (const auto ent = m_viewport.getHoveredEntity()) {
 		if (ent.hasComponent<scene::component::Tag>())
 			name = ent.getComponent<scene::component::Tag>().tag;
 	}
@@ -136,7 +189,13 @@ void EditorLayer::renderMenu() {
 				saveSceneAs();
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit"))
-				owl::core::Application::get().close();
+				core::Application::get().close();
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Settings")) {
+			if (ImGui::MenuItem("Show Stats", nullptr, m_showStats)) {
+				m_showStats = !m_showStats;
+			}
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
@@ -159,7 +218,9 @@ void EditorLayer::renderToolbar() {
 				 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	const float size = ImGui::GetWindowHeight() - 4.0f;
-	const shared<renderer::Texture2D> icon = m_state == State::Edit ? m_iconPlay : m_iconStop;
+	auto& textureLibrary = renderer::Renderer::getTextureLibrary();
+	const shared<renderer::Texture> icon =
+			m_state == State::Edit ? textureLibrary.get("icons/PlayButton") : textureLibrary.get("icons/StopButton");
 	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 	if (const auto tex = gui::imTexture(icon); tex.has_value()) {
 		if (ImGui::ImageButton("btn_start_stop", tex.value(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1))) {
@@ -314,7 +375,7 @@ void EditorLayer::onDuplicateEntity() const {
 		m_editorScene->duplicateEntity(selectedEntity);
 }
 
-scene::Entity EditorLayer::getSelectedEntity() const { return m_sceneHierarchy.getSelectedEntity(); }
+auto EditorLayer::getSelectedEntity() const -> scene::Entity { return m_sceneHierarchy.getSelectedEntity(); }
 
 void EditorLayer::setSelectedEntity(const scene::Entity iEntity) { m_sceneHierarchy.setSelectedEntity(iEntity); }
 

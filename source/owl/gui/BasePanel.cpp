@@ -14,13 +14,13 @@
 
 namespace owl::gui {
 
-BasePanel::BasePanel() = default;
+BasePanel::BasePanel(std::string&& iName) : m_name{std::move(iName)} {};
 
 BasePanel::~BasePanel() = default;
 
 void BasePanel::onRender() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-	ImGui::Begin("Viewport");
+	ImGui::Begin(m_name.c_str());
 	const auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 	const auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 	const auto viewportOffset = ImGui::GetWindowPos();
