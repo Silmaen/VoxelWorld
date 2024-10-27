@@ -63,6 +63,7 @@ void main() {
         case 31: texColor *= texture(u_Textures[31], i_Vertex.TexCoord * i_Vertex.TilingFactor); break;
     }
     o_Color = texColor;
+    if (o_Color.a == 0)discard;
 
     o_EntityID = i_EntityID;// placeholder for our entity ID
 }

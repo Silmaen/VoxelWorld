@@ -15,12 +15,8 @@
 
 
 namespace owl::nest::panel {
-namespace {
-constexpr auto vec(math::vec2 iVec) -> ImVec2 { return {iVec.x(), iVec.y()}; }
-constexpr auto vec(math::vec2ui iVec) -> ImVec2 { return {static_cast<float>(iVec.x()), static_cast<float>(iVec.y())}; }
-}// namespace
 
-Viewport::Viewport() = default;
+Viewport::Viewport() : BasePanel{"SceneView"} {}
 
 Viewport::~Viewport() = default;
 
@@ -109,8 +105,8 @@ void Viewport::onRenderInternal() {
 	OWL_PROFILE_FUNCTION()
 
 	if (const auto tex = gui::imTexture(m_framebuffer, 0); tex.has_value())
-		ImGui::Image(tex.value(), vec(getSize()), vec(m_framebuffer->getLowerData()),
-					 vec(m_framebuffer->getUpperData()));
+		ImGui::Image(tex.value(), gui::vec(getSize()), gui::vec(m_framebuffer->getLowerData()),
+					 gui::vec(m_framebuffer->getUpperData()));
 	if (m_parent != nullptr) {
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -155,13 +151,19 @@ void Viewport::renderOverlay() const {
 	renderer::Renderer2D::endScene();
 }
 
+
+void Viewport::setGuizmoType(const GuizmoType& iType) { m_gizmoType = iType; }
+auto Viewport::getGuizmoType() const -> GuizmoType { return m_gizmoType; }
+auto Viewport::getGuizmoTypeI() const -> uint16_t { return static_cast<uint16_t>(m_gizmoType); }
+
 void Viewport::renderGizmo() {
 	// Gizmos
 	if (m_parent == nullptr)
 		return;
 
 	// Gizmos
-	if (const scene::Entity selectedEntity = m_parent->getSelectedEntity(); selectedEntity && m_gizmoType != -1) {
+	if (const scene::Entity selectedEntity = m_parent->getSelectedEntity();
+		selectedEntity && m_gizmoType != GuizmoType::None) {
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
 
@@ -187,7 +189,7 @@ void Viewport::renderGizmo() {
 		const bool snap = input::Input::isKeyPressed(input::key::LeftControl);
 		float snapValue = 0.5f;// Snap to 0.5m for translation/scale
 		// Snap to 45 degrees for rotation
-		if (m_gizmoType == ImGuizmo::OPERATION::ROTATE)
+		if (getGuizmoTypeI() == ImGuizmo::OPERATION::ROTATE)
 			snapValue = 45.0f;
 
 		const float snapValues[3] = {snapValue, snapValue, snapValue};
@@ -228,7 +230,7 @@ auto Viewport::onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool {
 		case input::key::Q:
 			{
 				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = -1;
+					m_gizmoType = GuizmoType::None;
 					return true;
 				}
 				break;
@@ -236,7 +238,7 @@ auto Viewport::onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool {
 		case input::key::W:
 			{
 				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+					m_gizmoType = GuizmoType::Translation;
 					return true;
 				}
 				break;
@@ -244,7 +246,7 @@ auto Viewport::onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool {
 		case input::key::E:
 			{
 				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = ImGuizmo::OPERATION::ROTATE;
+					m_gizmoType = GuizmoType::Rotation;
 					return true;
 				}
 				break;
@@ -252,7 +254,15 @@ auto Viewport::onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool {
 		case input::key::R:
 			{
 				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = ImGuizmo::OPERATION::SCALE;
+					m_gizmoType = GuizmoType::Scale;
+					return true;
+				}
+				break;
+			}
+		case input::key::T:
+			{
+				if (!ImGuizmo::IsUsing()) {
+					m_gizmoType = GuizmoType::All;
 					return true;
 				}
 				break;

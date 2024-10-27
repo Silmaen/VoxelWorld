@@ -35,17 +35,19 @@
 
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
-#include "gui/BaseDrawPanel.h"
-#include "gui/BasePanel.h"
-#include "gui/Theme.h"
-#include "gui/UiLayer.h"
-#include "gui/utils.h"
 #include "input/CameraOrthoController.h"
 #include "input/Input.h"
 #include "input/Window.h"
 #include "input/video/Manager.h"
 #include "math/math.h"
 
+// -------- gui ------------
+#include "gui/BaseDrawPanel.h"
+#include "gui/BasePanel.h"
+#include "gui/Theme.h"
+#include "gui/UiLayer.h"
+#include "gui/utils.h"
+#include "gui/widgets/ButtonBar.h"
 // ------- scene -----------
 #include "scene/Entity.h"
 #include "scene/Scene.h"

@@ -120,6 +120,14 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 	if (m_initParams.hasGui) {
 		mp_imGuiLayer = mkShared<gui::UiLayer>();
 		pushOverlay(mp_imGuiLayer);
+
+		// applying the theme.
+		if (const auto defaultTheme = m_workingDirectory / "theme.yml"; exists(defaultTheme)) {
+			gui::Theme theme;
+			theme.loadFromFile(defaultTheme);
+			gui::UiLayer::setTheme(theme);
+		}
+
 		OWL_CORE_TRACE("GUI Layer created.")
 	}
 
@@ -130,12 +138,12 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 	OWL_CORE_TRACE("Application creation done.")
 }
 
-void Application::enableDocking() {
+void Application::enableDocking() const {
 	if (mp_imGuiLayer)
 		mp_imGuiLayer->enableDocking();
 }
 
-void Application::disableDocking() {
+void Application::disableDocking() const {
 	if (mp_imGuiLayer)
 		mp_imGuiLayer->disableDocking();
 }
@@ -315,22 +323,15 @@ auto Application::getFullAssetPath(const std::string& iAssetName, const std::str
 void AppParams::loadFromFile(const std::filesystem::path& iFile) {
 	YAML::Node data = YAML::LoadFile(iFile.string());
 	if (auto appConfig = data["AppConfig"]; appConfig) {
-		if (appConfig["width"])
-			width = appConfig["width"].as<uint32_t>();
-		if (appConfig["height"])
-			height = appConfig["height"].as<uint32_t>();
-		if (appConfig["renderer"]) {
-			if (const auto dRenderer =
-						magic_enum::enum_cast<renderer::RenderAPI::Type>(appConfig["renderer"].as<std::string>());
-				dRenderer.has_value())
-				renderer = dRenderer.value();
-		}
-		if (appConfig["hasGui"])
-			hasGui = appConfig["hasGui"].as<bool>();
-		if (appConfig["useDebugging"])
-			useDebugging = appConfig["useDebugging"].as<bool>();
-		if (appConfig["frameLogFrequency"])
-			frameLogFrequency = appConfig["frameLogFrequency"].as<uint64_t>();
+		get(appConfig, "width", width);
+		get(appConfig, "height", height);
+		std::string rendererStr;
+		get(appConfig, "renderer", rendererStr);
+		if (const auto dRenderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(rendererStr); dRenderer.has_value())
+			renderer = dRenderer.value();
+		get(appConfig, "hasGui", hasGui);
+		get(appConfig, "useDebugging", useDebugging);
+		get(appConfig, "frameLogFrequency", frameLogFrequency);
 	}
 }
 

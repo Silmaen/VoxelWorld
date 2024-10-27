@@ -58,12 +58,13 @@ private:
 	void renderMenu();
 	void renderToolbar();
 
-
 	auto onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool;
 	auto onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent) -> bool;
 	void onScenePlay();
 	void onSceneStop();
 	void onDuplicateEntity() const;
+
+	gui::widgets::ButtonBar m_controlBar;
 
 	input::CameraOrthoController m_cameraController;
 
@@ -74,13 +75,14 @@ private:
 
 	std::filesystem::path m_currentScenePath;
 
+	// stats
+	bool m_showStats = true;
+	size_t m_lastAllocCalls = 0;
+	size_t m_lastDeallocCalls = 0;
+
 	// Panels
 	panel::SceneHierarchy m_sceneHierarchy;
 	panel::ContentBrowser m_contentBrowser;
 	panel::Viewport m_viewport;
-
-	// Editor resources
-	shared<renderer::Texture2D> m_iconPlay;
-	shared<renderer::Texture2D> m_iconStop;
 };
 }// namespace owl::nest

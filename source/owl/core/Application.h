@@ -195,12 +195,12 @@ public:
 	/**
 		 * @brief Enable the docking environment.
 		 */
-	void enableDocking();
+	void enableDocking() const;
 
 	/**
 	 * @brief Disable the docking environment.
 	 */
-	void disableDocking();
+	void disableDocking() const;
 
 	/**
 	 * @brief Access to init parameters.

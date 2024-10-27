@@ -13,35 +13,43 @@
 
 namespace owl::nest::panel {
 
-
 namespace {
 
 void loadIcons() {
 	auto& textureLibrary = renderer::Renderer::getTextureLibrary();
-	textureLibrary.addFromStandardPath("icons/file_ext_jpg_icon");
-	textureLibrary.addFromStandardPath("icons/file_ext_owl_icon");
-	textureLibrary.addFromStandardPath("icons/file_ext_png_icon");
-	textureLibrary.addFromStandardPath("icons/file_ext_ttf_icon");
-	textureLibrary.addFromStandardPath("icons/file_ext_yml_icon");
-	textureLibrary.addFromStandardPath("icons/folder_icon");
-	textureLibrary.addFromStandardPath("icons/text_file_icon");
+	textureLibrary.addFromStandardPath("icons/files/folder_icon");
+	textureLibrary.addFromStandardPath("icons/files/glsl_icon");
+	textureLibrary.addFromStandardPath("icons/files/jpg_icon");
+	textureLibrary.addFromStandardPath("icons/files/json_icon");
+	textureLibrary.addFromStandardPath("icons/files/owl_icon");
+	textureLibrary.addFromStandardPath("icons/files/png_icon");
+	textureLibrary.addFromStandardPath("icons/files/svg_icon");
+	textureLibrary.addFromStandardPath("icons/files/text_icon");
+	textureLibrary.addFromStandardPath("icons/files/ttf_icon");
+	textureLibrary.addFromStandardPath("icons/files/yml_icon");
 }
 
-std::optional<ImTextureID> getFileIcon(const std::filesystem::path& iPath) {
+auto getFileIcon(const std::filesystem::path& iPath) -> std::optional<ImTextureID> {
 	auto& textureLibrary = renderer::Renderer::getTextureLibrary();
 	if (is_directory(iPath))
-		return gui::imTexture(textureLibrary.get("icons/folder_icon"));
-	if (iPath.extension() == ".png")
-		return gui::imTexture(textureLibrary.get("icons/file_ext_png_icon"));
+		return gui::imTexture(textureLibrary.get("icons/files/folder_icon"));
+	if (iPath.extension() == ".glsl" || iPath.extension() == ".frag" || iPath.extension() == ".vert")
+		return gui::imTexture(textureLibrary.get("icons/files/glsl_icon"));
 	if (iPath.extension() == ".jpg")
-		return gui::imTexture(textureLibrary.get("icons/file_ext_jpg_icon"));
+		return gui::imTexture(textureLibrary.get("icons/files/jpg_icon"));
+	if (iPath.extension() == ".json")
+		return gui::imTexture(textureLibrary.get("icons/files/json_icon"));
 	if (iPath.extension() == ".owl")
-		return gui::imTexture(textureLibrary.get("icons/file_ext_owl_icon"));
+		return gui::imTexture(textureLibrary.get("icons/files/owl_icon"));
+	if (iPath.extension() == ".png")
+		return gui::imTexture(textureLibrary.get("icons/files/png_icon"));
+	if (iPath.extension() == ".svg")
+		return gui::imTexture(textureLibrary.get("icons/files/svg_icon"));
 	if (iPath.extension() == ".ttf")
-		return gui::imTexture(textureLibrary.get("icons/file_ext_ttf_icon"));
-	if (iPath.extension() == ".yml")
-		return gui::imTexture(textureLibrary.get("icons/file_ext_yml_icon"));
-	return gui::imTexture(textureLibrary.get("icons/text_file_icon"));
+		return gui::imTexture(textureLibrary.get("icons/files/ttf_icon"));
+	if (iPath.extension() == ".yml" || iPath.extension() == ".yaml")
+		return gui::imTexture(textureLibrary.get("icons/files/yml_icon"));
+	return gui::imTexture(textureLibrary.get("icons/files/text_file_icon"));
 }
 
 }// namespace
