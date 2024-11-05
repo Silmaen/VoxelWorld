@@ -24,7 +24,7 @@ auto UniformBuffer::create(uint32_t iSize, uint32_t iBinding, const std::string&
 		case RenderAPI::Type::Vulkan:
 			return mkShared<vulkan::UniformBuffer>(iSize, iBinding, iRenderer);
 	}
-	OWL_CORE_ERROR("Unknown API Type!")
+	OWL_CORE_ERROR("Unknown Graphic API Type!")
 	return nullptr;
 }
 

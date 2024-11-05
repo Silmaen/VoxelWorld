@@ -164,6 +164,11 @@ find_package(glslang REQUIRED)
 find_package(shaderc REQUIRED)
 target_link_libraries(${ENGINE_NAME} PRIVATE shaderc::shaderc_shared)
 
+# OpenAL
+find_package(OpenAL CONFIG REQUIRED)
+message(STATUS "Found OpenAL version ${OpenAL_VERSION} @ ${OpenAL_DIR}")
+target_link_libraries(${ENGINE_NAME} PRIVATE OpenAL::OpenAL)
+
 # additional windows libs
 if (${PRJPREFIX}_PLATFORM_WINDOWS)
     target_link_libraries(${ENGINE_NAME} PUBLIC Mf Mfplat Mfreadwrite)
@@ -187,6 +192,11 @@ if (${PRJPREFIX}_PLATFORM_WINDOWS)
                     COMMENT "Copy the vulkan shared dll"
             )
         endforeach ()
+        add_custom_command(TARGET ${ENGINE_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${OpenAL_DIR}/../../../bin/OpenAL32$<$<CONFIG:Debug>:d>.dll" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                COMMAND_EXPAND_LISTS
+                COMMENT "Copy the OpenAL shared dll"
+        )
     endif ()
 elseif (${PRJPREFIX}_PLATFORM_LINUX)
     target_import_so_files(${ENGINE_NAME})
