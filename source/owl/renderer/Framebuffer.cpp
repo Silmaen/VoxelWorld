@@ -25,7 +25,7 @@ auto Framebuffer::create(const FramebufferSpecification& iSpec) -> shared<Frameb
 		case RenderAPI::Type::Vulkan:
 			return mkShared<vulkan::Framebuffer>(iSpec);
 	}
-	OWL_CORE_ERROR("Unknown API Type!")
+	OWL_CORE_ERROR("Unknown Graphic API Type!")
 	return nullptr;
 }
 

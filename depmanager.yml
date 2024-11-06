@@ -12,6 +12,8 @@ packages:
   imgui:
   imguizmo:
   mavsdk:
+  openal:
+    kind: "shared"
   spdlog:
   yaml-cpp:
   nfd:

@@ -164,7 +164,7 @@ public:
 
 	/**
 	 * @brief Check if the API type require initializations.
-	 * @return tRue if initialization required.
+	 * @return True if initialization required.
 	 */
 	static auto requireInit() -> bool {
 		if (mu_renderAPI)

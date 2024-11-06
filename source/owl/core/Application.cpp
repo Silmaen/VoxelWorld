@@ -14,6 +14,7 @@
 #include "core/external/yaml.h"
 #include "input/Input.h"
 #include "renderer/Renderer.h"
+#include "sound/SoundSystem.h"
 
 namespace owl::core {
 
@@ -129,6 +130,25 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 		}
 
 		OWL_CORE_TRACE("GUI Layer created.")
+	}
+
+	// Create the sound system
+	{
+		sound::SoundCommand::create(m_initParams.isDummy ? sound::SoundAPI::Type::Null : m_initParams.sound);
+		// check sound system creation
+		if (sound::SoundCommand::getState() != sound::SoundAPI::State::Created) {
+			OWL_CORE_ERROR("ERROR while Creating Sound system")
+			m_state = State::Error;
+			return;
+		}
+		sound::SoundSystem::init();
+		// check sound system initialization
+		if (sound::SoundCommand::getState() != sound::SoundAPI::State::Ready) {
+			OWL_CORE_ERROR("ERROR while Initializing Sound system")
+			m_state = State::Error;
+			return;
+		}
+		OWL_CORE_INFO("Sound system initiated.")
 	}
 
 	// update the state here. (required for font initialization)
@@ -329,6 +349,9 @@ void AppParams::loadFromFile(const std::filesystem::path& iFile) {
 		get(appConfig, "renderer", rendererStr);
 		if (const auto dRenderer = magic_enum::enum_cast<renderer::RenderAPI::Type>(rendererStr); dRenderer.has_value())
 			renderer = dRenderer.value();
+		get(appConfig, "sound", rendererStr);
+		if (const auto dSound = magic_enum::enum_cast<sound::SoundAPI::Type>(rendererStr); dSound.has_value())
+			sound = dSound.value();
 		get(appConfig, "hasGui", hasGui);
 		get(appConfig, "useDebugging", useDebugging);
 		get(appConfig, "frameLogFrequency", frameLogFrequency);
@@ -343,6 +366,7 @@ void AppParams::saveToFile(const std::filesystem::path& iFile) const {
 	out << YAML::Key << "width" << YAML::Value << width;
 	out << YAML::Key << "height" << YAML::Value << height;
 	out << YAML::Key << "renderer" << YAML::Value << std::string(magic_enum::enum_name(renderer));
+	out << YAML::Key << "sound" << YAML::Value << std::string(magic_enum::enum_name(sound));
 	out << YAML::Key << "hasGui" << YAML::Value << hasGui;
 	out << YAML::Key << "useDebugging" << YAML::Value << useDebugging;
 	out << YAML::Key << "frameLogFrequency" << YAML::Value << frameLogFrequency;

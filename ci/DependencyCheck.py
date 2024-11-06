@@ -12,6 +12,7 @@ dependencies = [
     {"name": "magic_enum", "version": "*", "header": True},
     {"name": "msdfgen", "version": "*", "header": False},
     {"name": "msdf-atlas-gen", "version": "*", "header": False},
+    {"name": "openal", "version": "*", "header": False, "kind": "shared"},
     {"name": "stb_image", "version": "*", "header": True},
     {"name": "fmt", "version": "*", "header": False},
     {"name": "glad", "version": "*", "header": False},

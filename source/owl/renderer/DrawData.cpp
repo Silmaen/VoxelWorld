@@ -26,7 +26,7 @@ auto DrawData::create() -> shared<DrawData> {
 		case RenderAPI::Type::Vulkan:
 			return mkShared<vulkan::DrawData>();
 	}
-	OWL_CORE_ERROR("Unknown API Type!")
+	OWL_CORE_ERROR("Unknown Graphic API Type!")
 	return nullptr;
 }
 

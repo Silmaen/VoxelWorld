@@ -15,6 +15,7 @@
 #include "input/Window.h"
 #include "layer/LayerStack.h"
 #include "renderer/RenderAPI.h"
+#include "sound/SoundAPI.h"
 #include <filesystem>
 
 auto main(int iArgc, char* iArgv[]) -> int;
@@ -49,6 +50,8 @@ struct OWL_API AppParams {
 	int argCount{0};
 	/// Renderer's type.
 	renderer::RenderAPI::Type renderer{renderer::RenderAPI::Type::Vulkan};
+	/// sound system's type.
+	sound::SoundAPI::Type sound{sound::SoundAPI::Type::OpenAL};
 	/// If the application should use ImGui overlay.
 	bool hasGui{true};
 	/// If extra debugging symbols should be loaded.
