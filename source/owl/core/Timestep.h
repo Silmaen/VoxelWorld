@@ -90,6 +90,12 @@ public:
 	 */
 	[[nodiscard]] auto getFrameNumber() const -> uint64_t { return m_frameId; }
 
+	/**
+	 * @brief Get the current time point.
+	 * @return The current time point.
+	 */
+	[[nodiscard]] auto getTimePoint() const -> const timePoint& { return m_lastCall; }
+
 private:
 	/// Last update call point.
 	timePoint m_lastCall;

@@ -82,6 +82,10 @@ constexpr auto mkShared(Args&&... iArgs) -> shared<T> {
 	return std::make_shared<T>(std::forward<Args>(iArgs)...);
 }
 
+/// Wrap to weak pointer.
+template<typename T>
+using weak = std::weak_ptr<T>;
+
 }// namespace owl
 
 #include "Assert.h"
