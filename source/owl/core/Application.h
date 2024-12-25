@@ -16,6 +16,9 @@
 #include "layer/LayerStack.h"
 #include "renderer/RenderAPI.h"
 #include "sound/SoundAPI.h"
+#include "task/Scheduler.h"
+#include "task/Task.h"
+
 #include <filesystem>
 
 auto main(int iArgc, char* iArgv[]) -> int;
@@ -246,6 +249,18 @@ public:
 	 */
 	[[nodiscard]] auto getFontLibrary() const -> const fonts::FontLibrary& { return m_fontLibrary; }
 
+	/**
+	 * @brief Access to the task scheduler.
+	 * @return The task scheduler.
+	 */
+	[[nodiscard]] auto getTaskScheduler() -> task::Scheduler& { return m_scheduler; }
+
+	/**
+	 * @brief Access to the task scheduler.
+	 * @return The task scheduler.
+	 */
+	[[nodiscard]] auto getTaskScheduler() const -> const task::Scheduler& { return m_scheduler; }
+
 private:
 	/**
 	 * @brief Helper function used to search for assets location.
@@ -295,6 +310,8 @@ private:
 	fonts::FontLibrary m_fontLibrary;
 	/// The application Instance.
 	static Application* s_instance;
+	/// The task Scheduler.
+	task::Scheduler m_scheduler;
 
 	/// Mark the main entrypoint function as friend.
 	friend auto ::main(int iArgc, char** iArgv) -> int;

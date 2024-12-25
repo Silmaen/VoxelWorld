@@ -20,5 +20,6 @@ class TestWithParam : public ::testing::Test, public ::testing::WithParamInterfa
 #include <filesystem>
 #include <fstream>
 #include <list>
+#include <queue>
 
 #include <entt/entt.hpp>

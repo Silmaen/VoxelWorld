@@ -86,6 +86,8 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 			m_state = State::Error;
 			return;
 		}
+		// wait for all asynchron tasks
+		m_scheduler.waitEmptyQueue();
 	}
 
 	// create main window
@@ -111,6 +113,8 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 			m_state = State::Error;
 			return;
 		}
+		// wait for all asynchron tasks
+		m_scheduler.waitEmptyQueue();
 		OWL_CORE_INFO("Renderer initiated.")
 	}
 
@@ -128,6 +132,8 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 			theme.loadFromFile(defaultTheme);
 			gui::UiLayer::setTheme(theme);
 		}
+		// wait for all asynchron tasks
+		m_scheduler.waitEmptyQueue();
 
 		OWL_CORE_TRACE("GUI Layer created.")
 	}
@@ -148,12 +154,16 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 			m_state = State::Error;
 			return;
 		}
+		// wait for all asynchron tasks
+		m_scheduler.waitEmptyQueue();
 		OWL_CORE_INFO("Sound system initiated.")
 	}
 
 	// update the state here. (required for font initialization)
 	m_state = State::Running;
 	m_fontLibrary.init();
+	// wait for all asynchron tasks
+	m_scheduler.waitEmptyQueue();
 
 	OWL_CORE_TRACE("Application creation done.")
 }
@@ -219,6 +229,8 @@ void Application::run() {
 			renderer::RenderCommand::endFrame();
 		}
 		mp_appWindow->onUpdate();
+
+		m_scheduler.frame(m_stepper);
 
 #if OWL_TRACKER_VERBOSITY >= 3
 		{

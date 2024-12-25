@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <fstream>
 #include <optional>
+#include <queue>
 // -------------------------
 
 // ------- 3rd party -------
