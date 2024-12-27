@@ -12,6 +12,8 @@
 #include "CircleRenderer.h"
 #include "ID.h"
 #include "NativeScript.h"
+#include "PhysicBody.h"
+#include "PhysicCollider.h"
 #include "SpriteRenderer.h"
 #include "Tag.h"
 #include "Text.h"

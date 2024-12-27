@@ -13,15 +13,9 @@
 #include "Entity.h"
 #include "renderer/Renderer2D.h"
 
-#include "component/Camera.h"
-#include "component/CircleRenderer.h"
-#include "component/ID.h"
-#include "component/NativeScript.h"
-#include "component/SpriteRenderer.h"
-#include "component/Tag.h"
-#include "component/Text.h"
-#include "component/Transform.h"
+#include "component/components.h"
 #include "core/Application.h"
+#include "physic/PhysicCommand.h"
 
 namespace owl::scene {
 namespace {
@@ -73,6 +67,8 @@ auto Scene::copy(const shared<Scene>& iOther) -> shared<Scene> {
 	copyComponent<component::Camera>(dstSceneRegistry, srcSceneRegistry, enttMap);
 	copyComponent<component::NativeScript>(dstSceneRegistry, srcSceneRegistry, enttMap);
 	copyComponent<component::Text>(dstSceneRegistry, srcSceneRegistry, enttMap);
+	copyComponent<component::PhysicBody>(dstSceneRegistry, srcSceneRegistry, enttMap);
+	copyComponent<component::PhysicCollider>(dstSceneRegistry, srcSceneRegistry, enttMap);
 	//copyComponent<component::Rigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 	//copyComponent<component::BoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 
@@ -96,6 +92,18 @@ void Scene::destroyEntity(Entity& ioEntity) {
 	ioEntity.m_entityHandle = entt::null;
 }
 
+void Scene::onStartRuntime() {
+	OWL_PROFILE_FUNCTION()
+
+	physic::PhysicCommand::init(this);
+}
+
+void Scene::onEndRuntime() {
+	OWL_PROFILE_FUNCTION()
+
+	physic::PhysicCommand::destroy();
+}
+
 void Scene::onUpdateRuntime(const core::Timestep& iTimeStep) {
 	// update scripts
 	registry.view<component::NativeScript>().each([iTimeStep, this](auto ioEntity, auto& ioNsc) {
@@ -106,6 +114,9 @@ void Scene::onUpdateRuntime(const core::Timestep& iTimeStep) {
 		}
 		ioNsc.instance->onUpdate(iTimeStep);
 	});
+
+	// Physics
+	physic::PhysicCommand::frame(iTimeStep);
 
 	// Render 2D
 	renderer::Camera* mainCamera = nullptr;
@@ -187,6 +198,8 @@ auto Scene::duplicateEntity(const Entity& iEntity) -> Entity {
 	copyComponentIfExists<component::Camera>(newEntity, iEntity);
 	copyComponentIfExists<component::NativeScript>(newEntity, iEntity);
 	copyComponentIfExists<component::Text>(newEntity, iEntity);
+	copyComponentIfExists<component::PhysicBody>(newEntity, iEntity);
+	copyComponentIfExists<component::PhysicCollider>(newEntity, iEntity);
 	//copyComponentIfExists<component::Rigidbody2D>(newEntity, iEntity);
 	//copyComponentIfExists<component::BoxCollider2D>(newEntity, iEntity);
 
@@ -248,5 +261,14 @@ OWL_API void Scene::onComponentAdded<component::Text>([[maybe_unused]] const Ent
 		}
 	}
 }
+
+template<>
+OWL_API void Scene::onComponentAdded<component::PhysicBody>([[maybe_unused]] const Entity& iEntity,
+															[[maybe_unused]] component::PhysicBody& ioComponent) {}
+
+template<>
+OWL_API void
+Scene::onComponentAdded<component::PhysicCollider>([[maybe_unused]] const Entity& iEntity,
+												   [[maybe_unused]] component::PhysicCollider& ioComponent) {}
 
 }// namespace owl::scene

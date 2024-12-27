@@ -6,11 +6,7 @@
 #include <scene/Entity.h>
 #include <scene/Scene.h>
 #include <scene/SceneSerializer.h>
-#include <scene/component/Camera.h>
-#include <scene/component/CircleRenderer.h>
-#include <scene/component/SpriteRenderer.h>
-#include <scene/component/Text.h>
-#include <scene/component/Transform.h>
+#include <scene/component/components.h>
 
 using namespace owl::scene;
 
@@ -42,6 +38,8 @@ TEST(SceneSerializer, SaveLoadFULL) {
 	ent.addOrReplaceComponent<component::SpriteRenderer>();
 	auto ent2 = sc->createEntityWithUUID(7, "bobObject2");
 	auto& spr = ent2.addOrReplaceComponent<component::SpriteRenderer>();
+	ent2.addOrReplaceComponent<component::PhysicBody>();
+	ent2.addOrReplaceComponent<component::PhysicCollider>();
 	ent2.addOrReplaceComponent<component::Text>();
 	spr.texture =
 			owl::mkShared<owl::renderer::null::Texture2D>(owl::renderer::Texture2D::Specification{.size = {1, 1}});

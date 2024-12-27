@@ -152,8 +152,7 @@ if (${PRJPREFIX}_PLATFORM_WINDOWS)
                 message(WARNING "Required Dll not found: ${COMPILER_PATH}/${lib}")
             else ()
                 message(STATUS "Adding Dll: ${COMPILER_PATH}/${lib}")
-                add_custom_command(TARGET ${CMAKE_PROJECT_NAME}_SuperBase
-                        DEPENDS ${COMPILER_PATH}/${lib}
+                add_custom_command(TARGET ${CMAKE_PROJECT_NAME}_SuperBase POST_BUILD
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${COMPILER_PATH}/${lib} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                         COMMENT "Copying ${lib} into ${${CMAKE_RUNTIME_OUTPUT_DIRECTORY}}")
             endif ()

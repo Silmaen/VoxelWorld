@@ -93,6 +93,24 @@ void serializeEntity(YAML::Emitter& ioOut, const Entity& iEntity) {
 		}
 		ioOut << YAML::EndMap;// CircleRenderer
 	}
+	if (iEntity.hasComponent<component::PhysicBody>()) {
+		ioOut << YAML::Key << "PhysicBody";
+		ioOut << YAML::BeginMap;
+		const auto& [type, fixedRotation, bodyId] = iEntity.getComponent<component::PhysicBody>();
+		ioOut << YAML::Key << "type" << YAML::Value << std::string(magic_enum::enum_name(type));
+		ioOut << YAML::Key << "fixedRotation" << YAML::Value << fixedRotation;
+		ioOut << YAML::EndMap;
+	}
+	if (iEntity.hasComponent<component::PhysicCollider>()) {
+		ioOut << YAML::Key << "PhysicCollider";
+		ioOut << YAML::BeginMap;
+		const auto& [size, density, restitution, friction] = iEntity.getComponent<component::PhysicCollider>();
+		ioOut << YAML::Key << "size" << YAML::Value << size;
+		ioOut << YAML::Key << "density" << YAML::Value << density;
+		ioOut << YAML::Key << "restitution" << YAML::Value << restitution;
+		ioOut << YAML::Key << "friction" << YAML::Value << friction;
+		ioOut << YAML::EndMap;
+	}
 
 	ioOut << YAML::EndMap;// Entity
 }
@@ -190,6 +208,22 @@ auto SceneSerializer::deserialize(const std::filesystem::path& iFilepath) const 
 							font = lib.getDefaultFont();
 						}
 					}
+				}
+				if (auto physicBodyComponent = entity["PhysicBody"]; physicBodyComponent) {
+					auto& [type, fixedRotation, bodyId] = deserializedEntity.addComponent<component::PhysicBody>();
+					type = magic_enum::enum_cast<component::PhysicBody::BodyType>(
+								   physicBodyComponent["type"].as<std::string>())
+								   .value_or(component::PhysicBody::BodyType::Static);
+					fixedRotation = physicBodyComponent["fixedRotation"].as<bool>();
+					bodyId = 0;
+				}
+				if (auto physicColliderComponent = entity["PhysicCollider"]; physicColliderComponent) {
+					auto& [size, density, restitution, friction] =
+							deserializedEntity.addComponent<component::PhysicCollider>();
+					size = physicColliderComponent["size"].as<math::vec3f>();
+					density = physicColliderComponent["density"].as<float>();
+					restitution = physicColliderComponent["restitution"].as<float>();
+					friction = physicColliderComponent["friction"].as<float>();
 				}
 			}
 		}

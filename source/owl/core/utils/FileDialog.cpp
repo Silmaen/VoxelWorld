@@ -39,14 +39,24 @@ OWL_DIAG_POP
 auto parseFilter(const std::string& iFilter) -> std::vector<nfdu8filteritem_t> {
 	std::vector<nfdu8filteritem_t> filters;
 	for (const auto filterStr = split(iFilter); auto str: filterStr) {
-		if (str.empty())
+		const std::string sstr{str};
+		if (sstr.empty())
 			continue;
-		auto items = split(str, '|');
+		auto items = split(sstr, '|');
 		if (items.size() != 2)
 			continue;
 		if (items[0].empty() || items[1].empty())
 			continue;
-		filters.push_back({std::string{items[0]}.c_str(), std::string{items[1]}.c_str()});
+		OWL_DIAG_PUSH
+		OWL_DIAG_DISABLE_CLANG16("-Wunsafe-buffer-usage")
+		auto* const s0 = new nfdu8char_t[items[0].size() + 1];
+		memcpy(s0, items[0].data(), items[0].size());
+		s0[items[0].size()] = '\0';
+		auto* const s1 = new nfdu8char_t[items[1].size() + 1];
+		memcpy(s1, items[1].data(), items[1].size());
+		s1[items[1].size()] = '\0';
+		OWL_DIAG_POP
+		filters.push_back(nfdu8filteritem_t{s0, s1});
 	}
 	return filters;
 }
@@ -60,7 +70,7 @@ auto FileDialog::openFile(const std::string& iFilter) -> std::filesystem::path {
 	const auto ff = parseFilter(filters);
 	const std::string tmp = Application::get().getAssetDirectories().front().assetsPath.string();
 
-	if (const auto result = NFD::OpenDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()), tmp.c_str());
+	if (const auto result = NFD_OpenDialogU8(&outPath, ff.data(), static_cast<nfdfiltersize_t>(ff.size()), tmp.c_str());
 		result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {
@@ -69,6 +79,10 @@ auto FileDialog::openFile(const std::string& iFilter) -> std::filesystem::path {
 	} else {
 		OWL_CORE_ERROR("while opening file: {}", NFD::GetError())
 		OWL_ASSERT(false, "Error Opening file")
+	}
+	for (const auto& [name, spec]: ff) {
+		delete name;
+		delete spec;
 	}
 	NFD::Quit();
 	return resultPath;
@@ -81,8 +95,8 @@ auto FileDialog::saveFile([[maybe_unused]] const std::string& iFilter) -> std::f
 	const std::string& filters{iFilter};
 	const auto ff = parseFilter(filters);
 	if (const auto result =
-				NFD::SaveDialog(outPath, ff.data(), static_cast<uint32_t>(ff.size()),
-								Application::get().getAssetDirectories().front().assetsPath.string().c_str(), nullptr);
+				NFD_SaveDialogU8(&outPath, ff.data(), static_cast<nfdfiltersize_t>(ff.size()),
+								 Application::get().getAssetDirectories().front().assetsPath.string().c_str(), nullptr);
 		result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {
@@ -90,6 +104,10 @@ auto FileDialog::saveFile([[maybe_unused]] const std::string& iFilter) -> std::f
 	} else {
 		OWL_CORE_ERROR("while opening file: {}", NFD::GetError())
 		OWL_ASSERT(false, "Error Opening file")
+	}
+	for (const auto& [name, spec]: ff) {
+		delete name;
+		delete spec;
 	}
 	NFD::Quit();
 	return resultPath;

@@ -354,6 +354,7 @@ void EditorLayer::onScenePlay() {
 	if (m_editorScene) {
 		m_state = State::Play;
 		m_activeScene = scene::Scene::copy(m_editorScene);
+		m_activeScene->onStartRuntime();
 
 		m_sceneHierarchy.setContext(m_activeScene);
 	}
@@ -362,6 +363,7 @@ void EditorLayer::onScenePlay() {
 void EditorLayer::onSceneStop() {
 	m_state = State::Edit;
 
+	m_activeScene->onEndRuntime();
 	m_activeScene = m_editorScene;
 
 	m_sceneHierarchy.setContext(m_activeScene);

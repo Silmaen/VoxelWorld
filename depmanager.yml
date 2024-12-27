@@ -4,6 +4,8 @@ remote:
   # If newer remote package exists, download it? (implies 'pull')
   pull-newer: true
 packages:
+  box2d:
+    version: 3.0.0
   googletest:
     version: 1.15.2
   cpptrace:

@@ -67,6 +67,16 @@ public:
 	void destroyEntity(Entity& ioEntity);
 
 	/**
+	 * @brief Beginning the scene as runtime (enabling physics).
+	 */
+	void onStartRuntime();
+
+	/**
+	 * @brief End scene runtime mode.
+	 */
+	void onEndRuntime();
+
+	/**
 	 * @brief Update actions for the runtime.
 	 * @param[in] iTimeStep The time step.
 	 */
