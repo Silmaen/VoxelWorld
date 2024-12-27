@@ -14,7 +14,7 @@
 #include "opengl/Shader.h"
 #include "vulkan/Shader.h"
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace owl::renderer {
 

@@ -46,7 +46,7 @@ OWL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
 #include "math/math.h"
 
 // third party
-#include <magic_enum.hpp>
 #include <entt/entt.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 OWL_DIAG_POP

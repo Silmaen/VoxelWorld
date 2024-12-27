@@ -29,6 +29,3 @@ dm_get_glibc(GLIBC_VERSION)
 if (${GLIBC_VERSION})
     set(${PRJPREFIX}_GLIBC_STR "glibc_${GLIBC_VERSION}")
 endif ()
-
-message(STATUS "Checking Third party dependencies")
-execute_process(COMMAND python -u ${CMAKE_SOURCE_DIR}/ci/DependencyCheck.py)
