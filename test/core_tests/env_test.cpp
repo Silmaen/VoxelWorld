@@ -14,4 +14,3 @@ TEST(Environement, variables) {
 	const std::string uhu = fmt::format("lo{}yo", g_sep);
 	EXPECT_STREQ(getEnv("BBOOBBOOBB").c_str(), uhu.c_str());
 }
-

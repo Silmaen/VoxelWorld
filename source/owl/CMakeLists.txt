@@ -41,6 +41,10 @@ if (NOT ${PRJPREFIX}_ENABLE_CLANG_TIDY)
     endif ()
 endif ()
 # ----==== third party ====----
+# box2d
+find_package(box2d REQUIRED)
+message(STATUS "Found box2d version ${box2d_VERSION} @ ${box2d_DIR}")
+target_link_libraries(${ENGINE_NAME} PUBLIC box2d::box2d)
 
 # cpptrace
 find_package(cpptrace REQUIRED)

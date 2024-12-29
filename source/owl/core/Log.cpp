@@ -70,10 +70,6 @@ void Log::invalidate() {
 	s_clientLogger.reset();
 }
 
-void Log::newFrame() {
-	OWL_CORE_FRAME_TRACE(" ---- END FRAME ----")
-	++s_frameCounter;
-	OWL_CORE_FRAME_TRACE(" ---- NEW FRAME ----")
-}
+void Log::newFrame() { ++s_frameCounter; }
 
 }// namespace owl::core

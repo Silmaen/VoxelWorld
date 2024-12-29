@@ -270,6 +270,30 @@ void renderProps(Text& ioComponent) {
 	ImGui::DragFloat("Line Spacing", &ioComponent.lineSpacing, 0.025f);
 }
 
+void renderProps(PhysicBody& ioComponent) {
+	// the type.
+	const std::string currentName{magic_enum::enum_name(ioComponent.type)};
+	if (ImGui::BeginCombo("Type", currentName.c_str())) {
+		for (const auto& name: magic_enum::enum_names<PhysicBody::BodyType>()) {
+			std::string sName{name};
+			if (ImGui::Selectable(sName.c_str(), currentName == sName)) {
+				ioComponent.type =
+						magic_enum::enum_cast<PhysicBody::BodyType>(sName).value_or(PhysicBody::BodyType::Static);
+			}
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::Checkbox("Fixed Rotation", &ioComponent.fixedRotation);
+}
+
+void renderProps(PhysicCollider& ioComponent) {
+	// the shape.
+	drawVec3Control("Size", ioComponent.size, 1.0f);
+	ImGui::DragFloat("Density", &ioComponent.density, 0.00025f, 0.0f, 10.0f);
+	ImGui::DragFloat("Restitution", &ioComponent.restitution, 0.00025f, 0.0f, 1.0f);
+	ImGui::DragFloat("Friction", &ioComponent.friction, 0.00025f, 0.0f, 1.0f);
+}
+
 template<typename T>
 void drawComponent(const std::string& iName, scene::Entity& ioEntity) {
 	constexpr ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
@@ -345,6 +369,18 @@ void SceneHierarchy::drawComponents(scene::Entity& ioEntity) {
 				ImGui::CloseCurrentPopup();
 			}
 		}
+		if (!m_selection.hasComponent<PhysicBody>()) {
+			if (ImGui::MenuItem("Physic Body")) {
+				m_selection.addComponent<PhysicBody>();
+				ImGui::CloseCurrentPopup();
+			}
+		}
+		if (!m_selection.hasComponent<PhysicCollider>()) {
+			if (ImGui::MenuItem("Physic Collider")) {
+				m_selection.addComponent<PhysicCollider>();
+				ImGui::CloseCurrentPopup();
+			}
+		}
 		ImGui::EndPopup();
 	}
 	ImGui::PopItemWidth();
@@ -354,6 +390,8 @@ void SceneHierarchy::drawComponents(scene::Entity& ioEntity) {
 	drawComponent<SpriteRenderer>("Sprite Renderer", ioEntity);
 	drawComponent<CircleRenderer>("Circle Renderer", ioEntity);
 	drawComponent<Text>("Text Renderer", ioEntity);
+	drawComponent<PhysicBody>("Physic Body", ioEntity);
+	drawComponent<PhysicCollider>("PhysicCollider", ioEntity);
 }
 
 }// namespace owl::nest::panel

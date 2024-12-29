@@ -55,16 +55,20 @@ TEST(Scene, Copy) {
 	owl::shared<Scene> sc2 = owl::mkShared<Scene>();
 	sc2->onViewportResize({800, 600});
 	sc2 = Scene::copy(sc);
-	EXPECT_TRUE(
-			sc2->registry.storage<owl::scene::Entity>().size() == sc->registry.storage<owl::scene::Entity>().size());
+	EXPECT_TRUE(sc2->registry.storage<owl::scene::Entity>().size() ==
+				sc->registry.storage<owl::scene::Entity>().size());
 }
 
 TEST(Scene, RenderEmpty) {
+	owl::core::Log::init(spdlog::level::off);
 	const owl::shared<Scene> sc = owl::mkShared<Scene>();
 	sc->onViewportResize({800, 600});
+	sc->onStartRuntime();
 	owl::core::Timestep ts;
 	ts.update();
 	sc->onUpdateRuntime(ts);
 	ts.update();
+	sc->onEndRuntime();
 	EXPECT_TRUE(true);
+	owl::core::Log::invalidate();
 }
