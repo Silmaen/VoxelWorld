@@ -223,7 +223,7 @@ void EditorLayer::renderToolbar() {
 			m_state == State::Edit ? textureLibrary.get("icons/PlayButton") : textureLibrary.get("icons/StopButton");
 	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 	if (const auto tex = gui::imTexture(icon); tex.has_value()) {
-		if (ImGui::ImageButton("btn_start_stop", tex.value(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1))) {
+		if (ImGui::ImageButton("btn_start_stop", tex.value(), {size, size})) {
 			if (m_state == State::Edit)
 				onScenePlay();
 			else if (m_state == State::Play)

@@ -29,7 +29,7 @@ void Button::onRenderBase() const {
 	if (selectedRot) {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.23f, 0.23f, 0.23f, 1));
 	}
-	if (const auto tex = gui::imTexture(icon); tex.has_value()) {
+	if (const auto tex = imTexture(icon); tex.has_value()) {
 		action = ImGui::ImageButton(m_data.id.c_str(), tex.value(), vec(m_data.size), {0, 1}, {1, 0});
 	} else {
 		action = ImGui::Button(m_data.replacementText.c_str(), vec(m_data.size));

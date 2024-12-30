@@ -8,17 +8,13 @@
 #include "owlpch.h"
 
 #include "BaseDrawPanel.h"
+
 #include "core/Application.h"
 #include "debug/Profiler.h"
+#include "utils.h"
 #include <imgui.h>
 
 namespace owl::gui {
-
-namespace {
-
-constexpr auto vec(math::vec2 iVec) -> ImVec2 { return {iVec.x(), iVec.y()}; }
-
-}// namespace
 
 BaseDrawPanel::BaseDrawPanel() = default;
 
@@ -26,7 +22,6 @@ BaseDrawPanel::~BaseDrawPanel() = default;
 
 void BaseDrawPanel::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) { OWL_PROFILE_FUNCTION() }
 
-// NOLINTBEGIN(performance-no-int-to-ptr)
 void BaseDrawPanel::onRender() {
 	OWL_PROFILE_FUNCTION()
 
@@ -44,15 +39,14 @@ void BaseDrawPanel::onRender() {
 
 	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	m_viewportSize = {static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y)};
-	if (const uint64_t textureId = mp_framebuffer->getColorAttachmentRendererId(0); textureId != 0)
-		ImGui::Image(reinterpret_cast<ImTextureID*>(textureId), viewportPanelSize, vec(mp_framebuffer->getLowerData()),
+	if (const auto tex = imTexture(mp_framebuffer, 0); tex.has_value()) {
+		ImGui::Image(tex.value(), viewportPanelSize, vec(mp_framebuffer->getLowerData()),
 					 vec(mp_framebuffer->getUpperData()));
-	else
+	} else
 		OWL_WARN("No frameBuffer to render...")
 
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
-// NOLINTEND(performance-no-int-to-ptr)
 
 }// namespace owl::gui
