@@ -27,9 +27,9 @@ packages:
   glfw:
     version: 3.4.0
   imgui:
-    version: 1.91.3-docking
+    version: 1.91.5-docking
   imguizmo:
-    version: 1.91.3
+    version: 1.91.5
   mavsdk:
     version: 2.0.1
   openal:

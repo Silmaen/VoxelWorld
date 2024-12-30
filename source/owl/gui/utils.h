@@ -23,10 +23,8 @@ namespace owl::gui {
 inline auto imTexture(const shared<renderer::Texture>& iTexture) -> std::optional<ImTextureID> {
 	if (iTexture == nullptr)
 		return std::nullopt;
-	// NOLINTBEGIN(performance-no-int-to-ptr)
-	auto* texture = reinterpret_cast<ImTextureID>(iTexture->getRendererId());
-	// NOLINTEND(performance-no-int-to-ptr)
-	if (texture == nullptr)
+	auto texture = static_cast<ImTextureID>(iTexture->getRendererId());
+	if (texture == 0)
 		return std::nullopt;
 	return texture;
 }
@@ -41,10 +39,8 @@ inline auto imTexture(const shared<renderer::Framebuffer>& iFrameBuffer, const u
 		-> std::optional<ImTextureID> {
 	if (iFrameBuffer == nullptr)
 		return std::nullopt;
-	// NOLINTBEGIN(performance-no-int-to-ptr)
-	auto* texture = reinterpret_cast<ImTextureID>(iFrameBuffer->getColorAttachmentRendererId(iIndex));
-	// NOLINTEND(performance-no-int-to-ptr)
-	if (texture == nullptr)
+	auto texture = static_cast<ImTextureID>(iFrameBuffer->getColorAttachmentRendererId(iIndex));
+	if (texture == 0)
 		return std::nullopt;
 	return texture;
 }

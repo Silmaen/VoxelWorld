@@ -212,7 +212,7 @@ void renderProps(Camera& ioComponent) {
 void renderProps(SpriteRenderer& ioComponent) {
 	ImGui::ColorEdit4("Color", ioComponent.color.data());
 	if (const auto tex = gui::imTexture(ioComponent.texture); tex.has_value()) {
-		if (ImGui::ImageButton("Texture", tex.value(), ImVec2(100.0f, 100.0f), ImVec2(0, 1), ImVec2(1, 0)) &&
+		if (ImGui::ImageButton("Texture", tex.value(), {100.0f, 100.0f}, {0, 1}, {1, 0}) &&
 			ioComponent.texture != nullptr) {
 			ImGui::OpenPopup("TextureSettings");
 		}
