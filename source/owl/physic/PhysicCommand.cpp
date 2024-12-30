@@ -29,13 +29,15 @@ scene::Scene* PhysicCommand::m_scene = nullptr;
 PhysicCommand::PhysicCommand() = default;
 
 void PhysicCommand::init(scene::Scene* iScene) {
-	if (iScene == nullptr)
+	if (iScene == nullptr) {
+		OWL_CORE_WARN("PhysicCommand::init(): Scene is null")
 		return;
+	}
 	if (isInitialized())
 		destroy();
 	m_scene = iScene;
 	b2WorldDef def = b2DefaultWorldDef();
-	def.gravity = {0.0f, -9.81f};
+	def.gravity = {.x = 0.0f, .y = -9.81f};
 	m_impl->worldId = b2CreateWorld(&def);
 	OWL_INFO("PhysicCommand::init(), world created ({} {})", m_impl->worldId.index1, m_impl->worldId.revision)
 
@@ -43,41 +45,38 @@ void PhysicCommand::init(scene::Scene* iScene) {
 	for (const auto& view = m_scene->registry.view<scene::component::PhysicBody, scene::component::Transform>();
 		 const auto& e: view) {
 		const scene::Entity entity{e, m_scene};
-		auto& [type, fixedRotation, bodyId] = entity.getComponent<scene::component::PhysicBody>();
+		auto& [sbody] = entity.getComponent<scene::component::PhysicBody>();
 		auto& [transform] = entity.getComponent<scene::component::Transform>();
 		b2BodyDef bodyDef = b2DefaultBodyDef();
-		switch (type) {
-			case scene::component::PhysicBody::BodyType::Static:
+		switch (sbody.type) {
+			case scene::SceneBody::BodyType::Static:
 				bodyDef.type = b2_staticBody;
 				break;
-			case scene::component::PhysicBody::BodyType::Dynamic:
+			case scene::SceneBody::BodyType::Dynamic:
 				bodyDef.type = b2_dynamicBody;
 				break;
-			case scene::component::PhysicBody::BodyType::Kinematic:
+			case scene::SceneBody::BodyType::Kinematic:
 				bodyDef.type = b2_kinematicBody;
 				break;
 		}
-		bodyDef.fixedRotation = fixedRotation;
+		bodyDef.fixedRotation = sbody.fixedRotation;
 		bodyDef.position.x = transform.translation().x();
 		bodyDef.position.y = transform.translation().y();
 		bodyDef.rotation = b2MakeRot(transform.rotation().z());
 
 		const b2BodyId body = b2CreateBody(m_impl->worldId, &bodyDef);
 		OWL_INFO("PhysicCommand::init(), body created ({} {} {})", body.index1, body.world0, body.revision)
-		bodyId = m_impl->nextId;
+		sbody.bodyId = m_impl->nextId;
 		m_impl->bodies[m_impl->nextId] = body;
 		m_impl->nextId++;
 
-		if (entity.hasComponent<scene::component::PhysicCollider>()) {
-			auto& [size, density, restitution, friction] = entity.getComponent<scene::component::PhysicCollider>();
-			const b2Polygon dynamicBox =
-					b2MakeBox(size.x() * transform.scale().x() * 0.5f, size.y() * transform.scale().y() * 0.5f);
-			b2ShapeDef shapeDef = b2DefaultShapeDef();
-			shapeDef.density = density;
-			shapeDef.friction = friction;
-			shapeDef.restitution = restitution;
-			b2CreatePolygonShape(body, &shapeDef, &dynamicBox);
-		}
+		const b2Polygon dynamicBox = b2MakeBox(sbody.colliderSize.x() * transform.scale().x() * 0.5f,
+											   sbody.colliderSize.y() * transform.scale().y() * 0.5f);
+		b2ShapeDef shapeDef = b2DefaultShapeDef();
+		shapeDef.density = sbody.density;
+		shapeDef.friction = sbody.friction;
+		shapeDef.restitution = sbody.restitution;
+		b2CreatePolygonShape(body, &shapeDef, &dynamicBox);
 	}
 }
 
@@ -88,15 +87,13 @@ void PhysicCommand::destroy() {
 	m_impl->bodies.clear();
 }
 
-auto PhysicCommand::isInitialized() -> bool {
-	if (m_scene == nullptr)
-		return false;
-	return true;
-}
+auto PhysicCommand::isInitialized() -> bool { return m_scene != nullptr; }
 
 void PhysicCommand::frame(const core::Timestep& iTimestep) {
-	if (!isInitialized())
+	if (!isInitialized()) {
+		OWL_CORE_WARN("PhysicCommand::frame(), Physic engine not initialized")
 		return;
+	}
 	// Update the physical world
 	b2World_Step(m_impl->worldId, iTimestep.getSeconds(), 4);
 
@@ -104,11 +101,51 @@ void PhysicCommand::frame(const core::Timestep& iTimestep) {
 	for (const auto view = m_scene->registry.view<scene::component::Transform, scene::component::PhysicBody>();
 		 const auto entity: view) {
 		auto&& [transform, physic] = view.get<scene::component::Transform, scene::component::PhysicBody>(entity);
-		auto [x, y] = b2Body_GetPosition(m_impl->bodies[physic.bodyId]);
+		auto [x, y] = b2Body_GetPosition(m_impl->bodies[physic.body.bodyId]);
 		transform.transform.translation().x() = x;
 		transform.transform.translation().y() = y;
-		transform.transform.rotation().z() = b2Rot_GetAngle(b2Body_GetRotation(m_impl->bodies[physic.bodyId]));
+		transform.transform.rotation().z() = b2Rot_GetAngle(b2Body_GetRotation(m_impl->bodies[physic.body.bodyId]));
 	}
+}
+
+void PhysicCommand::impulse(const scene::Entity& iEntity, const math::vec2f& iImpulse) {
+	if (!isInitialized()) {
+		OWL_CORE_WARN("PhysicCommand::impulse(), Physic engine not initialized.")
+		return;
+	}
+	if (!iEntity) {
+		// Void entity !!
+		OWL_CORE_WARN("PhysicCommand::impulse(), entity is null.")
+		return;
+	}
+	if (!iEntity.hasComponent<scene::component::PhysicBody>())
+		return;
+	auto& [body] = iEntity.getComponent<scene::component::PhysicBody>();
+	if (body.type == scene::SceneBody::BodyType::Static)
+		return;
+	OWL_CORE_INFO("Apply impulse ({} {}) to body ({} {} {})", iImpulse.x(), iImpulse.y(),
+				  m_impl->bodies[body.bodyId].index1, m_impl->bodies[body.bodyId].revision,
+				  m_impl->bodies[body.bodyId].world0)
+	b2Body_ApplyLinearImpulseToCenter(m_impl->bodies[body.bodyId], {iImpulse.x(), iImpulse.y()}, true);
+}
+
+auto PhysicCommand::getVelocity(const scene::Entity& iEntity) -> math::vec2f {
+	if (!isInitialized()) {
+		OWL_CORE_WARN("PhysicCommand::getVelocity(), Physic Engine not initialized.")
+		return {0.0f, 0.0f};
+	}
+	if (!iEntity) {
+		// Void entity !!
+		OWL_CORE_WARN("PhysicCommand::getVelocity(), entity is null.")
+		return {0.0f, 0.0f};
+	}
+	if (!iEntity.hasComponent<scene::component::PhysicBody>())
+		return {0.0f, 0.0f};
+	auto& [body] = iEntity.getComponent<scene::component::PhysicBody>();
+	if (body.type == scene::SceneBody::BodyType::Static)
+		return {0.0f, 0.0f};
+	const auto [x, y] = b2Body_GetLinearVelocity(m_impl->bodies[body.bodyId]);
+	return {x, y};
 }
 
 

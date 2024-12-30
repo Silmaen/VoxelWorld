@@ -1,29 +1,34 @@
 /**
- * @file Tag.h
+ * @file EntityLink.h
  * @author Silmaen
- * @date 23/12/2022
- * Copyright © 2022 All rights reserved.
+ * @date 1/1/25
+ * Copyright © 2025 All rights reserved.
  * All modification must get authorization from the author.
  */
 
 #pragma once
 
+#include "../Entity.h"
 #include "core/Core.h"
-#include "core/external/yaml.h"
 
 namespace owl::scene::component {
 
 /**
  * @brief A tag component.
  */
-struct OWL_API Tag {
-	/// The tag name.
-	std::string tag;
+struct OWL_API EntityLink {
+	/// the name of the linked entity.
+	std::string linkedEntityName;
+	/**
+	 * @brief Get the class title.
+	 * @return The class title.
+	 */
+	static auto name() -> const char* { return "Entity Link"; }
 	/**
 	 * @brief Get the YAML key for this component
 	 * @return The YAML key.
 	 */
-	static auto key() -> const char* { return "Tag"; }
+	static auto key() -> const char* { return "EntityLink"; }
 
 	/**
 	 * @brief Write this component to a YAML context.
@@ -32,7 +37,7 @@ struct OWL_API Tag {
 	void serialize(YAML::Emitter& ioOut) const {
 		ioOut << YAML::Key << key();
 		ioOut << YAML::BeginMap;// Tag
-		ioOut << YAML::Key << "tag" << YAML::Value << tag;
+		ioOut << YAML::Key << "linkedEntityName" << YAML::Value << linkedEntityName;
 		ioOut << YAML::EndMap;// Tag
 	}
 
@@ -41,9 +46,10 @@ struct OWL_API Tag {
 	 * @param iNode The YAML node to read.
 	 */
 	void deserialize(const YAML::Node& iNode) {
-		if (iNode["tag"])
-			tag = iNode["tag"].as<std::string>();
+		if (iNode["linkedEntityName"])
+			linkedEntityName = iNode["linkedEntityName"].as<std::string>();
 	}
+	/// The linked entity.
+	Entity linkedEntity;
 };
-
 }// namespace owl::scene::component

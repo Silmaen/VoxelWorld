@@ -10,6 +10,8 @@
 
 #include "../Input.h"
 
+#include <set>
+
 namespace owl::input::null {
 /**
  * @brief Class Input

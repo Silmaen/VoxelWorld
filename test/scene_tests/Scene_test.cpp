@@ -1,14 +1,11 @@
 
+#include "input/null/Input.h"
 #include "testHelper.h"
 
+#include <input/Input.h>
 #include <scene/Entity.h>
 #include <scene/Scene.h>
-#include <scene/component/Camera.h>
-#include <scene/component/CircleRenderer.h>
-#include <scene/component/NativeScript.h>
-#include <scene/component/SpriteRenderer.h>
-#include <scene/component/Text.h>
-#include <scene/component/Transform.h>
+#include <scene/component/components.h>
 
 using namespace owl::scene;
 
@@ -70,5 +67,112 @@ TEST(Scene, RenderEmpty) {
 	ts.update();
 	sc->onEndRuntime();
 	EXPECT_TRUE(true);
+	owl::core::Log::invalidate();
+}
+
+namespace {
+void createMinGameScene(Scene& ioScene) {
+	{
+		auto ground = ioScene.createEntity("ground");
+		auto& [body] = ground.addComponent<component::PhysicBody>();
+		auto& tran = ground.addOrReplaceComponent<component::Transform>().transform;
+		tran.scale().x() = 10.f;
+		tran.scale().y() = .1f;
+		tran.translation().y() = -.1f;
+		body.type = SceneBody::BodyType::Static;
+	}
+	{
+		auto player = ioScene.createEntity("player");
+		auto& tran = player.addOrReplaceComponent<component::Transform>().transform;
+		tran.translation().y() = 0.5;
+		auto& [primary, pplayer] = player.addComponent<component::Player>();
+		primary = true;
+		pplayer.linearImpulse = 5.f;
+		pplayer.canJump = false;
+		player.addComponent<component::Trigger>();
+		player.removeComponent<component::Trigger>();
+		auto& [body] = player.addComponent<component::PhysicBody>();
+		body.type = SceneBody::BodyType::Dynamic;
+	}
+	{
+		auto winZone = ioScene.createEntity("win");
+		winZone.addOrReplaceComponent<component::Transform>().transform.translation().x() = 5;
+		auto& [trigger] = winZone.addComponent<component::Trigger>();
+		trigger.type = SceneTrigger::TriggerType::Victory;
+		auto& [body] = winZone.addComponent<component::PhysicBody>();
+		body.type = SceneBody::BodyType::Static;
+	}
+	{
+		auto looseZone = ioScene.createEntity("looze");
+		looseZone.addOrReplaceComponent<component::Transform>().transform.translation().x() = -5;
+		auto& [trigger] = looseZone.addComponent<component::Trigger>();
+		trigger.type = SceneTrigger::TriggerType::Death;
+		auto& [body] = looseZone.addComponent<component::PhysicBody>();
+		body.type = SceneBody::BodyType::Static;
+	}
+}
+}// namespace
+
+TEST(Scene, RenderGame_loose) {
+	owl::core::Log::init(spdlog::level::off);
+	owl::input::Input::init(owl::input::Type::Null);
+	Scene sc;
+	createMinGameScene(sc);
+	owl::core::Timestep ts;
+	ts.forceUpdate(std::chrono::milliseconds(500));
+
+	EXPECT_EQ(sc.status, Scene::Status::Editing);
+	sc.onStartRuntime();
+	sc.onUpdateRuntime(ts);
+	EXPECT_EQ(sc.status, Scene::Status::Playing);
+	owl::input::Input::injectKey(owl::input::key::A);
+	owl::input::Input::injectKey(owl::input::key::Space);
+
+	ts.forceUpdate(std::chrono::milliseconds(500));
+	sc.onUpdateRuntime(ts);
+	ts.forceUpdate(std::chrono::milliseconds(500));
+	sc.onUpdateRuntime(ts);
+
+	ts.forceUpdate(std::chrono::milliseconds(500));
+	sc.onUpdateRuntime(ts);
+	ts.forceUpdate(std::chrono::milliseconds(500));
+	sc.onUpdateRuntime(ts);
+
+	EXPECT_EQ(sc.status, Scene::Status::Death);
+	sc.onEndRuntime();
+
+	owl::input::Input::invalidate();
+	owl::core::Log::invalidate();
+}
+
+
+TEST(Scene, RenderGame_win) {
+	owl::core::Log::init(spdlog::level::off);
+	owl::input::Input::init(owl::input::Type::Null);
+	Scene sc;
+	createMinGameScene(sc);
+	owl::core::Timestep ts;
+	ts.forceUpdate(std::chrono::milliseconds(500));
+
+	EXPECT_EQ(sc.status, Scene::Status::Editing);
+	sc.onStartRuntime();
+	sc.onUpdateRuntime(ts);
+	EXPECT_EQ(sc.status, Scene::Status::Playing);
+	owl::input::Input::injectKey(owl::input::key::D);
+
+	ts.forceUpdate(std::chrono::milliseconds(500));
+	sc.onUpdateRuntime(ts);
+	ts.forceUpdate(std::chrono::milliseconds(500));
+	sc.onUpdateRuntime(ts);
+
+	ts.forceUpdate(std::chrono::milliseconds(500));
+	sc.onUpdateRuntime(ts);
+	ts.forceUpdate(std::chrono::milliseconds(500));
+	sc.onUpdateRuntime(ts);
+
+	EXPECT_EQ(sc.status, Scene::Status::Victory);
+	sc.onEndRuntime();
+
+	owl::input::Input::invalidate();
 	owl::core::Log::invalidate();
 }

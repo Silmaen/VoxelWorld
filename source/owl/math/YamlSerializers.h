@@ -64,7 +64,7 @@ struct convert<owl::math::vec4> {
 	return ioOut;
 }
 
-static auto operator<<(Emitter& ioOut, const owl::math::vec4& iVect) -> Emitter& {
+[[maybe_unused]] static auto operator<<(Emitter& ioOut, const owl::math::vec4& iVect) -> Emitter& {
 	ioOut << Flow;
 	ioOut << BeginSeq << iVect.x() << iVect.y() << iVect.z() << iVect.w() << EndSeq;
 	return ioOut;

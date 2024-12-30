@@ -51,6 +51,20 @@ public:
 	 */
 	static void frame(const core::Timestep& iTimestep);
 
+	/**
+	 * @brief Apply an impulsion to the given entity (if Entity supports it).
+	 * @param iEntity The Entity where to apply impulse.
+	 * @param iImpulse The impulse force and direction.
+	 */
+	static void impulse(const scene::Entity& iEntity, const math::vec2f& iImpulse);
+
+	/**
+	 * @brief Get the velocity of the given entity.
+	 * @param iEntity The entity to check.
+	 * @return The entity velocity or null.
+	 */
+	static math::vec2f getVelocity(const scene::Entity& iEntity);
+
 private:
 	/// Implementation class.
 	class Impl;

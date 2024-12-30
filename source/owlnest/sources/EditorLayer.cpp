@@ -8,6 +8,8 @@
 
 #include "EditorLayer.h"
 
+#include "physic/PhysicCommand.h"
+
 // must be included AFTER imgui
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
@@ -133,7 +135,9 @@ void EditorLayer::onImGuiRender(const core::Timestep& iTimeStep) {
 	m_viewport.onRender();
 	//=============================================================
 	renderToolbar();
-	m_controlBar.onRender();
+	if (m_state == State::Edit) {
+		m_controlBar.onRender();
+	}
 }
 
 void EditorLayer::renderStats(const core::Timestep& iTimeStep) {
@@ -231,10 +235,10 @@ void EditorLayer::renderToolbar() {
 		}
 	} else {
 		if (m_state == State::Edit) {
-			if (ImGui::Button("play", ImVec2(size, size)))
+			if (ImGui::Button("play", {size, size}))
 				onScenePlay();
 		} else if (m_state == State::Play) {
-			if (ImGui::Button("stop", ImVec2(size, size)))
+			if (ImGui::Button("stop", {size, size}))
 				onSceneStop();
 		}
 	}
@@ -295,53 +299,54 @@ auto EditorLayer::onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool {
 	// Shortcuts
 	if (static_cast<int>(ioEvent.getRepeatCount()) > 0)
 		return false;
-
-	const bool control =
-			input::Input::isKeyPressed(input::key::LeftControl) || input::Input::isKeyPressed(input::key::RightControl);
-	const bool shift =
-			input::Input::isKeyPressed(input::key::LeftShift) || input::Input::isKeyPressed(input::key::RightShift);
-	switch (ioEvent.getKeyCode()) {
-		case input::key::N:
-			{
-				if (control) {
-					newScene();
-					return true;
-				}
-				break;
-			}
-		case input::key::O:
-			{
-				if (control) {
-					openScene();
-					return true;
-				}
-				break;
-			}
-		case input::key::S:
-			{
-				if (control) {
-					if (shift) {
-						saveSceneAs();
+	if (m_state == State::Edit) {
+		const bool control = input::Input::isKeyPressed(input::key::LeftControl) ||
+							 input::Input::isKeyPressed(input::key::RightControl);
+		const bool shift =
+				input::Input::isKeyPressed(input::key::LeftShift) || input::Input::isKeyPressed(input::key::RightShift);
+		switch (ioEvent.getKeyCode()) {
+			case input::key::N:
+				{
+					if (control) {
+						newScene();
 						return true;
 					}
-				} else {
-					saveCurrentScene();
-					return true;
+					break;
 				}
-			}
-			break;
-		// Scene Commands
-		case input::key::D:
-			{
-				if (control) {
-					onDuplicateEntity();
-					return true;
+			case input::key::O:
+				{
+					if (control) {
+						openScene();
+						return true;
+					}
+					break;
 				}
+			case input::key::S:
+				{
+					if (control) {
+						if (shift) {
+							saveSceneAs();
+							return true;
+						}
+						saveCurrentScene();
+						return true;
+					}
+					break;
+				}
+			// Scene Commands
+			case input::key::D:
+				{
+					if (control) {
+						onDuplicateEntity();
+						return true;
+					}
+					break;
+				}
+			default:
 				break;
-			}
-		default:
-			break;
+		}
 	}
+
 	return false;
 }
 

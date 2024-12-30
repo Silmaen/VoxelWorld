@@ -36,11 +36,13 @@ TEST(SceneSerializer, SaveLoadFULL) {
 	ent.addOrReplaceComponent<component::Camera>();
 	ent.addOrReplaceComponent<component::CircleRenderer>();
 	ent.addOrReplaceComponent<component::SpriteRenderer>();
+	ent.addOrReplaceComponent<component::Player>();
 	auto ent2 = sc->createEntityWithUUID(7, "bobObject2");
 	auto& spr = ent2.addOrReplaceComponent<component::SpriteRenderer>();
 	ent2.addOrReplaceComponent<component::PhysicBody>();
-	ent2.addOrReplaceComponent<component::PhysicCollider>();
 	ent2.addOrReplaceComponent<component::Text>();
+	ent2.addOrReplaceComponent<component::EntityLink>();
+	ent2.addOrReplaceComponent<component::Trigger>();
 	spr.texture =
 			owl::mkShared<owl::renderer::null::Texture2D>(owl::renderer::Texture2D::Specification{.size = {1, 1}});
 	spr.tilingFactor = 12.3f;

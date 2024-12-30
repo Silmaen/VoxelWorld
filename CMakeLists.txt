@@ -48,6 +48,15 @@ if (NOT ${PRJPREFIX}_DOC_ONLY)
         enable_testing()
         add_subdirectory(test)
     endif ()
+
+    #
+    # ---=== CLEANING PROCEDURES ===---
+    #
+    add_custom_target(clean_bin
+            COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/bin"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin"
+            COMMENT "Cleaning the binary directory ${CMAKE_BINARY_DIR}/bin"
+    )
 endif ()
 
 

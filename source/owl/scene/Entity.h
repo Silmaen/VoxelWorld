@@ -149,6 +149,12 @@ public:
 	 */
 	auto operator!=(const Entity& iOther) const -> bool { return !(*this == iOther); }
 
+	/**
+	 * @brief Access to the scene.
+	 * @return The scene.
+	 */
+	[[nodiscard]] auto getScene() const -> Scene* { return mp_scene; }
+
 private:
 	/// Entity's handle.
 	entt::entity m_entityHandle{entt::null};

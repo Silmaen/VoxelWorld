@@ -79,7 +79,7 @@ private:
 	 */
 	void drawComponents(scene::Entity& ioEntity);
 	/// The scene
-	shared<scene::Scene> m_context;
+	shared<scene::Scene> m_context = nullptr;
 	/// The selected item
 	scene::Entity m_selection;
 };
