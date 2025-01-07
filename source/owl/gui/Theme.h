@@ -15,7 +15,7 @@ namespace owl::gui {
  * @brief Definition  of the GUI theme.
  */
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-struct Theme {
+struct OWL_API Theme {
 	math::vec4 text{0.753f, 0.753f, 0.753f, 1.0};
 	math::vec4 windowBackground{0.1f, 0.105f, 0.11f, 1.0f};
 	math::vec4 childBackground{0.141f, 0.141f, 0.141f, 1.0f};

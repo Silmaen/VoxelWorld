@@ -37,6 +37,8 @@ TEST(FontLibrary, basic_with_app) {
 	EXPECT_EQ(fontLibrary.getFont("null"), nullptr);
 	const auto myFont = fontLibrary.getDefaultFont();
 	ASSERT_NE(myFont, nullptr);
+	EXPECT_TRUE(myFont->isDefault());
+	EXPECT_STREQ(myFont->getName().c_str(), "OpenSans-Regular");
 	EXPECT_NE(myFont->getAtlasTexture(), nullptr);
 
 	EXPECT_NEAR(myFont->getScaledLineHeight(), 1, 0.001);

@@ -29,7 +29,7 @@ TEST(TextureLibrary, creation) {
 		EXPECT_TRUE(lib.exists("superbob"));
 	}
 	{
-		auto bob = Texture2D::create(Texture2D::Specification{{1, 1}, ImageFormat::RGB8});
+		const auto bob = Texture2D::create(Texture2D::Specification{{1, 1}, ImageFormat::RGB8});
 		lib.load("checkerboard");
 		lib.add(bob);
 		EXPECT_TRUE(lib.exists(""));

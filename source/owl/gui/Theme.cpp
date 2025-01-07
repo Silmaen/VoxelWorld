@@ -29,7 +29,7 @@ void Theme::loadFromFile(const std::filesystem::path& iFile) {
 	}
 	const YAML::Node data = YAML::LoadFile(iFile.string());
 	if (const auto theme = data["Theme"]; theme) {
-		if (const auto colors = data["Colors"]; colors) {
+		if (const auto colors = theme["Colors"]; colors) {
 			get(colors, "Text", text);
 			get(colors, "WindowBackground", windowBackground);
 			get(colors, "ChildBackground", childBackground);
@@ -73,18 +73,18 @@ void Theme::loadFromFile(const std::filesystem::path& iFile) {
 			get(colors, "Highlight", highlight);
 			get(colors, "PropertyField", propertyField);
 		}
-		if (const auto frame = data["Frame"]; frame) {
+		if (const auto frame = theme["Frame"]; frame) {
 			get(frame, "WindowRounding", windowRounding);
 			get(frame, "FrameRounding", frameRounding);
 			get(frame, "FrameBorderSize", frameBorderSize);
 			get(frame, "IndentSpacing", indentSpacing);
 		}
-		if (const auto tabParam = data["Tab"]; tabParam) {
+		if (const auto tabParam = theme["Tab"]; tabParam) {
 			get(tabParam, "Rounding", tabRounding);
 			get(tabParam, "Overline", tabOverline);
 			get(tabParam, "Border", tabBorder);
 		}
-		if (const auto controls = data["Controls"]; controls) {
+		if (const auto controls = theme["Controls"]; controls) {
 			get(controls, "Rounding", controlsRounding);
 		}
 	}
