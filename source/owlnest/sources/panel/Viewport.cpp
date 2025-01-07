@@ -42,7 +42,7 @@ void Viewport::detach() {
 	m_framebuffer.reset();
 }
 
-void Viewport::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) {
+void Viewport::onUpdate(const core::Timestep& iTimeStep) {
 	OWL_PROFILE_FUNCTION()
 
 	// resize frame buffer if needed.
@@ -62,6 +62,16 @@ void Viewport::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) {
 	renderer::RenderCommand::setClearColor({0.1f, 0.1f, 0.1f, 1});
 	renderer::RenderCommand::clear();
 
+	// Get Mouse position.
+	auto [mx, my] = ImGui::GetMousePos();
+	mx -= m_lower.x();
+	my -= m_lower.y();
+	const math::vec2 viewportSizeInternal = m_upper - m_lower;
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
+		my = viewportSizeInternal.y() - my;
+	const int mouseX = static_cast<int>(mx);
+	const int mouseY = static_cast<int>(my);
+
 	// Clear our entity ID attachment to -1
 	m_framebuffer->clearAttachment(1, -1);
 
@@ -79,14 +89,6 @@ void Viewport::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) {
 				}
 		}
 
-		auto [mx, my] = ImGui::GetMousePos();
-		mx -= m_lower.x();
-		my -= m_lower.y();
-		const math::vec2 viewportSizeInternal = m_upper - m_lower;
-		if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
-			my = viewportSizeInternal.y() - my;
-		const int mouseX = static_cast<int>(mx);
-		const int mouseY = static_cast<int>(my);
 
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < static_cast<int>(viewportSizeInternal.x()) &&
 			mouseY < static_cast<int>(viewportSizeInternal.y())) {
@@ -95,8 +97,8 @@ void Viewport::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) {
 											  : scene::Entity(static_cast<entt::entity>(pixelData),
 															  m_parent->getActiveScene().get());
 		}
+		renderOverlay();
 	}
-	renderOverlay();
 
 	m_framebuffer->unbind();
 }
@@ -138,15 +140,19 @@ void Viewport::renderOverlay() const {
 	} else {
 		renderer::Renderer2D::beginScene(m_editorCamera);
 	}
-	// Draw selected entity outline
-	if (const scene::Entity selectedEntity = m_parent->getSelectedEntity()) {
-		const auto [transform] = selectedEntity.getComponent<scene::component::Transform>();
-		// Orange
-		// surrounding square
-		renderer::Renderer2D::drawRect({.transform = transform, .color = math::vec4(0.95f, 0.55f, 0.f, 1)});
-		// Overlay
-		renderer::Renderer2D::drawQuad({.transform = transform, .color = math::vec4{0.95f, 0.55f, 0.f, 0.2f}});
+
+	if (m_parent->getState() == EditorLayer::State::Edit) {
+		// Draw selected entity outline
+		if (const scene::Entity selectedEntity = m_parent->getSelectedEntity()) {
+			const auto [transform] = selectedEntity.getComponent<scene::component::Transform>();
+			// Orange
+			// surrounding square
+			renderer::Renderer2D::drawRect({.transform = transform, .color = math::vec4(0.95f, 0.55f, 0.f, 1)});
+			// Overlay
+			renderer::Renderer2D::drawQuad({.transform = transform, .color = math::vec4{0.95f, 0.55f, 0.f, 0.2f}});
+		}
 	}
+
 
 	renderer::Renderer2D::endScene();
 }
@@ -159,6 +165,8 @@ auto Viewport::getGuizmoTypeI() const -> uint16_t { return static_cast<uint16_t>
 void Viewport::renderGizmo() {
 	// Gizmos
 	if (m_parent == nullptr)
+		return;
+	if (m_parent->getState() != EditorLayer::State::Edit)
 		return;
 
 	// Gizmos
@@ -225,59 +233,62 @@ auto Viewport::onKeyPressed(const event::KeyPressedEvent& ioEvent) -> bool {
 		return false;
 	if (!isFocused() && !isHovered())
 		return false;
-	switch (ioEvent.getKeyCode()) {
-		// Gizmos
-		case input::key::Q:
-			{
-				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = GuizmoType::None;
-					return true;
+	if (m_parent->getState() == EditorLayer::State::Edit) {
+		switch (ioEvent.getKeyCode()) {
+			// Gizmos
+			case input::key::Q:
+				{
+					if (!ImGuizmo::IsUsing()) {
+						m_gizmoType = GuizmoType::None;
+						return true;
+					}
+					break;
 				}
-				break;
-			}
-		case input::key::W:
-			{
-				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = GuizmoType::Translation;
-					return true;
+			case input::key::W:
+				{
+					if (!ImGuizmo::IsUsing()) {
+						m_gizmoType = GuizmoType::Translation;
+						return true;
+					}
+					break;
 				}
-				break;
-			}
-		case input::key::E:
-			{
-				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = GuizmoType::Rotation;
-					return true;
+			case input::key::E:
+				{
+					if (!ImGuizmo::IsUsing()) {
+						m_gizmoType = GuizmoType::Rotation;
+						return true;
+					}
+					break;
 				}
-				break;
-			}
-		case input::key::R:
-			{
-				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = GuizmoType::Scale;
-					return true;
+			case input::key::R:
+				{
+					if (!ImGuizmo::IsUsing()) {
+						m_gizmoType = GuizmoType::Scale;
+						return true;
+					}
+					break;
 				}
-				break;
-			}
-		case input::key::T:
-			{
-				if (!ImGuizmo::IsUsing()) {
-					m_gizmoType = GuizmoType::All;
-					return true;
+			case input::key::T:
+				{
+					if (!ImGuizmo::IsUsing()) {
+						m_gizmoType = GuizmoType::All;
+						return true;
+					}
+					break;
 				}
+			default:
 				break;
-			}
-		default:
-			break;
+		}
 	}
 	return false;
 }
 
 auto Viewport::onMouseButtonPressed(const event::MouseButtonPressedEvent& ioEvent) -> bool {
-
-	if (ioEvent.getMouseButton() == input::mouse::ButtonLeft) {
-		if (isHovered() && !ImGuizmo::IsOver() && !input::Input::isKeyPressed(input::key::LeftAlt))
-			m_parent->setSelectedEntity(getHoveredEntity());
+	if (m_parent->getState() == EditorLayer::State::Edit) {
+		if (ioEvent.getMouseButton() == input::mouse::ButtonLeft) {
+			if (isHovered() && !ImGuizmo::IsOver() && !input::Input::isKeyPressed(input::key::LeftAlt))
+				m_parent->setSelectedEntity(getHoveredEntity());
+		}
 	}
 	return false;
 }

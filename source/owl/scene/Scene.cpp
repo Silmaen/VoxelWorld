@@ -15,11 +15,13 @@
 
 #include "component/components.h"
 #include "core/Application.h"
+#include "input/Input.h"
 #include "physic/PhysicCommand.h"
 
 namespace owl::scene {
 namespace {
-template<typename Component>
+
+template<component::isComponent Component>
 void copyComponent(entt::registry& oDst, const entt::registry& iSrc,
 				   const std::unordered_map<core::UUID, entt::entity>& iEnttMap) {
 	for (auto view = iSrc.view<Component>(); auto e: view) {
@@ -31,11 +33,35 @@ void copyComponent(entt::registry& oDst, const entt::registry& iSrc,
 	}
 }
 
-template<typename Component>
+template<typename... Components>
+void copyComponentFromTuple(entt::registry& oDst, const entt::registry& iSrc,
+							const std::unordered_map<core::UUID, entt::entity>& iEnttMap, std::tuple<Components...>) {
+	(..., copyComponent<Components>(oDst, iSrc, iEnttMap));
+}
+
+template<component::isComponent Component>
 void copyComponentIfExists(Entity& oDst, const Entity& iSrc) {
 	if (iSrc.hasComponent<Component>())
 		oDst.addOrReplaceComponent<Component>(iSrc.getComponent<Component>());
 }
+
+template<typename... Components>
+void copyComponentIfExistsFromTuple(Entity& oDst, const Entity& iSrc, std::tuple<Components...>) {
+	(..., copyComponentIfExists<Components>(oDst, iSrc));
+}
+
+math::box2f getColliderBox(const Entity& iEntity) {
+	auto& transform = iEntity.getComponent<component::Transform>().transform;
+	auto halfDiag = math::vec2f{transform.scale().x() * 0.5f, transform.scale().y() * 0.5f};
+	if (iEntity.hasComponent<component::PhysicBody>()) {
+		auto& [body] = iEntity.getComponent<component::PhysicBody>();
+		halfDiag.x() *= body.colliderSize.x();
+		halfDiag.y() *= body.colliderSize.y();
+	}
+	const math::vec2f center = {transform.translation().x(), transform.translation().y()};
+	return {center - halfDiag, center + halfDiag};
+}
+
 }// namespace
 
 Scene::Scene() = default;
@@ -61,16 +87,7 @@ auto Scene::copy(const shared<Scene>& iOther) -> shared<Scene> {
 	}
 
 	// Copy components (except IDComponent and TagComponent)
-	copyComponent<component::Transform>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	copyComponent<component::SpriteRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	copyComponent<component::CircleRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	copyComponent<component::Camera>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	copyComponent<component::NativeScript>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	copyComponent<component::Text>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	copyComponent<component::PhysicBody>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	copyComponent<component::PhysicCollider>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	//copyComponent<component::Rigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
-	//copyComponent<component::BoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
+	copyComponentFromTuple(dstSceneRegistry, srcSceneRegistry, enttMap, component::copiableComponents{});
 
 	return newScene;
 }
@@ -94,7 +111,7 @@ void Scene::destroyEntity(Entity& ioEntity) {
 
 void Scene::onStartRuntime() {
 	OWL_PROFILE_FUNCTION()
-
+	status = Status::Playing;
 	physic::PhysicCommand::init(this);
 }
 
@@ -102,9 +119,60 @@ void Scene::onEndRuntime() {
 	OWL_PROFILE_FUNCTION()
 
 	physic::PhysicCommand::destroy();
+	status = Status::Editing;
 }
 
 void Scene::onUpdateRuntime(const core::Timestep& iTimeStep) {
+	// find camera
+	renderer::Camera* mainCamera = nullptr;
+	math::mat4 cameraTransform;
+	math::Transform camTransform;
+	for (const auto view = registry.view<component::Transform, component::Camera>(); const auto entity: view) {
+		auto [transform, camera] = view.get<component::Transform, component::Camera>(entity);
+		if (camera.primary) {
+			mainCamera = &camera.camera;
+			cameraTransform = transform.transform();
+			camTransform = transform.transform();
+			break;
+		}
+	}
+
+	if (status == Status::Victory) {
+		if (mainCamera != nullptr) {
+			const auto font = core::Application::get().getFontLibrary().getDefaultFont();
+			math::Transform textTransform = camTransform;
+			textTransform.translation().z() = 0;
+			textTransform.scale().x() = 3.f;
+			mainCamera->setTransform(cameraTransform);
+			renderer::Renderer2D::resetStats();
+			renderer::Renderer2D::beginScene(*mainCamera);
+			renderer::Renderer2D::drawString({.transform = textTransform,
+											  .text = "Victory!",
+											  .font = font,
+											  .color = {1, 1, 1, 1},
+											  .entityId = 0});
+			renderer::Renderer2D::endScene();
+		}
+		return;
+	}
+	if (status == Status::Death) {
+		if (mainCamera != nullptr) {
+			const auto font = core::Application::get().getFontLibrary().getDefaultFont();
+			math::Transform textTransform = camTransform;
+			textTransform.translation().z() = 0;
+			textTransform.scale().x() = 3.f;
+			mainCamera->setTransform(cameraTransform);
+			renderer::Renderer2D::resetStats();
+			renderer::Renderer2D::beginScene(*mainCamera);
+			renderer::Renderer2D::drawString({.transform = textTransform,
+											  .text = "You loose!",
+											  .font = font,
+											  .color = {1, 1, 1, 1},
+											  .entityId = 0});
+			renderer::Renderer2D::endScene();
+		}
+		return;
+	}
 	// update scripts
 	registry.view<component::NativeScript>().each([iTimeStep, this](auto ioEntity, auto& ioNsc) {
 		if (!ioNsc.instance) {
@@ -115,21 +183,40 @@ void Scene::onUpdateRuntime(const core::Timestep& iTimeStep) {
 		ioNsc.instance->onUpdate(iTimeStep);
 	});
 
+	// Inputs
+	if (const Entity player = getPrimaryPlayer()) {
+		auto& [primary, iplayer] = player.getComponent<component::Player>();
+		iplayer.parseInputs(player);
+	}
+
 	// Physics
 	physic::PhysicCommand::frame(iTimeStep);
 
-	// Render 2D
-	renderer::Camera* mainCamera = nullptr;
-	math::mat4 cameraTransform;
-	for (const auto view = registry.view<component::Transform, component::Camera>(); const auto entity: view) {
-		auto [transform, camera] = view.get<component::Transform, component::Camera>(entity);
-		if (camera.primary) {
-			mainCamera = &camera.camera;
-			cameraTransform = transform.transform();
-			break;
+	// links
+	for (const auto view = registry.view<component::Transform, component::EntityLink>(); const auto entity: view) {
+		auto [transform, link] = view.get<component::Transform, component::EntityLink>(entity);
+		if (!link.linkedEntity || link.linkedEntity.getComponent<component::Tag>().tag != link.linkedEntityName) {
+			for (const auto view2 = registry.view<component::Tag>(); const auto entity2: view2) {
+				if (view2.get<component::Tag>(entity2).tag == link.linkedEntityName) {
+					link.linkedEntity = {entity2, this};
+					break;
+				}
+			}
+		}
+		auto& [linkedTransform] = link.linkedEntity.getComponent<component::Transform>();
+		transform.transform.translation() = linkedTransform.translation();
+	}
+
+	// Trigger
+	for (const auto view = registry.view<component::Trigger>(); const auto ent: view) {
+		Entity entity{ent, this};
+		Entity player = getPrimaryPlayer();
+		if (getColliderBox(entity).intersect(getColliderBox(player))) {
+			entity.getComponent<component::Trigger>().trigger.onTriggered(player);
 		}
 	}
 
+	// Render 2D
 	if (mainCamera != nullptr) {
 		mainCamera->setTransform(cameraTransform);
 		renderer::Renderer2D::resetStats();
@@ -191,18 +278,7 @@ void Scene::onViewportResize(const math::vec2ui& iSize) {
 auto Scene::duplicateEntity(const Entity& iEntity) -> Entity {
 	const std::string name = iEntity.getName();
 	Entity newEntity = createEntity(name);
-
-	copyComponentIfExists<component::Transform>(newEntity, iEntity);
-	copyComponentIfExists<component::SpriteRenderer>(newEntity, iEntity);
-	copyComponentIfExists<component::CircleRenderer>(newEntity, iEntity);
-	copyComponentIfExists<component::Camera>(newEntity, iEntity);
-	copyComponentIfExists<component::NativeScript>(newEntity, iEntity);
-	copyComponentIfExists<component::Text>(newEntity, iEntity);
-	copyComponentIfExists<component::PhysicBody>(newEntity, iEntity);
-	copyComponentIfExists<component::PhysicCollider>(newEntity, iEntity);
-	//copyComponentIfExists<component::Rigidbody2D>(newEntity, iEntity);
-	//copyComponentIfExists<component::BoxCollider2D>(newEntity, iEntity);
-
+	copyComponentIfExistsFromTuple(newEntity, iEntity, component::copiableComponents{});
 	return newEntity;
 }
 
@@ -213,6 +289,15 @@ auto Scene::getPrimaryCamera() -> Entity {
 	}
 	return {};
 }
+
+auto Scene::getPrimaryPlayer() -> Entity {
+	for (const auto view = registry.view<component::Player>(); const auto entity: view) {
+		if (view.get<component::Player>(entity).primary)
+			return Entity{entity, this};
+	}
+	return {};
+}
+
 
 template<typename T>
 void Scene::onComponentAdded([[maybe_unused]] const Entity& iEntity, [[maybe_unused]] T& ioComponent) {
@@ -267,8 +352,15 @@ OWL_API void Scene::onComponentAdded<component::PhysicBody>([[maybe_unused]] con
 															[[maybe_unused]] component::PhysicBody& ioComponent) {}
 
 template<>
-OWL_API void
-Scene::onComponentAdded<component::PhysicCollider>([[maybe_unused]] const Entity& iEntity,
-												   [[maybe_unused]] component::PhysicCollider& ioComponent) {}
+OWL_API void Scene::onComponentAdded<component::Player>([[maybe_unused]] const Entity& iEntity,
+														[[maybe_unused]] component::Player& ioComponent) {}
+
+template<>
+OWL_API void Scene::onComponentAdded<component::Trigger>([[maybe_unused]] const Entity& iEntity,
+														 [[maybe_unused]] component::Trigger& ioComponent) {}
+
+template<>
+OWL_API void Scene::onComponentAdded<component::EntityLink>([[maybe_unused]] const Entity& iEntity,
+															[[maybe_unused]] component::EntityLink& ioComponent) {}
 
 }// namespace owl::scene

@@ -117,7 +117,7 @@ target_link_libraries(${ENGINE_NAME} PUBLIC imguizmo::imguizmo)
 # magic_enum
 find_package(magic_enum REQUIRED)
 message(STATUS "Found magic_enum version ${magic_enum_VERSION} @ ${magic_enum_DIR}")
-target_link_libraries(${ENGINE_NAME} PRIVATE magic_enum::magic_enum)
+target_link_libraries(${ENGINE_NAME} PUBLIC magic_enum::magic_enum)
 
 # msdf-atlas-gen
 find_package(msdf-atlas-gen REQUIRED)

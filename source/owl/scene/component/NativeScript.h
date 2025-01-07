@@ -16,18 +16,18 @@ namespace owl::scene::component {
  */
 struct OWL_API NativeScript {
 	/// Script instance.
-	ScriptableEntity *instance = nullptr;
+	ScriptableEntity* instance = nullptr;
 
 	/**
 	 * @brief Run the script.
 	 * @return the script instance.
 	 */
-	ScriptableEntity *(*instantiateScript)(){};
+	ScriptableEntity* (*instantiateScript)(){};
 
 	/**
 	 * @brief Run destroy script.
 	 */
-	[[maybe_unused]] void (*destroyScript)(NativeScript *){};
+	[[maybe_unused]] void (*destroyScript)(NativeScript*){};
 
 	/**
 	 * @brief Bind the script.
@@ -36,12 +36,22 @@ struct OWL_API NativeScript {
 	// NOLINTBEGIN(cppcoreguidelines-owning-memory)
 	template<typename T>
 	void bind() {
-		instantiateScript = []() { return static_cast<ScriptableEntity *>(new T()); };
-		destroyScript = [](NativeScript *nsc) {
-			delete nsc->instance;
-			nsc->instance = nullptr;
+		instantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+		destroyScript = [](NativeScript* ioNsc) {
+			delete ioNsc->instance;
+			ioNsc->instance = nullptr;
 		};
 	}
 	// NOLINTEND(cppcoreguidelines-owning-memory)
+	/**
+	 * @brief Get the class title.
+	 * @return The class title.
+	 */
+	static auto name() -> const char* { return "Native Script"; }
+	/**
+	 * @brief Get the YAML key for this component
+	 * @return The YAML key.
+	 */
+	static auto key() -> const char* { return "NativeScript"; }
 };
 }// namespace owl::scene::component

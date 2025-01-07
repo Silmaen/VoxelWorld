@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 /**
  * @brief Namespace for Input management.
  */

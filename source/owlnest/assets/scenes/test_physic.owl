@@ -12,8 +12,7 @@ Entities:
     PhysicBody:
       type: Dynamic
       fixedRotation: false
-    PhysicCollider:
-      size: [1, 1, 1]
+      colliderSize: [1, 1, 1]
       density: 1
       restitution: 0.5
       friction: 0.1
@@ -29,8 +28,7 @@ Entities:
     PhysicBody:
       type: Static
       fixedRotation: true
-    PhysicCollider:
-      size: [1, 1, 1]
+      colliderSize: [1, 1, 1]
       density: 1
       restitution: 0.5
       friction: 0.2

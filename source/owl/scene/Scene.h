@@ -103,13 +103,31 @@ public:
 	auto duplicateEntity(const Entity& iEntity) -> Entity;
 
 	/**
-	 * @brief Access to the primary Came.ra.
-	 * @return The primary camera
+	 * @brief Access to the primary Camera.
+	 * @return The primary camera.
 	 */
 	auto getPrimaryCamera() -> Entity;
 
+	/**
+	 * @brief Access to the primary player
+	 * @return The primary player.
+	 */
+	auto getPrimaryPlayer() -> Entity;
+
 	/// Entities registry.
 	entt::registry registry;
+
+	/**
+	 * @brief List the statuses
+	 */
+	enum struct Status : uint8_t {
+		Editing,///< Editing.
+		Playing,///< Playing.
+		Victory,///< player won.
+		Death,///< Player loose.
+	};
+	/// The scene status.
+	Status status = Status::Editing;
 
 private:
 	/**
