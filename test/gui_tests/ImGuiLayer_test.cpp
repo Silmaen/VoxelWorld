@@ -14,7 +14,7 @@ TEST(ImGuiLayer, creation) {
 	layer.disableDocking();
 	layer.disableApp();
 	layer.onAttach();
-	layer.setTheme();
+	UiLayer::setTheme();
 	owl::event::KeyPressedEvent evt(owl::input::key::A, 1);
 	layer.onEvent(evt);
 	layer.blockEvents(true);

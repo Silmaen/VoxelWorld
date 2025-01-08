@@ -23,11 +23,12 @@ TEST(CameraEditor, defaultCreation) {
 }
 
 TEST(CameraEditor, fovCreation) {
-	const CameraEditor cam(45, 1.5f, 0.1f, 15);
+	CameraEditor cam(45, 1.5f, 0.1f, 15);
 	EXPECT_EQ(cam.getDistance(), 10.f);
 	const auto proj = cam.getViewProjection();
 	const auto view = cam.getView();
 	EXPECT_EQ(view(0, 0), 1.f);
+	cam.setTransform(view);
 	EXPECT_NEAR(proj(0, 0), 1.6094f, 0.001);
 	EXPECT_TRUE(cam.getPosition() == owl::math::vec3({0.f, 0.f, 10.f}));
 	EXPECT_EQ(cam.getPitch(), 0.f);

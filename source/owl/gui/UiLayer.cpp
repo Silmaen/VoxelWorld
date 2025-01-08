@@ -17,6 +17,8 @@
 #include "renderer/vulkan/internal/VulkanHandler.h"
 #include "utils.h"
 
+#include <input/Input.h>
+
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
 #include <ImGuizmo.h>
@@ -66,34 +68,35 @@ void UiLayer::onAttach() {
 
 	setTheme();
 
-	if (m_withApp) {
+	if (m_withApp && core::Application::get().getWindow().getType() == input::Type::GLFW) {
 		auto* window = static_cast<GLFWwindow*>(core::Application::get().getWindow().getNativeWindow());
-
 		if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL) {
 			ImGui_ImplGlfw_InitForOpenGL(window, true);
-			ImGui_ImplOpenGL3_Init("#version 410");
-		}
-		if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
+		} else if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
 			ImGui_ImplGlfw_InitForVulkan(window, true);
-			auto& vkh = renderer::vulkan::internal::VulkanHandler::get();
-			std::vector<VkFormat> formats;
-			ImGui_ImplVulkan_InitInfo info = vkh.toImGuiInfo(formats);
-			ImGui_ImplVulkan_Init(&info);
-			ImGui_ImplVulkan_CreateFontsTexture();
 		}
+	}
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL) {
+		ImGui_ImplOpenGL3_Init("#version 410");
+	} else if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
+		auto& vkh = renderer::vulkan::internal::VulkanHandler::get();
+		std::vector<VkFormat> formats;
+		ImGui_ImplVulkan_InitInfo info = vkh.toImGuiInfo(formats);
+		ImGui_ImplVulkan_Init(&info);
+		ImGui_ImplVulkan_CreateFontsTexture();
 	}
 }
 
 void UiLayer::onDetach() {
 	OWL_PROFILE_FUNCTION()
-	if (m_withApp) {
-		if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
-			ImGui_ImplOpenGL3_Shutdown();
-		if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
-			const auto& vkc = renderer::vulkan::internal::VulkanCore::get();
-			vkDeviceWaitIdle(vkc.getLogicalDevice());
-			ImGui_ImplVulkan_Shutdown();
-		}
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
+		ImGui_ImplOpenGL3_Shutdown();
+	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
+		const auto& vkc = renderer::vulkan::internal::VulkanCore::get();
+		vkDeviceWaitIdle(vkc.getLogicalDevice());
+		ImGui_ImplVulkan_Shutdown();
+	}
+	if (m_withApp && core::Application::get().getWindow().getType() == input::Type::GLFW) {
 		ImGui_ImplGlfw_Shutdown();
 	}
 	ImGui::DestroyContext();
@@ -112,9 +115,22 @@ void UiLayer::begin() const {
 		ImGui_ImplOpenGL3_NewFrame();
 	else if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
 		ImGui_ImplVulkan_NewFrame();
-	} else
-		return;
-	ImGui_ImplGlfw_NewFrame();
+	} else {
+		ImGuiIO& io = ImGui::GetIO();
+		// fake load fonts
+		unsigned char* pixels = nullptr;
+		int width;
+		int height;
+		io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+	}
+	if (m_withApp && core::Application::get().getWindow().getType() == input::Type::GLFW) {
+		ImGui_ImplGlfw_NewFrame();
+	} else {
+		ImGuiIO& io = ImGui::GetIO();
+		// dummy data
+		io.DisplaySize = ImVec2(800, 600);
+		io.DeltaTime = 1.0f / 60.0f;
+	}
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
 	if (m_dockingEnable) {
@@ -128,8 +144,10 @@ void UiLayer::end() const {
 		ImGui::End();
 	}
 	ImGuiIO& io = ImGui::GetIO();
-	const core::Application& app = core::Application::get();
-	io.DisplaySize = vec(app.getWindow().getSize());
+	if (m_withApp) {
+		const core::Application& app = core::Application::get();
+		io.DisplaySize = vec(app.getWindow().getSize());
+	}
 	ImGui::EndFrame();
 	// Rendering
 	if (renderer::RenderCommand::getApi() != renderer::RenderAPI::Type::OpenGL &&
@@ -138,7 +156,7 @@ void UiLayer::end() const {
 	ImGui::Render();
 	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::OpenGL)
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
+	else if (renderer::RenderCommand::getApi() == renderer::RenderAPI::Type::Vulkan) {
 		const auto& vkh = renderer::vulkan::internal::VulkanHandler::get();
 		renderer::RenderCommand::beginBatch();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), vkh.getCurrentCommandBuffer());

@@ -48,7 +48,7 @@ public:
 	explicit Texture(std::filesystem::path iPath);
 
 	/// Texture Specifications.
-	struct Specification {
+	struct OWL_API Specification {
 		/// Texture size.
 		math::vec2ui size;
 		/// Pixel format.

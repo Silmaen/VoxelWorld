@@ -354,7 +354,7 @@ auto Application::getFullAssetPath(const std::string& iAssetName, const std::str
 
 void AppParams::loadFromFile(const std::filesystem::path& iFile) {
 	YAML::Node data = YAML::LoadFile(iFile.string());
-	if (auto appConfig = data["AppConfig"]; appConfig) {
+	if (const auto appConfig = data["AppConfig"]; appConfig) {
 		get(appConfig, "width", width);
 		get(appConfig, "height", height);
 		std::string rendererStr;

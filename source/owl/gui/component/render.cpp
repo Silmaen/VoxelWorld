@@ -172,15 +172,17 @@ void renderProps(CircleRenderer& ioComponent) {
 
 void renderProps(Text& ioComponent) {
 	ImGui::InputTextMultiline("Text String", &ioComponent.text, {0, 70});
-	auto& fontLib = core::Application::get().getFontLibrary();
-	const std::string display = ioComponent.font->isDefault() ? "(default)" : ioComponent.font->getName();
-	if (ImGui::BeginCombo("Font", display.c_str())) {
-		for (const auto& font: fontLib.getFoundFontNames()) {
-			if (ImGui::Selectable(font.c_str(), ioComponent.font->getName() == font)) {
-				ioComponent.font = fontLib.getFont(font);
+	if (core::Application::instanced()) {
+		auto& fontLib = core::Application::get().getFontLibrary();
+		const std::string display = ioComponent.font->isDefault() ? "(default)" : ioComponent.font->getName();
+		if (ImGui::BeginCombo("Font", display.c_str())) {
+			for (const auto& font: fontLib.getFoundFontNames()) {
+				if (ImGui::Selectable(font.c_str(), ioComponent.font->getName() == font)) {
+					ioComponent.font = fontLib.getFont(font);
+				}
 			}
+			ImGui::EndCombo();
 		}
-		ImGui::EndCombo();
 	}
 
 	ImGui::ColorEdit4("Color", ioComponent.color.data());
@@ -229,6 +231,7 @@ void renderProps(Trigger& ioComponent) {
 		ImGui::EndCombo();
 	}
 }
+
 void renderProps(EntityLink& ioComponent) { ImGui::InputText("linked Entity Name", &ioComponent.linkedEntityName); }
 
 }// namespace owl::gui::component
