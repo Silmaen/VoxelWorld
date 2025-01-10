@@ -9,6 +9,7 @@
 #pragma once
 
 #include "core/Core.h"
+#include <filesystem>
 
 namespace owl::sound {
 
@@ -18,9 +19,23 @@ namespace owl::sound {
 class OWL_API SoundData {
 public:
 	/**
-	 * @brief Default constructor.
+	 * @brief Definition of a sound.
 	 */
-	SoundData() = default;
+	struct Specification {
+		/// Sound's name, used to find the file in the assets.
+		std::filesystem::path file;
+	};
+
+	/**
+	 * @brief Default constructor.
+	 * @param[in] iSpec the sound specifications.
+	 */
+	explicit SoundData(const Specification& iSpec);
+	/**
+	 * @brief Default constructor.
+	 * @param[in] iSpec the sound specifications.
+	 */
+	explicit SoundData(Specification&& iSpec);
 	/**
 	 * @brief Default destructor.
 	 */
@@ -41,18 +56,35 @@ public:
 	 * @brief Default move affectation operator.
 	 */
 	auto operator=(SoundData&&) -> SoundData& = default;
+
 	/**
-	 * @brief Create a new drax data buffer.
+	 * @brief Get the system id.
+	 * @return The system id.
+	 */
+	virtual auto getSystemId() const -> uint64_t = 0;
+
+	/**
+	 * @brief Create a new sound data buffer base on specifications.
+	 * @param[in] iSpec The specifications of the sound.
 	 * @return Pointer to the created buffer.
 	 */
-	static auto create() -> shared<SoundData>;
+	static auto create(const Specification& iSpec) -> shared<SoundData>;
+	/**
+	 * @brief Create a new sound data buffer base on a file.
+	 * @param[in] iPath The file to load as data.
+	 * @return Pointer to the created buffer.
+	 */
+	static auto create(const std::filesystem::path& iPath) -> shared<SoundData>;
 
 	/**
-	 * @brief Initialize the sound data.
+	 * @brief Defines the possible extensions type for this dta
+	 * @return List of supported extensions.
 	 */
-	virtual void init() = 0;
+	static auto extension() -> std::vector<std::string> { return {".wav"}; }
 
-private:
+protected:
+	/// The sound's data specification.
+	Specification m_specification;
 };
 
 }// namespace owl::sound

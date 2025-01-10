@@ -8,8 +8,7 @@
 
 #include "SoundAPI.h"
 
-#include <AL/al.h>
-#include <AL/alc.h>
+#include "core/external/openal.h"
 #include <debug/Profiler.h>
 
 namespace owl::sound::openal {
@@ -86,6 +85,39 @@ SoundAPI::~SoundAPI() {
 	setState(State::Created);
 }
 
-void SoundAPI::playSound([[maybe_unused]] const shared<SoundData>& iData) {}
+void SoundAPI::playSound(const shared<SoundData>& iData) {
+	OWL_PROFILE_FUNCTION()
+
+	if (iData == nullptr) {
+		OWL_CORE_WARN("SoundAPI(OpenAL)::playSound: SoundData is null")
+		return;
+	}
+	const auto id = static_cast<uint32_t>(iData->getSystemId());
+	uint32_t& source = m_alSources.emplace_back();
+	alGenSources(1, &source);
+	alSourcei(source, AL_BUFFER, static_cast<ALint>(id));
+	if (const ALenum err = alGetError(); err != AL_NO_ERROR) {
+		OWL_CORE_ERROR("SoundAPI:::playSound OpenAL error: {}.", alGetString(err))
+		m_alSources.pop_back();
+	}
+	alSourcePlay(source);
+}
+
+void SoundAPI::frame(const core::Timestep&) {
+	OWL_PROFILE_FUNCTION()
+
+	std::vector<uint32_t> sources;
+	for (auto& source: m_alSources) {
+		ALint state = 0;
+		alGetSourcei(source, AL_SOURCE_STATE, &state);
+		if (state != AL_PLAYING) {
+			alDeleteSources(1, &source);
+			continue;
+		}
+		sources.emplace_back(source);
+	}
+	std::swap(m_alSources, sources);
+}
+
 
 }// namespace owl::sound::openal

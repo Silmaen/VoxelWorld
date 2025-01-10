@@ -40,6 +40,12 @@ public:
 	 */
 	void playSound(const shared<SoundData>& iData) override;
 
+	/**
+	 * @brief The function to call every frame.
+	 * @param iTs The time step.
+	 */
+	void frame(const core::Timestep& iTs) override;
+
 private:
 };
 

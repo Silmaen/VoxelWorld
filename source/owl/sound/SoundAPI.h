@@ -10,6 +10,8 @@
 
 #include "SoundData.h"
 
+#include <core/Timestep.h>
+
 namespace owl::sound {
 
 /**
@@ -77,6 +79,12 @@ public:
 	 * @param[in] iData The Sound to play.
 	 */
 	virtual void playSound(const shared<SoundData>& iData) = 0;
+
+	/**
+	 * @brief The function to call every frame.
+	 * @param iTs The time step.
+	 */
+	virtual void frame(const core::Timestep& iTs) = 0;
 
 protected:
 	/**

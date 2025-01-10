@@ -19,8 +19,9 @@ class OWL_API SoundData final : public sound::SoundData {
 public:
 	/**
 	 * @brief Default constructor.
+	 * @param[in] iSpecifications The specifications.
 	 */
-	SoundData() = default;
+	explicit SoundData(const Specification& iSpecifications);
 	/**
 	 * @brief Default destructor.
 	 */
@@ -41,13 +42,11 @@ public:
 	 * @brief Default move affectation operator.
 	 */
 	auto operator=(SoundData&&) -> SoundData& = default;
-
 	/**
-	 * @brief Initialize the sound data.
+	 * @brief Get the system id.
+	 * @return The system id.
 	 */
-	void init() override;
-
-private:
+	auto getSystemId() const -> uint64_t override { return 0; }
 };
 
 }// namespace owl::sound::null

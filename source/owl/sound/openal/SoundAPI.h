@@ -20,7 +20,7 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	SoundAPI() : sound::SoundAPI{Type::Null} {}
+	SoundAPI() : sound::SoundAPI{Type::OpenAL} {}
 	SoundAPI(const SoundAPI&) = delete;
 	SoundAPI(SoundAPI&&) = delete;
 	auto operator=(const SoundAPI&) -> SoundAPI& = delete;
@@ -40,7 +40,15 @@ public:
 	 */
 	void playSound(const shared<SoundData>& iData) override;
 
+	/**
+	 * @brief The function to call every frame.
+	 * @param iTs The time step.
+	 */
+	void frame(const core::Timestep& iTs) override;
+
 private:
+	/// The list of active sources.
+	std::vector<uint32_t> m_alSources;
 };
 
 }// namespace owl::sound::openal

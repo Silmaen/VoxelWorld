@@ -16,4 +16,6 @@ SoundAPI::~SoundAPI() { setState(State::Created); }
 
 void SoundAPI::playSound(const shared<SoundData>&) {}
 
+void SoundAPI::frame(const core::Timestep&) {}
+
 }// namespace owl::sound::null

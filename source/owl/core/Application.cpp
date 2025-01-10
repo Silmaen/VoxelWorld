@@ -209,6 +209,8 @@ void Application::run() {
 		OWL_CORE_FRAME_ADVANCE
 
 		m_stepper.update();
+
+		// Graphics part.
 		if (!m_minimized) {
 			renderer::RenderCommand::beginFrame();
 			if (renderer::RenderCommand::getState() != renderer::RenderAPI::State::Ready) {
@@ -228,6 +230,16 @@ void Application::run() {
 			}
 			renderer::RenderCommand::endFrame();
 		}
+
+		// sound part
+		{
+			sound::SoundCommand::frame(m_stepper);
+			if (sound::SoundCommand::getState() != sound::SoundAPI::State::Ready) {
+				m_state = State::Error;
+				continue;
+			}
+		}
+
 		mp_appWindow->onUpdate();
 
 		m_scheduler.frame(m_stepper);

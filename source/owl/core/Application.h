@@ -20,6 +20,7 @@
 #include "task/Task.h"
 
 #include <filesystem>
+#include <list>
 
 auto main(int iArgc, char* iArgv[]) -> int;
 

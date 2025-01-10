@@ -11,6 +11,8 @@
 #include "SoundAPI.h"
 #include "core/Core.h"
 
+#include <core/Timestep.h>
+
 namespace owl::sound {
 
 /**
@@ -62,9 +64,7 @@ public:
 	static auto getApi() -> SoundAPI::Type {
 		if (m_soundAPI)
 			return m_soundAPI->getApi();
-		// NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange)
-		return static_cast<SoundAPI::Type>(-1);
-		// NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange)
+		return static_cast<SoundAPI::Type>(-1);// NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
 	}
 
 	/**
@@ -83,6 +83,15 @@ public:
 	static void playSound(const shared<SoundData>& iData) {
 		if (m_soundAPI)
 			return m_soundAPI->playSound(iData);
+	}
+
+	/**
+	 * @brief The function to call every frame.
+	 * @param iTs The time step.
+	 */
+	static void frame(const core::Timestep& iTs) {
+		if (m_soundAPI)
+			m_soundAPI->frame(iTs);
 	}
 
 private:

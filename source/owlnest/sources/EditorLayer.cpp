@@ -10,6 +10,9 @@
 
 #include "physic/PhysicCommand.h"
 
+#include <sound/SoundCommand.h>
+#include <sound/SoundSystem.h>
+
 // must be included AFTER imgui
 OWL_DIAG_PUSH
 OWL_DIAG_DISABLE_CLANG("-Wzero-as-null-pointer-constant")
@@ -26,6 +29,11 @@ void loadIcons() {
 	textureLibrary.addFromStandardPath("icons/PlayButton");
 	textureLibrary.addFromStandardPath("icons/StopButton");
 }
+void loadSounds() {
+	auto& soundLibrary = sound::SoundSystem::getSoundLibrary();
+	soundLibrary.load("clic.wav");
+}
+
 }// namespace
 EditorLayer::EditorLayer() : Layer("EditorLayer"), m_cameraController{1280.0f / 720.0f} {}
 
@@ -39,7 +47,7 @@ void EditorLayer::onAttach() {
 	m_viewport.attachParent(this);
 
 	loadIcons();
-
+	loadSounds();
 
 	m_controlBar.init(gui::widgets::ButtonBarData{{.id = "##controlBar", .visible = true}, false, false, true});
 	m_controlBar.addButton({{.id = "##ctrlTranslation", .visible = true},
@@ -357,6 +365,9 @@ auto EditorLayer::onMouseButtonPressed([[maybe_unused]] const event::MouseButton
 
 void EditorLayer::onScenePlay() {
 	if (m_editorScene) {
+		auto& soundLibrary = sound::SoundSystem::getSoundLibrary();
+		sound::SoundCommand::playSound(soundLibrary.get("clic.wav"));
+
 		m_state = State::Play;
 		m_activeScene = scene::Scene::copy(m_editorScene);
 		m_activeScene->onStartRuntime();
