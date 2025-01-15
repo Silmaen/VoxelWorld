@@ -11,6 +11,8 @@ TEST(SoundSystem, creation) {
 	EXPECT_EQ(SoundSystem::getState(), SoundSystem::State::Created);
 	SoundSystem::init();
 	EXPECT_EQ(SoundSystem::getState(), SoundSystem::State::Error);
+	SoundCommand::create(SoundAPI::Type{255});
+	EXPECT_EQ(SoundSystem::getState(), SoundSystem::State::Error);
 	SoundCommand::create(SoundAPI::Type::Null);
 	SoundSystem::init();
 	EXPECT_EQ(SoundSystem::getState(), SoundSystem::State::Running);
@@ -25,8 +27,10 @@ TEST(Renderer, fakeScene) {
 	owl::core::Log::init(spdlog::level::off);
 	SoundCommand::create(SoundAPI::Type::Null);
 	SoundSystem::init();
-	const owl::shared<SoundData> data = SoundData::create();
+	const owl::shared<SoundData> data = SoundData::create("");
+	EXPECT_EQ(data->getSystemId(), 0);
 	SoundCommand::playSound(data);
+	SoundCommand::frame(owl::core::Timestep{});
 	SoundCommand::invalidate();
 	owl::core::Log::invalidate();
 }

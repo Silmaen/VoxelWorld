@@ -123,9 +123,6 @@ void PhysicCommand::impulse(const scene::Entity& iEntity, const math::vec2f& iIm
 	auto& [body] = iEntity.getComponent<scene::component::PhysicBody>();
 	if (body.type == scene::SceneBody::BodyType::Static)
 		return;
-	OWL_CORE_INFO("Apply impulse ({} {}) to body ({} {} {})", iImpulse.x(), iImpulse.y(),
-				  m_impl->bodies[body.bodyId].index1, m_impl->bodies[body.bodyId].revision,
-				  m_impl->bodies[body.bodyId].world0)
 	b2Body_ApplyLinearImpulseToCenter(m_impl->bodies[body.bodyId], {iImpulse.x(), iImpulse.y()}, true);
 }
 

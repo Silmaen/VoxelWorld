@@ -10,8 +10,8 @@
 
 namespace owl::sound::null {
 
-SoundData::~SoundData() = default;
+SoundData::SoundData(const Specification& iSpecifications) : sound::SoundData{iSpecifications} {}
 
-void SoundData::init() {}
+SoundData::~SoundData() = default;
 
 }// namespace owl::sound::null

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Font.h"
+#include <list>
 
 namespace owl::fonts {
 

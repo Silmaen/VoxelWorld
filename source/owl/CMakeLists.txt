@@ -173,6 +173,11 @@ find_package(OpenAL CONFIG REQUIRED)
 message(STATUS "Found OpenAL version ${OpenAL_VERSION} @ ${OpenAL_DIR}")
 target_link_libraries(${ENGINE_NAME} PRIVATE OpenAL::OpenAL)
 
+# SndFile
+find_package(SndFile CONFIG REQUIRED)
+message(STATUS "Found SndFile version ${SndFile_VERSION} @ ${SndFile_DIR}")
+target_link_libraries(${ENGINE_NAME} PRIVATE SndFile::sndfile)
+
 # additional windows libs
 if (${PRJPREFIX}_PLATFORM_WINDOWS)
     target_link_libraries(${ENGINE_NAME} PUBLIC Mf Mfplat Mfreadwrite)

@@ -35,6 +35,8 @@ packages:
   openal:
     version: 1.24.1
     kind: "shared"
+  libsndfile:
+    version: 1.2.2
   spdlog:
     version: 1.14.1.1
   yaml-cpp:
