@@ -12,6 +12,8 @@ namespace owl::sound::openal {
 
 SoundData::~SoundData() = default;
 
-void SoundData::init() {}
+void SoundData::init() {
+	/// nothing
+	}
 
 }// namespace owl::sound::openal
