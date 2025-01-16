@@ -13,7 +13,7 @@
 namespace owl::input::video {
 
 /**
- * @brief Class Device.
+ * @brief Class describing the video input device.
  */
 class OWL_API Device {
 public:

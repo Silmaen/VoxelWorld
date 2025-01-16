@@ -9,8 +9,8 @@
 #pragma once
 
 
-/// Wrap to mouse code.
 namespace owl::input {
+/// Wrap to mouse code.
 using MouseCode = uint8_t;
 }// namespace owl::input
 

@@ -11,7 +11,7 @@
 namespace owl::renderer {
 
 /**
- * @brief Class UniformBuffer.
+ * @brief Abstract class for managing uniform buffer.
  */
 class OWL_API UniformBuffer {
 public:

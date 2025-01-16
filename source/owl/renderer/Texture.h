@@ -28,7 +28,7 @@ enum struct ImageFormat : uint8_t {
 
 class TextureLibrary;
 /**
- * @brief Class Texture.
+ * @brief Abstract class managing texture.
  */
 class OWL_API Texture {
 public:

@@ -12,7 +12,7 @@
 
 namespace owl::renderer::null {
 /**
- * @brief Class Texture.
+ * @brief Specialized class managing null texture.
  */
 class OWL_API Texture2D final : public renderer::Texture2D {
 public:

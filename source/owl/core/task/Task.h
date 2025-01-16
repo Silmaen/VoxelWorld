@@ -15,7 +15,7 @@ namespace owl::core::task {
 class Scheduler;
 
 /**
- * @brief Class Task.
+ * @brief Class defining a simple task for mutlithreading.
  */
 class OWL_API Task final {
 public:

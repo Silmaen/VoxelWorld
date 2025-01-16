@@ -16,7 +16,7 @@
 namespace owl::scene::component {
 
 /**
- * @brief A tag component.
+ * @brief A text rendering component.
  */
 struct OWL_API Text {
 	/// The text.

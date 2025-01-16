@@ -13,7 +13,7 @@
 
 namespace owl::renderer::vulkan {
 /**
- * @brief Class Texture.
+ * @brief Specialized class managing Vulkan texture.
  */
 class OWL_API Texture2D final : public ::owl::renderer::Texture2D {
 public:

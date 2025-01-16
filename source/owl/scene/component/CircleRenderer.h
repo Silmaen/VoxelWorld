@@ -13,7 +13,7 @@
 namespace owl::scene::component {
 
 /**
- * @brief Struct CircleRenderer.
+ * @brief Struct for component drawing a circle.
  */
 struct OWL_API CircleRenderer {
 	/// The circle color.

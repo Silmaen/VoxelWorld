@@ -15,7 +15,7 @@
 namespace owl::gui {
 
 /**
- * @brief Class BasePanel.
+ * @brief Class describing a basic gui panel.
  */
 class OWL_API BasePanel {
 public:

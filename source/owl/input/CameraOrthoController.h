@@ -15,7 +15,7 @@
 
 namespace owl::input {
 /**
- * @brief Class CameraOrthoController.
+ * @brief Class For controlling otho camera.
  */
 class OWL_API CameraOrthoController final {
 public:

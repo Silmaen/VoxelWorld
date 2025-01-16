@@ -14,7 +14,7 @@
 namespace owl::gui {
 
 /**
- * @brief Class BaseDrawPanel.
+ * @brief Class describing a basic panel with a draw frame buffer.
  */
 class OWL_API BaseDrawPanel {
 public:

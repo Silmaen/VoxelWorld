@@ -8,6 +8,7 @@ if (DOXYGEN_FOUND)
     if (${DOXYGEN_VERSION} VERSION_LESS 1.9.1)
         message(FATAL_ERROR "Doxygen version 1.9.1 or higher is required")
     endif ()
+    configure_file(${CMAKE_SOURCE_DIR}/DoxyfileTemplate ${CMAKE_SOURCE_DIR}/Doxyfile)
     add_custom_target(documentation)
     add_custom_command(
             TARGET documentation PRE_BUILD

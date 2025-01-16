@@ -14,14 +14,14 @@
 
 #include <entt/entt.hpp>
 /**
- * @brief Namespace for the Scene elements
+ * @brief Namespace for the scene elements
  */
 namespace owl::scene {
 class Entity;
 class ScriptableEntity;
 
 /**
- * @brief Class Scene.
+ * @brief Class describing a scene.
  */
 class OWL_API Scene final {
 public:

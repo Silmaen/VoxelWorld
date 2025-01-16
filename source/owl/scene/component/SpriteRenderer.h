@@ -14,7 +14,7 @@
 namespace owl::scene::component {
 
 /**
- * @brief Struct SpriteRenderer.
+ * @brief Struct for draw a quad sprite.
  */
 struct OWL_API SpriteRenderer {
 	/// Sprite color.

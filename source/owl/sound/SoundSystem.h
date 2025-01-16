@@ -12,10 +12,13 @@
 
 #include <core/assets/AssetLibrary.h>
 
+/**
+ * @brief Namespace for sound management.
+ */
 namespace owl::sound {
 
 /**
- * @brief Class SoundSystem.
+ * @brief Class for sound management.
  */
 class OWL_API SoundSystem {
 public:

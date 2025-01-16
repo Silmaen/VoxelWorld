@@ -19,7 +19,7 @@
 namespace owl::core::layer {
 
 /**
- * @brief Class Layer.
+ * @brief Base class for game layer definition.
  */
 class OWL_API Layer {
 public:

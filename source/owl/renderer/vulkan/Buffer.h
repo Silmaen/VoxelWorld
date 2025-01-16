@@ -13,7 +13,7 @@
 
 namespace owl::renderer::vulkan {
 /**
- * @brief Class VertexBuffer.
+ * @brief Specialized class for managing vulkan vertex buffer.
  */
 class VertexBuffer final : public ::owl::renderer::VertexBuffer {
 public:
@@ -83,7 +83,7 @@ private:
 };
 
 /**
- * @brief Class IndexBuffer.
+ * @brief Specialized class for managing vulkan index buffer.
  */
 class IndexBuffer final : public renderer::IndexBuffer {
 public:

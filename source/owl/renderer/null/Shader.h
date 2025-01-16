@@ -12,7 +12,7 @@
 
 namespace owl::renderer::null {
 /**
- * @brief Class Shader.
+ * @brief Specialized class managing null shader.
  */
 class OWL_API Shader final : public owl::renderer::Shader {
 public:

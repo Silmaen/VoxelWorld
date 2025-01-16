@@ -11,6 +11,9 @@
 #include "scene/component/components.h"
 #include <core/Core.h>
 
+/**
+ * @brief Namespace defining functions for draw components in GUI.
+ */
 namespace owl::gui::component {
 
 /**
@@ -66,6 +69,9 @@ OWL_API void renderProps(scene::component::Trigger& ioComponent);
  */
 OWL_API void renderProps(scene::component::EntityLink& ioComponent);
 
+/**
+ * @brief List of components that have a render function.
+ */
 using drawableComponents =
 		std::tuple<scene::component::Transform, scene::component::Camera, scene::component::SpriteRenderer,
 				   scene::component::CircleRenderer, scene::component::Text, scene::component::PhysicBody,

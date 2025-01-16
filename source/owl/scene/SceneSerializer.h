@@ -12,7 +12,7 @@
 
 namespace owl::scene {
 /**
- * @brief Class SceneSerializer.
+ * @brief Class use to serialize of deserialize the scene.
  */
 class OWL_API SceneSerializer {
 public:

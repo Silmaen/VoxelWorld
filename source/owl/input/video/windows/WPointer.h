@@ -12,7 +12,7 @@
  */
 namespace owl::input::video::windows {
 /**
- * @brief Class WPointer
+ * @brief Class for managing a windows pointer.
  *
  * Simple class to handle windows object pointers like a unique_ptr
  */

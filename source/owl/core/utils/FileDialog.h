@@ -16,7 +16,7 @@
 namespace owl::core::utils {
 
 /**
- * @brief class FileDialog.
+ * @brief class For displaying a file dialog.
  */
 class OWL_API FileDialog {
 public:

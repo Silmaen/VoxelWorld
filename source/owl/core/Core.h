@@ -49,6 +49,35 @@
  * @brief Base Namespace for the project.
  */
 namespace owl {
+/**
+ * @brief Gets the version as code with first 2 bytes major, then minor, then patch, then 00.
+ * @return version code.
+ */
+OWL_API auto getVersionCode() -> uint32_t;
+
+/**
+ * @brief Gets the major version number.
+ * @return Major version code.
+ */
+OWL_API auto getVersionMajor() -> uint8_t;
+
+/**
+ * @brief Gets the minor version number.
+ * @return Minor version code.
+ */
+OWL_API auto getVersionMinor() -> uint8_t;
+
+/**
+ * @brief Gets the patch version number.
+ * @return Patch version code.
+ */
+OWL_API auto getVersionPatch() -> uint8_t;
+
+/**
+ * @brief Gets the engine version as a string x.y.z.
+ * @return The current engin version.
+ */
+OWL_API auto getVersionString() -> std::string;
 
 /// Wrap to unique pointer.
 template<typename T>

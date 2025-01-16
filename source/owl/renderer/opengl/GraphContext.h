@@ -13,7 +13,7 @@
 
 namespace owl::renderer::opengl {
 /**
- * @brief Class GraphContext.
+ * @brief Specialized class for manipulate OpenGL graph context.
  */
 class OWL_API GraphContext final : public renderer::GraphContext {
 public:

@@ -12,7 +12,7 @@
 
 namespace owl::scene {
 /**
- * @brief Class ScriptableEntity.
+ * @brief Class managing the C++ scripts attached to an entity.
  */
 class OWL_API ScriptableEntity final {
 public:

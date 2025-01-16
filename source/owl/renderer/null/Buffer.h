@@ -12,7 +12,7 @@
 
 namespace owl::renderer::null {
 /**
- * @brief Class VertexBuffer.
+ * @brief Specialized class for managing null vertex buffer.
  */
 class OWL_API VertexBuffer final : public renderer::VertexBuffer {
 public:
@@ -57,7 +57,7 @@ public:
 };
 
 /**
- * @brief Class IndexBuffer.
+ * @brief Specialized class for managing null index buffer.
  */
 class OWL_API IndexBuffer final : public renderer::IndexBuffer {
 public:

@@ -13,7 +13,7 @@
 
 namespace owl::renderer {
 /**
- * @brief Class Camera.
+ * @brief Base class for camera.
  */
 class OWL_API Camera {
 public:

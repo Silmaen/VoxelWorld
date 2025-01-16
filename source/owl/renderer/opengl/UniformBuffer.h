@@ -11,7 +11,7 @@
 
 namespace owl::renderer::opengl {
 /**
- * @brief Class UniformBuffer.
+ * @brief Specialized class for managing OpenGL uniform buffer.
  */
 class UniformBuffer final : public renderer::UniformBuffer {
 public:

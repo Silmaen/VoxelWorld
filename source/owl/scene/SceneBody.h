@@ -14,7 +14,7 @@
 namespace owl::scene {
 
 /**
- * @brief Class SceneBody.
+ * @brief Class describing a physical body in the scene.
  */
 class OWL_API SceneBody {
 public:

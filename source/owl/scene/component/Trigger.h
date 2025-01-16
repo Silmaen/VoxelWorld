@@ -14,7 +14,7 @@
 namespace owl::scene::component {
 
 /**
- * @brief Class Trigger.
+ * @brief component describing a game trigger.
  */
 struct OWL_API Trigger {
 	/// The scene trigger.

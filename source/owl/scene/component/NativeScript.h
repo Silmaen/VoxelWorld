@@ -12,7 +12,7 @@
 
 namespace owl::scene::component {
 /**
- * @brief Class NativeScript.
+ * @brief Class allowing the use of C++ scripts.
  */
 struct OWL_API NativeScript {
 	/// Script instance.

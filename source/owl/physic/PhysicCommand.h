@@ -11,10 +11,13 @@
 #include "core/Core.h"
 #include "scene/Scene.h"
 
+/**
+ * @brief Namespace for phyisics management.
+ */
 namespace owl::physic {
 
 /**
- * @brief Class PhysicCommand.
+ * @brief Class for physics management.
  */
 class OWL_API PhysicCommand final {
 public:

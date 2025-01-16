@@ -16,7 +16,7 @@
 namespace owl::sound {
 
 /**
- * @brief Class SoundCommand.
+ * @brief Class gathering the sound's commands.
  */
 class OWL_API SoundCommand {
 public:

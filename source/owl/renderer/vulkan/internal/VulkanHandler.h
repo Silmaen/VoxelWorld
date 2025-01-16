@@ -18,7 +18,7 @@
  */
 namespace owl::renderer::vulkan::internal {
 /**
- * @brief Class VulkanHandler.
+ * @brief Class for handling Vulkan API.
  */
 class VulkanHandler final {
 public:

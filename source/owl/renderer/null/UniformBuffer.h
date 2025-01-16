@@ -11,7 +11,7 @@
 
 namespace owl::renderer::null {
 /**
- * @brief Class UniformBuffer.
+ * @brief Specialized class for managing null uniform buffer.
  */
 class UniformBuffer final : public ::owl::renderer::UniformBuffer {
 public:

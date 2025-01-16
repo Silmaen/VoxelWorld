@@ -15,7 +15,7 @@
  */
 namespace owl::renderer::opengl {
 /**
- * @brief Class RenderAPI.
+ * @brief Specialized class to manage OpenGL rendering API.
  */
 class RenderAPI final : public renderer::RenderAPI {
 public:

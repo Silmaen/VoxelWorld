@@ -28,7 +28,8 @@ template<typename DataType>
 concept derivedFromWidgetData = std::derived_from<DataType, WidgetData>;
 
 /**
- * @brief Class Widget.
+ * @brief base widget's class.
+ * @tparam DataType Type of data describing the widget.
  */
 template<derivedFromWidgetData DataType = WidgetData>
 class OWL_API Widget {

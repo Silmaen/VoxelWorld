@@ -18,7 +18,8 @@
 namespace owl::core::assets {
 
 /**
- * @brief Class AssetLibrary.
+ * @brief Class managing a library of assets.
+ * @tparam DataType The underlying data type.
  */
 template<assetDataType DataType>
 class AssetLibrary {

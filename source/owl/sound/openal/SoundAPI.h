@@ -10,10 +10,13 @@
 
 #include "sound/SoundAPI.h"
 
+/**
+ * @brief Namespace for OpenAL sound management.
+ */
 namespace owl::sound::openal {
 
 /**
- * @brief Class SoundAPI.
+ * @brief Specialized class for OpenAl sound API..
  */
 class OWL_API SoundAPI final : public sound::SoundAPI {
 public:

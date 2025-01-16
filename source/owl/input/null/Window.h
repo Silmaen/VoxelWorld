@@ -16,9 +16,9 @@
 namespace owl::input::null {
 
 /**
- * @brief GLFW implementation of window.
+ * @brief Specialization class for null window.
  */
-class OWL_API Window final : public ::owl::input::Window {
+class OWL_API Window final : public input::Window {
 public:
 	Window(const Window&) = delete;
 	Window(Window&&) = delete;
@@ -45,19 +45,19 @@ public:
 	 * @brief Get Size attribute of width.
 	 * @return The window's width.
 	 */
-	[[nodiscard]] auto getWidth() const -> uint32_t override { return m_windowData.m_size.x(); }
+	[[nodiscard]] auto getWidth() const -> uint32_t override { return m_windowData.size.x(); }
 
 	/**
 	 * @brief Get Size attribute of height.
 	 * @return The window's height.
 	 */
-	[[nodiscard]] auto getHeight() const -> uint32_t override { return m_windowData.m_size.y(); }
+	[[nodiscard]] auto getHeight() const -> uint32_t override { return m_windowData.size.y(); }
 
 	/**
 	 * @brief Access to texture's size.
 	 * @return Texture's size.
 	 */
-	[[nodiscard]] auto getSize() const -> const math::vec2ui& override { return m_windowData.m_size; }
+	[[nodiscard]] auto getSize() const -> const math::vec2ui& override { return m_windowData.size; }
 
 	/**
 	 * @brief Get the type of window manager.
@@ -69,7 +69,7 @@ public:
 	 * @brief Define the Event Callback function.
 	 * @param[in] iCallback The new callback function.
 	 */
-	void setEventCallback(const EventCallback& iCallback) override { m_windowData.m_eventCallback = iCallback; }
+	void setEventCallback(const EventCallback& iCallback) override { m_windowData.eventCallback = iCallback; }
 	/**
 	 * @brief St the VSync.
 	 * @param[in] iEnabled Should VSync enabled.
@@ -108,13 +108,13 @@ private:
 	 */
 	struct WindowData {
 		/// Window's title.
-		std::string m_title;
+		std::string title;
 		/// Window's size.
-		math::vec2ui m_size{0, 0};
+		math::vec2ui size{0, 0};
 		/// Window's VSync property.
-		bool m_VSync = false;
+		bool vSync = false;
 		/// Event Call back.
-		EventCallback m_eventCallback;
+		EventCallback eventCallback;
 	};
 
 	/// The Window's data.

@@ -11,6 +11,7 @@
 #include "core/external/yaml.h"
 #include "vectors.h"
 
+/// @cond
 namespace YAML {
 
 template<>
@@ -72,3 +73,4 @@ struct convert<owl::math::vec4> {
 // NOLINTEND(misc-use-anonymous-namespace)
 
 }// namespace YAML
+/// @endcond

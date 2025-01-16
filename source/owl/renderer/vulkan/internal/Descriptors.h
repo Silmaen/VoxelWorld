@@ -32,7 +32,7 @@ struct TextureData {
 };
 
 /**
- * @brief Class Descriptors.
+ * @brief Class handling vulkan descriptors.
  */
 class Descriptors {
 public:
@@ -112,6 +112,9 @@ private:
 	 */
 	Descriptors();
 
+	/**
+	 * @brief Vulkan management of the texture list.
+	 */
 	struct TextureList {
 		using tex = shared<TextureData>;
 		using elem = std::pair<uint32_t, tex>;

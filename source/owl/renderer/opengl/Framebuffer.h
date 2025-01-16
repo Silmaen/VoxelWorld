@@ -12,7 +12,7 @@
 
 namespace owl::renderer::opengl {
 /**
- * @brief Class Framebuffer.
+ * @brief Specialized class for manipulating OpenGL frame buffer.
  */
 class Framebuffer final : public renderer::Framebuffer {
 public:
