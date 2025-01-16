@@ -14,7 +14,7 @@
 namespace owl::scene {
 
 /**
- * @brief Class SceneTrigger.
+ * @brief Class describing a trigger in the scene.
  */
 class OWL_API SceneTrigger {
 public:

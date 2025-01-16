@@ -29,8 +29,26 @@
 #include <cpptrace/cpptrace.hpp>
 #endif
 
+/**
+ * @namespace owl
+ * @brief Base namespace for the project.
+ */
+
+/**
+ * @brief namespace for debug functions.
+ */
+namespace owl::debug {
+
+/**
+ * @brief Verys simple structure to handle an integer describing a memory amount.
+ */
 struct MemorySize {
+	/// The memory size.
 	std::size_t size = 0;
+	/**
+	 * @brief Pretty printer of the memory amount.
+	 * @return String representing the memory with units.
+	 */
 	[[nodiscard]] auto str() const -> std::string {
 		if (size < 1024)
 			return fmt::format("{} bytes", size);
@@ -47,21 +65,16 @@ struct MemorySize {
 		return fmt::format("{:.3} TB", fsize);
 	}
 };
-//using size_t = std::size_t;
 
-/**
- * @namespace owl
- * @brief Base namespace for the project.
- */
-
-/**
- * @brief namespace for debug functions.
- */
-namespace owl::debug {
 /**
  * @brief Information about memory chunk.
  */
 struct OWL_API AllocationInfo {
+	/**
+	 * @brief Constructor
+	 * @param iLocation Pointer to the data in memory.
+	 * @param iSize Size of the dat in memory.
+	 */
 	AllocationInfo(void* iLocation, size_t iSize);
 	/// Location in memory.
 	void* location = nullptr;

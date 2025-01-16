@@ -28,7 +28,7 @@ namespace owl::sound {
 
 
 /**
- * @brief Class SoundLibrary.
+ * @brief Class managing sound assets.
  */
 class SoundLibrary final : public core::assets::AssetLibrary<SoundData> {
 public:

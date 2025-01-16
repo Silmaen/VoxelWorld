@@ -12,7 +12,7 @@
 
 namespace owl::renderer::opengl {
 /**
- * @brief Class Shader.
+ * @brief Specialized class managing OpenGL shader.
  */
 class OWL_API Shader final : public renderer::Shader {
 public:

@@ -14,7 +14,7 @@
 namespace owl::scene {
 
 /**
- * @brief Class ScenePlayer.
+ * @brief Class describing a playre in the scene.
  */
 class OWL_API ScenePlayer final {
 public:

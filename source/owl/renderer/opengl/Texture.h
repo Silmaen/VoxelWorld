@@ -12,7 +12,7 @@
 
 namespace owl::renderer::opengl {
 /**
- * @brief Class Texture.
+ * @brief Specialized class managing OpenGL texture.
  */
 class Texture2D final : public renderer::Texture2D {
 public:

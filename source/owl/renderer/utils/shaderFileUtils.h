@@ -11,6 +11,9 @@
 #include "core/external/shaderc.h"
 #include "renderer/Shader.h"
 
+/**
+ * @brief Namespace gathering utility functions used accross different renderers.
+ */
 namespace owl::renderer::utils {
 
 auto getCacheDirectory(const std::string& iRenderer, const std::string& iRendererApi) -> std::filesystem::path;

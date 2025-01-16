@@ -13,7 +13,7 @@
 
 namespace owl::renderer::vulkan {
 /**
- * @brief Class GraphContext.
+ * @brief Specialized class for manipulate Vulkan graph context.
  */
 class OWL_API GraphContext final : public ::owl::renderer::GraphContext {
 public:

@@ -15,7 +15,7 @@
 
 namespace owl::input {
 /**
- * @brief Class Input
+ * @brief Base class for input management.
  */
 class OWL_API Input {
 public:

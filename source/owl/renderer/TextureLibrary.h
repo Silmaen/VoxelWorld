@@ -12,7 +12,7 @@
 namespace owl::renderer {
 
 /**
- * @brief Class TextureLibrary
+ * @brief Class handling library of textures.
  */
 class OWL_API TextureLibrary final {
 public:

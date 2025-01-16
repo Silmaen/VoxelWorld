@@ -14,7 +14,7 @@
 
 namespace owl::scene {
 /**
- * @brief Class SceneCamera.
+ * @brief Class describing a camera in the scene.
  */
 class OWL_API SceneCamera final : public renderer::Camera {
 public:

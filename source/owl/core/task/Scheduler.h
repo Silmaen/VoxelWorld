@@ -11,10 +11,13 @@
 #include "Timer.h"
 #include <queue>
 
+/**
+ * @brief Namespace for task management.
+ */
 namespace owl::core::task {
 
 /**
- * @brief Class Scheduler.
+ * @brief Class that manage the tasks.
  */
 class OWL_API Scheduler final {
 public:

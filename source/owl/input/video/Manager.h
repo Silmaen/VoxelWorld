@@ -18,7 +18,7 @@ namespace owl::input::video {
 constexpr size_t g_maxDevices = 10;
 
 /**
- * @brief Class Manager.
+ * @brief Class managing the video input devices.
  */
 class OWL_API Manager final {
 public:

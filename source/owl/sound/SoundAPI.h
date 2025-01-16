@@ -15,7 +15,7 @@
 namespace owl::sound {
 
 /**
- * @brief Class SoundAPI.
+ * @brief Abstract class for sound API.
  */
 class OWL_API SoundAPI {
 public:

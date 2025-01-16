@@ -43,3 +43,4 @@ cache
 # cmake presets
 /CMakeUserPresets.json
 api.py
+Doxyfile

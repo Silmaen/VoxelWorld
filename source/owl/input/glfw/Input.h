@@ -13,7 +13,7 @@
 namespace owl::input::glfw {
 
 /**
- * @brief Class Input
+ * @brief Specialization class for inputs using glfw.
  */
 class OWL_API Input final : public input::Input {
 public:

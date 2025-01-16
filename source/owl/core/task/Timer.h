@@ -30,7 +30,7 @@ struct TimerParam {
 };
 
 /**
- * @brief Class Timer.
+ * @brief Class defining a regularly called task.
  */
 class OWL_API Timer final {
 public:
@@ -85,11 +85,14 @@ public:
 	 */
 	void togglePaused();
 
+	/**
+	 * @brief The Timer state.
+	 */
 	enum struct State : uint8_t {
-		Started,
-		Running,
-		Paused,
-		Expired,
+		Started,///< Timer started.
+		Running,///< Timer is active.
+		Paused,///< Timer still exists but not executed.
+		Expired,///< Timer has expired.
 	};
 
 	/**

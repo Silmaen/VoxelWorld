@@ -61,7 +61,7 @@ struct FramebufferSpecification {
 };
 
 /**
- * @brief Class Framebuffer.
+ * @brief General class for manipulating frame buffer.
  */
 class OWL_API Framebuffer {
 public:

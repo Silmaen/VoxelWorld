@@ -15,7 +15,7 @@
 namespace owl::scene::component {
 
 /**
- * @brief Class Camera.
+ * @brief Struct for scene camera component.
  */
 struct OWL_API Camera {
 	/// If camera is the primary one.

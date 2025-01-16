@@ -14,7 +14,7 @@
 namespace owl::scene::component {
 
 /**
- * @brief Class Player.
+ * @brief component for player informations.
  */
 struct OWL_API Player {
 	/// If player is the primary one.

@@ -12,6 +12,11 @@
 
 namespace owl::math {
 
+/**
+ * @brief Very simple box definition.
+ * @tparam BaseType Base type of coordinates.
+ * @tparam Dim The space dimensions.
+ */
 template<typename BaseType, std::size_t Dim>
 class Box {
 public:

@@ -15,7 +15,7 @@
  */
 namespace owl::renderer::null {
 /**
- * @brief Class RenderAPI.
+ * @brief Specialized class to manage null rendering API.
  */
 class RenderAPI final : public renderer::RenderAPI {
 public:

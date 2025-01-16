@@ -68,7 +68,7 @@ struct InstanceInformations {
 };
 
 /**
- * @brief Class VulkanCore.
+ * @brief Class gathering Vulkan core functions.
  */
 class VulkanCore final {
 public:

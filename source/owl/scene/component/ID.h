@@ -16,7 +16,7 @@
 namespace owl::scene::component {
 
 /**
- * @brief Class ID.
+ * @brief Class for the entity's ID.
  */
 struct OWL_API ID {
 	/// The ID.

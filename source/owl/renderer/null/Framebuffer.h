@@ -12,7 +12,7 @@
 
 namespace owl::renderer::null {
 /**
- * @brief Class Framebuffer.
+ * @brief Specialized class for manipulating null frame buffer.
  */
 class Framebuffer final : public renderer::Framebuffer {
 public:

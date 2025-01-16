@@ -19,7 +19,7 @@
 namespace owl::renderer {
 
 /**
- * @brief Class Renderer.
+ * @brief Base renderer class.
  */
 class OWL_API Renderer {
 public:

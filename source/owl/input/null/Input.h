@@ -14,7 +14,7 @@
 
 namespace owl::input::null {
 /**
- * @brief Class Input
+ * @brief Specialization class for null input.
  */
 class OWL_API Input final : public input::Input {
 public:

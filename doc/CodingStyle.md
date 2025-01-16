@@ -27,10 +27,7 @@ If no particular rule, use lowerCameCase convention.
 * UpperCamelCase name
 * no indentation for public, private, protected.
 * private member naming
-    * prefix `m_` for regular member
-    * prefix `mu_` for unique pointer member
-    * prefix `mp_` for pointer member
-    * prefix `s_` for static members
+    * prefix `m_` member
 
 ### Method and function parameter
 

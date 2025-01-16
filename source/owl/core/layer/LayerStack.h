@@ -13,7 +13,7 @@
 namespace owl::core::layer {
 
 /**
- * @brief Class LayerStack.
+ * @brief Class for managing a stack of game layers.
  */
 class OWL_API LayerStack final {
 public:

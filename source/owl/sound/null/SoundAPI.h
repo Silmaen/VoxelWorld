@@ -10,10 +10,13 @@
 
 #include "sound/SoundAPI.h"
 
+/**
+ * @brief Namespace for null sound management.
+ */
 namespace owl::sound::null {
 
 /**
- * @brief Class SoundAPI.
+ * @brief Specialized class for null sound API.
  */
 class OWL_API SoundAPI final : public sound::SoundAPI {
 public:

@@ -12,7 +12,7 @@
 
 namespace owl::renderer::vulkan::internal {
 /**
- * @brief Class PhysicalDeviceCapabilities.
+ * @brief Class for managing Vulkan physical device capabilities.
  */
 class PhysicalDeviceCapabilities final {
 public:

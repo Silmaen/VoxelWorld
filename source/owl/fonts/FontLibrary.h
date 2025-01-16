@@ -11,10 +11,13 @@
 #include "Font.h"
 #include <list>
 
+/**
+ * @brief Namespace for font management.
+ */
 namespace owl::fonts {
 
 /**
- * @brief Class FontLibrary.
+ * @brief Class for managing the fonts.
  */
 class OWL_API FontLibrary final {
 public:

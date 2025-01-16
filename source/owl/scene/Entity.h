@@ -16,7 +16,7 @@
 
 namespace owl::scene {
 /**
- * @brief Class Entity.
+ * @brief Class describing a scene entity.
  */
 class OWL_API Entity final {
 public:

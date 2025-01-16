@@ -13,7 +13,7 @@
 
 namespace owl::renderer::vulkan {
 /**
- * @brief Class Shader.
+ * @brief Specialized class managing Vulkan shader.
  */
 class OWL_API Shader final : public owl::renderer::Shader {
 public:

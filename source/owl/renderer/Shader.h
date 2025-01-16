@@ -16,16 +16,19 @@
 namespace owl::renderer {
 class ShaderLibrary;
 
+/**
+ * @brief Types of Shader.
+ */
 enum class ShaderType : uint8_t {
-	None,
-	Vertex,
-	Fragment,
-	Geometry,
-	Compute,
+	None,///< No type of unknown.
+	Vertex,///< Vertex shader.
+	Fragment,///< Fragment shader.
+	Geometry,///< Geometry shader.
+	Compute,///< Compute shader.
 };
 
 /**
- * @brief Class Shader.
+ * @brief Abstract class managing shader.
  */
 class OWL_API Shader {
 public:

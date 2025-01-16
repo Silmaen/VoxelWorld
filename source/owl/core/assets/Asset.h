@@ -21,6 +21,7 @@ namespace owl::core::assets {
  * - An internal class `Specification`.
  * - A static function `create` that takes a `DataType::Specification`
  *   and returns a `shared<DataType>`.
+ * - A static function that gives the possible file extensions.
  */
 template<typename DataType>
 concept assetDataType = requires {
@@ -33,12 +34,14 @@ concept assetDataType = requires {
 	// Check for existence of static function create with DataType::Specification.
 	{ DataType::create(std::declval<const typename DataType::Specification&>()) } -> std::same_as<shared<DataType>>;
 
+	// check existence of a static function that gives the possible file extensions.
 	{ DataType::extension() } -> std::same_as<std::vector<std::string>>;
 };
 
 
 /**
- * @brief Class Asset.
+ * @brief Class for managing the assets.
+ * @tparam DataType the underlying data structure.
  */
 template<assetDataType DataType>
 class Asset final {

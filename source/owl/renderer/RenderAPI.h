@@ -14,7 +14,7 @@
 namespace owl::renderer {
 
 /**
- * @brief General class to manage RenderAPI
+ * @brief Abstract class to manage rendering API.
  */
 class OWL_API RenderAPI {
 public:

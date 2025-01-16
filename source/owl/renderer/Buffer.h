@@ -61,7 +61,7 @@ static auto shaderDataTypeSize(const ShaderDataType iType) -> uint32_t {
 }
 
 /**
- * @brief Class BufferElement.
+ * @brief Class for buffer element.
  */
 struct OWL_API BufferElement {
 	/// Element Name.
@@ -121,7 +121,7 @@ struct OWL_API BufferElement {
 };
 
 /**
- * @brief Class BufferLayout.
+ * @brief Class Describing the buffer layout.
  */
 class OWL_API BufferLayout {
 public:
@@ -175,7 +175,7 @@ private:
 };
 
 /**
- * @brief Class VertexBuffer.
+ * @brief Abstract class for managing vertex buffer.
  */
 class OWL_API VertexBuffer {
 public:
@@ -224,7 +224,7 @@ private:
 };
 
 /**
- * @brief Class IndexBuffer.
+ * @brief Abstract class for managing index buffer.
  */
 class OWL_API IndexBuffer {
 public:

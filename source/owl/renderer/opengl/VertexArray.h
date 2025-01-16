@@ -12,7 +12,7 @@
 
 namespace owl::renderer::opengl {
 /**
- * @brief Class VertexArray.
+ * @brief Class for OpenGL vertex array.
  */
 class VertexArray {
 public:

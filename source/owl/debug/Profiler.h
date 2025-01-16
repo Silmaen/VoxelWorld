@@ -34,7 +34,7 @@ struct ProfileSession {
 };
 
 /**
- * @brief class Profiler.
+ * @brief class for accessing to the internal profiler.
  */
 class OWL_API Profiler {
 public:

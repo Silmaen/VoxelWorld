@@ -13,7 +13,7 @@
 
 namespace owl::renderer {
 /**
- * @brief Class RenderCommand
+ * @brief Class gathering all render commands.
  */
 class OWL_API RenderCommand final {
 public:
@@ -99,9 +99,7 @@ public:
 	static auto getApi() -> RenderAPI::Type {
 		if (mu_renderAPI)
 			return mu_renderAPI->getApi();
-		// NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange)
-		return static_cast<RenderAPI::Type>(-1);
-		// NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange)
+		return static_cast<RenderAPI::Type>(-1);// NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
 	}
 
 	/**

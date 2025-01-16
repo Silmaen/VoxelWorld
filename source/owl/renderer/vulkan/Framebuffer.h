@@ -14,7 +14,7 @@
 
 namespace owl::renderer::vulkan {
 /**
- * @brief Class Framebuffer.
+ * @brief Specialized class for manipulating vulkan frame buffer.
  */
 class OWL_API Framebuffer final : public renderer::Framebuffer {
 public:
@@ -142,6 +142,9 @@ private:
 	bool m_firstBatch = true;
 
 	// one per sample...
+	/**
+	 * @brief Structure for vulkan sample manipulations.
+	 */
 	struct Sample {
 		VkSemaphore imageAvailableSemaphore;
 		VkSemaphore renderFinishedSemaphore;
@@ -149,6 +152,9 @@ private:
 		VkCommandBuffer commandBuffer;
 	};
 
+	/**
+	 * @brief Structure for vulkan image manipulation.
+	 */
 	struct Image {
 		VkImage image;
 		VkDeviceMemory imageMemory;

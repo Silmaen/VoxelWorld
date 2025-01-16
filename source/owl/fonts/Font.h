@@ -18,9 +18,9 @@ namespace owl::fonts {
 struct MsdfData;
 
 /**
- * @brief Class Font.
+ * @brief Class describing a font.
  */
-class OWL_API Font {
+class OWL_API Font final {
 public:
 	/**
 	 * @brief Default constructor.
@@ -29,7 +29,7 @@ public:
 	/**
 	 * @brief Default destructor.
 	 */
-	virtual ~Font();
+	~Font();
 	/**
 	 * @brief Default copy constructor.
 	 */
@@ -53,8 +53,13 @@ public:
 	 */
 	[[nodiscard]] auto getAtlasTexture() const -> shared<renderer::Texture2D> { return m_atlasTexture; }
 
+	/**
+	 * @brief Metrics of the glyphs.
+	 */
 	struct GlyphMetrics {
+		/// The quad for 3D space.
 		math::box2f quad;
+		/// The quad for texture space.
 		math::box2f uv;
 	};
 	[[nodiscard]] auto getGlyphBox(const char& iChar) const -> GlyphMetrics;

@@ -15,7 +15,7 @@
  */
 namespace owl::renderer::vulkan {
 /**
- * @brief Class RenderAPI.
+ * @brief Specialized class to manage Vulkan rendering API.
  */
 class OWL_API RenderAPI final : public renderer::RenderAPI {
 public:

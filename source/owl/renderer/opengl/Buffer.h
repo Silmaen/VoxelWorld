@@ -12,7 +12,7 @@
 
 namespace owl::renderer::opengl {
 /**
- * @brief OpenGL implementation of vertex buffer.
+ * @brief Specialized class for managing OpenGL vertex buffer.
  */
 class OWL_API VertexBuffer final : public renderer::VertexBuffer {
 public:
@@ -61,7 +61,7 @@ private:
 };
 
 /**
- * @brief OpenGL implementation of index buffer.
+ * @brief Specialized class for managing opengl index buffer.
  */
 class OWL_API IndexBuffer final : public renderer::IndexBuffer {
 public:

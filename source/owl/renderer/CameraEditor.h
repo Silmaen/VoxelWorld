@@ -15,7 +15,7 @@
 
 namespace owl::renderer {
 /**
- * @brief Class CameraEditor.
+ * @brief Class use to manage camera in the editor.
  */
 class OWL_API CameraEditor final : public Camera {
 public:

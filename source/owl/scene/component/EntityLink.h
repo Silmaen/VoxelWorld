@@ -14,7 +14,7 @@
 namespace owl::scene::component {
 
 /**
- * @brief A tag component.
+ * @brief Component to describe link between entities.
  */
 struct OWL_API EntityLink {
 	/// the name of the linked entity.
