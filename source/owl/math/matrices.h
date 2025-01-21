@@ -120,7 +120,7 @@ public:
 	 * @param iVector The row values.
 	 */
 	template<size_t Dim>
-	constexpr void setRow(const std::size_t i, const Vector<BaseType, NCol>& iVector) noexcept {
+	constexpr void setRow(const std::size_t i, const Vector<BaseType, Dim>& iVector) noexcept {
 		for (size_t it = 0; it < std::min(NCol, Dim); ++it) get(i, it) = iVector[it];
 	}
 

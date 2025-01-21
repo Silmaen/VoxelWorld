@@ -38,7 +38,6 @@ concept assetDataType = requires {
 	{ DataType::extension() } -> std::same_as<std::vector<std::string>>;
 };
 
-
 /**
  * @brief Class for managing the assets.
  * @tparam DataType the underlying data structure.

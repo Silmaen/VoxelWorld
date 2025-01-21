@@ -15,7 +15,7 @@ const char* texName = "textures/GaugeCover";
 BaseGauge::BaseGauge() {
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
 	if (!textureLib.exists(texName))
-		textureLib.addFromStandardPath(texName);
+		textureLib.load(texName);
 	m_coverTexture = textureLib.get(texName);
 }
 

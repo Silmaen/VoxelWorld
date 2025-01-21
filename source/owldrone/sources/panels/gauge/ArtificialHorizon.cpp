@@ -15,10 +15,10 @@ constexpr float deg2rad = std::numbers::pi_v<float> / 180.f;
 ArtificialHorizon::ArtificialHorizon() {
 
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
-	textureLib.addFromStandardPath("textures/GaugeHORBack");
-	textureLib.addFromStandardPath("textures/GaugeHORCursor");
-	textureLib.addFromStandardPath("textures/GaugeHOROlivePitch");
-	textureLib.addFromStandardPath("textures/GaugeHORRollRing");
+	textureLib.load("textures/GaugeHORBack");
+	textureLib.load("textures/GaugeHORCursor");
+	textureLib.load("textures/GaugeHOROlivePitch");
+	textureLib.load("textures/GaugeHORRollRing");
 	background = textureLib.get("textures/GaugeHORBack");
 	cursor = textureLib.get("textures/GaugeHORCursor");
 	olivePitch = textureLib.get("textures/GaugeHOROlivePitch");

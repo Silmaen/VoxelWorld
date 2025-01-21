@@ -14,7 +14,7 @@ constexpr bool vecNear(const vec3& a, const vec3& b, float accuracy = 0.001f) {
 
 const float pis2 = 2.f * std::atan(1.f);
 
-TEST(math, decomposeTrivial) {
+TEST(Transform, decomposeTrivial) {
 	mat4 mat{};
 
 	// identity matrix
@@ -39,7 +39,7 @@ TEST(math, decomposeTrivial) {
 	}
 }
 
-TEST(math, decomposeWithPerspective) {
+TEST(Transform, decomposeWithPerspective) {
 	mat4 mat = identity<float, 4>();
 
 	// first perspective
@@ -68,6 +68,37 @@ TEST(math, decomposeWithPerspective) {
 		Transform transform{mat};
 		EXPECT_TRUE(vecNear(transform.translation(), {0, 0, 0}));
 		EXPECT_TRUE(vecNear(transform.rotation(), {0, 0, 0}));
+		EXPECT_TRUE(vecNear(transform.scale(), {1, 1, 1}));
+	}
+}
+
+
+TEST(Transform, moreInits) {
+	{
+		const mat4 mat;
+		Transform transform{mat};
+		EXPECT_TRUE(vecNear(transform.translation(), {0, 0, 0}));
+	}
+	{
+		mat4 mat;
+		mat(0, 0) = 1.f;
+		mat(2, 1) = 1.f;
+		mat(1, 2) = 1.f;
+		mat(3, 3) = 1.f;
+		Transform transform{mat};
+		EXPECT_TRUE(vecNear(transform.scale(), {-1, -1, -1}));
+	}
+	{
+		mat4 mat;
+		mat(2, 0) = -1.f;
+		mat(1, 1) = 1.f;
+		mat(0, 2) = 1.f;
+		mat(3, 3) = 1.f;
+		Transform transform{mat};
+		EXPECT_TRUE(vecNear(transform.rotation(), {0, pis2, 0}));
+	}
+	{
+		Transform transform{vec3{10, 12, 13}, vec3{0.2f, 0.3f, 0.4f}};
 		EXPECT_TRUE(vecNear(transform.scale(), {1, 1, 1}));
 	}
 }

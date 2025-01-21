@@ -191,15 +191,6 @@ public:
 	[[nodiscard]] auto getAssetDirectories() const -> const std::list<AssetDirectory>& { return m_assetDirectories; }
 
 	/**
-	 * @brief Search across the assets directories for a specific asset.
-	 * @param iAssetName the asset name with or without extension.
-	 * @param iAssetCategory The optional subdir of the asset.
-	 * @return Full path to asset or invalid path if not found.
-	 */
-	[[nodiscard]] auto getFullAssetPath(const std::string& iAssetName, const std::string& iAssetCategory = "") const
-			-> std::optional<std::filesystem::path>;
-
-	/**
 		 * @brief Enable the docking environment.
 		 */
 	void enableDocking() const;

@@ -11,10 +11,10 @@ namespace drone::panels::gauge {
 
 Altitude::Altitude() {
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
-	textureLib.addFromStandardPath("textures/GaugeAltBack");
-	textureLib.addFromStandardPath("textures/GaugeAltCursor");
-	textureLib.addFromStandardPath("textures/GaugeAltCursor10");
-	textureLib.addFromStandardPath("textures/GaugeAltCursor100");
+	textureLib.load("textures/GaugeAltBack");
+	textureLib.load("textures/GaugeAltCursor");
+	textureLib.load("textures/GaugeAltCursor10");
+	textureLib.load("textures/GaugeAltCursor100");
 	background = textureLib.get("textures/GaugeAltBack");
 	cursor = textureLib.get("textures/GaugeAltCursor");
 	cursor10 = textureLib.get("textures/GaugeAltCursor10");

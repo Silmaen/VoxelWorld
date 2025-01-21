@@ -42,9 +42,9 @@ TEST(RenderAPI, badCreation) {
 	const auto fb = Framebuffer::create({});
 	const auto ub = UniformBuffer::create(0, 0, "Renderer2D");
 	const auto tex = Texture2D::create(std::filesystem::path());
-	const auto tex2 = Texture2D::create(Texture2D::Specification{{1, 1}});
-	const auto shader = Shader::create("bob2", "", std::filesystem::path());
-	const auto shader2 = Shader::create("bob2", "");
+	const auto tex2 = Texture2D::create(Texture2D::Specification{.size = {1, 1}});
+	const auto shader = Shader::create(std::filesystem::path());
+	const auto shader2 = Shader::create("bob2");
 	EXPECT_TRUE(api == nullptr);
 	EXPECT_TRUE(gf == nullptr);
 	EXPECT_TRUE(fb == nullptr);

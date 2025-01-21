@@ -11,7 +11,10 @@
 
 namespace owl::renderer::null {
 
-Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {}
+Texture2D::Texture2D(std::filesystem::path iPath) : renderer::Texture2D{std::move(iPath)} {
+	if (exists(m_path))
+		m_specification.size = {1, 1};
+}
 
 Texture2D::Texture2D(const Specification& iSpecs) : renderer::Texture2D{iSpecs} {}
 

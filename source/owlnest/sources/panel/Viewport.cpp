@@ -113,7 +113,9 @@ void Viewport::onRenderInternal() {
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 				const auto* path = static_cast<const char*>(payload->Data);
-				if (const auto scenePath = core::Application::get().getFullAssetPath(path);
+				// this is not a texture file, but as soon as you give a file with extension,
+				// any 'AssetLibrary' will search for its path.
+				if (const auto scenePath = renderer::Renderer::getTextureLibrary().find(path);
 					scenePath.has_value() && scenePath.value().extension() == ".owl")
 					m_parent->openScene(scenePath.value());
 				else

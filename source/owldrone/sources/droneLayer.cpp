@@ -39,11 +39,11 @@ void DroneLayer::onAttach() {
 
 	// icons
 	auto& textureLib = renderer::Renderer::getTextureLibrary();
-	textureLib.addFromStandardPath("icons/exit");
-	textureLib.addFromStandardPath("icons/gauges");
-	textureLib.addFromStandardPath("icons/settings");
-	textureLib.addFromStandardPath("icons/connected");
-	textureLib.addFromStandardPath("icons/connect");
+	textureLib.load("icons/exit");
+	textureLib.load("icons/gauges");
+	textureLib.load("icons/settings");
+	textureLib.load("icons/connected");
+	textureLib.load("icons/connect");
 
 	// remote controller
 	rc = owl::mkShared<controller::RemoteController>();

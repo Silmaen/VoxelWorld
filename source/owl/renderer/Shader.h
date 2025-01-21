@@ -14,8 +14,6 @@
 #include <filesystem>
 
 namespace owl::renderer {
-class ShaderLibrary;
-
 /**
  * @brief Types of Shader.
  */
@@ -38,12 +36,29 @@ public:
 	auto operator=(Shader&&) -> Shader& = default;
 
 	/**
+	 * @brief Structure holding shader components name.
+	 */
+	struct ShaderName {
+		std::string name;///< The shader base name.
+		std::string renderer;///< The name of the renderer.
+	};
+
+	/**
+	 * @brief the shader's specifications.
+	 */
+	struct Specification {
+		ShaderName shaderName;
+	};
+
+	/**
 	 * @brief Constructor.
 	 * @param[in] iShaderName The shader's name.
 	 * @param[in] iRenderer The renderer's name.
 	 */
-	Shader(std::string iShaderName, std::string iRenderer)
-		: m_name{std::move(iShaderName)}, m_renderer{std::move(iRenderer)} {}
+	Shader(std::string iShaderName, std::string iRenderer) {
+		m_specs.shaderName.name = std::move(iShaderName);
+		m_specs.shaderName.renderer = std::move(iRenderer);
+	}
 
 	/**
 	 * @brief Destructor.
@@ -63,20 +78,16 @@ public:
 	/**
 	* @brief Create a new shader.
 	 * @param[in] iShaderName Shader's name.
-	 * @param[in] iRenderer Name of the shader's related renderer.
 	 * @return Pointer to the shader.
 	 */
-	static auto create(const std::string& iShaderName, const std::string& iRenderer) -> shared<Shader>;
+	static auto create(const Specification& iShaderName) -> shared<Shader>;
 
 	/**
 	* @brief Create a new shader.
-	 * @param[in] iShaderName Shader's name.
-	 * @param[in] iRenderer Name of the shader's related renderer.
 	 * @param[in] iFile Source of the shader.
 	 * @return Pointer to the shader.
 	 */
-	static auto create(const std::string& iShaderName, const std::string& iRenderer, const std::filesystem::path& iFile)
-			-> shared<Shader>;
+	static auto create(const std::filesystem::path& iFile) -> shared<Shader>;
 
 	/**
 	 * @brief Set shader's internal int variable.
@@ -132,25 +143,48 @@ public:
 	 * @brief get the shader's name.
 	 * @return Shader's name.
 	 */
-	[[nodiscard]] virtual auto getName() const -> const std::string& { return m_name; }
+	[[nodiscard]] virtual auto getName() const -> const std::string& { return m_specs.shaderName.name; }
 	/**
 	 * @brief get the shader's renderer's name.
 	 * @return Shader's renderer's name.
 	 */
-	[[nodiscard]] virtual auto getRenderer() const -> const std::string& { return m_renderer; }
+	[[nodiscard]] virtual auto getRenderer() const -> const std::string& { return m_specs.shaderName.renderer; }
 
 	/**
 	 * @brief get the shader's full name.
 	 * @return Shader's full name.
 	 */
-	[[nodiscard]] virtual auto getFullName() const -> std::string { return fmt::format("{}_{}", m_renderer, m_name); }
+	[[nodiscard]] virtual auto getFullName() const -> std::string { return composeName(m_specs.shaderName); }
+
+
+	/**
+	 * @brief Decode a string to a composed shader name.
+	 * @param iFullName The string to decompose.
+	 * @return The shader names.
+	 */
+	static auto decomposeName(const std::string& iFullName) -> ShaderName;
+
+	/**
+	 * @brief Compose a string with shader naming.
+	 * @param iNames the shader components name.
+	 * @return The composed name.
+	 */
+	static auto composeName(const ShaderName& iNames) -> std::string;
+
+	/**
+	 * @brief Gets the extension for this assets, return empty list for other management.
+	 * @return Empty list.
+	 */
+	static auto extension() -> std::vector<std::string> { return {}; }
+
+	static auto stringToSpecification(const std::string& iString) -> Specification {
+		Specification specification;
+		specification.shaderName = decomposeName(iString);
+		return specification;
+	}
 
 private:
 	/// Shader's name.
-	std::string m_name;
-	/// Shader's name.
-	std::string m_renderer;
-	/// Library is a friend to be able to modify name.
-	friend class ShaderLibrary;
+	Specification m_specs;
 };
 }// namespace owl::renderer

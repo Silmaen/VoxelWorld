@@ -66,6 +66,5 @@
 #include "renderer/RenderCommand.h"
 #include "renderer/Renderer.h"
 #include "renderer/Renderer2D.h"
-#include "renderer/ShaderLibrary.h"
 #include "renderer/Texture.h"
 // -------------------------

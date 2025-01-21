@@ -47,7 +47,7 @@ public:
 	 */
 	explicit Texture(std::filesystem::path iPath);
 
-	/// Texture Specifications.
+	/// Texture specifications.
 	struct OWL_API Specification {
 		/// Texture size.
 		math::vec2ui size;
@@ -177,13 +177,6 @@ public:
 
 	/**
 	 * @brief Create a new texture.
-	 * @param[in] iTextureName Name of the files in the standard path.
-	 * @return Pointer to the texture.
-	 */
-	static auto create(const std::string& iTextureName) -> shared<Texture2D>;
-
-	/**
-	 * @brief Create a new texture.
 	 * @param[in] iTextureSerializedName Name of the files in the standard path.
 	 * @return Pointer to the texture.
 	 */
@@ -195,6 +188,12 @@ public:
 	 * @return Resulting texture.
 	 */
 	static auto create(const Specification& iSpecs) -> shared<Texture2D>;
+
+	/**
+	 * @brief Get the possible file extension for this dataset.
+	 * @return The datasets possible extension.
+	 */
+	static auto extension() -> std::vector<std::string> { return {".jpg", ".png"}; }
 };
 OWL_DIAG_POP
 

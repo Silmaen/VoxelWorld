@@ -17,8 +17,7 @@ TEST(MouseEvent, ButtonPressed) {
 	EXPECT_STREQ(event.getName().c_str(), "MouseButtonPressedEvent");
 	EXPECT_EQ(event.getType(), Type::MouseButtonPressed);
 	EXPECT_EQ(event.getStaticType(), Type::MouseButtonPressed);
-	EXPECT_EQ(event.getCategoryFlags(),
-	          Category::Input | Category::Mouse | Category::MouseButton);
+	EXPECT_EQ(event.getCategoryFlags(), Category::Input | Category::Mouse | Category::MouseButton);
 	EXPECT_STREQ(event.toString().c_str(), "MouseButtonPressedEvent: 12");
 	EXPECT_TRUE(event.isInCategory(Category::Input));
 	EXPECT_FALSE(event.isInCategory(Category::Keyboard));
@@ -26,6 +25,7 @@ TEST(MouseEvent, ButtonPressed) {
 	EXPECT_TRUE(event.isInCategory(Category::Mouse));
 	EXPECT_TRUE(event.isInCategory(Category::MouseButton));
 	EXPECT_FALSE(event.isInCategory(Category::None));
+	EXPECT_EQ(event.getMouseButton(), 12);
 }
 
 TEST(MouseEvent, ButtonReleased) {
@@ -33,8 +33,7 @@ TEST(MouseEvent, ButtonReleased) {
 	EXPECT_STREQ(event.getName().c_str(), "MouseButtonReleasedEvent");
 	EXPECT_EQ(event.getType(), Type::MouseButtonReleased);
 	EXPECT_EQ(event.getStaticType(), Type::MouseButtonReleased);
-	EXPECT_EQ(event.getCategoryFlags(),
-	          Category::Input | Category::Mouse | Category::MouseButton);
+	EXPECT_EQ(event.getCategoryFlags(), Category::Input | Category::Mouse | Category::MouseButton);
 	EXPECT_STREQ(event.toString().c_str(), "MouseButtonReleasedEvent: 12");
 	EXPECT_TRUE(event.isInCategory(Category::Input));
 	EXPECT_FALSE(event.isInCategory(Category::Keyboard));

@@ -6,6 +6,15 @@
 
 using namespace owl::math;
 
+TEST(math, matrixRowCol) {
+	mat3 mat;
+	mat.setRow(0, vec3{1.f, 2.f, 3.f});
+	EXPECT_EQ(mat(0, 1), 2.f);
+	mat.setColumn(1, vec3{1.f, 2.f, 3.f});
+	EXPECT_EQ(mat(0, 1), 1.f);
+	EXPECT_EQ(mat(0, 2), 3.f);
+}
+
 TEST(math, matrixBase) {
 	const mat3 mat{1, 2, 3, 4, 5, 6, 7, 8, 9};
 	EXPECT_NEAR(mat.norm(), 16.15549, 0.001);

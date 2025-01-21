@@ -11,6 +11,8 @@
 #include "core/Application.h"
 #include "shaderFileUtils.h"
 
+#include "renderer/Renderer.h"
+
 namespace owl::renderer::utils {
 
 auto getCacheDirectory(const std::string& iRenderer, const std::string& iRendererApi) -> std::filesystem::path {
@@ -38,9 +40,8 @@ auto getShaderCachedPath(const std::string& iShaderName, const std::string& iRen
 
 auto getShaderPath(const std::string& iShaderName, const std::string& iRenderer, const std::string& iRendererApi,
 				   const ShaderType& iType) -> std::filesystem::path {
-	return core::Application::get()
-			.getFullAssetPath(fmt::format("{}/{}/{}{}", iRenderer, iRendererApi, iShaderName, getExtension(iType)),
-							  "shaders")
+	return Renderer::getTextureLibrary()
+			.find(fmt::format("shaders/{}/{}/{}{}", iRenderer, iRendererApi, iShaderName, getExtension(iType)))
 			.value_or(std::filesystem::path{});
 }
 

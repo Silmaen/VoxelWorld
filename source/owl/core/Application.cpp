@@ -92,11 +92,13 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 
 	// create main window
 	{
-
 		mp_appWindow = input::Window::create({
 				.winType = m_initParams.isDummy ? input::Type::Null : input::Type::GLFW,
 				.title = m_initParams.name,
-				.iconPath = m_initParams.icon.empty() ? "" : getFullAssetPath(m_initParams.icon).value_or("").string(),
+				.iconPath =
+						m_initParams.icon.empty()
+								? ""
+								: renderer::Renderer::getTextureLibrary().find(m_initParams.icon).value_or("").string(),
 				.width = m_initParams.width,
 				.height = m_initParams.height,
 		});
@@ -331,36 +333,6 @@ auto Application::searchAssets(const std::string& iPattern) const -> std::option
 		parent = parent.parent_path();
 		assets = parent / iPattern;
 	}
-	return std::nullopt;
-}
-
-auto Application::getFullAssetPath(const std::string& iAssetName, const std::string& iAssetCategory) const
-		-> std::optional<std::filesystem::path> {
-	OWL_PROFILE_FUNCTION()
-	OWL_SCOPE_UNTRACK
-
-	for (const auto& [title, assetsPath]: m_assetDirectories) {
-		auto searchDir = assetsPath;
-		if (!iAssetCategory.empty()) {
-			if (!exists(searchDir / iAssetCategory))
-				continue;
-			searchDir /= iAssetCategory;
-		}
-		const std::filesystem::path name{iAssetName};
-		searchDir /= name.parent_path();
-		if (!exists(searchDir))
-			continue;
-		for (const auto& entry: std::filesystem::recursive_directory_iterator{searchDir}) {
-			if (name.has_extension()) {
-				if (entry.is_regular_file() && entry.path().filename() == name.filename())
-					return entry.path();
-			} else {
-				if (entry.is_regular_file() && entry.path().stem() == name.stem())
-					return entry.path();
-			}
-		}
-	}
-	// nothing found.
 	return std::nullopt;
 }
 

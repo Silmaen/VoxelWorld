@@ -58,9 +58,10 @@ void DrawData::init(const BufferLayout& iLayout, const std::string& iRenderer, s
 
 void DrawData::setShader(const std::string& iShaderName, const std::string& iRenderer) {
 	auto& shLib = Renderer::getShaderLibrary();
-	if (!shLib.exists(iShaderName, iRenderer))
-		shLib.addFromStandardPath(iShaderName, iRenderer);
-	mp_shader = static_pointer_cast<Shader>(shLib.get(iShaderName, iRenderer));
+	const auto baseName = Shader::composeName({iShaderName, iRenderer});
+	if (!shLib.exists(baseName))
+		shLib.load(baseName);
+	mp_shader = static_pointer_cast<Shader>(shLib.get(baseName));
 }
 
 void DrawData::bind() const {

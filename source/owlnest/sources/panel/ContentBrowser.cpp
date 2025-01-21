@@ -17,16 +17,16 @@ namespace {
 
 void loadIcons() {
 	auto& textureLibrary = renderer::Renderer::getTextureLibrary();
-	textureLibrary.addFromStandardPath("icons/files/folder_icon");
-	textureLibrary.addFromStandardPath("icons/files/glsl_icon");
-	textureLibrary.addFromStandardPath("icons/files/jpg_icon");
-	textureLibrary.addFromStandardPath("icons/files/json_icon");
-	textureLibrary.addFromStandardPath("icons/files/owl_icon");
-	textureLibrary.addFromStandardPath("icons/files/png_icon");
-	textureLibrary.addFromStandardPath("icons/files/svg_icon");
-	textureLibrary.addFromStandardPath("icons/files/text_icon");
-	textureLibrary.addFromStandardPath("icons/files/ttf_icon");
-	textureLibrary.addFromStandardPath("icons/files/yml_icon");
+	textureLibrary.load("icons/files/folder_icon");
+	textureLibrary.load("icons/files/glsl_icon");
+	textureLibrary.load("icons/files/jpg_icon");
+	textureLibrary.load("icons/files/json_icon");
+	textureLibrary.load("icons/files/owl_icon");
+	textureLibrary.load("icons/files/png_icon");
+	textureLibrary.load("icons/files/svg_icon");
+	textureLibrary.load("icons/files/text_icon");
+	textureLibrary.load("icons/files/ttf_icon");
+	textureLibrary.load("icons/files/yml_icon");
 }
 
 auto getFileIcon(const std::filesystem::path& iPath) -> std::optional<ImTextureID> {

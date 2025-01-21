@@ -92,18 +92,6 @@ void Viewport::onRender() {
 	if (const auto tex = gui::imTexture(mp_framebuffer, 0); tex.has_value())
 		ImGui::Image(tex.value(), viewportPanelSize, vec(mp_framebuffer->getLowerData()),
 					 vec(mp_framebuffer->getUpperData()));
-
-	/*if (ImGui::BeginDragDropTarget()) {
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-			const auto* const path = static_cast<const char*>(payload->Data);
-			auto data = core::Application::get().getFullAssetPath(path);
-			if (!data.has_value())
-				OWL_CORE_WARN("Could not load file {}: unsupported format.", path)
-
-		}
-		ImGui::EndDragDropTarget();
-	}*/
-
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
