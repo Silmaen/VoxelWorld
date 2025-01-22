@@ -23,11 +23,11 @@ namespace owl::nest {
 namespace {
 void loadIcons() {
 	auto& textureLibrary = renderer::Renderer::getTextureLibrary();
-	textureLibrary.addFromStandardPath("icons/control/ctrl_rotation");
-	textureLibrary.addFromStandardPath("icons/control/ctrl_scale");
-	textureLibrary.addFromStandardPath("icons/control/ctrl_translation");
-	textureLibrary.addFromStandardPath("icons/PlayButton");
-	textureLibrary.addFromStandardPath("icons/StopButton");
+	textureLibrary.load("icons/control/ctrl_rotation");
+	textureLibrary.load("icons/control/ctrl_scale");
+	textureLibrary.load("icons/control/ctrl_translation");
+	textureLibrary.load("icons/PlayButton");
+	textureLibrary.load("icons/StopButton");
 }
 void loadSounds() {
 	auto& soundLibrary = sound::SoundSystem::getSoundLibrary();

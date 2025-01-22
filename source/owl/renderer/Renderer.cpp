@@ -14,8 +14,8 @@ namespace owl::renderer {
 
 Renderer::State Renderer::m_internalState = Renderer::State::Created;
 shared<Renderer::SceneData> Renderer::m_sceneData = nullptr;
-shared<ShaderLibrary> Renderer::m_shaderLibrary = nullptr;
-shared<TextureLibrary> Renderer::m_textureLibrary = nullptr;
+shared<Renderer::ShaderLibrary> Renderer::m_shaderLibrary = nullptr;
+shared<Renderer::TextureLibrary> Renderer::m_textureLibrary = nullptr;
 
 void Renderer::init() {
 	OWL_PROFILE_FUNCTION()
@@ -48,9 +48,7 @@ void Renderer::reset() {
 	m_textureLibrary.reset();
 }
 
-void Renderer::beginScene(const Camera &iCamera) {
-	m_sceneData->viewProjectionMatrix = iCamera.getViewProjection();
-}
+void Renderer::beginScene(const Camera& iCamera) { m_sceneData->viewProjectionMatrix = iCamera.getViewProjection(); }
 
 void Renderer::endScene() {}
 

@@ -14,13 +14,13 @@ using namespace owl::event;
 
 TEST(KeyEvent, Pressed) {
 	const KeyPressedEvent event(owl::input::key::A, 12);
+	EXPECT_EQ(event.getKeyCode(), owl::input::key::A);
 	EXPECT_STREQ(event.getName().c_str(), "KeyPressedEvent");
 	EXPECT_EQ(event.getType(), Type::KeyPressed);
 	EXPECT_EQ(event.getStaticType(), Type::KeyPressed);
 	EXPECT_TRUE(event.getRepeatCount());
 	EXPECT_EQ(event.getCategoryFlags(), Category::Input | Category::Keyboard);
-	EXPECT_STREQ(event.toString().c_str(),
-	             "KeyPressedEvent: 65 (repeat = 12)");
+	EXPECT_STREQ(event.toString().c_str(), "KeyPressedEvent: 65 (repeat = 12)");
 	EXPECT_TRUE(event.isInCategory(Category::Input));
 	EXPECT_TRUE(event.isInCategory(Category::Keyboard));
 	EXPECT_FALSE(event.isInCategory(Category::Application));

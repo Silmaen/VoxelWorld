@@ -11,8 +11,8 @@ namespace drone::panels::gauge {
 
 Compas::Compas() {
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
-	textureLib.addFromStandardPath("textures/GaugeHDGBack");
-	textureLib.addFromStandardPath("textures/GaugeHDGCursor");
+	textureLib.load("textures/GaugeHDGBack");
+	textureLib.load("textures/GaugeHDGCursor");
 	background = textureLib.get("textures/GaugeHDGBack");
 	cursor = textureLib.get("textures/GaugeHDGCursor");
 }

@@ -14,11 +14,11 @@ constexpr float maxAngle = 67.5;
 
 MotorRate::MotorRate() {
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
-	textureLib.addFromStandardPath("textures/GaugeMOTBack");
-	textureLib.addFromStandardPath("textures/GaugeMOTCursor1");
-	textureLib.addFromStandardPath("textures/GaugeMOTCursor2");
-	textureLib.addFromStandardPath("textures/GaugeMOTCursor3");
-	textureLib.addFromStandardPath("textures/GaugeMOTCursor4");
+	textureLib.load("textures/GaugeMOTBack");
+	textureLib.load("textures/GaugeMOTCursor1");
+	textureLib.load("textures/GaugeMOTCursor2");
+	textureLib.load("textures/GaugeMOTCursor3");
+	textureLib.load("textures/GaugeMOTCursor4");
 	background = textureLib.get("textures/GaugeMOTBack");
 	cursor1 = textureLib.get("textures/GaugeMOTCursor1");
 	cursor2 = textureLib.get("textures/GaugeMOTCursor2");

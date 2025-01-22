@@ -17,10 +17,9 @@ void Base2D::onAttach() {
 	OWL_PROFILE_FUNCTION()
 
 	OWL_SCOPE_UNTRACK
-	const auto& app = core::Application::get();
-	m_checkerboardTexture =
-			renderer::Texture2D::create(app.getFullAssetPath("CheckerBoard.png", "textures").value_or(""));
-	m_spriteTexture = renderer::Texture2D::create(app.getFullAssetPath("mario.png", "textures").value_or(""));
+	auto texLib = renderer::Renderer::getTextureLibrary();
+	m_checkerboardTexture = texLib.load("CheckerBoard");
+	m_spriteTexture = texLib.load("mario");
 }
 
 void Base2D::onDetach() { OWL_PROFILE_FUNCTION() }

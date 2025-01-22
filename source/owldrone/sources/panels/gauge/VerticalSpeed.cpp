@@ -14,8 +14,8 @@ constexpr float maxAngle = 157;
 
 VerticalSpeed::VerticalSpeed() {
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
-	textureLib.addFromStandardPath("textures/GaugeVSIBack");
-	textureLib.addFromStandardPath("textures/GaugeVSICursor");
+	textureLib.load("textures/GaugeVSIBack");
+	textureLib.load("textures/GaugeVSICursor");
 	background = textureLib.get("textures/GaugeVSIBack");
 	cursor = textureLib.get("textures/GaugeVSICursor");
 }

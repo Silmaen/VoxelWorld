@@ -14,8 +14,8 @@ constexpr float maxAngle = 275;
 
 AirSpeed::AirSpeed() {
 	auto textureLib = owl::renderer::Renderer::getTextureLibrary();
-	textureLib.addFromStandardPath("textures/GaugeSPDBack");
-	textureLib.addFromStandardPath("textures/GaugeSPDCursor");
+	textureLib.load("textures/GaugeSPDBack");
+	textureLib.load("textures/GaugeSPDCursor");
 	background = textureLib.get("textures/GaugeSPDBack");
 	cursor = textureLib.get("textures/GaugeSPDCursor");
 }

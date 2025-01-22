@@ -13,6 +13,14 @@
 #include <core/Application.h>
 
 /**
+ * @brief Concept tha check existence of a conversion function from string to specification.
+ */
+template<typename T>
+concept HasStringSpec = requires {
+	{ T::stringToSpecification(std::declval<const std::string&>()) } -> std::same_as<typename T::Specification>;
+};
+
+/**
  * @brief Namespace for asset management.
  */
 namespace owl::core::assets {
@@ -72,12 +80,17 @@ public:
 			OWL_CORE_WARN("AssetLibrary::load({}) already exists!", iName)
 			return m_assets.at(iName).get();
 		}
-		auto assetFile = find(iName);
-		if (!assetFile.has_value()) {
-			OWL_CORE_WARN("AssetLibrary::load({}) does not exist in asset folders!", iName)
-			return nullptr;
+		shared<DataType> asset = nullptr;
+		if (!DataType::extension().empty()) {
+			auto assetFile = find(iName);
+			if (!assetFile.has_value()) {
+				OWL_CORE_WARN("AssetLibrary::load({}) does not exist in asset folders!", iName)
+				return nullptr;
+			}
+			asset = DataType::create(assetFile.value());
+		} else if constexpr (HasStringSpec<DataType>) {
+			asset = DataType::create(DataType::stringToSpecification(iName));
 		}
-		auto asset = DataType::create(assetFile.value());
 		if (asset == nullptr) {
 			OWL_CORE_WARN("AssetLibrary::load({}) could not load asset!", iName)
 			return nullptr;
@@ -96,11 +109,13 @@ public:
 	auto load(const std::string& iName, const std::filesystem::path& iFile) -> shared<DataType> {
 		if (exists(iName)) {
 			OWL_CORE_WARN("AssetLibrary::load({}, {}) already exists!", iName, iFile.string())
-			return m_assets[iName].get();
+			return m_assets.at(iName).get();
 		}
-		if (!exists(iFile)) {
-			OWL_CORE_WARN("AssetLibrary::load({}, {}) file does not exist!", iName, iFile.string())
-			return nullptr;
+		if (!DataType::extension().empty()) {
+			if (!std::filesystem::exists(iFile)) {
+				OWL_CORE_WARN("AssetLibrary::load({}, {}) file does not exist!", iName, iFile.string())
+				return nullptr;
+			}
 		}
 		auto asset = DataType::create(iFile);
 		if (asset == nullptr) {
@@ -139,13 +154,15 @@ public:
 	 * @return Asset's pointer or nullptr if not exists.
 	 */
 	auto get(const std::string& iName) -> shared<DataType> {
-		if (!exists(iName))
+		if (!exists(iName)) {
+			OWL_CORE_ERROR("Asset {} not found in library", iName)
 			return nullptr;
+		}
 		return m_assets.at(iName).get();
 	}
 
 	/**
-	 * @brief Verify if a asset exists.
+	 * @brief Verify if an asset exists.
 	 * @param[in] iName Name of the asset.
 	 * @return True if the asset exists.
 	 */
@@ -193,12 +210,38 @@ public:
 		} else {
 			assetDirectories.push_back({"cwd", std::filesystem::current_path()});
 		}
+		const std::filesystem::path name(iName);
+		const bool hasExtension = name.has_extension();
 		for (const auto& [title, assetsPath]: assetDirectories) {
+			// check base folders
+			{
+				std::filesystem::path filePath = assetsPath / name;
+				if (hasExtension) {
+					if (std::filesystem::exists(filePath))
+						return filePath;
+				} else {
+					for (auto& e: ext) {
+						std::filesystem::path filePathWithExt = filePath.string() + e;
+						if (std::filesystem::exists(filePathWithExt))
+							return filePathWithExt;
+					}
+				}
+			}
+			// Check sub-folders
 			for (const auto& entry: std::filesystem::recursive_directory_iterator(assetsPath)) {
-				if (entry.path().filename() != iName)
+				if (!entry.is_directory())
 					continue;
-				if (std::find(ext.begin(), ext.end(), entry.path().extension()) != ext.end()) {
-					return entry.path();
+				std::filesystem::path filePath = entry.path() / name;
+				if (hasExtension) {
+					if (std::filesystem::exists(filePath))
+						return filePath;
+				} else {
+					for (auto& e: ext) {
+						filePath.replace_extension(e);
+						OWL_CORE_INFO("Checking sub {}", filePath.string())
+						if (std::filesystem::exists(filePath))
+							return filePath;
+					}
 				}
 			}
 		}

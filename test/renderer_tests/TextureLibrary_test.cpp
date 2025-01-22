@@ -3,7 +3,7 @@
 
 #include <core/Application.h>
 #include <renderer/RenderCommand.h>
-#include <renderer/TextureLibrary.h>
+#include <renderer/Renderer.h>
 
 using namespace owl::renderer;
 using namespace owl::core;
@@ -11,29 +11,22 @@ using namespace owl::core;
 TEST(TextureLibrary, creation) {
 	Log::init(spdlog::level::off);
 	RenderCommand::create(RenderAPI::Type::Null);
-	AppParams const params{.name = "super boby", .renderer = RenderAPI::Type::Null, .hasGui = false, .isDummy = true};
+	const AppParams params{.name = "super boby", .renderer = RenderAPI::Type::Null, .hasGui = false, .isDummy = true};
 	auto app = owl::mkShared<Application>(params);
-	auto lib = TextureLibrary();
+	auto lib = Renderer::TextureLibrary();
 	{
 		EXPECT_FALSE(lib.exists("bob"));
-		lib.addFromStandardPath("checkerboard");
-		lib.addFromStandardPath("checkerboard");
-		EXPECT_TRUE(lib.exists("checkerboard"));
+		lib.load("CheckerBoard");
+		lib.load("CheckerBoard");
+		EXPECT_TRUE(lib.exists("CheckerBoard"));
 		EXPECT_EQ(lib.get("bob"), nullptr);
-		EXPECT_EQ(lib.get("checkerboard"), nullptr);
+		EXPECT_NE(lib.get("CheckerBoard"), nullptr);
 	}
 	{
 		auto bob = Texture2D::create(Texture2D::Specification{{1, 1}, ImageFormat::RGB8});
-		lib.addNRename("checkerboard", bob);
-		lib.addNRename("superbob", bob);
+		lib.add("checkerboard", bob);
+		lib.add("superbob", bob);
 		EXPECT_TRUE(lib.exists("superbob"));
-	}
-	{
-		const auto bob = Texture2D::create(Texture2D::Specification{{1, 1}, ImageFormat::RGB8});
-		lib.load("checkerboard");
-		lib.add(bob);
-		EXPECT_TRUE(lib.exists(""));
-		lib.add(bob);
 	}
 	Application::invalidate();
 	app.reset();

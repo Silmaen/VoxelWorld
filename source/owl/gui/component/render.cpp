@@ -11,6 +11,9 @@
 #include "core/Application.h"
 #include "gui/utils.h"
 #include "render.h"
+
+#include "renderer/Renderer.h"
+
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 
@@ -148,7 +151,7 @@ void renderProps(SpriteRenderer& ioComponent) {
 	if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
 			const auto* const path = static_cast<const char*>(payload->Data);
-			const std::filesystem::path texturePath = core::Application::get().getFullAssetPath(path).value();
+			const std::filesystem::path texturePath = renderer::Renderer::getTextureLibrary().find(path).value();
 			ioComponent.texture = renderer::Texture2D::create(texturePath);
 		}
 		ImGui::EndDragDropTarget();
