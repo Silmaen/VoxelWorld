@@ -202,3 +202,7 @@ if (${PRJPREFIX}_ENABLE_COVERAGE)
 endif ()
 
 include(cmake/DocumentationConfig.cmake)
+
+if (NOT ${PRJPREFIX}_PACKAGING)
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE OWL_DEVELOPMENT)
+endif ()

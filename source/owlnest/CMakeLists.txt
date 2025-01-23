@@ -1,8 +1,25 @@
+
+
+set(OWL_PROJECT ${CMAKE_PROJECT_NAME}Nest)
+
+# ----==== app Runner ====----
+file(GLOB_RECURSE SRCS_RUNNER
+        runner/*.cpp
+)
+file(GLOB_RECURSE HDRS_RUNNER
+        runner/*.h
+)
+set(RUNNER_NAME ${CMAKE_PROJECT_NAME}Runner)
+add_executable(${RUNNER_NAME} ${SRCS_RUNNER} ${HDRS_RUNNER})
+set_target_properties(${RUNNER_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+target_include_directories(${RUNNER_NAME} PRIVATE sources)
+target_compile_definitions(${RUNNER_NAME} PRIVATE OWL_ASSETS_LOCATION="source/owlnest/assets")
+target_link_libraries(${RUNNER_NAME} PRIVATE ${ENGINE_NAME})
+# ----==== app Runner ====----
+
 #
 #  Main Executable
 #
-set(OWL_PROJECT ${CMAKE_PROJECT_NAME}Nest)
-
 file(GLOB_RECURSE SRCS
         sources/*.cpp
 )
@@ -18,6 +35,7 @@ target_include_directories(${OWL_PROJECT} PRIVATE sources)
 target_link_libraries(${OWL_PROJECT} PRIVATE
         ${ENGINE_NAME}
 )
+add_dependencies(${OWL_PROJECT} ${CMAKE_PROJECT_NAME}Runner)
 
 target_compile_definitions(${OWL_PROJECT} PRIVATE OWL_ASSETS_LOCATION="source/owlnest/assets")
 
@@ -47,6 +65,11 @@ install(TARGETS ${OWL_PROJECT}
         RUNTIME DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
         FRAMEWORK DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
 )
+install(TARGETS ${RUNNER_NAME}
+        LIBRARY DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
+        RUNTIME DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
+        FRAMEWORK DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
+)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/assets/
-        DESTINATION assets
+        DESTINATION ${${PRJPREFIX}_INSTALL_BIN}/assets
 )

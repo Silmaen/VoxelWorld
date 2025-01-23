@@ -8,8 +8,6 @@
 
 #include "EditorLayer.h"
 
-#include "physic/PhysicCommand.h"
-
 #include <sound/SoundCommand.h>
 #include <sound/SoundSystem.h>
 

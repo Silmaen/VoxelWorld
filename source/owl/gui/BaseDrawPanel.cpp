@@ -16,7 +16,7 @@
 
 namespace owl::gui {
 
-BaseDrawPanel::BaseDrawPanel() = default;
+BaseDrawPanel::BaseDrawPanel(std::string&& iName) : m_panelName{std::move(iName)} {}
 
 BaseDrawPanel::~BaseDrawPanel() = default;
 

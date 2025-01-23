@@ -10,7 +10,7 @@
 
 namespace owl::raycaster {
 
-MapWindow::MapWindow() {
+MapWindow::MapWindow() : BaseDrawPanel{"mapWindow"} {
 	const renderer::FramebufferSpecification specs{
 			.size = {1280, 720},
 			.attachments = {{renderer::AttachmentSpecification::Format::Surface,
@@ -23,11 +23,10 @@ MapWindow::MapWindow() {
 	mp_framebuffer = renderer::Framebuffer::create(specs);
 	// camera
 	m_camera = mkShared<renderer::CameraOrtho>(0, 1280, 0, 720);
-	setName("mapWindow");
 }
 
 MapWindow::~MapWindow() = default;
 
-void MapWindow::onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) { OWL_PROFILE_FUNCTION() }
+void MapWindow::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) { OWL_PROFILE_FUNCTION() }
 
 }// namespace owl::raycaster

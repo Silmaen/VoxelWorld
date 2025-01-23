@@ -247,7 +247,7 @@ else ()
             DESTINATION ${${PRJPREFIX}_INSTALL_BIN}
     )
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/engine_assets/
-            DESTINATION assets
+            DESTINATION ${${PRJPREFIX}_INSTALL_BIN}/assets
             COMPONENT Engine
     )
 endif ()

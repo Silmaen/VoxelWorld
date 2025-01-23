@@ -13,8 +13,7 @@ TEST(BaseDrawPanel, basic) {
 	layer.disableApp();
 	layer.enableDocking();
 	layer.onAttach();
-	BaseDrawPanel drawPanel;
-	drawPanel.setName("superpanel");
+	BaseDrawPanel drawPanel("superpanel");
 	EXPECT_STREQ(drawPanel.getName().c_str(), "superpanel");
 	const Timestep ts;
 	drawPanel.onUpdate(ts);
