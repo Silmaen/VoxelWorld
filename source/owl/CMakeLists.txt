@@ -50,9 +50,6 @@ target_link_libraries(${ENGINE_NAME} PUBLIC box2d::box2d)
 find_package(cpptrace REQUIRED)
 message(STATUS "Found cpptrace version ${cpptrace_VERSION} @ ${cpptrace_DIR}")
 target_link_libraries(${ENGINE_NAME} PUBLIC cpptrace::cpptrace)
-if (${PRJPREFIX}_BUILD_SHARED)
-    target_link_libraries(${ENGINE_NAME} PUBLIC zstd::libzstd_shared)
-endif ()
 
 # debugbreak
 find_package(debugbreak REQUIRED)

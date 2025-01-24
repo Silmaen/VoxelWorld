@@ -10,9 +10,9 @@
   ],
   "configurePresets": [
     {
-      "name": "linux-gcc-release-static",
+      "name": "linux-gcc-release",
       "inherits": [
-        "gcc-release-static"
+        "gcc-release"
       ],
       "condition": {
         "type": "equals",
@@ -21,9 +21,9 @@
       }
     },
     {
-      "name": "linux-gcc-debug-static",
+      "name": "linux-gcc-debug",
       "inherits": [
-        "gcc-debug-static"
+        "gcc-debug"
       ],
       "condition": {
         "type": "equals",
@@ -32,9 +32,9 @@
       }
     },
     {
-      "name": "linux-clang-release-static",
+      "name": "linux-clang-release",
       "inherits": [
-        "clang-release-static"
+        "clang-release"
       ],
       "condition": {
         "type": "equals",
@@ -43,53 +43,9 @@
       }
     },
     {
-      "name": "linux-clang-debug-static",
+      "name": "linux-clang-debug",
       "inherits": [
-        "clang-debug-static"
-      ],
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "linux-gcc-release-shared",
-      "inherits": [
-        "gcc-release-shared"
-      ],
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "linux-gcc-debug-shared",
-      "inherits": [
-        "gcc-debug-shared"
-      ],
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "linux-clang-release-shared",
-      "inherits": [
-        "clang-release-shared"
-      ],
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "linux-clang-debug-shared",
-      "inherits": [
-        "clang-debug-shared"
+        "clang-debug"
       ],
       "condition": {
         "type": "equals",

@@ -18,7 +18,7 @@
       "installDir": "output/install/${presetName}"
     },
     {
-      "name": "gcc-release-static",
+      "name": "gcc-release",
       "inherits": "base",
       "hidden": true,
       "cacheVariables": {
@@ -27,15 +27,15 @@
       }
     },
     {
-      "name": "gcc-debug-static",
-      "inherits": "gcc-release-static",
+      "name": "gcc-debug",
+      "inherits": "gcc-release",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "clang-release-static",
+      "name": "clang-release",
       "inherits": "base",
       "hidden": true,
       "cacheVariables": {
@@ -46,40 +46,8 @@
       }
     },
     {
-      "name": "clang-debug-static",
-      "inherits": "clang-release-static",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "gcc-release-shared",
-      "inherits": "gcc-release-static",
-      "hidden": true,
-      "cacheVariables": {
-        "OWL_BUILD_SHARED": "ON"
-      }
-    },
-    {
-      "name": "gcc-debug-shared",
-      "inherits": "gcc-release-shared",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "clang-release-shared",
-      "inherits": "clang-release-static",
-      "hidden": true,
-      "cacheVariables": {
-        "OWL_BUILD_SHARED": "ON"
-      }
-    },
-    {
-      "name": "clang-debug-shared",
-      "inherits": "clang-release-shared",
+      "name": "clang-debug",
+      "inherits": "clang-release",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
@@ -96,15 +64,6 @@
       "vendor": {
         "jetbrains.com/clion": {
           "toolchain": "MinGW"
-        }
-      }
-    },
-    {
-      "name": "toolset-wsl",
-      "hidden": true,
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "WSL"
         }
       }
     }
