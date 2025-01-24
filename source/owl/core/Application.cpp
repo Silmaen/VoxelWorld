@@ -55,18 +55,21 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 	}
 	// Looking for asset Directories
 	{
+#ifdef OWL_DEVELOPMENT
 		// first (lowest priority) - Engine assets.
 		if (const auto engineAsset = searchAssets("engine_assets"); engineAsset.has_value()) {
 			m_assetDirectories.push_front({"Engine assets", engineAsset.value()});
 		} else {
 			OWL_CORE_ERROR("Unable to find engine assets")
 		}
+#endif
 		// second working dir asset directory
 		if (exists(m_workingDirectory / "assets")) {
 			m_assetDirectories.push_front({"working dir assets", m_workingDirectory / "assets"});
 		} else {
 			OWL_CORE_WARN("Unable to find working dir assets")
 		}
+#ifdef OWL_DEVELOPMENT
 		// third app asset if any.
 		if (!m_initParams.assetsPattern.empty()) {
 			if (const auto engineAsset = searchAssets(m_initParams.assetsPattern); engineAsset.has_value()) {
@@ -75,6 +78,7 @@ Application::Application(AppParams iAppParams) : m_initParams{std::move(iAppPara
 				OWL_CORE_ERROR("Unable to find app assets")
 			}
 		}
+#endif
 	}
 
 	// Create the renderer

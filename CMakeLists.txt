@@ -10,7 +10,7 @@ project(Owl VERSION 0.0.1 LANGUAGES C CXX)
 #
 # ---=== Options ===---
 #
-option(${PRJPREFIX}_BUILD_SHARED "If the Library must be build as shared library" OFF)
+option(${PRJPREFIX}_BUILD_SHARED "If the Library must be build as shared library" ON)
 option(${PRJPREFIX}_SKIP_DEPMANAGER "Don't use depmanager" OFF)
 option(${PRJPREFIX}_DEFINE_VULKAN_LAYERS "Copy vulkan layers in the binary directory" ON)
 

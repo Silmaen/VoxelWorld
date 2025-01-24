@@ -10,7 +10,7 @@
 
 namespace owl::raycaster {
 
-ViewPort::ViewPort() {
+ViewPort::ViewPort() : BaseDrawPanel{"viewport"} {
 	const renderer::FramebufferSpecification specs{
 			.size = {1280, 720},
 			.attachments = {{renderer::AttachmentSpecification::Format::Surface,
@@ -23,11 +23,10 @@ ViewPort::ViewPort() {
 	mp_framebuffer = renderer::Framebuffer::create(specs);
 	// camera
 	m_camera = mkShared<renderer::CameraOrtho>(0, 1280, 0, 720);
-	setName("viewport");
 }
 
 ViewPort::~ViewPort() = default;
 
-void ViewPort::onUpdate([[maybe_unused]] const core::Timestep &iTimeStep) { OWL_PROFILE_FUNCTION() }
+void ViewPort::onUpdate([[maybe_unused]] const core::Timestep& iTimeStep) { OWL_PROFILE_FUNCTION() }
 
 }// namespace owl::raycaster

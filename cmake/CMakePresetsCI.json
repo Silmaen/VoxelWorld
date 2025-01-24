@@ -21,7 +21,7 @@
     },
     {
       "name": "CodeCoverage_gcc",
-      "inherits": "gcc-debug-static",
+      "inherits": "gcc-debug",
       "cacheVariables": {
         "OWL_ENABLE_COVERAGE": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -34,7 +34,7 @@
     },
     {
       "name": "CodeCoverage_clang",
-      "inherits": "clang-debug-static",
+      "inherits": "clang-debug",
       "cacheVariables": {
         "OWL_ENABLE_COVERAGE": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -47,7 +47,7 @@
     },
     {
       "name": "CodeCoverage_gcc_mingw",
-      "inherits": "mingw-gcc-debug-static",
+      "inherits": "mingw-gcc-debug",
       "cacheVariables": {
         "OWL_ENABLE_COVERAGE": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -60,7 +60,7 @@
     },
     {
       "name": "CodeCoverage_clang_mingw",
-      "inherits": "mingw-clang-debug-static",
+      "inherits": "mingw-clang-debug",
       "cacheVariables": {
         "OWL_ENABLE_COVERAGE": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -73,7 +73,7 @@
     },
     {
       "name": "clang-tidy",
-      "inherits": "clang-debug-shared",
+      "inherits": "clang-debug",
       "cacheVariables": {
         "OWL_ENABLE_CLANG_TIDY": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -86,7 +86,7 @@
     },
     {
       "name": "clang-tidy_mingw",
-      "inherits": "mingw-clang-debug-shared",
+      "inherits": "mingw-clang-debug",
       "cacheVariables": {
         "OWL_ENABLE_CLANG_TIDY": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -99,7 +99,7 @@
     },
     {
       "name": "sanitizer-address",
-      "inherits": "clang-debug-shared",
+      "inherits": "clang-debug",
       "cacheVariables": {
         "OWL_ENABLE_ADDRESS_SANITIZER": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -112,7 +112,7 @@
     },
     {
       "name": "sanitizer-thread",
-      "inherits": "clang-debug-shared",
+      "inherits": "clang-debug",
       "cacheVariables": {
         "OWL_ENABLE_THREAD_SANITIZER": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -125,7 +125,7 @@
     },
     {
       "name": "sanitizer-undefined-behavior",
-      "inherits": "clang-debug-shared",
+      "inherits": "clang-debug",
       "cacheVariables": {
         "OWL_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"
@@ -138,7 +138,7 @@
     },
     {
       "name": "sanitizer-leak",
-      "inherits": "clang-debug-shared",
+      "inherits": "clang-debug",
       "cacheVariables": {
         "OWL_ENABLE_LEAK_SANITIZER": "ON",
         "OWL_ENABLE_STACKTRACE": "ON"

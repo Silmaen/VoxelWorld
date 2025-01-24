@@ -25,7 +25,7 @@
       }
     },
     {
-      "name": "packaging-static",
+      "name": "packaging",
       "generator": "Ninja Multi-Config",
       "hidden": true,
       "inherits": [
@@ -36,19 +36,9 @@
       }
     },
     {
-      "name": "packaging-shared",
+      "name": "package-engine",
       "inherits": [
-        "packaging-static"
-      ],
-      "hidden": true,
-      "cacheVariables": {
-        "OWL_BUILD_SHARED": "ON"
-      }
-    },
-    {
-      "name": "package-engine-static",
-      "inherits": [
-        "packaging-static"
+        "packaging"
       ],
       "cacheVariables": {
         "OWL_PACKAGE_NAME": "OwlEngine",
@@ -60,21 +50,7 @@
       }
     },
     {
-      "name": "package-engine-shared",
-      "inherits": [
-        "packaging-shared"
-      ],
-      "cacheVariables": {
-        "OWL_PACKAGE_NAME": "OwlEngine",
-        "OWL_BUILD_NEST": "OFF",
-        "OWL_BUILD_SANDBOX": "ON",
-        "OWL_BUILD_DRONE": "OFF",
-        "OWL_BUILD_CAST": "OFF",
-        "OWL_PACKAGE_ENGINE": "ON"
-      }
-    },
-    {
-      "name": "packaging-app-static",
+      "name": "packaging-app",
       "generator": "Ninja",
       "hidden": true,
       "inherits": [
@@ -85,19 +61,9 @@
       }
     },
     {
-      "name": "packaging-app-shared",
+      "name": "package-app-nest",
       "inherits": [
-        "packaging-app-static"
-      ],
-      "hidden": true,
-      "cacheVariables": {
-        "OWL_BUILD_SHARED": "ON"
-      }
-    },
-    {
-      "name": "package-app-nest-shared",
-      "inherits": [
-        "packaging-app-shared"
+        "packaging-app"
       ],
       "cacheVariables": {
         "OWL_PACKAGE_NAME": "OwlNest",
@@ -109,37 +75,9 @@
       }
     },
     {
-      "name": "package-app-nest-static",
+      "name": "package-app-drone",
       "inherits": [
-        "packaging-app-static"
-      ],
-      "cacheVariables": {
-        "OWL_PACKAGE_NAME": "OwlNest",
-        "OWL_BUILD_NEST": "ON",
-        "OWL_BUILD_SANDBOX": "OFF",
-        "OWL_BUILD_DRONE": "OFF",
-        "OWL_BUILD_CAST": "OFF",
-        "OWL_PACKAGE_ENGINE": "OFF"
-      }
-    },
-    {
-      "name": "package-app-drone-shared",
-      "inherits": [
-        "packaging-app-shared"
-      ],
-      "cacheVariables": {
-        "OWL_PACKAGE_NAME": "OwlDrone",
-        "OWL_BUILD_NEST": "OFF",
-        "OWL_BUILD_SANDBOX": "OFF",
-        "OWL_BUILD_DRONE": "ON",
-        "OWL_BUILD_CAST": "OFF",
-        "OWL_PACKAGE_ENGINE": "OFF"
-      }
-    },
-    {
-      "name": "package-app-drone-static",
-      "inherits": [
-        "packaging-static"
+        "packaging-app"
       ],
       "cacheVariables": {
         "OWL_PACKAGE_NAME": "OwlDrone",

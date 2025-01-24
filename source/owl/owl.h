@@ -15,11 +15,6 @@
 #include <queue>
 // -------------------------
 
-// ------- 3rd party -------
-#include <entt/entt.hpp>
-#include <imgui.h>
-// -------------------------
-
 // ------- core ------------
 #include "core/Application.h"
 #include "core/Log.h"

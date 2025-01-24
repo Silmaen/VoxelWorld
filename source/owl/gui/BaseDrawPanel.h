@@ -21,7 +21,7 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	BaseDrawPanel();
+	BaseDrawPanel(std::string&& iName);
 	/**
 	 * @brief Default destructor.
 	 */
@@ -54,15 +54,16 @@ public:
 	virtual void onRender();
 
 	/**
-	 * @brief Defines the name of the panel.
-	 * @param iName The Panel's Name.
-	 */
-	void setName(const std::string& iName) { m_panelName = iName; }
-	/**
 	 * @brief Get the panel's name.
 	 * @return The panel's name.
 	 */
 	[[nodiscard]] auto getName() const -> const std::string& { return m_panelName; }
+
+	/**
+	 * @brief Get the viewport's size.
+	 * @return The viewport's size.
+	 */
+	[[nodiscard]] auto getSize() const -> const math::vec2ui& { return m_viewportSize; }
 
 protected:
 	/// The unique panel name.
@@ -76,7 +77,9 @@ protected:
 	/// View port bounds.
 	math::vec2 m_viewportLower = {0.0f, 0.0f};
 	math::vec2 m_viewportUpper = {0.0f, 0.0f};
+	/// Focused state.
 	bool m_viewportFocused = false;
+	/// Hovered state.
 	bool m_viewportHovered = false;
 };
 
